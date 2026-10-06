@@ -96,7 +96,7 @@ def analyze_game(game):
 
 
 
-def Check_Games(reader, season=None):
+def Check_Games(reader, season=None, week=None, gametime=None, location=None, is_primetime=None, min_spread=None, max_spread=None, home_team=None, away_team=None, home_score=None, away_score=None, result=None, game_id=None, overtime=None, away_rest=None, home_rest=None, spread_line=None, total_line=None, roof=None, surface=None, temp=None, wind=None, away_qb_name=None, home_qb_name=None, away_coach=None, home_coach=None, referee=None, stadium=None):
     pickem_winners = []
     pickem_locations = []
     pickem_seasons = []
@@ -160,10 +160,19 @@ def Check_Games(reader, season=None):
             continue
         if game['result'] == '':
             continue
-        if season is not None and game['season'] != season:
+        if season is not None:
+            if isinstance(season, tuple):
+                game['season'] = int(game['season'])
+                if not season[0] <= game['season'] <= season[1]:
+                    continue
+            elif game['season'] != season:
+                continue
+        analysis = analyze_game(game)
+        if is_primetime is not None and analysis['is_primetime'] != is_primetime:
+            continue
+        if location is not None and analysis['dog_location'] != location:
             continue
         stats['all_games']['games'] += 1
-        analysis = analyze_game(game)
         if analysis["dog_location"] == 'Home':
             stats['all_games']['home']['total'] += 1
             if analysis['dog_won']:
@@ -219,7 +228,7 @@ def Check_Games(reader, season=None):
                     stats['primetime_games']['away']['covers'] += 1
                 if analysis['dog_push']:
                     stats['primetime_games']['away']['pushes'] += 1
-    
+                    
     print_report(stats)
 
 
@@ -319,21 +328,51 @@ All Dog ATS Cover Rate Excluding Pushes: {all_ats_no_push:.2f}%
         print(f'Pick Em" Winners: {winner:<5}-  {location} {seasons}')
 
 def main_menu():
-    
     while True:
+        season = None
+        week = None
+        location = None
+        is_primetime = None
+        min_spread = None
+        max_spread = None
+        home_team = None
+        away_team = None
+        home_score = None
+        away_score = None
+        result = None
+        game_id = None
+        overtime = None
+        home_rest = None
+        away_rest = None
+        spread_line = None
+        total_line = None
+        roof = None
+        surface = None
+        temp = None
+        wind = None
+        away_qb_name = None
+        home_qb_name = None
+        away_coach = None
+        home_coach = None
+        referee = None
+        stadium = None
+        gametime = None
         print()
         print('Choice')
         print()
         print(f'''1. All Seasons
 2. Single Season
-3. Exit''')
+3. Season Range
+4. PrimeTime Only
+5. Home Dogs/Away Dogs
+6. Quit
+''')
         print()
-        choice = get_choice(3)
+        choice = get_choice(6)
         match choice:
             case 1:
                 season = None
             case 2:
-                #pattern = r"^(1999|20[0-1]\d|202[0-6])-(1999|20[0-1]\d|202[0-6])$"
                 try:
                     print()
                     season = int(input('Please Enter A Season: '))
@@ -344,19 +383,54 @@ def main_menu():
                 if 1999 <= season <= 2026:
                     print('Valid Season')
                     season = str(season)
-                    
                 else: 
                     print('Please Enter A Valid Year From 1999 - 2026')
                     continue
             case 3:
-                print('GoodBye')
-                exit()
-
+                try:
+                    start_season_limit = 1999
+                    end_season_limit = 2026
+                    print()
+                    print('Please Select A Range')
+                    print()
+                    start_season = int(input('Enter Your Start Date: '))
+                    print()
+                    end_season = int(input('Enter Your End Date: '))
+                except ValueError:
+                    print('Please Enter A Valid Range From 1999 - 2026')
+                    continue
+                if start_season_limit <= start_season <= end_season <= end_season_limit:
+                    print(f'Valid Range: {start_season} - {end_season}')
+                    season = start_season, end_season
+                else:
+                    print('Enter A Valid Range From 1999 - 2026')
+                    continue
+            case 4:
+                is_primetime = True
+            case 5:
+                print('Do You Want To See Home Or Away Dogs?')
+                print()
+                print('''1. Home Dogs'
+2. Away Dogs
+3. All Dogs
+''')
+                print()
+                dog_choice = get_choice(3)
+                match dog_choice:
+                    case 1:
+                        location = 'Home'
+                    case 2:
+                        location = 'Away'
+                    case 3:
+                        location = None 
+            case 6:
+                print('Trend Findah 3000 Signing Out!!')
+                return
             
         try:
             with open(game_file, "r") as game_check:
                 reader = csv.DictReader(game_check)
-                Check_Games(reader, season)
+                Check_Games(reader, season=season, location=location, gametime=gametime, is_primetime=is_primetime, week=week, home_team=home_team, min_spread=min_spread, max_spread=max_spread, away_team=away_team, home_score=home_score, away_score=away_score, result=result, game_id=game_id, overtime=overtime, home_rest=home_rest, away_rest=away_rest, spread_line=spread_line, total_line=total_line, roof=roof, surface=surface, temp=temp, wind=wind, away_qb_name=away_qb_name, home_qb_name=home_qb_name, away_coach=away_coach, home_coach=home_coach, referee=referee, stadium=stadium)
         except FileNotFoundError:
             print('Error: Game file not found.')
 main_menu()
