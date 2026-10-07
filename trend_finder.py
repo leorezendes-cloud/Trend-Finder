@@ -7,7 +7,7 @@ game_file = Path('nfl_games.csv')
 
 def get_choice(number_of_choices):
     try:
-        choice = int(input('Please enter the number of your answer: '))
+        choice = int(input('Please Enter The Number Of Your Choice: '))
     except ValueError:
         print(f'Your choice has to be a number between 1 and {number_of_choices}')
         return get_choice(number_of_choices)
@@ -42,6 +42,7 @@ def analyze_game(game):
     dog_covered = False
     dog_push = False
     dog_team = None
+    dog_spread = abs(spread_line)
     dog_location = None
     pickem_winner = None
     pickem_location = None
@@ -83,6 +84,7 @@ def analyze_game(game):
         "is_pickem": is_pickem,
         "dog_team": dog_team,
         "dog_location": dog_location,
+        'dog_spread': dog_spread,
         "dog_won": dog_won,
         "dog_push": dog_push,
         "dog_covered": dog_covered,
@@ -96,7 +98,7 @@ def analyze_game(game):
 
 
 
-def Check_Games(reader, season=None, week=None, gametime=None, location=None, is_primetime=None, min_spread=None, max_spread=None, home_team=None, away_team=None, home_score=None, away_score=None, result=None, game_id=None, overtime=None, away_rest=None, home_rest=None, spread_line=None, total_line=None, roof=None, surface=None, temp=None, wind=None, away_qb_name=None, home_qb_name=None, away_coach=None, home_coach=None, referee=None, stadium=None):
+def Check_Games(reader, season=None, week=None, gametime=None, exact_spread=None, location=None, is_primetime=None, min_spread=None, max_spread=None, home_team=None, away_team=None, home_score=None, away_score=None, result=None, game_id=None, overtime=None, away_rest=None, home_rest=None, spread_line=None, total_line=None, roof=None, surface=None, temp=None, wind=None, away_qb_name=None, home_qb_name=None, away_coach=None, home_coach=None, referee=None, stadium=None):
     pickem_winners = []
     pickem_locations = []
     pickem_seasons = []
@@ -158,6 +160,7 @@ def Check_Games(reader, season=None, week=None, gametime=None, location=None, is
             continue
         if game['spread_line'] == '':
             continue
+
         if game['result'] == '':
             continue
         if season is not None:
@@ -172,6 +175,12 @@ def Check_Games(reader, season=None, week=None, gametime=None, location=None, is
             continue
         if location is not None and analysis['dog_location'] != location:
             continue
+        if min_spread is not None and analysis['dog_spread'] < min_spread:
+            continue
+        if max_spread is not None and analysis['dog_spread'] > max_spread:
+            continue
+        if exact_spread is not None and analysis['dog_spread'] != exact_spread:
+            continue 
         stats['all_games']['games'] += 1
         if analysis["dog_location"] == 'Home':
             stats['all_games']['home']['total'] += 1
@@ -233,6 +242,12 @@ def Check_Games(reader, season=None, week=None, gametime=None, location=None, is
 
 
 def print_report(stats):
+    ats_cover_rate_no_push = 0
+    dog_win_rate = 0
+    ats_cover_rate = 0
+    all_ats_no_push = 0
+    all_dog_atsrate = 0
+    all_dog_win_rate = 0
     all_games = stats['all_games']
     prime = stats['primetime_games']
     all_pickems = all_games['pickems']
@@ -245,26 +260,31 @@ def print_report(stats):
     all_dog_wins = stats['all_games']['home']['wins'] + stats['all_games']['away']['wins']
     all_dog_push = stats['all_games']['home']['pushes'] + stats['all_games']['away']['pushes']
     total_all_dogs = stats['all_games']['home']['total'] + stats['all_games']['away']['total']
-    all_no_push = total_all_dogs - all_dog_push
     all_dog_covers = stats['all_games']['away']['covers'] + stats['all_games']['home']['covers']
-    all_ats_no_push = (all_dog_covers / all_no_push) * 100
-    all_dog_atsrate = (all_dog_covers / total_all_dogs) * 100
-    all_dog_win_rate = (all_dog_wins / total_all_dogs) * 100
     all_homedog_losses = stats['all_games']['home']['total'] - (stats['all_games']['home']['covers'] + stats['all_games']['home']['pushes'])
     all_awaydog_losses = stats['all_games']['away']['total'] - (stats['all_games']['away']['covers'] + stats['all_games']['away']['pushes'])
+    all_no_push = total_all_dogs - all_dog_push
     all_dog_losses = all_homedog_losses + all_awaydog_losses    
+    if all_no_push != 0:
+        all_ats_no_push = (all_dog_covers / all_no_push) * 100
+    if total_all_dogs != 0:
+        all_dog_atsrate = (all_dog_covers / total_all_dogs) * 100
+        all_dog_win_rate = (all_dog_wins / total_all_dogs) * 100
+       
 
     primetime_dogs = stats['primetime_games']['home']['total'] + stats['primetime_games']['away']['total']
     home_dog_losses = stats['primetime_games']['home']['total'] - (stats['primetime_games']['home']['covers'] + stats['primetime_games']['home']['pushes'])
-    away_dog_losses = stats['primetime_games']['away']['total'] - (stats['primetime_games']['away']['pushes'] + stats['primetime_games']['away']['covers'])         
-    total_losses = away_dog_losses + home_dog_losses    
+    away_dog_losses = stats['primetime_games']['away']['total'] - (stats['primetime_games']['away']['pushes'] + stats['primetime_games']['away']['covers'])             
     primetime_dog_wins = stats['primetime_games']['home']['wins'] + stats['primetime_games']['away']['wins']
     primetime_dog_covers = stats['primetime_games']['home']['covers'] + stats['primetime_games']['away']['covers']
     primetime_push = stats['primetime_games']['home']['pushes'] + stats['primetime_games']['away']['pushes']
-    ats_cover_rate = (primetime_dog_covers / primetime_dogs) * 100 
-    dog_win_rate = (primetime_dog_wins / primetime_dogs) * 100 
-    dogs_no_push = primetime_dogs - primetime_push             
-    ats_cover_rate_no_push = (primetime_dog_covers / dogs_no_push ) * 100 
+    total_losses = away_dog_losses + home_dog_losses
+    dogs_no_push = primetime_dogs - primetime_push 
+    if primetime_dogs != 0:
+        ats_cover_rate = (primetime_dog_covers / primetime_dogs) * 100 
+        dog_win_rate = (primetime_dog_wins / primetime_dogs) * 100    
+    if dogs_no_push != 0:          
+        ats_cover_rate_no_push = (primetime_dog_covers / dogs_no_push ) * 100 
     print(f'_________________________________')
     print(f'           PrimeTime Dogs')
     print(f'=================================')
@@ -328,110 +348,367 @@ All Dog ATS Cover Rate Excluding Pushes: {all_ats_no_push:.2f}%
         print(f'Pick Em" Winners: {winner:<5}-  {location} {seasons}')
 
 def main_menu():
+    season = None
+    week = None
+    location = None
+    is_primetime = None
+    min_spread = None
+    max_spread = None
+    home_team = None
+    away_team = None
+    home_score = None
+    away_score = None
+    result = None
+    game_id = None
+    overtime = None
+    home_rest = None
+    away_rest = None
+    exact_spread = None
+    total_line = None
+    roof = None
+    surface = None
+    temp = None
+    wind = None
+    away_qb_name = None
+    home_qb_name = None
+    away_coach = None
+    home_coach = None
+    referee = None
+    stadium = None
+    gametime = None
+
+    
     while True:
-        season = None
-        week = None
-        location = None
-        is_primetime = None
-        min_spread = None
-        max_spread = None
-        home_team = None
-        away_team = None
-        home_score = None
-        away_score = None
-        result = None
-        game_id = None
-        overtime = None
-        home_rest = None
-        away_rest = None
-        spread_line = None
-        total_line = None
-        roof = None
-        surface = None
-        temp = None
-        wind = None
-        away_qb_name = None
-        home_qb_name = None
-        away_coach = None
-        home_coach = None
-        referee = None
-        stadium = None
-        gametime = None
         print()
-        print('Choice')
+        print(f'CURRENT FILTERS')
         print()
-        print(f'''1. All Seasons
-2. Single Season
-3. Season Range
-4. PrimeTime Only
-5. Home Dogs/Away Dogs
-6. Quit
+        print(f'''1. Season : {season} 
+2. Home Dogs/Away Dogs: {location}
+3. PrimeTime Status: {is_primetime}
+4. Spreads (Min-Max-SpreadLine) : {min_spread} - {max_spread} - {exact_spread}
+5. CLEAR FILTERS
+6. SEARCH
+7. QUIT
 ''')
         print()
-        choice = get_choice(6)
+        choice = get_choice(7)
         match choice:
             case 1:
-                season = None
-            case 2:
-                try:
-                    print()
-                    season = int(input('Please Enter A Season: '))
-                    print()
-                except ValueError:
-                    print('Please Enter A Valid Year From 1999 - 2026')
-                    continue
-                if 1999 <= season <= 2026:
-                    print('Valid Season')
-                    season = str(season)
-                else: 
-                    print('Please Enter A Valid Year From 1999 - 2026')
-                    continue
-            case 3:
-                try:
-                    start_season_limit = 1999
-                    end_season_limit = 2026
-                    print()
-                    print('Please Select A Range')
-                    print()
-                    start_season = int(input('Enter Your Start Date: '))
-                    print()
-                    end_season = int(input('Enter Your End Date: '))
-                except ValueError:
-                    print('Please Enter A Valid Range From 1999 - 2026')
-                    continue
-                if start_season_limit <= start_season <= end_season <= end_season_limit:
-                    print(f'Valid Range: {start_season} - {end_season}')
-                    season = start_season, end_season
-                else:
-                    print('Enter A Valid Range From 1999 - 2026')
-                    continue
-            case 4:
-                is_primetime = True
-            case 5:
-                print('Do You Want To See Home Or Away Dogs?')
+                print('***********************************')
                 print()
-                print('''1. Home Dogs'
-2. Away Dogs
-3. All Dogs
+                print(f'Current Status: {season}')
+                print()
+                print('Select By Season Or By Range')
+                print()
+                print('1. Single Season')
+                print('2. Range Of Seasons')
+                print('3. Back')
+                print()
+                season_choice = get_choice(3)
+                match season_choice:
+                    case 1:
+                        while True:
+                            print('***********************************')
+                            print(f'Current Status: {season}')
+                            print()
+                            print('or "back" to go back')
+                            print()
+                            season_input = input('Please Enter A Season: ')
+                            print()
+                            if season_input.lower() == 'back':
+                                break
+                            try:
+                                season = int(season_input)
+                            except ValueError:
+                                print('Please Enter A Valid Year From 1999 - 2026')
+                                continue
+                            if 1999 <= season <= 2026:
+                                print('Valid Season')
+                                season = str(season)
+                                break
+                            else: 
+                                print('Please Enter A Valid Year From 1999 - 2026')
+                                continue
+                    case 2:
+                        while True:
+                            print('***********************************')
+                            start_season_limit = 1999
+                            end_season_limit = 2026
+                            print(f'Current Status: {season}')
+                            print()
+                            print('Please Select A Range')
+                            print()
+                            print('or "back" to go back')
+                            start_season_input = input('Enter Your Start Date: ')
+                            if start_season_input.lower() == 'back':
+                                break
+                            print()
+                            end_season_input = input('Enter Your End Date: ')
+                            print()
+                            if end_season_input.lower() == 'back':
+                                break
+                            try:
+                                start_season = int(start_season_input)
+                                end_season = int(end_season_input)
+                            except ValueError:
+                                print('Please Enter A Valid Range From 1999 - 2026')
+                                continue
+                            if start_season_limit <= start_season <= end_season <= end_season_limit:
+                                print(f'Valid Range: {start_season} - {end_season}')
+                                season = start_season, end_season
+                                break
+                            else:
+                                print('Enter A Valid Range From 1999 - 2026')
+                                continue
+                    case 3:
+                        continue
+            case 2:
+                while True:
+                    print('***********************************')
+                    print()
+                    print(f'Current Status : {location}')
+                    print()
+                    print('Choose A Side..Or Not')
+                    print()
+                    print('1. Home Dog')
+                    print('2. Away Dog')
+                    print('3. No Dog')
+                    print('4. Back')
+                    print()
+                    dog_choice = get_choice(4)
+                    match dog_choice:
+                        case 1:
+                            location = 'Home'
+                            break
+                        case 2:
+                            location = 'Away'
+                            break
+                        case 3:
+                            location = None 
+                            break
+                        case 4:
+                            break
+            case 3:
+               print('***********************************')
+               print()
+               print(f'Current PrimeTime Status: {is_primetime}')
+               print()
+               print('Choose PrimeTime Status')
+               print()
+               print('1. PrimeTime ')
+               print('2. Not Primetime')
+               print('3. None')
+               print('4. Back')
+               print()
+               prime_choice = get_choice(4)
+               match prime_choice:
+                    case 1:
+                        print('***********************************')
+                        is_primetime = True
+                        print()
+                        print('PrimeTime Active')
+                        print()
+                    case 2: 
+                       print('************************************')
+                       is_primetime = False 
+                       print()
+                       print('PrimeTime Not Active') 
+                       print()
+                    case 3:
+                       print('************************************')
+                       is_primetime = None
+                    case 4:
+                       continue
+            case 4:
+                print('************************************')
+                print()
+                print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                print("Filter By Spread(s)")
+                print()
+                print('1. Filter By Min. Max. Or Exact Spread')
+                print('2. Filter By Range Of Spread')
+                print('3. All Spreads')
+                print('4. Back')
+                print()
+                spread_choice = get_choice(4)
+                match spread_choice:
+                    case 1:
+                        while True:
+                            print('************************************')
+                            print()
+                            print('Choose Between | Min. - Max. - Exact |')
+                            print(f'---------------> {min_spread} - {max_spread} - {exact_spread}')
+                            print()
+                            print('1. Min. Spread')
+                            print('2. Max. Spread')
+                            print('3. Exact Spread')
+                            print('4. Back')
+                            print()
+                            single_spread_choice = get_choice(4)
+                            match single_spread_choice:
+                                case 1:
+                                    while True:
+                                        print('************************************')
+                                        print()
+                                        print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                                        print()
+                                        print('or "back" to go back')
+                                        min_spread_input = (input('Please Enter A Min. Spread: '))
+                                        print()
+                                        if min_spread_input.lower() == 'back':
+                                            break
+                                        try:
+                                            min_spread = float(min_spread_input)
+                                        except ValueError:
+                                            print('Please Enter A Valid Min. Spread (Float)')
+                                            continue
+                                        if 0.0 <= min_spread <= 25.0:
+                                            max_spread = None
+                                            spread_line = None
+                                            print('Valid Spread')
+                                            break
+                                        else: 
+                                            print('Please Enter A Valid Min. Spread (Float)')
+                                            continue
+                                case 2:
+                                    while True:
+                                            print('************************************')
+                                            print()
+                                            print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                                            print()
+                                            print('or "back" to go back')
+                                            max_spread_input = (input('Please Enter A Max. Spread: '))
+                                            print()
+                                            if max_spread_input.lower() == 'back':
+                                                break
+                                            try:
+                                                max_spread = float(max_spread_input)
+                                            except ValueError:
+                                                print('Please Enter A Valid Max. Spread (Float)')
+                                                continue
+                                            if 0.0 <= max_spread <= 25.0:
+                                                min_spread = None
+                                                spread_line = None
+                                                print('Valid Spread')
+                                                break
+                                            else: 
+                                                print('Please Enter A Valid Max. Spread (Float)')
+                                                continue
+                                case 3:
+                                    while True:
+                                        print('************************************')
+                                        print()
+                                        print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                                        print()
+                                        print('or "back" to go back')
+                                        spread_line_input = input('Please Enter A Spread: ')
+                                        print()
+                                        if spread_line_input.lower() == 'back':
+                                            break
+                                        try:
+                                            exact_spread = float(spread_line_input)
+                                        except ValueError:
+                                            print('Please Enter A Valid Spread (Float)')
+                                            continue
+                                        if 0.0 <= exact_spread <= 25.0:
+                                            print('Valid Spread')
+                                            min_spread = None
+                                            max_spread = None
+                                            break
+                                        else: 
+                                            print('Please Enter A Valid Spread (Float)')
+                                            continue
+                                case 4:
+                                    break
+                    case 2:
+                        while True:
+                            print('************************************')
+                            print()
+                            print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                            min_spread_limit = 0.0
+                            max_spread_limit = 25.0
+                            print()
+                            print('Please Select A Range')
+                            print()
+                            print('or "back" to go back')
+                            min_spread_input_2 = input('Enter Your Min. Spread: ')
+                            if min_spread_input_2.lower() == 'back':
+                                break
+                            print()
+                            max_spread_input_2 = input('Enter Your Max. Spread: ')
+                            print()
+                            if max_spread_input_2.lower() == 'back':
+                                break
+                            try:
+                                min_spread = float(min_spread_input_2)
+                                max_spread = float(max_spread_input_2)
+                            except ValueError:
+                                print('Please Enter A Valid Range From 0.0 to 25.0')
+                                continue
+                            if min_spread_limit <= min_spread <= max_spread <= max_spread_limit:
+                                spread_line = None
+                                print(f'Valid Range: {min_spread} - {max_spread}')
+                                break
+                            else:
+                                print('Enter A Valid Range From 0.0 to 25.0')
+                                continue
+                    case 3:
+                        print('***********************************')
+                        print()
+                        print(f'Current Status: {min_spread} - {max_spread} - {exact_spread}')
+                        print()
+                        min_spread = None
+                        max_spread = None
+                        spread_line = None
+                        print('No Filter - All Spreads')
+                        print()
+                        break
+                    case 4:
+                        continue
+            case 5:
+                print('***********************************')
+                print()
+                print('Are You Sure You Want To CLEAR The Filters?')
+                print()
+                print('''1. Yes
+2. No
 ''')
                 print()
-                dog_choice = get_choice(3)
-                match dog_choice:
+                clear_choice = get_choice(2)
+                match clear_choice:
                     case 1:
-                        location = 'Home'
+                        print('************************************')
+                        print()
+                        print('Confirm')
+                        print()
+                        print('1. Yes')
+                        print('2. No')
+                        print()
+                        confirm_choice = get_choice(2)
+                        match confirm_choice:
+                            case 1:
+                                print('************************************')
+                                print()
+                                season = None
+                                location = None
+                                is_primetime = None
+                                min_spread = None
+                                max_spread = None
+                                spread_line = None
+                            case 2:
+                                continue
                     case 2:
-                        location = 'Away'
-                    case 3:
-                        location = None 
+                        continue
             case 6:
+                try:
+                    with open(game_file, "r") as game_check:
+                        reader = csv.DictReader(game_check)
+                        Check_Games(reader, season=season, location=location, gametime=gametime, is_primetime=is_primetime, week=week, home_team=home_team, min_spread=min_spread, max_spread=max_spread, away_team=away_team, home_score=home_score, away_score=away_score, result=result, game_id=game_id, overtime=overtime, home_rest=home_rest, away_rest=away_rest, spread_line=spread_line, exact_spread=exact_spread, total_line=total_line, roof=roof, surface=surface, temp=temp, wind=wind, away_qb_name=away_qb_name, home_qb_name=home_qb_name, away_coach=away_coach, home_coach=home_coach, referee=referee, stadium=stadium)
+                except FileNotFoundError:
+                    print('Error: Game file not found.')
+            case 7:
                 print('Trend Findah 3000 Signing Out!!')
                 return
             
-        try:
-            with open(game_file, "r") as game_check:
-                reader = csv.DictReader(game_check)
-                Check_Games(reader, season=season, location=location, gametime=gametime, is_primetime=is_primetime, week=week, home_team=home_team, min_spread=min_spread, max_spread=max_spread, away_team=away_team, home_score=home_score, away_score=away_score, result=result, game_id=game_id, overtime=overtime, home_rest=home_rest, away_rest=away_rest, spread_line=spread_line, total_line=total_line, roof=roof, surface=surface, temp=temp, wind=wind, away_qb_name=away_qb_name, home_qb_name=home_qb_name, away_coach=away_coach, home_coach=home_coach, referee=referee, stadium=stadium)
-        except FileNotFoundError:
-            print('Error: Game file not found.')
 main_menu()
 
