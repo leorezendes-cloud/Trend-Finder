@@ -703,7 +703,7 @@ def main_menu():
                 try:
                     with open(game_file, "r") as game_check:
                         reader = csv.DictReader(game_check)
-                        Check_Games(reader, season=season, location=location, gametime=gametime, is_primetime=is_primetime, week=week, home_team=home_team, min_spread=min_spread, max_spread=max_spread, away_team=away_team, home_score=home_score, away_score=away_score, result=result, game_id=game_id, overtime=overtime, home_rest=home_rest, away_rest=away_rest, spread_line=spread_line, exact_spread=exact_spread, total_line=total_line, roof=roof, surface=surface, temp=temp, wind=wind, away_qb_name=away_qb_name, home_qb_name=home_qb_name, away_coach=away_coach, home_coach=home_coach, referee=referee, stadium=stadium)
+                        Check_Games(reader, season=season, location=location, gametime=gametime, is_primetime=is_primetime, week=week, home_team=home_team, min_spread=min_spread, max_spread=max_spread, away_team=away_team, home_score=home_score, away_score=away_score, result=result, game_id=game_id, overtime=overtime, home_rest=home_rest, away_rest=away_rest, exact_spread=exact_spread, total_line=total_line, roof=roof, surface=surface, temp=temp, wind=wind, away_qb_name=away_qb_name, home_qb_name=home_qb_name, away_coach=away_coach, home_coach=home_coach, referee=referee, stadium=stadium)
                 except FileNotFoundError:
                     print('Error: Game file not found.')
             case 7:
