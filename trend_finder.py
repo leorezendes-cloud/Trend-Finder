@@ -385,7 +385,7 @@ def main_menu():
         print(f'''1. Season : {season} 
 2. Home Dogs/Away Dogs: {location}
 3. PrimeTime Status: {is_primetime}
-4. Spreads (Min-Max-SpreadLine) : {min_spread} - {max_spread} - {exact_spread}
+4. Spreads (Min-Max-Exact) : {min_spread} - {max_spread} - {exact_spread}
 5. CLEAR FILTERS
 6. SEARCH
 7. QUIT
