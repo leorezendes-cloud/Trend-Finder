@@ -47,12 +47,16 @@ class SiteSectionsTests(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
 
-    def test_home_is_matchups_with_three_section_destinations(self):
+    def test_home_is_landing_with_three_section_destinations(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         html = response.text
-        self.assertIn('Upcoming Matchups', html)
-        self.assertIn('Images/Branding/gravy-train-branding/gravy-train/gravy-train-full.png', html)
+        self.assertIn('Find your next angle.', html)
+        self.assertIn('Find a sneaky trend with the Trend Findah 3000.', html)
+        self.assertIn('Picks going left?? Get right with the plugs.', html)
+        self.assertIn('Find the fix in the Conspiracy Dungeon.', html)
+        self.assertIn('Sign in', html)
+        self.assertIn('Images/Branding/trend-findah-background.png', html)
         self.assertNotIn('class="home-filter-form"', html)
         parser = NavigationParser()
         parser.feed(html)
@@ -85,7 +89,7 @@ class SiteSectionsTests(unittest.TestCase):
         self.assertEqual(self.client.get('/sunday').status_code, 200)
 
     def test_collapsed_menu_and_page_specific_backdrops(self):
-        for path, art in [('/', 'gravy-train-full.png'), ('/trend-finder', 'trend-findah-background.png'), ('/the-plug', 'the-plug-full.png'), ('/conspiracy-dungeon', 'conspiracy-dungeon-full.png')]:
+        for path, art in [('/', 'trend-findah-background.png'), ('/trend-finder', 'trend-findah-background.png'), ('/the-plug', 'the-plug-full.png'), ('/conspiracy-dungeon', 'conspiracy-dungeon-full.png')]:
             html = self.client.get(path).text
             self.assertIn('<details class="site-menu" id="site-menu">', html)
             self.assertNotIn('id="site-menu" open', html)

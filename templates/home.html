@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Findah | Find your next angle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+    {% include '_branding_head.html' %}
+</head>
+<body class="landing-page">
+    <main class="trend-dashboard landing-dashboard">
+        {% include '_site_navigation.html' %}
+        <section class="landing-welcome" aria-labelledby="landing-title">
+            <h1 id="landing-title">Find your next angle.</h1>
+            <nav class="home-section-cards" aria-label="Explore our main sections">
+                <a class="home-section-card" href="{{ url_for('trend_finder') }}">
+                    <img src="{{ url_for('static', filename='Images/Branding/trend-findah-icon.png') }}" alt="" width="84" height="84">
+                    <strong>Trend Findah 3000</strong>
+                    <span>Find a sneaky trend with the Trend Findah 3000.</span>
+                </a>
+                <a class="home-section-card" href="{{ url_for('plug_page') }}">
+                    <img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-icon-192.png') }}" alt="" width="84" height="84">
+                    <strong>The Plug</strong>
+                    <span>Picks going left?? Get right with the plugs.</span>
+                </a>
+                <a class="home-section-card" href="{{ url_for('conspiracy_dungeon_page') }}">
+                    <img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-192.png') }}" alt="" width="84" height="84">
+                    <strong>Conspiracy Dungeon</strong>
+                    <span>Find the fix in the Conspiracy Dungeon.</span>
+                </a>
+            </nav>
+            <div class="landing-account">
+                {% if g.member %}
+                <a class="landing-signin" href="{{ url_for('membership.preferences') }}">My Membership</a>
+                {% else %}
+                <a class="landing-signin" href="{{ url_for('membership.login') }}">Sign in</a>
+                <p>New here? <a href="{{ url_for('membership.register') }}">Join free</a></p>
+                {% endif %}
+            </div>
+            <a class="landing-matchups" href="{{ url_for('sunday_page') }}">View upcoming matchups →</a>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {% set endpoint = request.endpoint or '' %}
-{% if endpoint in ['trend_finder','trends_page','trend_details','trend_games','combination_details','backtest_page'] %}
+{% if endpoint in ['home','trend_finder','trends_page','trend_details','trend_games','combination_details','backtest_page'] %}
 {% set background = 'Images/Branding/trend-findah-background.png' %}
 {% elif endpoint == 'plug_page' or endpoint == 'sunday_scout.sunday_scout_page' or endpoint.startswith('scout4.') %}
 {% set background = 'Images/Branding/gravy-train-branding/the-plug/the-plug-full.png' %}

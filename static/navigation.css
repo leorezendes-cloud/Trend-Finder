@@ -40,7 +40,21 @@ html body .section-navigation a { color: #e2e8f0; font: 15px Arial,sans-serif; t
     .home-section-card img { width: 65px; height: 65px; grid-row: span 2; }
 }
 
-/* Keep the site name clear beside the original train artwork. */
-.site-brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
-.site-brand img { width: 70px; flex: 0 0 70px; }
-.site-brand span { font-size: clamp(20px, 3vw, 30px); font-weight: 700; line-height: 1.1; }
+/* The landing page uses the Trend Finder backdrop and its three destinations. */
+html body main.landing-dashboard { max-width: 1200px; margin: 24px auto; }
+.landing-welcome { max-width: 1040px; margin: 0 auto; padding: 32px 0; text-align: center; }
+html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 36px; }
+.landing-welcome .home-section-card { background: #1f2937; padding: 28px 20px; }
+.landing-welcome .home-section-card strong { font-size: 22px; }
+.landing-account { margin: 36px 0 24px; font: 15px/1.6 Arial,sans-serif; }
+.landing-account p { margin: 12px 0 0; }
+.landing-account a, .landing-matchups { color: #fbbf24; }
+.landing-account .landing-signin { display: inline-block; padding: 12px 42px; border: 1px solid #fbbf24; border-radius: 8px; background: #1f2937; color: #fff; font-weight: bold; text-decoration: none; }
+.landing-matchups { font: 15px/1.6 Arial,sans-serif; }
+.landing-signin:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+@media (max-width: 600px) {
+    html body main.landing-dashboard { margin: 0 auto; }
+    .landing-welcome { padding: 16px 0; }
+    .landing-welcome .home-section-card { padding: 18px 14px; }
+    .landing-welcome .home-section-card strong { font-size: 20px; }
+}

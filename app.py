@@ -77,7 +77,7 @@ def home():
     if request.method == 'POST':
         # Preserve bookmarked legacy analysis forms without changing the new home.
         return redirect(url_for('trend_finder'), code=307)
-    return sunday_page()
+    return render_template("home.html")
 
 
 @app.route("/the-plug")
