@@ -908,8 +908,8 @@
     "sha256": "f588f637d3fc3a4ebd99e1f23ce9f4f0d21a2e812bca70810312ed949bb9a1aa"
   },
   "static/branding.css": {
-    "bytes": 2309,
-    "sha256": "2833794805d0dddda8d3d8c8b897c0847131574903df5562a0318f6d104c7b14"
+    "bytes": 2352,
+    "sha256": "c80392cdc50dbbbbe21131361ccd47dd2e4fb57cf911e5c5bbd0534e77a93eb0"
   },
   "static/membership.css": {
     "bytes": 783,
@@ -1024,8 +1024,8 @@
     "sha256": "6e992d2e3fa07147da8f35604fd4740943727ccdc62655de915007d24cc05ac7"
   },
   "templates/password_recovery.html": {
-    "bytes": 2377,
-    "sha256": "120145d94629af35010ad828e45ddaafc13ef083b5d81196db08416a62296675"
+    "bytes": 2393,
+    "sha256": "27afa106f1834519249451789ef6411935bbe6d1585c67d9d4e3f01f5e8c63f9"
   },
   "templates/scout4_base.html": {
     "bytes": 3233,
@@ -1156,7 +1156,7 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 2850,
-    "sha256": "d72098b120060c78b309bc353b2539a7b103d1b77171a7c20ad18146ab3f24b0"
+    "bytes": 2849,
+    "sha256": "9c02d684b4099f37adacd83480b1110154c459359f6957622eec9bf766d4675c"
   }
 }

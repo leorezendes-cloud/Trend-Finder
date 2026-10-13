@@ -5,7 +5,7 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-even
 html body h1, html body.scout4 header h1 { color: white; -webkit-text-stroke: 0.25px black; text-decoration: none; text-shadow: 0 2px 10px #000; }
 html body > main, html body main.trend-dashboard, html body main.dungeon, html body main.scout-page, html body.scout4 > main { background: rgba(7,12,20,.8); border-radius: 16px; padding: clamp(14px,3vw,32px); box-sizing: border-box; }
 html body .section-intro, html body .discovery-note, html body .top-text, html body .membership > p { color: #f1f5f9; }
-html body .member-message { color: #111827; }
+html body main.membership > p.member-message { color: #111827; -webkit-text-stroke: 0; }
 html body.scout4 .eyebrow { color: #fbbf24; }
 html body.scout4 header > p { color: #e2e8f0; }
 html body.scout4 .stats-note { color: #172234; }
