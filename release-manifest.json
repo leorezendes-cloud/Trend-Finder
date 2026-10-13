@@ -1088,8 +1088,8 @@
     "sha256": "ea95f376126e044861d8666d53aceb8d2eb766d2f3ac4eaa1bfa6f882cdae0ef"
   },
   "test_site_sections.py": {
-    "bytes": 5653,
-    "sha256": "e1385712cc2bd206fc5fd588e960a3abc452a90b8d9e8d5d8ca2ddc09bb417aa"
+    "bytes": 5652,
+    "sha256": "cf539da0ace630209193d4a8740a85188f02b25cc01da4f6890ca4c7c12a45f9"
   },
   "test_trend_filters.py": {
     "bytes": 18681,
@@ -1156,7 +1156,7 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 2851,
-    "sha256": "7773cfbcc447d8891c52f29dd6a051f84b7799a3f584856db9480672c24357ab"
+    "bytes": 2850,
+    "sha256": "d72098b120060c78b309bc353b2539a7b103d1b77171a7c20ad18146ab3f24b0"
   }
 }

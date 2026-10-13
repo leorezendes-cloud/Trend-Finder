@@ -53,7 +53,7 @@ class SiteSectionsTests(unittest.TestCase):
         html = response.text
         self.assertIn('Find your next angle.', html)
         self.assertIn('Find a sneaky trend with the Trend Findah 3000.', html)
-        self.assertIn('Picks going left?? Get right with the plugs.', html)
+        self.assertIn('Picks going left?? Get right with the plug.', html)
         self.assertIn('Find the fix in the Conspiracy Dungeon.', html)
         self.assertIn('Sign in', html)
         self.assertIn('Images/Branding/trend-findah-background.png', html)
