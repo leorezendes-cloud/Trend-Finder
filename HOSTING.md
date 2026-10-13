@@ -6,7 +6,7 @@ This checkout now combines the website and membership changes with the original 
 
 - `requirements.txt`: Flask, Werkzeug and Gunicorn dependencies for public browsing and membership. Collectors and data refresh are intentionally not part of the hosted runtime.
 - `wsgi.py`: production entry point, project-relative working directory, `/healthz`, and configurable trusted proxy count.
-- `gunicorn.conf.py`: host-provided port (default 8000), one worker for SQLite, and no access logs containing reset-link secrets.
+- `gunicorn.conf.py`: host-provided port (default 8000), one worker with four request threads for SQLite, and no access logs containing reset-link secrets.
 - `render.yaml`: optional Render template with a persistent 1 GB disk and generated session secret. It selects a paid service; review pricing in your account before applying. Nothing has been provisioned.
 - `scripts/prepare_release.py`: assembles a clean website snapshot in `dist/website` and writes a file fingerprint manifest. It excludes account databases, secrets, backups, raw personnel downloads and experiment outputs not read by public pages.
 
@@ -64,3 +64,5 @@ Before public launch: reconcile current Scout work, confirm the release-data man
 ## Site structure
 
 Gravy Train is the umbrella brand. `/` now shows Upcoming Matchups with links to the three primary sections: `/trend-finder`, `/the-plug`, and `/conspiracy-dungeon`. Discover Trends (`/trends`) and Backtests sit under Trend Finder. Stats, ratings, and Forecast Tracker sit under The Plug. Results is linked from Home. Existing `/sunday`, `/sunday-scout`, stats and trend-detail URLs remain available. Old POST forms targeting `/` redirect with HTTP 307 to `/trend-finder`, preserving their submitted fields. No predictive logic or data files were changed by this reorganization.
+
+Static files use Werkzeug middleware with one-hour public caching and bypass Flask session/page work. CSS and JavaScript URLs contain content versions. Four request threads allow assets and health checks to respond while page analysis runs.

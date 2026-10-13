@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 5476,
-    "sha256": "5e10b97759fa380799cdcb2cc970a666a3da01e034b5f3cee2cf252b43a60287"
+    "bytes": 5744,
+    "sha256": "651fae439dddafa061befda89c25a76c2821ca169cdb5d157e40e40dc48b47d6"
   },
   "MEMBERSHIP.md": {
     "bytes": 4942,
@@ -516,8 +516,8 @@
     "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
   },
   "gunicorn.conf.py": {
-    "bytes": 362,
-    "sha256": "cbb247679edcfce936615742fb7d5eb65645301e9654a4e2ae3ce1d9b04f7e39"
+    "bytes": 447,
+    "sha256": "52f4eee1ea243a580dc07f9a7304e25185a20a67200ea8663f58de4a552e431d"
   },
   "home_results.py": {
     "bytes": 3550,
@@ -1076,8 +1076,8 @@
     "sha256": "f97955da8a29aea29a952253d13f143a83828d7b48bf88595108a2987c3f6668"
   },
   "test_hosting.py": {
-    "bytes": 1997,
-    "sha256": "348a4b289c7e6f59ef7c6199081326bd86ad48fe294b785826fd0be8f99a6496"
+    "bytes": 3726,
+    "sha256": "1fa28b2e1c0f281b5de7e925c57d8c424693619c0fe9b81a3e6f90ca7a4eb62b"
   },
   "test_membership.py": {
     "bytes": 12531,
@@ -1128,8 +1128,8 @@
     "sha256": "efb4b177fab2ba2c6223dc95c3f338f0bf53d6708d196748fa886afc0ce29a3d"
   },
   "wsgi.py": {
-    "bytes": 1521,
-    "sha256": "a74bd00425cfed31415d0ee93770a6e882d81a84f9f0421f18e752619bc070e3"
+    "bytes": 1958,
+    "sha256": "1e1acf8582c76e2a3eceaa7178d4bb9f83a3e2048a45daa8e141b5073a72283f"
   },
   "LAUNCH_CHECKLIST.md": {
     "bytes": 2099,

@@ -27,6 +27,37 @@ class HostingTests(unittest.TestCase):
         self.assertEqual(client.post('/').status_code, 200)
         self.assertEqual(client.post('/trend-finder').status_code, 200)
 
+    def test_static_files_bypass_application_work_and_are_cacheable(self):
+        from flask import request
+        application = self.make_app()
+        application.config['TESTING'] = True
+        @application.before_request
+        def reject_static_application_work():
+            if request.path in ('/static/navigation.css', '/static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png'):
+                self.fail('Static request ran page/session logic')
+        client = application.test_client()
+        with client.get('/static/navigation.css') as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('.home-section-card img', response.text)
+            self.assertIn('public', response.headers['Cache-Control'])
+            self.assertIn('max-age=3600', response.headers['Cache-Control'])
+            self.assertNotIn('Cookie', response.headers.get('Vary', ''))
+        path = '/static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png'
+        with client.get(path) as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.mimetype, 'image/png')
+        with client.get('/static/../membership.py') as response:
+            self.assertEqual(response.status_code, 404)
+        self.assertEqual(client.post('/refresh').status_code, 403)
+
+    def test_server_has_parallel_request_capacity(self):
+        import runpy
+        from pathlib import Path
+        config = runpy.run_path(str(Path(__file__).with_name('gunicorn.conf.py')))
+        self.assertEqual(config['worker_class'], 'gthread')
+        self.assertGreaterEqual(config['threads'], 4)
+        self.assertEqual(config['workers'], 1)
+
     def test_forwarded_address_is_ignored_by_default(self):
         response = self.make_app().test_client().get('/peer', headers={'X-Forwarded-For':'203.0.113.9'})
         self.assertEqual(response.text, '127.0.0.1')

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from flask import abort, jsonify, request
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 # Legacy public analysis reads several files relative to the project directory.
 os.chdir(Path(__file__).resolve().parent)
@@ -28,6 +29,13 @@ def configure_hosted_app(application):
             # Public analysis is read-only even though it submits a POST form.
             if request.endpoint not in ('home', 'trend_finder') and request.blueprint != 'membership':
                 abort(403, description='Data refresh and research editing are available only in the local research app.')
+
+    # Public assets bypass page/session work; browsers may cache them for an hour.
+    # CSS/JS URLs already carry content hashes so deployments fetch changed files.
+    if application.static_folder:
+        application.wsgi_app = SharedDataMiddleware(
+            application.wsgi_app, {'/static': application.static_folder},
+            cache=True, cache_timeout=3600)
 
     @application.get('/healthz')
     def health():
