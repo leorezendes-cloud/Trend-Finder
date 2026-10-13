@@ -46,6 +46,9 @@ def display_trend_baseline(filters):
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+    # Render probes HEAD / during port detection; do not run historical scans.
+    if request.method == 'HEAD':
+        return Response(status=200)
     if request.method == 'POST':
         # Preserve bookmarked legacy analysis forms without changing the new home.
         return redirect(url_for('trend_finder'), code=307)

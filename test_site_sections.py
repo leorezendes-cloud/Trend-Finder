@@ -24,6 +24,13 @@ class NavigationParser(HTMLParser):
 
 
 class SiteSectionsTests(unittest.TestCase):
+    def test_home_head_probe_does_not_build_matchup_page(self):
+        from unittest.mock import patch
+        with patch('app.sunday_page', side_effect=AssertionError('Probe ran trend analysis')):
+            response = app.test_client().head('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b'')
+
     def setUp(self):
         self.client = app.test_client()
 
