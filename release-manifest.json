@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 4453,
-    "sha256": "4611e2b3c08696e19969bc68045981d85adb3889bd2558fc7d96b78612e66039"
+    "bytes": 4760,
+    "sha256": "84264d18cb88371ee58a4c46d933f1498e44e0843c7f76cca4627ef0196042e8"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -984,12 +984,12 @@
     "sha256": "5ef027803b634e23c58cb5afd01da883b4125a41880ec961479306bffdf77355"
   },
   "templates/_home_sections.html": {
-    "bytes": 1227,
-    "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
+    "bytes": 1228,
+    "sha256": "b0b26686c4972ca3972ca3b4e6ab04298bf6dd2466138dd501f24b19651a5368"
   },
   "templates/_site_navigation.html": {
-    "bytes": 3728,
-    "sha256": "7f16de4b6c3d81640378730018bb20e57d17cff7589c40f04d9ea1c98f688a49"
+    "bytes": 3733,
+    "sha256": "66d57e936ea46c725735a9d28829cc304ec159a1a17db9243306108e926f6695"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2708,
@@ -1004,32 +1004,32 @@
     "sha256": "8c28029a1537d7aece64691fc22dade4bdd2d407bd9c31581a4b79641929a1d7"
   },
   "templates/backtests.html": {
-    "bytes": 8965,
-    "sha256": "0af093f86f2cdc80d33efe0038b3d871782ebaf637f4d7464ed5a6e46269fe26"
+    "bytes": 8966,
+    "sha256": "18df72b80c1d55fac2dbc6087bc3ff648ea49fa543aceb810d64c937d0570412"
   },
   "templates/conspiracy_dungeon.html": {
-    "bytes": 21546,
-    "sha256": "857ec15ddcdf367e9de071089e19cc1c914d7ef0c7afdce35f52ab8f9c8904e6"
+    "bytes": 21547,
+    "sha256": "c85083c7850ddf63c0ba7eddaada3c09871867e93da017a359c2288c45aea9f2"
   },
   "templates/index.html": {
-    "bytes": 25714,
-    "sha256": "3562a906cb31806e953d4dd863718db8235ec3a697a925f5bafd940a04ddaa4a"
+    "bytes": 25715,
+    "sha256": "6279523b7d56c76429a09b36e4a97bbeaffc846a6db56a2ff65c3ba04622532b"
   },
   "templates/membership.html": {
-    "bytes": 3928,
-    "sha256": "3cf464169e61567acd9d814b53b104fec9585828beef9c144011a46adc02026c"
+    "bytes": 3930,
+    "sha256": "123f8b4cd3b76c0bfd90b628e205c642bdfab961ce7bbc0d64b42746fb415559"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
     "sha256": "6e992d2e3fa07147da8f35604fd4740943727ccdc62655de915007d24cc05ac7"
   },
   "templates/password_recovery.html": {
-    "bytes": 2335,
-    "sha256": "f20320792b1004bdb931c64d1750e154e32e29d8f3dd9844daf925ec303b193f"
+    "bytes": 2337,
+    "sha256": "e9827ab7d4fd82f1318d373f5112cefb0bda462a65a33b7b67f7034358d8073d"
   },
   "templates/scout4_base.html": {
-    "bytes": 3233,
-    "sha256": "8f5e0748647ca1b3ae96ae27ea4e3dfc0930cb25fcb202a63f8ef64c698e6eb7"
+    "bytes": 3234,
+    "sha256": "4c0c03cf68e6583912ce584a8f811dba5210dc9925b821b3fcd65b92471faf56"
   },
   "templates/scout4_capture_error.html": {
     "bytes": 593,
@@ -1052,28 +1052,28 @@
     "sha256": "260e22ac1b1b34c473dadcad67431e6693cc701fdd5fe06326dfeeadb8b0e666"
   },
   "templates/sunday.html": {
-    "bytes": 8128,
-    "sha256": "c4d538a548141dae9a1ae7336b121e08d720eb7aebbc24296090b4000f8c8348"
+    "bytes": 8130,
+    "sha256": "eeeafa013cf2c3fb4c34510e54c851bcf3b0f0e3f01fba4d039437422920e9bc"
   },
   "templates/sunday_results.html": {
-    "bytes": 6459,
-    "sha256": "d12929ff2d30d0cfe031897b53b0c885890c6588113f8f1004d265faab04f5ea"
+    "bytes": 6460,
+    "sha256": "edb7e87841ff9be05cdd7d9049e8e6931108ad806531864c6c69b2e55951b088"
   },
   "templates/sunday_scout.html": {
-    "bytes": 9483,
-    "sha256": "0ca0fb5f7b2e796e0ffe505292def3b43fe7e98231881a0acb93a84ed619b9f5"
+    "bytes": 9484,
+    "sha256": "5df8875b51e65d20e2b4a3612f14ce18a687439e343f185660b241b12374eabe"
   },
   "templates/trend_details.html": {
-    "bytes": 3841,
-    "sha256": "332a6b73fcdb6b683bdda2856962242d6dd60d97ab1c7087dc62e92d580a6a6b"
+    "bytes": 3842,
+    "sha256": "2eefe55bcc292ae622866f4616b572796e09d1cc03e0b007b75c13afd088d311"
   },
   "templates/trend_games.html": {
-    "bytes": 4049,
-    "sha256": "54b4c1206ad105199adfadb181ef133a339a4d0b440350cd5c800165e0e65020"
+    "bytes": 4050,
+    "sha256": "092dbbda103058d453f380a1de1898cd9c7a74efa00f259c0c09ab26072bc108"
   },
   "templates/trends.html": {
-    "bytes": 19343,
-    "sha256": "f97955da8a29aea29a952253d13f143a83828d7b48bf88595108a2987c3f6668"
+    "bytes": 19344,
+    "sha256": "f2d0773580c8f245ec34ce674d5101def4e8781ec560921c323e95920288aa7b"
   },
   "test_hosting.py": {
     "bytes": 3726,

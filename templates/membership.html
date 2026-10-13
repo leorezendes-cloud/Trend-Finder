@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Membership | Gravy Train</title>
+<title>Membership | Trend Findah</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='membership.css') }}">
 {% include '_branding_head.html' %}
 </head>
 <body>
-<h1>Gravy Train</h1>
+<h1>Trend Findah</h1>
 {% include '_site_navigation.html' %}
 <main class="membership">
 <h2>{{ {'register':'Join Free', 'login':'Welcome Back', 'preferences':'My Membership'}[mode] }}</h2>

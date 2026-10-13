@@ -39,3 +39,8 @@ html body .section-navigation a { color: #e2e8f0; font: 15px Arial,sans-serif; t
     .home-section-card { display: grid; grid-template-columns: 65px 1fr; text-align: left; column-gap: 14px; }
     .home-section-card img { width: 65px; height: 65px; grid-row: span 2; }
 }
+
+/* Keep the site name clear beside the original train artwork. */
+.site-brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+.site-brand img { width: 70px; flex: 0 0 70px; }
+.site-brand span { font-size: clamp(20px, 3vw, 30px); font-weight: 700; line-height: 1.1; }
