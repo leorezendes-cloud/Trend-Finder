@@ -1,0 +1,132 @@
+team,unit,flagged_players,listed_first_string_flagged,first_string_reported_out,first_string_reported_doubtful,first_string_reported_questionable,first_string_missed_practice_only,first_string_limited_practice_only,projected_unit_rating_change
+ARI,Defensive front,1,1,0,0,1,0,0,NOT ESTIMATED
+ARI,Linebackers,1,0,0,0,0,0,0,NOT ESTIMATED
+ARI,Offensive line,1,0,0,0,0,0,0,NOT ESTIMATED
+ARI,Secondary,1,1,1,0,0,0,0,NOT ESTIMATED
+ATL,Defensive front,2,2,0,0,2,0,0,NOT ESTIMATED
+ATL,Linebackers,2,1,0,0,1,0,0,NOT ESTIMATED
+ATL,Offensive line,1,1,0,0,1,0,0,NOT ESTIMATED
+BAL,Defensive front,1,1,0,0,0,1,0,NOT ESTIMATED
+BAL,Linebackers,1,1,1,0,0,0,0,NOT ESTIMATED
+BAL,Offensive line,3,2,1,0,0,0,1,NOT ESTIMATED
+BAL,Quarterback,1,1,1,0,0,0,0,NOT ESTIMATED
+BAL,Receivers,1,1,0,0,1,0,0,NOT ESTIMATED
+BAL,Secondary,1,1,0,0,1,0,0,NOT ESTIMATED
+BAL,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+BUF,Defensive front,2,1,1,0,0,0,0,NOT ESTIMATED
+BUF,Linebackers,1,1,0,0,0,1,0,NOT ESTIMATED
+BUF,Receivers,2,1,0,0,1,0,0,NOT ESTIMATED
+BUF,Secondary,1,1,0,0,1,0,0,NOT ESTIMATED
+CHI,Backfield,1,0,0,0,0,0,0,NOT ESTIMATED
+CHI,Defensive front,1,0,0,0,0,0,0,NOT ESTIMATED
+CHI,Linebackers,2,0,0,0,0,0,0,NOT ESTIMATED
+CHI,Quarterback,1,1,0,0,1,0,0,NOT ESTIMATED
+CHI,Secondary,1,0,0,0,0,0,0,NOT ESTIMATED
+CIN,Defensive front,3,2,0,0,0,1,1,NOT ESTIMATED
+CIN,Linebackers,1,0,0,0,0,0,0,NOT ESTIMATED
+CIN,Receivers,3,1,0,0,1,0,0,NOT ESTIMATED
+CIN,Secondary,2,1,0,0,1,0,0,NOT ESTIMATED
+CLE,Defensive front,4,1,1,0,0,0,0,NOT ESTIMATED
+CLE,Offensive line,1,0,0,0,0,0,0,NOT ESTIMATED
+CLE,Quarterback,1,0,0,0,0,0,0,NOT ESTIMATED
+CLE,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+CLE,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+DAL,Linebackers,1,1,1,0,0,0,0,NOT ESTIMATED
+DAL,Offensive line,2,1,0,0,1,0,0,NOT ESTIMATED
+DAL,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+DAL,Secondary,1,0,0,0,0,0,0,NOT ESTIMATED
+DEN,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+DEN,Secondary,2,2,2,0,0,0,0,NOT ESTIMATED
+DET,Defensive front,1,1,0,0,1,0,0,NOT ESTIMATED
+DET,Offensive line,2,0,0,0,0,0,0,NOT ESTIMATED
+DET,Secondary,2,0,0,0,0,0,0,NOT ESTIMATED
+GB,Backfield,1,0,0,0,0,0,0,NOT ESTIMATED
+GB,Defensive front,3,2,0,0,1,0,1,NOT ESTIMATED
+GB,Linebackers,1,1,0,0,0,0,1,NOT ESTIMATED
+GB,Offensive line,4,2,0,1,0,0,1,NOT ESTIMATED
+GB,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+HOU,Defensive front,2,0,0,0,0,0,0,NOT ESTIMATED
+HOU,Offensive line,5,2,0,0,1,1,0,NOT ESTIMATED
+HOU,Receivers,2,1,0,0,0,0,1,NOT ESTIMATED
+HOU,Secondary,1,0,0,0,0,0,0,NOT ESTIMATED
+IND,Defensive front,2,1,0,0,0,1,0,NOT ESTIMATED
+IND,Linebackers,1,1,1,0,0,0,0,NOT ESTIMATED
+IND,Receivers,3,0,0,0,0,0,0,NOT ESTIMATED
+IND,Secondary,1,1,0,0,1,0,0,NOT ESTIMATED
+IND,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+JAX,Defensive front,2,2,0,0,0,0,2,NOT ESTIMATED
+JAX,Secondary,5,3,0,1,0,0,2,NOT ESTIMATED
+LA,Defensive front,1,1,0,0,0,1,0,NOT ESTIMATED
+LA,Linebackers,3,1,0,0,0,1,0,NOT ESTIMATED
+LA,Offensive line,1,1,0,0,0,1,0,NOT ESTIMATED
+LA,Secondary,1,1,0,0,1,0,0,NOT ESTIMATED
+LA,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+LAC,Backfield,1,0,0,0,0,0,0,NOT ESTIMATED
+LAC,Offensive line,5,1,1,0,0,0,0,NOT ESTIMATED
+LAC,Quarterback,1,0,0,0,0,0,0,NOT ESTIMATED
+LAC,Receivers,3,1,0,0,1,0,0,NOT ESTIMATED
+LAC,Secondary,3,2,2,0,0,0,0,NOT ESTIMATED
+LAC,Tight ends,1,1,0,0,1,0,0,NOT ESTIMATED
+LV,Backfield,1,1,0,0,1,0,0,NOT ESTIMATED
+LV,Offensive line,1,0,0,0,0,0,0,NOT ESTIMATED
+LV,Receivers,2,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Backfield,1,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Defensive front,2,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Linebackers,1,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Other / unknown,1,1,0,0,0,0,1,NOT ESTIMATED
+MIA,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Secondary,2,0,0,0,0,0,0,NOT ESTIMATED
+MIA,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+MIN,Backfield,1,1,0,0,0,0,1,NOT ESTIMATED
+MIN,Offensive line,3,2,1,0,1,0,0,NOT ESTIMATED
+MIN,Receivers,2,1,0,0,1,0,0,NOT ESTIMATED
+MIN,Secondary,2,1,0,0,0,0,1,NOT ESTIMATED
+MIN,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+NE,Backfield,2,2,1,0,1,0,0,NOT ESTIMATED
+NE,Defensive front,1,1,0,0,1,0,0,NOT ESTIMATED
+NE,Linebackers,2,2,0,0,2,0,0,NOT ESTIMATED
+NE,Offensive line,1,1,0,0,1,0,0,NOT ESTIMATED
+NE,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+NE,Secondary,6,3,2,0,1,0,0,NOT ESTIMATED
+NO,Backfield,1,1,0,0,1,0,0,NOT ESTIMATED
+NO,Defensive front,1,0,0,0,0,0,0,NOT ESTIMATED
+NO,Linebackers,3,1,1,0,0,0,0,NOT ESTIMATED
+NO,Offensive line,1,0,0,0,0,0,0,NOT ESTIMATED
+NO,Receivers,1,1,0,0,1,0,0,NOT ESTIMATED
+NO,Secondary,2,1,0,0,1,0,0,NOT ESTIMATED
+NYG,Defensive front,1,0,0,0,0,0,0,NOT ESTIMATED
+NYG,Secondary,1,0,0,0,0,0,0,NOT ESTIMATED
+NYJ,Backfield,1,1,1,0,0,0,0,NOT ESTIMATED
+NYJ,Defensive front,2,1,0,0,1,0,0,NOT ESTIMATED
+NYJ,Linebackers,1,1,1,0,0,0,0,NOT ESTIMATED
+NYJ,Offensive line,1,1,1,0,0,0,0,NOT ESTIMATED
+NYJ,Receivers,2,0,0,0,0,0,0,NOT ESTIMATED
+PHI,Backfield,1,1,1,0,0,0,0,NOT ESTIMATED
+PHI,Defensive front,1,0,0,0,0,0,0,NOT ESTIMATED
+PHI,Linebackers,1,1,0,0,1,0,0,NOT ESTIMATED
+PHI,Offensive line,1,1,1,0,0,0,0,NOT ESTIMATED
+PHI,Receivers,3,1,1,0,0,0,0,NOT ESTIMATED
+PHI,Secondary,1,1,1,0,0,0,0,NOT ESTIMATED
+PIT,Backfield,1,0,0,0,0,0,0,NOT ESTIMATED
+PIT,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+PIT,Secondary,3,2,1,0,1,0,0,NOT ESTIMATED
+SEA,Backfield,2,0,0,0,0,0,0,NOT ESTIMATED
+SEA,Linebackers,1,0,0,0,0,0,0,NOT ESTIMATED
+SEA,Receivers,1,0,0,0,0,0,0,NOT ESTIMATED
+SEA,Secondary,1,0,0,0,0,0,0,NOT ESTIMATED
+SF,Backfield,1,1,1,0,0,0,0,NOT ESTIMATED
+SF,Defensive front,3,1,1,0,0,0,0,NOT ESTIMATED
+SF,Receivers,1,1,0,0,0,0,1,NOT ESTIMATED
+SF,Secondary,2,2,1,0,1,0,0,NOT ESTIMATED
+TB,Linebackers,2,0,0,0,0,0,0,NOT ESTIMATED
+TB,Quarterback,1,1,1,0,0,0,0,NOT ESTIMATED
+TB,Secondary,2,2,2,0,0,0,0,NOT ESTIMATED
+TEN,Receivers,1,1,0,0,1,0,0,NOT ESTIMATED
+TEN,Secondary,4,3,1,0,0,0,2,NOT ESTIMATED
+TEN,Tight ends,1,0,0,0,0,0,0,NOT ESTIMATED
+WAS,Backfield,2,0,0,0,0,0,0,NOT ESTIMATED
+WAS,Defensive front,2,0,0,0,0,0,0,NOT ESTIMATED
+WAS,Linebackers,1,0,0,0,0,0,0,NOT ESTIMATED
+WAS,Quarterback,1,0,0,0,0,0,0,NOT ESTIMATED
+WAS,Receivers,2,1,0,0,1,0,0,NOT ESTIMATED
+WAS,Secondary,4,1,1,0,0,0,0,NOT ESTIMATED

@@ -1,0 +1,92 @@
+{
+  "venues_url": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+  "venues_sha256": "8de55868f633112f1d29672155ad67e59555e67c2b8dafce34800313df45098b",
+  "schedule_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "code_sha256": "811eabe38a0c084e2332535c58eb8ee7a5d694c7bdea515031d7fc5970a50610",
+  "responses": [
+    {
+      "game_id": "2026_06_SEA_DEN",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7439402&longitude=-105.0201065&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.252664+00:00",
+      "sha256": "f84b57ef41580c43e6bbbcaaf88a7e8729903db03d855d46f76fe30799750ee9"
+    },
+    {
+      "game_id": "2026_06_HOU_JAX",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=51.5559836&longitude=-0.2795903&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.391244+00:00",
+      "sha256": "a34b74526a622ddea21933b006847ce613276acf6d77f0ed366caab443c19a86"
+    },
+    {
+      "game_id": "2026_06_CHI_ATL",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=33.7555052&longitude=-84.4008484&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.542237+00:00",
+      "sha256": "bd64a8e4322dcc797d31f1c5356b9756f31f432ff43243ea6c0a9d26caf2cb64"
+    },
+    {
+      "game_id": "2026_06_BAL_CLE",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=41.5060371&longitude=-81.699586&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.714389+00:00",
+      "sha256": "3937da174ca5639676802814405dfe37c98880d371562239439908ac7390612b"
+    },
+    {
+      "game_id": "2026_06_TEN_IND",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7602037&longitude=-86.1638068&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.852113+00:00",
+      "sha256": "438062e7b017cabe41853e67bd45a2bd959ebc97cc76abd5f5b71d61e6cc6774"
+    },
+    {
+      "game_id": "2026_06_NYJ_NE",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=42.0909217&longitude=-71.2643321&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:28.996832+00:00",
+      "sha256": "bf717c9ff6483e47c3512161453fa2d3998e8539b10e85341a851923ad45f514"
+    },
+    {
+      "game_id": "2026_06_NO_NYG",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=40.813507465&longitude=-74.074342406&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.199580+00:00",
+      "sha256": "873b8e06208b999a59a9dc33d234c845248603ed15b74fcadde9948928230d74"
+    },
+    {
+      "game_id": "2026_06_CAR_PHI",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9007914&longitude=-75.1674645&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.352857+00:00",
+      "sha256": "4cc06258b78ecd527cfb91989d390a2056e2b7df10df51e083efcf540bc7d36b"
+    },
+    {
+      "game_id": "2026_06_PIT_TB",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=27.9759691&longitude=-82.503356&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.503968+00:00",
+      "sha256": "8ced822d62e43e83d1e0377c755eaea86165d8ce78c11eed9779228455a3ae20"
+    },
+    {
+      "game_id": "2026_06_ARI_LA",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=33.953485&longitude=-118.3390307&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.649084+00:00",
+      "sha256": "ba969beb3c6a25bb48b2763dc3d63ae25dd4768401b0da7183cab8d2a2f40f33"
+    },
+    {
+      "game_id": "2026_06_LAC_KC",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489275&longitude=-94.4839962&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.851951+00:00",
+      "sha256": "f2d29cee973e13ea0fc4e17991300b279f4d2f912af991a6d9936144f7ebe931"
+    },
+    {
+      "game_id": "2026_06_BUF_LV",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=36.0908515&longitude=-115.1833441&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:29.986972+00:00",
+      "sha256": "70e1a67fee3310b2857eac2dc23ff0cd78fca438d3a435c83aea881b8f9e46f6"
+    },
+    {
+      "game_id": "2026_06_DAL_GB",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=44.5014769&longitude=-88.0621617&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:30.127753+00:00",
+      "sha256": "2a13499692c49f5f87653c9364e7f0ebc6446ddf0f422daa5818e9b70e02afdb"
+    },
+    {
+      "game_id": "2026_06_WAS_SF",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=37.4031837&longitude=-121.9698094&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8",
+      "observed_at": "2026-10-13T14:36:30.318232+00:00",
+      "sha256": "1b9173bb3900b2331ede85f517bca8e69be45775daefaa01fcb676fc3fd37f57"
+    }
+  ]
+}

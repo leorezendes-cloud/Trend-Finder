@@ -1,0 +1,12 @@
+model,status,available_games,common_games,wins_all,losses_all,pushes_all,no_calls_all,wins_common,losses_common,pushes_common,ats_pct_common
+TM Baseline,REPLAY,208,151,95,112,1,0,67,83,1,44.67
+V1 Offense,REPLAY,208,151,93,114,1,0,70,80,1,46.67
+V1 Offense+Defense,REPLAY,208,151,115,92,1,0,83,67,1,55.33
+V1 Recent Form,REPLAY,208,151,116,91,1,0,82,68,1,54.67
+V3 Matchup EPA,REPLAY,208,151,112,95,1,0,82,68,1,54.67
+Scorecard Net x0.5,REPLAY,208,151,97,80,1,30,79,71,1,52.67
+Scorecard OppAdj,REPLAY,208,151,84,83,1,40,78,72,1,52.0
+Lab NET+SPREAD,REPLAY,208,151,99,108,1,0,77,73,1,51.33
+Lab +REST/PRIME,REPLAY,208,151,101,106,1,0,74,76,1,49.33
+Lab +QB HISTORY,RESEARCH,208,151,99,108,1,0,71,79,1,47.33
+Lab +QB SITUATIONS,RESEARCH,208,151,102,105,1,0,76,74,1,50.67

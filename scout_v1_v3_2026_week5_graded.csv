@@ -1,0 +1,14 @@
+season,week,matchup,away_team,home_team,underdog,dog_spread,away_spread,snapshot_et,v1_pick,v1_edge_away,v3_pick,v3_edge_away,v3_matchup_epa_diff,models_agree,underdog_ats_result,v1_ats_result,v3_ats_result
+2026,5,PHI @ JAX,PHI,JAX,PHI,7.5,+7.5,2026-10-09 11:53,JAX,-16.798,JAX,-0.013,-0.228,Yes,Cover,Wrong,Wrong
+2026,5,CHI @ GB,CHI,GB,GB,1.5,-1.5,2026-10-09 11:53,CHI,+14.537,GB,-5.841,-0.097,No,Cover,Wrong,Correct
+2026,5,CIN @ MIA,CIN,MIA,MIA,6.5,-6.5,2026-10-09 11:53,CIN,+6.155,MIA,-1.905,+0.272,No,No Cover,Correct,Wrong
+2026,5,CLE @ NYJ,CLE,NYJ,CLE,2.5,+2.5,2026-10-09 11:53,CLE,+2.939,CLE,+0.339,-0.007,Yes,No Cover,Wrong,Wrong
+2026,5,HOU @ TEN,HOU,TEN,TEN,7.5,-7.5,2026-10-09 11:53,TEN,-2.888,TEN,-2.517,+0.288,Yes,No Cover,Wrong,Wrong
+2026,5,IND @ PIT,IND,PIT,IND,2.5,+2.5,2026-10-09 11:53,IND,+4.828,PIT,-3.585,-0.169,No,No Cover,Wrong,Correct
+2026,5,LV @ NE,LV,NE,LV,3.5,+3.5,2026-10-09 11:53,LV,+10.744,NE,-1.713,-0.133,No,No Cover,Wrong,Correct
+2026,5,NYG @ WAS,NYG,WAS,NYG,4.5,+4.5,2026-10-09 11:53,NYG,+8.185,WAS,-0.882,-0.140,No,Pending,Pending,Pending
+2026,5,MIN @ NO,MIN,NO,NO,2.5,-2.5,2026-10-09 11:53,MIN,+11.619,NO,-3.620,+0.036,No,No Cover,Correct,Wrong
+2026,5,DEN @ LAC,DEN,LAC,LAC,3.5,-3.5,2026-10-09 11:53,LAC,-1.165,LAC,-4.111,+0.057,Yes,Pending,Pending,Pending
+2026,5,DET @ ARI,DET,ARI,ARI,5.5,-5.5,2026-10-09 11:53,DET,+0.817,ARI,-7.032,+0.019,No,Pending,Pending,Pending
+2026,5,SF @ SEA,SF,SEA,SF,3,+3,2026-10-09 11:53,SF,+8.031,SF,+5.101,+0.169,Yes,Pending,Pending,Pending
+2026,5,BAL @ ATL,BAL,ATL,BAL,3,+3,2026-10-09 11:53,BAL,+2.012,BAL,+5.585,+0.189,Yes,Pending,Pending,Pending

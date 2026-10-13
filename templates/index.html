@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Findah 3000 | Gravy Train</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body>
+
+    <div class="section-logo-title"><img src="{{ url_for('static', filename='Images/Branding/trend-findah-nav.png') }}" alt="Trend Findah 3000" width="953" height="179"></div>
+    {% include '_site_navigation.html' %}
+
+    <p class="section-intro">Build your own research with filters and combinations, or <a href="{{ url_for('trends_page') }}">Discover Trends</a> to explore current patterns and streaks.</p>
+    <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
+        <h1 class="search-panel-title">Trend Findah 3000</h1>
+        <div class="form-grid">
+            <div class="filter-mode-row">
+            <div class="field">
+                <label for="season_mode">Season Filter:</label>
+
+                <select id="season_mode" name="season_mode">
+                    <option value="single"{% if season_mode == 'single' %}selected{% endif %}>Single Season</option>
+                    <option value="range"{% if season_mode == 'range' %}selected{% endif %}>Season Range</option>
+                </select>
+            </div>
+                <div class="filter-mode-values">
+            <div id="single-season-fields">
+                <label for="season">Season:</label>
+
+                <select id="season" name="season">
+                    <option value="">All Seasons</option>
+
+                    {% for year in range(2026, 1998, -1) %}
+                        <option
+                            value="{{ year }}"
+                            {% if season == year|string %}selected{% endif %}
+                        >
+                            {{ year }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div id="range-season-fields">
+                <label for="start_season">Start Season:</label>
+                
+                <select id="start_season" name="start_season">
+                    <option value="">Start Year</option>
+
+                    {% for year in range(2026, 1998, -1) %}
+                        <option
+                            value="{{ year }}"
+                            {% if start_season == year %}selected{% endif %}
+                        >
+                            {{ year }}
+                        </option>
+                    {% endfor %}
+                </select>
+            
+                <label for="end_season">End Season:</label>
+
+                <select id="end_season" name="end_season">
+                    <option value="">End Year</option>
+
+                    {% for year in range(2026, 1998, -1) %}
+                        <option
+                            value="{{ year }}"
+                            {% if end_season == year %}selected{% endif %}
+                        >
+                            {{ year }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+                </div>
+            </div>
+            <div class="filter-mode-row">
+            <div class="field">
+                <label for="spread_mode">Spread Filter:</label>
+
+                <select id="spread_mode" name="spread_mode">
+                    <option value="none"{% if spread_mode == 'none' %}selected{% endif %}>All Spreads</option>
+                    <option value="min"{% if spread_mode == 'min' %}selected{% endif %}>Minimum Spread</option>
+                    <option value="max"{% if spread_mode == 'max' %}selected{% endif %}>Maximum Spread</option>
+                    <option value="exact"{% if spread_mode == 'exact' %}selected{% endif %}>Exact Spread</option>
+                    <option value="range"{% if spread_mode == 'range' %}selected{% endif %}>Spread Range</option>
+                </select>
+            </div>
+                <div class="filter-mode-values">
+            <div id="min-spread-field">
+                <label for="min_spread">Min Spread:</label>
+                <select id="min_spread" name="min_spread">
+                    <option value="">Select Spread</option>
+
+                    {% for number in range(0, 51) %}
+                        {% set spread = number / 2 %}
+                            <option value="{{ spread }}"
+                                {% if min_spread == spread %}selected{% endif %}
+                            >
+                                {{ spread }}
+                            </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="max-spread-field">
+                <label for="max_spread">Max Spread:</label>
+                <select id="max_spread" name="max_spread">
+                    <option value="">Select Spread</option>
+
+                    {% for number in range(0, 51) %}
+                        {% set spread = number / 2 %}
+                            <option value="{{ spread}}"
+                                {% if max_spread == spread %}selected{% endif %}
+                            >
+                                {{ spread }}
+                            </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="exact-spread-field">
+                <label for="exact_spread">Exact Spread:</label>
+                <select id="exact_spread" name="exact_spread">
+                    <option value="">Select Spread</option>
+
+                    {% for number in range(0, 51) %}
+                        {% set spread = number / 2 %}
+                            <option 
+                                value="{{ spread }}"
+                                {% if exact_spread == spread %}selected{% endif %}
+                            >
+                                {{ spread }}
+                            </option>
+                    {% endfor %}
+                </select>
+            </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="location">Dog Location:</label>
+
+                <select id="location" name="location">
+                    <option value=""{% if location is none %}selected{% endif %}>All Dogs</option>
+                    <option value="Home"{% if location == 'Home' %}selected{% endif %}>Home Dogs</option>
+                    <option value="Away"{% if location == 'Away' %}selected{% endif %}>Away Dogs</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="primetime">Primetime:</label>
+
+                <select id="primetime" name="primetime">
+                    <option value=""{% if is_primetime is none %}selected{% endif %}>All Games</option>
+                    <option value="yes"{% if is_primetime is true %}selected{% endif %}>Primetime Only</option>
+                    <option value="no"{% if is_primetime is false %}selected{% endif %}>Non-Primetime Only</option>
+
+                </select>
+            </div>
+            <div class="field">
+                <label for="dog_qb_name">Underdog QB:</label>
+                <select id="dog_qb_name" name="dog_qb_name">
+                    <option value="">All Underdog QBs</option>
+                    {% for qb in current_qbs %}<option value="{{ qb }}" {% if dog_qb_name == qb %}selected{% endif %}>{{ qb }}</option>{% endfor %}
+                </select>
+                <small class="qb-filter-note">QBs recorded in current-season games.</small>
+            </div>
+            <div class="field">
+                <label for="game_type">Game Type:</label>
+                <select id="game_type" name="game_type">
+                    <option value="">All Game Types</option>
+                    {% set game_type_labels = {'REG': 'Regular Season', 'WC': 'Wild Card', 'DIV': 'Divisional Playoffs', 'CON': 'Conference Championship', 'SB': 'Super Bowl', 'PRE': 'Preseason'} %}
+                    {% for value in filter_options.get('game_type', []) %}
+                    <option value="{{ value }}" {% if csv_filters.get('game_type') == value %}selected{% endif %}>{{ game_type_labels.get(value, value) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <details id="more-filters"{% if csv_filters.get("qb_name") or historical_dog_qb_name %} open{% endif %}>
+            <summary class="csv-filters-heading">More filters</summary>
+            <p class="search-text">Combine any filters below. Each matches an exact CSV value; All includes missing values. Scores, result, and overtime describe completed games.</p>
+            <div class="field">
+            <label for="qb_name">Any recorded QB (either team):</label>
+            <input id="qb_name" name="qb_name" type="search" list="qb-name-options"
+                   value="{{ csv_filters.get('qb_name', '') }}" placeholder="All QBs — type a name"
+                   autocomplete="off" aria-label="Select QB, type to find a player">
+            <datalist id="qb-name-options">
+                {% for qb in filter_options.get('qb_name', []) %}<option value="{{ qb }}"></option>{% endfor %}
+            </datalist>
+            <small class="qb-filter-note">Historical game records for either team; this does not confirm an upcoming starter.</small>
+        </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="historical_dog_qb_name">Historical Underdog QB:</label>
+                    <select id="historical_dog_qb_name" name="historical_dog_qb_name">
+                        <option value="">All Underdog QBs</option>
+                        {% for qb in filter_options.get('dog_qb_name', []) %}<option value="{{ qb }}" {% if historical_dog_qb_name == qb %}selected{% endif %}>{{ qb }}</option>{% endfor %}
+                    </select>
+                    <small class="qb-filter-note">All CSV seasons, including former QBs. Use either QB dropdown.</small>
+                </div>
+                {% for field, values in filter_options.items() if field not in ('dog_qb_name', 'game_type', 'qb_name') %}
+                <div class="field">
+                    <label for="csv-{{ field }}">{{ field.replace('_', ' ').title() }}</label>
+                    <select id="csv-{{ field }}" name="{{ field }}">
+                        <option value="">All</option>
+                        {% for value in values %}
+                        <option value="{{ value }}" {% if csv_filters.get(field) == value %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+        </details>
+        <div class="form-actions">
+            <button type="submit" name="action" value="analyze">Analyze</button>
+            <button type="submit" name="action" value="combinations">Find combinations</button>
+
+            <a href="{{ url_for('trend_finder') }}" class="clear-button">Clear Filters</a>
+
+        </div>
+    </form>
+    {% if error%}
+        <p>{{ error }}</p>
+    {% endif %}
+    {% if summary is not none and combinations is none %}
+    <section class="results">
+        <h2>Results</h2>
+        {% if filter_chips %}<div class="active-filter-chips">{% for chip in filter_chips %}<button type="button" class="filter-chip" data-remove-fields='{{ chip.fields|tojson }}' aria-label="Remove {{ chip.label }}">{{ chip.label }} <span aria-hidden="true">×</span></button>{% endfor %}</div>{% else %}<p class="active-filters">All Games</p>{% endif %}
+        {% if results_freshness %}<p class="active-filters" style="font-size:14px;">Results recorded through {{ results_freshness.season }} Week {{ results_freshness.week }} • {{ results_freshness.date }}</p>{% if results_freshness.missing_refs or results_freshness.missing_spreads or results_freshness.missing_totals %}<p class="active-filters" style="font-size:13px;">Missing season data: {{ results_freshness.missing_refs }} referee names • {{ results_freshness.missing_spreads }} spreads • {{ results_freshness.missing_totals }} betting totals</p>{% endif %}{% endif %}
+        {% for qb in qb_summaries %}<div class="qb-search-summary"><h3>{{ qb.name }} — Team ATS</h3><strong>{{ qb.covers }}-{{ qb.losses }}-{{ qb.pushes }} ATS{% if qb.rate is not none %} • {{ qb.rate }}% covers{% endif %}</strong><p>Across the games matching your filters. Pushes excluded from cover rate.{% if qb.pending %} {{ qb.pending }} pending.{% endif %}</p></div>{% endfor %}
+        <div class="results-grid">
+            <div class="stat">
+                <span class="stat-label">Games</span>
+                <span class="stat-value">{{ summary.games }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Total Dogs</span>
+                <span class="stat-value">{{ summary.dogs }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Staight Up Wins</span>
+                <span class="stat-value">{{ summary.wins }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Dog Covers</span>
+                <span class="stat-value">{{ summary.covers }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Pushes</span>
+                <span class="stat-value">{{ summary.pushes }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Straight Up Win Rate</span>
+                <span class="stat-value">{{ "%.2f"|format(summary.win_rate) }}%</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Dog Cover Rate</span>
+                <span class="stat-value">{{ "%.2f"|format(summary.ats_rate) }}%</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Pick' Ems</span>
+                <span class="stat-value"> {{ summary.pickems }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Sample Strength</span>
+                <span class="stat-value">{{ summary.sample_strength }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">ATS Edge</span>
+                <span class="stat-value">{{ "%+.2f"|format(summary.ats_edge) }}%</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">95% ATS Range</span>
+                <span class="stat-value">
+                    {% if summary.ats_ci_low is not none %}
+                        {{ "%.2f"|format(summary.ats_ci_low) }}% - {{ "%.2f"|format(summary.ats_ci_high) }}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Trend Signal</span>
+                <span class="stat-value">{{ summary.trend_signal }}</span>
+            </div>
+        </div>
+        <details class="home-matching-games" style="margin-top: 24px; color: black; -webkit-text-stroke: 0;">
+            <summary style="cursor: pointer; font-size: 20px; font-weight: bold;">View games involved ({{ summary.games }})</summary>
+            {% for group in matchup_groups %}
+            <details style="margin-top: 12px;">
+                <summary style="cursor: pointer; font-weight: bold;">{{ group.games|length }} {% if is_primetime is sameas true %}primetime {% elif is_primetime is sameas false %}non-primetime {% endif %}games from {{ group.year }}</summary>
+                <div class="evidence-table-scroll" style="background: #1f2937; border-radius: 8px;">
+                    <table class="evidence-table">
+                        <thead><tr><th>Date</th><th>Matchup</th><th>Score</th><th>Underdog</th><th>Spread</th><th>Dog ATS</th><th>Spread source</th>{% if group.show_qb_ats %}<th>QB Team ATS</th>{% endif %}</tr></thead>
+                        <tbody>{% for game in group.games %}
+                            <tr><td>{{ game.gameday }}</td><td>{{ game.away_team }} @ {{ game.home_team }}</td><td>{{ game.away_score }}–{{ game.home_score }}</td><td>{{ game.dog_team or "Pick’em" }}</td><td>{% if game.dog_team %}{{ "%+.1f"|format(game.dog_spread) }}{% else %}0{% endif %}</td><td>{{ game.ats_result }}</td><td><small>{{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }}<br>{{ game.line_minutes }} min before kickoff{% if game.line_minutes > 15 %}<br>No capture in final 15 minutes{% endif %}{% endif %}{% if game.line_url %}<br><a href="{{ game.line_url }}" target="_blank" rel="noopener noreferrer">View Source</a>{% endif %}</small></td>{% if group.show_qb_ats %}<td>{% for qb in game.qb_results %}<div><strong>{{ qb.team }}: {{ qb.result }}</strong><br><small>{{ qb.name }} • {{ "%+.1f"|format(qb.spread) }}</small></div>{% else %}—{% endfor %}</td>{% endif %}</tr>
+                        {% endfor %}</tbody>
+                    </table>
+                </div>
+            </details>
+            {% else %}<p>No completed games match these filters.</p>{% endfor %}
+        </details>
+    </section>
+    {% endif %}
+    {% if combinations is not none %}
+    <section class="results">
+        <h2>Combinations within your filters</h2>
+        {% if data_status %}<p class="evidence-data-note">CSV file last modified: {{ data_status.modified }} | Latest completed game: {{ data_status.latest_result }}</p>{% endif %}
+        <p>Showing the top {{ combinations|length }} grouped trends from {{ combination_count }} combinations (up to 100 retained), with at least {{ combination_minimum }} games and 55% ATS success.</p>
+        <details class="combination-card combination-help">
+            <summary>How the grouped search works</summary>
+            <div class="combination-details">
+                <p>Game time: morning before noon, day from noon to 7 PM, night from 7 PM onward, using CSV times.</p>
+                <p>Rest: less than 7 days, exactly 7 days, or more than 7 days. Automatic combinations include all totals; the Total Line field remains available for a manual exact-total filter.</p>
+                <p>Week, temperature, and wind use bands. Automatic searches consider all eligible features; spread and total are only applied when you select their manual filters. Teams, underdog quarterbacks, coaches, stadiums, referees, roofs, surfaces, weekdays, game types, and division games use their CSV categories. Dates are grouped by month.</p>
+                <p>Quarterback combinations use only the underdog’s quarterback, whether home or away. Home and away quarterback names remain available as manual filters.</p>
+                <p>Automatic combinations must match a game context in the newest CSV season, keeping older quarterbacks, coaches, teams, stadiums, and referees out of discovery. This uses CSV activity rather than live roster status. Historical names remain available in manual filters.</p>
+                <p>Missing values do not create categories. Groups below the minimum sample are removed. The search checks up to three features together and expands the strongest 150 candidates at each step.</p>
+                <p>The upcoming flag requires every condition and manual filter to match a known, unstarted CSV game within seven days. Missing game details cannot establish a match.</p>
+                <p>Final scores, results, overtime, and game IDs are manual filters only. Automatic searches use pregame information.</p>
+            </div>
+        </details>
+        {% if not combinations %}<p>No combinations have at least {{ combination_minimum }} games and 55% ATS with these filters.</p>{% endif %}
+        {% for trend in combinations %}
+        <details class="combination-card">
+            <summary>
+                <span class="combination-header">
+                <span class="combination-filters">
+                    {% if trend.coming_soon %}<span class="combination-soon">🏈 Coming up within 7 days</span>{% endif %}
+                    {{ trend.filters | display_trend_filters }}
+                    {% if active_filters %}<span class="combination-scope">{{ active_filters | display_trend_filters }}</span>{% endif %}
+                </span>
+                <span class="combination-metrics">
+                    <span class="combination-record-line">
+                        <span class="combination-record">Underdog ATS: {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }}</span>
+                        <span class="combination-win-rate">{{ '%.2f'|format(trend.ats_rate) }}% ATS</span>
+                    </span>
+                    <small class="combination-sample">{{ trend.sample }} underdogs · {{ trend.dog_no_push }} ATS decisions · {{ trend.sample - trend.dog_no_push }} pushes</small>
+                </span>
+                </span>
+            </summary>
+            <div class="combination-details">
+                {% if trend.baseline %}
+                <p class="combination-baseline">Baseline: {{ trend.baseline.filters | display_trend_baseline }} | Underdog ATS: {{ '%.2f'|format(trend.baseline.ats_rate) }}%</p>
+                {% endif %}
+                {% if trend.coming_soon %}
+                <p><strong>Upcoming matches</strong></p>
+                {% for game in trend.upcoming_games[:1] %}<p>{{ game.matchup }} | {{ game.kickoff }} | Underdog: {{ game.dog_team }}</p>{% endfor %}
+                {% endif %}
+                <p class="combination-description">{{ trend.description }}</p>
+                {% if trend.related %}
+                <p><strong>Filter comparison preview</strong></p>
+                {% for related in trend.related[:2] %}
+                <p>With {{ related.added_filters | display_trend_filters }}: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} points vs. baseline{% if related.filters == trend.filters %} (this card){% endif %}</p>
+                {% endfor %}
+                {% endif %}
+                <p><a class="evidence-link" href="{{ trend.games_url }}" target="_blank" rel="noopener">Full trend details →</a></p>
+
+            </div>
+        </details>
+        {% endfor %}
+    </section>
+    {% endif %}
+    <script>
+    const currentDogQb = document.getElementById('dog_qb_name');
+    const historicalDogQb = document.getElementById('historical_dog_qb_name');
+    currentDogQb.addEventListener('change', () => {
+        if (currentDogQb.value) historicalDogQb.value = '';
+    });
+    historicalDogQb.addEventListener('change', () => {
+        if (historicalDogQb.value) currentDogQb.value = '';
+    });
+
+    const seasonMode = document.getElementById("season_mode");
+    const singleSeasonFields = document.getElementById("single-season-fields");
+    const rangeSeasonFields = document.getElementById("range-season-fields");
+
+    const season = document.getElementById("season");
+    const startSeason = document.getElementById("start_season");
+    const endSeason = document.getElementById("end_season");
+
+
+    function updateSeasonFields() {
+        if (seasonMode.value === "single") {
+            singleSeasonFields.hidden = false;
+            rangeSeasonFields.hidden = true;
+
+            season.disabled = false;
+            startSeason.disabled = true;
+            endSeason.disabled = true;
+        }
+        else {
+            singleSeasonFields.hidden = true;
+            rangeSeasonFields.hidden = false;
+
+            season.disabled = true;
+            startSeason.disabled = false;
+            endSeason.disabled = false;
+        }
+    }
+
+
+    const spreadMode = document.getElementById("spread_mode");
+
+    const minSpreadField = document.getElementById("min-spread-field");
+    const maxSpreadField = document.getElementById("max-spread-field");
+    const exactSpreadField = document.getElementById("exact-spread-field");
+
+    const minSpread = document.getElementById("min_spread");
+    const maxSpread = document.getElementById("max_spread");
+    const exactSpread = document.getElementById("exact_spread");
+
+
+    function updateSpreadFields() {
+        const mode = spreadMode.value;
+
+        minSpreadField.hidden = !(mode === "min" || mode === "range");
+        maxSpreadField.hidden = !(mode === "max" || mode === "range");
+        exactSpreadField.hidden = mode !== "exact";
+
+        minSpread.disabled = !(mode === "min" || mode === "range");
+        maxSpread.disabled = !(mode === "max" || mode === "range");
+        exactSpread.disabled = mode !== "exact";
+    }
+
+
+    seasonMode.addEventListener("change", updateSeasonFields);
+    spreadMode.addEventListener("change", updateSpreadFields);
+
+    document.querySelectorAll('[data-remove-fields]').forEach(button => button.addEventListener('click', () => {
+        const form=document.querySelector('.home-filter-form');
+        JSON.parse(button.dataset.removeFields).forEach(name => { const control=form.elements.namedItem(name); if(control)control.value=name==='spread_mode'?'none':''; });
+        updateSeasonFields();updateSpreadFields();
+        form.requestSubmit(form.querySelector('button[value="analyze"]'));
+    }));
+    updateSeasonFields();
+    updateSpreadFields();
+    </script>
+</body>
+</html>

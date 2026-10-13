@@ -1,0 +1,62 @@
+{% from '_trend_evidence.html' import record_table %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Details · Gravy Train</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body>
+<main class="trend-dashboard">
+    <h1>Trend details</h1>
+    {% include '_site_navigation.html' %}
+    <section class="combination-card">
+        <h2>{{ conditions | display_trend_filters }}</h2>
+        <p>{% if season is none %}All seasons{% elif season is number %}Season {{ season }}{% else %}Seasons {{ season[0] }}–{{ season[1] }}{% endif %}{% if scope_labels %} | {{ scope_labels | display_trend_filters }}{% endif %}</p>
+        <p>These are completed games matching every condition and manual filter. The ATS result belongs to the underdog; the score is shown away team first. Pushes are excluded from the cover rate.</p>
+        <p class="combination-description">{{ trend.description }}</p>
+        {% if trend.ats_rate is defined %}<p class="combination-win-rate">Underdog ATS: {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }} | {{ '%.2f'|format(trend.ats_rate) }}%</p>{% endif %}
+                {% if trend.baseline %}
+                <p class="combination-baseline">Baseline: {{ trend.baseline.filters | display_trend_baseline }} | Underdog ATS: {{ '%.2f'|format(trend.baseline.ats_rate) }}%</p>
+                {% endif %}
+        {% if trend.coming_soon %}
+        <h3>Upcoming matches</h3>
+        {% for game in trend.upcoming_games %}<p>{{ game.matchup }} | {{ game.kickoff }} | Underdog: {{ game.dog_team }}</p>{% endfor %}
+        {% endif %}
+        <h3>Recent and historical performance</h3>
+        {{ record_table(evidence.periods) }}
+        <p>The three-season row is a subset of the historical record. Empty periods have no matching games in this selection.</p>
+        <p class="evidence-data-note">{{ trend.validation_label }}. These games contributed to discovering the trend; the record is not a test on unseen games.</p>
+        <details class="evidence-season-details"><summary>Record by season</summary>{{ record_table(evidence.seasons) }}</details>
+        <p class="evidence-data-note">CSV file last modified: {{ data_status.modified }}. Latest completed game in CSV: {{ data_status.latest_result }}. File modification time does not verify the age of individual odds or quarterback information.</p>
+    </section>
+    {% if trend.sample is defined %}
+    <section class="combination-card">
+        <h2>Trend analysis</h2>
+        {% include '_trend_comparisons.html' %}
+    </section>
+    {% endif %}
+    <section class="combination-card">
+        <h2>Games behind the record</h2>
+        {% if games %}
+        <div class="evidence-table-scroll">
+            <table class="evidence-table">
+                <thead><tr><th scope="col">Date</th><th scope="col">Matchup</th><th scope="col">Score</th><th scope="col">Underdog</th><th scope="col">Spread</th><th scope="col">ATS result</th></tr></thead>
+                <tbody>{% for game in games %}
+                <tr><td>{{ game.gameday }}</td><td>{{ game.away_team }} at {{ game.home_team }}</td><td>{{ game.away_score }}–{{ game.home_score }}</td><td>{{ game.dog_team }}</td><td>+{{ '%g'|format(game.dog_spread) }}</td><td>{{ game.ats_result }}</td></tr>
+                {% endfor %}</tbody>
+            </table>
+        </div>
+        {% else %}<p>No completed games match these conditions.</p>{% endif %}
+        <nav class="evidence-pagination" aria-label="Matching game pages">
+            {% if previous_url %}<a href="{{ previous_url }}">Previous 25 games</a>{% endif %}
+            <span>Page {{ page }} of {{ page_count }}</span>
+            {% if next_url %}<a href="{{ next_url }}">Next 25 games</a>{% endif %}
+        </nav>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{
+  "game_id": "2026_05_BUF_LA",
+  "matchup": "BUF @ LA",
+  "generated_at": "2026-10-12T16:41:01.131287-04:00",
+  "kickoff": "2026-10-12T20:15:00-04:00",
+  "pregame": true,
+  "saved_spread": {
+    "away": "BUF",
+    "away_handicap": 2.5,
+    "home": "LA",
+    "home_handicap": -2.5,
+    "source": "nfl_games.csv saved spread (NOT current market verified)"
+  },
+  "team_games_used": {
+    "BUF": 4,
+    "LA": 4
+  },
+  "factors": [
+    {
+      "factor": "Existing baseline ATS edge",
+      "team": "Neither",
+      "points": 0,
+      "detail": "BUF model ATS edge +1.10 points, using the CSV's BUF +2.5 spread"
+    },
+    {
+      "factor": "Recent scoring offense",
+      "team": "BUF",
+      "points": 2,
+      "detail": "BUF 31.8 PPG vs LA 21.2 PPG (Weeks 1\u20134)"
+    },
+    {
+      "factor": "Recent scoring defense",
+      "team": "LA",
+      "points": 2,
+      "detail": "BUF allows 26.8 PPG vs LA 20.8 PPG (Weeks 1\u20134)"
+    },
+    {
+      "factor": "Rest advantage",
+      "team": "Neither",
+      "points": 0,
+      "detail": "BUF: 8 days, LA: 8 days"
+    },
+    {
+      "factor": "Historical primetime underdogs",
+      "team": "Neither",
+      "points": 0,
+      "detail": "1999\u20132025: 536-549-27 ATS (49.4%); no qualifying positive signal"
+    }
+  ],
+  "totals": {
+    "BUF": 2,
+    "LA": 2
+  },
+  "difference_away_minus_home": 0,
+  "scorecard_lean": "No scorecard lean",
+  "label": "LOW/NEUTRAL \u2014 UNVALIDATED",
+  "baseline_projected_away_margin": -1.397,
+  "historical_primetime_dog_ats": {
+    "wins": 536,
+    "losses": 549,
+    "pushes": 27,
+    "ats_pct": 49.4,
+    "sample": 1085
+  },
+  "research_notes": [
+    "Mike/Gemini reports 75% of ATS handle on Buffalo; ORIGINAL sportsbook/time unverified: 0 points.",
+    "Josh Allen underdog ATS ~60% reported by user; sample and filters not verified: 0 points.",
+    "Confirmed Bills OUT (Oct 10 team report): Ed Oliver (DL), Joshua Palmer (WR); no calibrated numerical impact: 0 points.",
+    "DJ Moore (WR), Dee Alford (CB), Landon Jackson (DL) were questionable in the Oct 10 Bills report; statuses may change before kickoff.",
+    "Injuries/weather not numerically modeled in this version: 0 points.",
+    "Recent scoring offense/defense overlap baseline team-margin inputs; points are NOT independent evidence.",
+    "No HOT probability or winning percentage can be inferred from the total until backtested."
+  ]
+}

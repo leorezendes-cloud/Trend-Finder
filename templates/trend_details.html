@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Trend Details | Gravy Train</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+
+<body>
+    <main class="trend-dashboard">
+
+        {% include '_site_navigation.html' %}
+
+        <h1 class="label">Trend Details</h1>
+
+        <h2>
+            {{ trend.location }} |
+            {{ "Primetime" if trend.primetime
+               else "Non-Primetime" }} |
+            {{ trend.spread }}
+        </h2>
+
+        <section class="trend-card">
+
+            <div class="results-grid">
+
+                <div class="stat">
+                    <span class="stat-label">2026 ATS</span>
+                    <span class="stat-value">
+                        {{ "%.1f"|format(trend.current_ats_rate) }}%
+                    </span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">Historical ATS</span>
+                    <span class="stat-value">
+                        {{ "%.1f"|format(trend.historical_ats_rate) }}%
+                    </span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">Recent ATS</span>
+                    <span class="stat-value">
+                        {{ recent.wins }}-{{ recent.losses }}
+                    </span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">Active Streak</span>
+                    <span class="stat-value">
+                        {{ streak|length }} Covers
+                    </span>
+                </div>
+
+            </div>
+
+            <h2>Historical Comparison</h2>
+
+            <p>
+                Historical Sample:
+                {{ trend.historical_sample }} games
+            </p>
+
+            <p>
+                2026 Sample:
+                {{ trend.current_sample }} games
+            </p>
+
+            <p>
+                ATS Difference:
+                {{ "%+.1f"|format(trend.ats_difference) }} pts
+            </p>
+
+            <h2>Recent Games</h2>
+
+            <div class="game-list">
+
+                {% for game in recent.games %}
+
+                    <div class="game-row">
+
+                        <div class="game-info">
+                            <strong>
+                                {{ game.away_team }} @
+                                {{ game.home_team }}
+                            </strong>
+
+                            <small>
+                                {{ game.gameday }} |
+                                {{ game.dog_team }}
+                                +{{ game.dog_spread }}
+                            </small>
+                        </div>
+
+                        <div class="game-result">
+                            <strong>
+                                {{ game.away_score }} -
+                                {{ game.home_score }}
+                            </strong>
+
+                            {% if game.dog_covered %}
+                                <span class="ats-cover">
+                                    Cover ✓
+                                </span>
+                            {% else %}
+                                <span class="ats-loss">
+                                    Loss ATS ✗
+                                </span>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                {% else %}
+                    <p>No recent games available.</p>
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+</body>
+</html>

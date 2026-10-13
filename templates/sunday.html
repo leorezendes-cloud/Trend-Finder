@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Matchups | Gravy Train</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+
+<body>
+    <main class="trend-dashboard">
+
+        <h1 class="visually-hidden">Gravy Train</h1>
+        
+        {% include '_site_navigation.html' %}
+        {% include '_home_sections.html' %}
+        <h2 class="home-matchups-title">Upcoming Matchups</h2>
+        
+        <p>{% if archive %}<strong>Archived October 11, 2026 snapshot.</strong> <a href="{{ url_for('sunday_page',window=selected_window) }}">View current matchups</a>{% else %}<strong>Scheduled games in the next seven days.</strong> Historical trends use saved lines, not live odds. <a href="{{ url_for('sunday_page',window=selected_window,view='archive') }}">View October 11 archive</a>{% endif %}</p>
+        {% if pending %}<p>{{ pending|length }} scheduled games have no eligible underdog trend line yet.</p>{% endif %}
+        <section class="sunday-window-selector">
+            <a class="snapshot-link" href="{{ url_for('sunday_page', window=selected_window,download=1,view="archive" if archive else "current") }}">
+                ⬇️ Save Pregame Snapshot ⬇️
+            </a>
+
+            <h3 class="window-title">Compare Historical Seasons</h3>
+
+            <form method="GET"
+                action="{{ url_for('sunday_page') }}">{% if archive %}<input type="hidden" name="view" value="archive">{% endif %}
+
+                <select name="window"
+                        onchange="this.form.submit()">
+
+                    <option value="1"
+                        {% if selected_window == "1" %}selected{% endif %}>
+                        Previous Season
+                    </option>
+
+                    <option value="3"
+                        {% if selected_window == "3" %}selected{% endif %}>
+                        Last 3 Seasons
+                    </option>
+
+                    <option value="5"
+                        {% if selected_window == "5" %}selected{% endif %}>
+                        Last 5 Seasons
+                    </option>
+
+                    <option value="10"
+                        {% if selected_window == "10" %}selected{% endif %}>
+                        Last 10 Seasons
+                    </option>
+
+                    <option value="all"
+                        {% if selected_window == "all" %}selected{% endif %}>
+                        All History
+                    </option>
+
+                </select>
+
+
+            </form>
+
+            <p>
+                Analyzing {{ start_year }}–2025
+                to evaluate upcoming 2026 games.
+            </p>
+
+        </section>
+
+
+        <details class="comparison-section sunday-guide">
+
+            <summary>
+                📖 Understanding the Numbers
+            </summary>
+            
+            <div class="trend-details">
+
+                <p>
+                    <strong>Watchlist Rank:</strong>
+                    Games ranked by the historical Wilson lower bound
+                    of their predefined spread category.
+                    Games with identical scores share the same rank.
+                </p>
+
+                <p>
+                    <strong>Historical ATS:</strong>
+                    Percentage of underdogs that covered
+                    the spread in matching historical games.
+                    Pushes are excluded.
+                </p>
+
+                <p>
+                    <strong>Historical Games:</strong>
+                    Number of games matching the filters.
+                </p>
+
+                <p>
+                    <strong>Spread Range:</strong>
+                    The historical range containing
+                    the upcoming underdog's spread.
+                </p>
+
+                <p>
+                    <strong>95% Lower Bound:</strong>
+                    The conservative end of our
+                    Wilson confidence interval.
+                    Higher values provide stronger
+                    historical evidence for a high ATS rate.
+                </p>
+
+                <p>
+                    <strong>Important:</strong>
+                    These are historical patterns,
+                    not probabilities that an underdog
+                    will cover Sunday's game.
+                </p>
+
+            </div>
+
+        </details>
+
+        <div class="trend-card-grid sunday-game-grid">
+
+            {% for game in games %}
+            
+            
+            <div class="trend-card compact-card">
+
+                <div class="compact-summary">
+                    <span class="watchlist-rank">
+                        {% if game.rank is none %}
+                            Unranked
+                        {% elif game.tied %}
+                            Tied #{{ game.rank }}
+                        {% else %}
+                            Watchlist Rank #{{ game.rank }}
+                        {% endif %}
+                    </span>
+
+                
+                    <strong class="compact-title">
+                        {{ game.away_team }} @ {{ game.home_team }}
+                    </strong>
+
+                    <span class="compact-spread">
+                        Underdog: {{ game.dog_team }} +{{ game.dog_spread }}
+                    </span>
+
+
+                    {% if game.ranking_score >= 0 %}
+
+                    <p class="ranking-basis">
+                        <strong>Ranking Basis:</strong>
+                        Spread {{ game.ranking_trend.spread }} |
+                        Historical ATS:
+                        {{ "%.1f"|format(game.ranking_trend.ats_rate) }}% |
+                        95% LB:
+                        {{ "%.1f"|format(game.ranking_score) }}%
+                    </p>
+
+                    {% else %}
+
+                    <p>Insufficient historical data for ranking.</p>
+
+                    {% endif %}
+
+
+                    
+                    {% if not archive %}<p>{{ game.gameday }} · {{ game.gametime_et }} ET{% if game.neutral %} · Neutral venue{% endif %}<br>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}{% if game.line_stale %} · Saved quote is over 24 hours old{% endif %}</p>{% endif %}
+                    <h4>Exploratory Matching Ranges</h4>
+
+                    {% if game.top_trends %}
+
+                    <div class="sunday-table-wrapper">
+                        <table class="sunday-trend-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Spread</th>
+                                    <th>ATS</th>
+                                    <th>Games</th>
+                                    <th>95% LB</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for trend in game.top_trends %}
+
+                                <tr>
+                                    <td>+{{ trend.spread }}</td>
+
+                                    <td>
+                                        {{ "%.1f"|format(trend.historical_ats_rate) }}%
+                                    </td>
+
+                                    <td>{{ trend.historical_sample }}</td>
+
+                                    <td>
+                                        {{ "%.1f"|format(trend.historical_ci_low) }}%
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    {% else %}
+                        <p>No qualifying historical trends found.</p>
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+</body>
+</html>

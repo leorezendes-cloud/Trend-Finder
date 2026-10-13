@@ -1,0 +1,1154 @@
+{
+  ".env.example": {
+    "bytes": 368,
+    "sha256": "bc1206aa26bcf70b7a088bba62fffa8d1515ea51073d0e1f5a639bfd17e84596"
+  },
+  ".gitignore": {
+    "bytes": 161,
+    "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
+  },
+  "HOSTING.md": {
+    "bytes": 5476,
+    "sha256": "5e10b97759fa380799cdcb2cc970a666a3da01e034b5f3cee2cf252b43a60287"
+  },
+  "MEMBERSHIP.md": {
+    "bytes": 4942,
+    "sha256": "3966b16db8f2931c39ec6ba73ca51305337b68400739a29923135dba8d5be85f"
+  },
+  "anomaly_analysis.py": {
+    "bytes": 8461,
+    "sha256": "39a84e69ce77c15e244aa8e92cdb6d6f8826e6cb3dd4ace6d449a89ae3b06f65"
+  },
+  "anomaly_events.csv": {
+    "bytes": 85,
+    "sha256": "079baf26649ba23e952d225ddadadc119afdf712373db923636780b3473ddffe"
+  },
+  "anomaly_store.py": {
+    "bytes": 1806,
+    "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
+  },
+  "app.py": {
+    "bytes": 34755,
+    "sha256": "fda579095e38e81956b644d1e5a9f08031f6c2933b6c915ea3d2281d5cb198e5"
+  },
+  "ats_handle_snapshots.csv": {
+    "bytes": 275168,
+    "sha256": "8f2614c90cc4214a6f78e86d7192fcfe751853ddbbbde3251767c4fe3d802e6c"
+  },
+  "ats_money_analysis.py": {
+    "bytes": 9694,
+    "sha256": "c11069a00a34d21a4e16a9a4fe9a07e0c39c7c6caf731273ac43eb3955062b72"
+  },
+  "backtest_summary.csv": {
+    "bytes": 684,
+    "sha256": "2526b8e35d03cacd443b8b368e3682745503074e727687f9c22337bbe61ffeea"
+  },
+  "backtest_summary_previous.csv": {
+    "bytes": 137,
+    "sha256": "2c732d68222fd8d1310573f14313b6f4d1d78dfd0122f0207d5e9fe8b25ad167"
+  },
+  "collect_ats_handle.py": {
+    "bytes": 8870,
+    "sha256": "f9672eec47023efdff9657c03be8b63a30ff2125482507fc1bf893bcc98cdb8b"
+  },
+  "data/scout4/2019/20261013T041221140326Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "b9bb4b645f12da387f98b4385c46d776d62f578da0f7958965ae7209d5678d77"
+  },
+  "data/scout4/2019/20261013T041221140326Z/player.csv": {
+    "bytes": 1983555,
+    "sha256": "26154fb375ae7d24e037a99cd9d45c0b89992dd3b8995d981f40dd5c31bf836f"
+  },
+  "data/scout4/2019/20261013T041221140326Z/team.csv": {
+    "bytes": 47698,
+    "sha256": "43498f8e4535a680945147f0fbafa55b6ed7ed7e4f39c50c1312079805372468"
+  },
+  "data/scout4/2019/latest.json": {
+    "bytes": 664,
+    "sha256": "b9bb4b645f12da387f98b4385c46d776d62f578da0f7958965ae7209d5678d77"
+  },
+  "data/scout4/2020/20261013T041221914901Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "e14136d93de0baf7daeec64b373e5ca161b0a604777d9f0d0a107b8959e4bfd2"
+  },
+  "data/scout4/2020/20261013T041221914901Z/player.csv": {
+    "bytes": 2014945,
+    "sha256": "5c8b9b86d14d2cfb30675a00c7f75eb512b25d4856cce4dce39d51473f34164e"
+  },
+  "data/scout4/2020/20261013T041221914901Z/team.csv": {
+    "bytes": 48057,
+    "sha256": "59254b7389912175931e00c9f3172f70b934eedb1815197234503c893cef84ba"
+  },
+  "data/scout4/2020/latest.json": {
+    "bytes": 664,
+    "sha256": "e14136d93de0baf7daeec64b373e5ca161b0a604777d9f0d0a107b8959e4bfd2"
+  },
+  "data/scout4/2021/20261013T035528286788Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "65ab0c6f2788d6a13dc6e3a62b4cc247d6c8d018eb9792c958267522abaefacb"
+  },
+  "data/scout4/2021/20261013T035528286788Z/player.csv": {
+    "bytes": 2171193,
+    "sha256": "c515d9f539a147b730d3de4621688792b18d6b050d142fad1a6996b915712934"
+  },
+  "data/scout4/2021/20261013T035528286788Z/team.csv": {
+    "bytes": 50864,
+    "sha256": "e9caf43e82982cc535672b82900bf432713b6f7bbd7a796dd054a55b11d1cb01"
+  },
+  "data/scout4/2021/latest.json": {
+    "bytes": 664,
+    "sha256": "65ab0c6f2788d6a13dc6e3a62b4cc247d6c8d018eb9792c958267522abaefacb"
+  },
+  "data/scout4/2022/20261013T035532620748Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "26a1a047716f046ea946a047431b95754351d025d76f5f158463d1ab35fecf07"
+  },
+  "data/scout4/2022/20261013T035532620748Z/player.csv": {
+    "bytes": 2155458,
+    "sha256": "f57cc58e3c551aeb73fddf5971cbfe131e6888a9f0019913de815749a6d17d8f"
+  },
+  "data/scout4/2022/20261013T035532620748Z/team.csv": {
+    "bytes": 50756,
+    "sha256": "66db0f53316f259c9945f446ccd182ca9dcebc172742318d45544831f289d284"
+  },
+  "data/scout4/2022/latest.json": {
+    "bytes": 664,
+    "sha256": "26a1a047716f046ea946a047431b95754351d025d76f5f158463d1ab35fecf07"
+  },
+  "data/scout4/2023/20261013T035540422462Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "b31e6cf90dbdea011a776814a5d8eaace9aa3a525d660b030710a74f3342a48e"
+  },
+  "data/scout4/2023/20261013T035540422462Z/player.csv": {
+    "bytes": 2136222,
+    "sha256": "a8bd2e0c4d30890a91f4ea290486d8160f4e30f01e29483f3caa3c596bc104f9"
+  },
+  "data/scout4/2023/20261013T035540422462Z/team.csv": {
+    "bytes": 50914,
+    "sha256": "8aebaf16335662166bdd785b05503b1b4e3c35ba687332e64a893df5af6b68f7"
+  },
+  "data/scout4/2023/latest.json": {
+    "bytes": 664,
+    "sha256": "b31e6cf90dbdea011a776814a5d8eaace9aa3a525d660b030710a74f3342a48e"
+  },
+  "data/scout4/2024/20261013T031207905248Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "c22fc7c51d19732ecabef0774d1645a3f725eb703709bac69054640d03ef1f9f"
+  },
+  "data/scout4/2024/20261013T031207905248Z/player.csv": {
+    "bytes": 2174726,
+    "sha256": "9a58b56d5be5b4f5ed8d3be63efe5694cbf9468d2bc25b1b3f64d0d83f335045"
+  },
+  "data/scout4/2024/20261013T031207905248Z/team.csv": {
+    "bytes": 50875,
+    "sha256": "6c4ac463c872d009d24444aec9a5f56bba21fe210e2aa3fc0054f79ce42a7a1b"
+  },
+  "data/scout4/2024/latest.json": {
+    "bytes": 664,
+    "sha256": "c22fc7c51d19732ecabef0774d1645a3f725eb703709bac69054640d03ef1f9f"
+  },
+  "data/scout4/2025/20261013T021057941414Z/manifest.json": {
+    "bytes": 664,
+    "sha256": "39689fb59337ae4375e6932ff1704b95fe79ce5538386447aa1fdfb73fff856d"
+  },
+  "data/scout4/2025/20261013T021057941414Z/player.csv": {
+    "bytes": 2223326,
+    "sha256": "c192c13c6cd54ca32d6dcb37826e38d3bd81aa8b72e987a167e302937df23c10"
+  },
+  "data/scout4/2025/20261013T021057941414Z/team.csv": {
+    "bytes": 50927,
+    "sha256": "91551442bafea1bcdb4840ff85889da0c1cbdc378229fd6d2d3daba86090ca06"
+  },
+  "data/scout4/2025/latest.json": {
+    "bytes": 664,
+    "sha256": "39689fb59337ae4375e6932ff1704b95fe79ce5538386447aa1fdfb73fff856d"
+  },
+  "data/scout4/2026/20261013T021058668445Z/manifest.json": {
+    "bytes": 663,
+    "sha256": "37cd6ddfdc5fc2fe7ad9d3a71a125459fba2eb92f3c3a293bff3edece54f9869"
+  },
+  "data/scout4/2026/20261013T021058668445Z/player.csv": {
+    "bytes": 618556,
+    "sha256": "1211366bffbc670722d1bb71a2f9a533a75e14599e5babfbdb8a1ddcec88e89f"
+  },
+  "data/scout4/2026/20261013T021058668445Z/team.csv": {
+    "bytes": 13925,
+    "sha256": "c3089798dd730a11b3cf27d3b34b69e971f1e15d85f6bc7fd5d3b027579b2e10"
+  },
+  "data/scout4/2026/20261013T044023235067Z/manifest.json": {
+    "bytes": 663,
+    "sha256": "f26e65ff3d1b03c0ddbe9320f15dfbd004dfb273b85adcf77df536c5cad0115e"
+  },
+  "data/scout4/2026/20261013T044023235067Z/player.csv": {
+    "bytes": 627050,
+    "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c"
+  },
+  "data/scout4/2026/20261013T044023235067Z/team.csv": {
+    "bytes": 14100,
+    "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c"
+  },
+  "data/scout4/2026/20261013T045250196539Z/manifest.json": {
+    "bytes": 725,
+    "sha256": "009fb50d58dee0b5149a8c5d6c901555dde81d174d8257d8dd93b2ceaab335b2"
+  },
+  "data/scout4/2026/20261013T045250196539Z/player.csv": {
+    "bytes": 627050,
+    "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c"
+  },
+  "data/scout4/2026/20261013T045250196539Z/team.csv": {
+    "bytes": 14100,
+    "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c"
+  },
+  "data/scout4/2026/20261013T045819694360Z/manifest.json": {
+    "bytes": 725,
+    "sha256": "a711efd772c3076aecb12ce0a31eeedcfdb7fb0092964a03b0ff698fe0389dc7"
+  },
+  "data/scout4/2026/20261013T045819694360Z/player.csv": {
+    "bytes": 627050,
+    "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c"
+  },
+  "data/scout4/2026/20261013T045819694360Z/team.csv": {
+    "bytes": 14100,
+    "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c"
+  },
+  "data/scout4/2026/20261013T151740212695Z/manifest.json": {
+    "bytes": 725,
+    "sha256": "937de25a6efa13475b412234a60fe573b69ac175262d05e1abf90c3d37e0dce6"
+  },
+  "data/scout4/2026/20261013T151740212695Z/player.csv": {
+    "bytes": 627051,
+    "sha256": "9b5dc2354a7c2d9f507cb7c27097bc92977af4ad8ecd7aaceb5f2b5d4d69e62d"
+  },
+  "data/scout4/2026/20261013T151740212695Z/team.csv": {
+    "bytes": 14100,
+    "sha256": "5acdf24ea619f7f535b363e3f59574bd8a81574661f26cea11ff46134f53a784"
+  },
+  "data/scout4/2026/20261013T152544831433Z/manifest.json": {
+    "bytes": 725,
+    "sha256": "481176e683289fa39f32949489cfe97e86981b64f016ff84fe7062184cc30922"
+  },
+  "data/scout4/2026/20261013T152544831433Z/player.csv": {
+    "bytes": 627051,
+    "sha256": "9b5dc2354a7c2d9f507cb7c27097bc92977af4ad8ecd7aaceb5f2b5d4d69e62d"
+  },
+  "data/scout4/2026/20261013T152544831433Z/team.csv": {
+    "bytes": 14100,
+    "sha256": "5acdf24ea619f7f535b363e3f59574bd8a81574661f26cea11ff46134f53a784"
+  },
+  "data/scout4/2026/latest.json": {
+    "bytes": 725,
+    "sha256": "481176e683289fa39f32949489cfe97e86981b64f016ff84fe7062184cc30922"
+  },
+  "data/scout4/blend/predictions/2026_06_ARI_LA.json": {
+    "bytes": 12559,
+    "sha256": "413e745203ca0975db1d7622a9b745a9c67fc5c386a7516bf895fa159a11c732"
+  },
+  "data/scout4/blend/predictions/2026_06_BAL_CLE.json": {
+    "bytes": 12653,
+    "sha256": "8adf6a394f010d7b8c656580e6cf92c1ca2250470eedc3373706bbecb41bf39e"
+  },
+  "data/scout4/blend/predictions/2026_06_BUF_LV.json": {
+    "bytes": 12645,
+    "sha256": "f231aba722ca94da029e35aef6d7fedb6a4d84c07d18c3507efe55ec476f7a15"
+  },
+  "data/scout4/blend/predictions/2026_06_CAR_PHI.json": {
+    "bytes": 12640,
+    "sha256": "3f2a210f7af6e800c1a5e7c272e54af7169f0b5f764ce6fd3a732ee0cc17fc0e"
+  },
+  "data/scout4/blend/predictions/2026_06_CHI_ATL.json": {
+    "bytes": 12526,
+    "sha256": "0383507254830c482e9d7aff59e01301786eba1234e04e219c781e86ccd4766e"
+  },
+  "data/scout4/blend/predictions/2026_06_DAL_GB.json": {
+    "bytes": 12589,
+    "sha256": "f41e2f67e4d0293b16b9c40d1f6488d8e4531535b30a3f6d6b42f5d26b57878a"
+  },
+  "data/scout4/blend/predictions/2026_06_HOU_JAX.json": {
+    "bytes": 12550,
+    "sha256": "e4d92850a740abfdf28d71e72799fcc03e6d5bdb4a9f1116cca87e785b036bf1"
+  },
+  "data/scout4/blend/predictions/2026_06_LAC_KC.json": {
+    "bytes": 12561,
+    "sha256": "579952f7ccd8822bf5fcf60d5487aeaf0419fcd3367f2f3fda8f78b8222b6e77"
+  },
+  "data/scout4/blend/predictions/2026_06_NO_NYG.json": {
+    "bytes": 12655,
+    "sha256": "dfa7d561f5f670db77f3f8c5f0e613bc98d56df053a9a9d6802809531ea9e15e"
+  },
+  "data/scout4/blend/predictions/2026_06_NYJ_NE.json": {
+    "bytes": 12632,
+    "sha256": "9be2fcefb32b639c5e768a06179a2a86a0bdec3f32d10696b9405c8efad57d67"
+  },
+  "data/scout4/blend/predictions/2026_06_PIT_TB.json": {
+    "bytes": 12641,
+    "sha256": "673c1807b15db081ec92912dbe28be156b0c929e01cd73483362e2c6dd5f4668"
+  },
+  "data/scout4/blend/predictions/2026_06_SEA_DEN.json": {
+    "bytes": 12610,
+    "sha256": "5c26b341ff3d99eed7b29ef5780bf2b6e37500d874b6f1c5130c8a542cb9d871"
+  },
+  "data/scout4/blend/predictions/2026_06_TEN_IND.json": {
+    "bytes": 12600,
+    "sha256": "67a0d925214bcb4a9a37b6f48fbd1a372d4b67e4e503ffd4292bff94809971d5"
+  },
+  "data/scout4/blend/predictions/2026_06_WAS_SF.json": {
+    "bytes": 12649,
+    "sha256": "2ee062cf729a6c189e584531d8675d735b21ef67eda5c77f0b72aa69edbe500d"
+  },
+  "data/scout4/blend/status.json": {
+    "bytes": 104,
+    "sha256": "659dcb4cb61da0f973e9fdd0b850ded1a1043affa98bdbc13d6924abdf4d8bb0"
+  },
+  "data/scout4/pace/2026/20261013T142508900335Z/profiles_before_week6.json": {
+    "bytes": 9663,
+    "sha256": "6da4fc29588e450e43ff0dd3ddefd6653c7b37ecc6113088454f2c174d654d0d"
+  },
+  "data/scout4/personnel/2026/20261013T142052194213Z/pregame_evidence.json": {
+    "bytes": 87792,
+    "sha256": "32dd05f9574afeabc2ae778ddc62e497bcc181b4a199dca4d0c5f0258153ac94"
+  },
+  "data/scout4/ratings_latest.json": {
+    "bytes": 2177,
+    "sha256": "bc2828446116231e392fe4993381f838cb93603d376bfef265b278f4229d3cfe"
+  },
+  "data/scout4/ratings_runs/20261013T031502094593Z/models.json": {
+    "bytes": 2464,
+    "sha256": "0da67d8b982e514ce3355cca5f3a134c6d94a5732b7b9c11721cdad44b1b309f"
+  },
+  "data/scout4/ratings_runs/20261013T031502094593Z/summary.json": {
+    "bytes": 1724,
+    "sha256": "821a5c6e6582bf351ba83fb3c58f6582e3bcb938b98dc61b902a01d81867f925"
+  },
+  "data/scout4/shadow/predictions/2026_06_ARI_LA__Spread__4f7d99f21452.json": {
+    "bytes": 4644,
+    "sha256": "5af9350df420d1691710ebce4568d360f8d84b311c0419539c34348870a55d00"
+  },
+  "data/scout4/shadow/predictions/2026_06_ARI_LA__Total__f6cb333805e1.json": {
+    "bytes": 6257,
+    "sha256": "21eeec811e9be7ca922079a211923a8e32bc3c8acf3ade43fd1ae3b517feb6a7"
+  },
+  "data/scout4/shadow/predictions/2026_06_BAL_CLE__Spread__4f7d99f21452.json": {
+    "bytes": 4640,
+    "sha256": "e222476503f3097258856b0f5b973fe81ffd9d6c622e8c34356e75aa0f387428"
+  },
+  "data/scout4/shadow/predictions/2026_06_BAL_CLE__Total__f6cb333805e1.json": {
+    "bytes": 6281,
+    "sha256": "d25b78810ea8d0db3666c5060d495ef3759aa5bac2e535f29befd49a260d62af"
+  },
+  "data/scout4/shadow/predictions/2026_06_BUF_LV__Spread__4f7d99f21452.json": {
+    "bytes": 4634,
+    "sha256": "02114be8f32164c2ed7fb9e6551bdefb500e6104cf157e6ceee8049afc502ef1"
+  },
+  "data/scout4/shadow/predictions/2026_06_BUF_LV__Total__f6cb333805e1.json": {
+    "bytes": 6263,
+    "sha256": "e391c61fcd6554c6dea499c690eab35a120a3d784dda04049add8cd7941c8378"
+  },
+  "data/scout4/shadow/predictions/2026_06_CAR_PHI__Spread__4f7d99f21452.json": {
+    "bytes": 4616,
+    "sha256": "700c8b75e5873beef341f95406e5932ac152b585944c33bd2d7076ecea554f0c"
+  },
+  "data/scout4/shadow/predictions/2026_06_CAR_PHI__Total__f6cb333805e1.json": {
+    "bytes": 6255,
+    "sha256": "f22ea681224066eb247cca90bc88c51e3e908c8c478ce9fb3378c408bf4af073"
+  },
+  "data/scout4/shadow/predictions/2026_06_CHI_ATL__Spread__4f7d99f21452.json": {
+    "bytes": 4613,
+    "sha256": "7db554379cd465fd6461c8d584b017d677e95b848915fb491af0eda56d32c3a0"
+  },
+  "data/scout4/shadow/predictions/2026_06_CHI_ATL__Total__f6cb333805e1.json": {
+    "bytes": 6263,
+    "sha256": "02bd36a476288ab81682f32957c3c431e7f07d75b8d532ebfdcbb716c6de29c5"
+  },
+  "data/scout4/shadow/predictions/2026_06_DAL_GB__Spread__4f7d99f21452.json": {
+    "bytes": 4639,
+    "sha256": "7b925ade2d904f90e98888d7ceb1673b11b44dc6171ea2675790ab0a72d4a9f9"
+  },
+  "data/scout4/shadow/predictions/2026_06_DAL_GB__Total__f6cb333805e1.json": {
+    "bytes": 6254,
+    "sha256": "b4e842ecc21ee36ef64dcf85840c2699de801b676a196ff27a7be0740e8f6285"
+  },
+  "data/scout4/shadow/predictions/2026_06_HOU_JAX__Spread__4f7d99f21452.json": {
+    "bytes": 4585,
+    "sha256": "2f1dbb96437623688c1cd1d5f81716182d78041db061fddbb2e8790b5959475c"
+  },
+  "data/scout4/shadow/predictions/2026_06_HOU_JAX__Total__f6cb333805e1.json": {
+    "bytes": 6266,
+    "sha256": "ad2cda8b73177a93973425232d1553cf60d33ede91327a494e70f73bc0ac8172"
+  },
+  "data/scout4/shadow/predictions/2026_06_LAC_KC__Spread__4f7d99f21452.json": {
+    "bytes": 4618,
+    "sha256": "f9a7f51aa7880544ad1d83e12e43363e64873d9466336f46e28babf09c3ef16a"
+  },
+  "data/scout4/shadow/predictions/2026_06_LAC_KC__Total__f6cb333805e1.json": {
+    "bytes": 6238,
+    "sha256": "d80bb121dcf422f1b6ffa43c66c32c5eba748f26c855095261f14df1fac9813b"
+  },
+  "data/scout4/shadow/predictions/2026_06_NO_NYG__Spread__4f7d99f21452.json": {
+    "bytes": 4611,
+    "sha256": "6f0b64d5134ec059765302940d794c62cbd9e25143b1940e8a9cf0e754adc32e"
+  },
+  "data/scout4/shadow/predictions/2026_06_NO_NYG__Total__f6cb333805e1.json": {
+    "bytes": 6263,
+    "sha256": "681c89be75baf3fce855c62f11b3771511e20c3db39776385480392a4362352f"
+  },
+  "data/scout4/shadow/predictions/2026_06_NYJ_NE__Spread__4f7d99f21452.json": {
+    "bytes": 4642,
+    "sha256": "2908168edd17ed0eda742319bafcbc7304fd1c849e9983e46149f32a817d924f"
+  },
+  "data/scout4/shadow/predictions/2026_06_NYJ_NE__Total__f6cb333805e1.json": {
+    "bytes": 6276,
+    "sha256": "6f651a32ab1e7de3923a8cc86ad0c5c86c76d5e735d2cbdf7e4e85993918f617"
+  },
+  "data/scout4/shadow/predictions/2026_06_PIT_TB__Spread__4f7d99f21452.json": {
+    "bytes": 4612,
+    "sha256": "b6126e16cf464f7236c1232f19dece98883dfdbedaedf992da87ca3fb0a1e463"
+  },
+  "data/scout4/shadow/predictions/2026_06_PIT_TB__Total__f6cb333805e1.json": {
+    "bytes": 6265,
+    "sha256": "8175701e961927f6bddca7cffa3684890c5ec3e7722d836d42d4357caf6b02c1"
+  },
+  "data/scout4/shadow/predictions/2026_06_SEA_DEN__Spread__4f7d99f21452.json": {
+    "bytes": 4648,
+    "sha256": "3a03e3d13aac16851a75c4e188c390b4cf3acc99e57bd6938e113be293f8853c"
+  },
+  "data/scout4/shadow/predictions/2026_06_SEA_DEN__Total__f6cb333805e1.json": {
+    "bytes": 6264,
+    "sha256": "ffc5fd0478f8fa481425db5f7dabdccb7f764a896c3f6edf44ca22f450d42bc5"
+  },
+  "data/scout4/shadow/predictions/2026_06_TEN_IND__Spread__4f7d99f21452.json": {
+    "bytes": 4653,
+    "sha256": "e93f2b2e7ea9cb01df81f36d82a20b3cb310dd3577c478a57c4123da1071c487"
+  },
+  "data/scout4/shadow/predictions/2026_06_TEN_IND__Total__f6cb333805e1.json": {
+    "bytes": 6268,
+    "sha256": "4c252a82f63e01c98d6004fad420315af379c34a7f814563f4cee8dc4d728487"
+  },
+  "data/scout4/shadow/predictions/2026_06_WAS_SF__Spread__4f7d99f21452.json": {
+    "bytes": 4641,
+    "sha256": "39ca7d1fc84d95a951b1b531ae866bee411e06aac3f3aa500a19db55cf3c8070"
+  },
+  "data/scout4/shadow/predictions/2026_06_WAS_SF__Total__f6cb333805e1.json": {
+    "bytes": 6273,
+    "sha256": "9134f0db11b54e77db1246d77919f9f6b7bf19df1ede2c85c1cddae3d36cdc7a"
+  },
+  "data/scout4/shadow/status.json": {
+    "bytes": 132,
+    "sha256": "99dd13d86b6f4cbe9cb13dcdb4409a7de6491d64bda74dc2b211471e082cedef"
+  },
+  "data/scout4/totals_runs/20261013T044405371208Z/summary.json": {
+    "bytes": 11277,
+    "sha256": "72436dd32c5302fa6f3d831726196e0253dcce723df552b1a4b7d09749e32191"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_ARI_LA.json": {
+    "bytes": 8167,
+    "sha256": "ba969beb3c6a25bb48b2763dc3d63ae25dd4768401b0da7183cab8d2a2f40f33"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_BAL_CLE.json": {
+    "bytes": 8450,
+    "sha256": "3937da174ca5639676802814405dfe37c98880d371562239439908ac7390612b"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_BUF_LV.json": {
+    "bytes": 8320,
+    "sha256": "70e1a67fee3310b2857eac2dc23ff0cd78fca438d3a435c83aea881b8f9e46f6"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_CAR_PHI.json": {
+    "bytes": 8348,
+    "sha256": "4cc06258b78ecd527cfb91989d390a2056e2b7df10df51e083efcf540bc7d36b"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_CHI_ATL.json": {
+    "bytes": 8259,
+    "sha256": "bd64a8e4322dcc797d31f1c5356b9756f31f432ff43243ea6c0a9d26caf2cb64"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_DAL_GB.json": {
+    "bytes": 8410,
+    "sha256": "2a13499692c49f5f87653c9364e7f0ebc6446ddf0f422daa5818e9b70e02afdb"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_HOU_JAX.json": {
+    "bytes": 8422,
+    "sha256": "a34b74526a622ddea21933b006847ce613276acf6d77f0ed366caab443c19a86"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_LAC_KC.json": {
+    "bytes": 8446,
+    "sha256": "f2d29cee973e13ea0fc4e17991300b279f4d2f912af991a6d9936144f7ebe931"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_NO_NYG.json": {
+    "bytes": 8371,
+    "sha256": "873b8e06208b999a59a9dc33d234c845248603ed15b74fcadde9948928230d74"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_NYJ_NE.json": {
+    "bytes": 8419,
+    "sha256": "bf717c9ff6483e47c3512161453fa2d3998e8539b10e85341a851923ad45f514"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_PIT_TB.json": {
+    "bytes": 8397,
+    "sha256": "8ced822d62e43e83d1e0377c755eaea86165d8ce78c11eed9779228455a3ae20"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_SEA_DEN.json": {
+    "bytes": 8264,
+    "sha256": "f84b57ef41580c43e6bbbcaaf88a7e8729903db03d855d46f76fe30799750ee9"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_TEN_IND.json": {
+    "bytes": 8373,
+    "sha256": "438062e7b017cabe41853e67bd45a2bd959ebc97cc76abd5f5b71d61e6cc6774"
+  },
+  "data/scout4/weather/20261013T143627927666Z/2026_06_WAS_SF.json": {
+    "bytes": 8239,
+    "sha256": "1b9173bb3900b2331ede85f517bca8e69be45775daefaa01fcb676fc3fd37f57"
+  },
+  "data/scout4/weather/20261013T143627927666Z/evidence.json": {
+    "bytes": 37510,
+    "sha256": "dd527f7fe817e360251e5731cd13b143dd6736dda48a57aca4c3deaf73b7ef78"
+  },
+  "data/scout4/weather/20261013T143627927666Z/manifest.json": {
+    "bytes": 7306,
+    "sha256": "4d4b292693dc8b34cf7fc33d003ca977512c31f5a27cbe10b3ad797c71e5d951"
+  },
+  "dungeon_results.py": {
+    "bytes": 8841,
+    "sha256": "c2a706e51ed5be0ddd684e2f37609c83e02060156de4f6bfc7437bf514d0b95e"
+  },
+  "game_penalty_stats.csv": {
+    "bytes": 83068,
+    "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
+  },
+  "graded_sunday_pregame_2026-10-11_3.csv": {
+    "bytes": 1686,
+    "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
+  },
+  "gunicorn.conf.py": {
+    "bytes": 362,
+    "sha256": "cbb247679edcfce936615742fb7d5eb65645301e9654a4e2ae3ce1d9b04f7e39"
+  },
+  "home_results.py": {
+    "bytes": 3550,
+    "sha256": "026b270d7b86d67b38562d65b1121e6218a11c0f8ce722a56884109773af3de4"
+  },
+  "manual_spread_overrides.csv": {
+    "bytes": 344,
+    "sha256": "9f43e095cd5278fcdfdf8bc7ab3d578ea8450ee8e006a77fc3179be23e27245d"
+  },
+  "market_movement.py": {
+    "bytes": 3988,
+    "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
+  },
+  "membership.py": {
+    "bytes": 14388,
+    "sha256": "d3cce650cdd187c9a00b74547f3afab2e1aead31ed91fed5eefe10c020358382"
+  },
+  "nfl_games.csv": {
+    "bytes": 2190111,
+    "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+  },
+  "nfl_games_update_status.json": {
+    "bytes": 355,
+    "sha256": "58527afe3b0b023cc0acb26813dd5314e6bf6bbae9eb62a689ed9d81840ba94d"
+  },
+  "penalty_analysis.py": {
+    "bytes": 3073,
+    "sha256": "9d462ed610b9b60b2f9a6099f582452c7301e6e762ef0785c7d965096a725de0"
+  },
+  "pregame_lines.py": {
+    "bytes": 2671,
+    "sha256": "1c06e26845382ce7b46d1e0023a21334afd7a2f931b565f6de1ce257dec23bb6"
+  },
+  "public_money.py": {
+    "bytes": 10148,
+    "sha256": "8af346dee9daf057075ce0dec5be1b9ad94ed5337d7c94222cffc220a9afd0a1"
+  },
+  "public_money_snapshots.csv": {
+    "bytes": 929860,
+    "sha256": "a4c0b1f4171facb27f9b1f4f873ccfd6c9fd60739d61c5b0343410accfd33380"
+  },
+  "referee_assignments.csv": {
+    "bytes": 3688,
+    "sha256": "f8b7e573da64d6d311e4f5976e58f3bb47284a412e71b209ef4b5fa1004f6dbc"
+  },
+  "render.yaml": {
+    "bytes": 740,
+    "sha256": "15ea69966d1a7e4f92a3b11e90ee42765d461c47c5137cdc4a1d3fa788096f1b"
+  },
+  "requirements.txt": {
+    "bytes": 46,
+    "sha256": "c4007934a0ecfd74b130d918ed43221c19e267e8e33b65993a88f1382bd041fa"
+  },
+  "reverse_line_analysis.py": {
+    "bytes": 4093,
+    "sha256": "22b4beee97a6d7613d5fd117496403bdd5a7b42cd423ce9008100e37e09bef55"
+  },
+  "scheduled_ats_capture.py": {
+    "bytes": 2770,
+    "sha256": "ee1c03da63a22cf96b4e56b4bb537f4ea858fbe67d54d4cc2da0fa64e7f5013f"
+  },
+  "scout4/ats_lab.py": {
+    "bytes": 7213,
+    "sha256": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f"
+  },
+  "scout4/blend.py": {
+    "bytes": 9476,
+    "sha256": "e12d8159a432c2b81d0c6c447bc278cb950d79387b9b29a3485d2abc02cfbff7"
+  },
+  "scout4/blend_results.py": {
+    "bytes": 2770,
+    "sha256": "0900217095a20485838667dda254f3998d082854bf6422f613711a7394c45467"
+  },
+  "scout4/collect.py": {
+    "bytes": 2964,
+    "sha256": "106a1654b081e3ec58c76523d7633fac87d15ed8de23477871d2292caac3628e"
+  },
+  "scout4/margin_lab.py": {
+    "bytes": 4765,
+    "sha256": "a827d32fca6ccef6ccc93f1718d52a455eb5e16f5e66d530716684b5dd1d862c"
+  },
+  "scout4/personnel.py": {
+    "bytes": 6809,
+    "sha256": "0c7164e7a2be3b6a1406b92624d8567fd6895c33d8220a5e9d0287d8a3e10b61"
+  },
+  "scout4/ratings.py": {
+    "bytes": 8384,
+    "sha256": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145"
+  },
+  "scout4/shadow.py": {
+    "bytes": 15450,
+    "sha256": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6"
+  },
+  "scout4/starters.py": {
+    "bytes": 2555,
+    "sha256": "0d44d0f583f6154684b65910475db2876c76e146bdd33b00b01c418ae80e49e7"
+  },
+  "scout4/stats.py": {
+    "bytes": 8983,
+    "sha256": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba"
+  },
+  "scout4/totals.py": {
+    "bytes": 8289,
+    "sha256": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4"
+  },
+  "scout4/weather.py": {
+    "bytes": 6519,
+    "sha256": "811eabe38a0c084e2332535c58eb8ee7a5d694c7bdea515031d7fc5970a50610"
+  },
+  "scout4/web.py": {
+    "bytes": 14140,
+    "sha256": "9e35a3d12b50f9caa39e2bb66f34162ec9cdd1eb3c78954644f955e7b80fcde9"
+  },
+  "scout_kickoff_2026_10_12_model_comparison.csv": {
+    "bytes": 272,
+    "sha256": "6b58e855e164cfd8feb64c81b7c52d13dbff42bd35c1da5565b0374734c1f208"
+  },
+  "scout_kickoff_2026_10_12_pregame.json": {
+    "bytes": 5966,
+    "sha256": "7ef38bc9bffa58bd546d653946a8ef5ea29cba670a289eea8cc1f2903ee28305"
+  },
+  "scout_market_diagnostic.csv": {
+    "bytes": 371003,
+    "sha256": "be15d11910d9ceb33d312e8cb6bad70cf480e7fe1d455b6762df6e93fa35cd00"
+  },
+  "scout_market_diagnostic_ourrun.csv": {
+    "bytes": 371003,
+    "sha256": "be15d11910d9ceb33d312e8cb6bad70cf480e7fe1d455b6762df6e93fa35cd00"
+  },
+  "scout_personnel_2026_week5_replacements.csv": {
+    "bytes": 8095,
+    "sha256": "ef7f439becdc17ce682381804546d809501aabd572f021d6a8b6fc3a67aac67b"
+  },
+  "scout_personnel_2026_week5_triage.csv": {
+    "bytes": 69223,
+    "sha256": "22e2b1972074585391452a0d5907e44a203de9e386eed05d85fbfe46ce7023cc"
+  },
+  "scout_personnel_2026_week5_unit_summary.csv": {
+    "bytes": 6114,
+    "sha256": "3753d10c2ecf588e556090fe8658aa052282e7e8c9e0736352a1f446499d8344"
+  },
+  "scout_personnel_2026_week5_usage.csv": {
+    "bytes": 85956,
+    "sha256": "b0ab00a02d8764abf0e8dc7240c3b255f7441196789e64a8e253753bcc8bd68d"
+  },
+  "scout_personnel_2026_week5_watchlist.csv": {
+    "bytes": 49296,
+    "sha256": "d974ea8a8e0eb1c6b9c05029ca0c98480ee426b5084e4b00fd3c57d8515c698c"
+  },
+  "scout_qb_2025_switch_audit.csv": {
+    "bytes": 44364,
+    "sha256": "f4aee0490af9216eecd72e7178cb9abc18d22ee425f9bea4020c7bbf0ad39b85"
+  },
+  "scout_qb_2025_switch_validation.csv": {
+    "bytes": 6520,
+    "sha256": "ffabfd46985dccfe7069798cf8dd90226e1dd835937ad7188a8978974b53cac6"
+  },
+  "scout_qb_2026_week5_efficiency.csv": {
+    "bytes": 1042,
+    "sha256": "8314215e0e6a17fc1fe0339b583b5bbe4ec83ac2e08686d492172893bb1d318c"
+  },
+  "scout_qb_2026_week5_shrunk.csv": {
+    "bytes": 1580,
+    "sha256": "27c0df4cad9211d1889fea939711cc3d4f1de5045fca68d046249c8abd488a27"
+  },
+  "scout_qb_shrinkage_validation.csv": {
+    "bytes": 471,
+    "sha256": "68c93330e545eb33659be705a78f8647ee16ee77f6ca821bf80d9723ed5cf627"
+  },
+  "scout_qb_streak_backtest.csv": {
+    "bytes": 728134,
+    "sha256": "608e8f912d88d9e3dc760872821e085f1c5012c0d974e2c49c3f66c2e959a98c"
+  },
+  "scout_qb_team_context_2025.csv": {
+    "bytes": 104109,
+    "sha256": "c2c9843af73ed5d5f965e7f67d9a6fd462dcac3d4b59014330232a37e62788fc"
+  },
+  "scout_scorecard_2026-10-12_BUF_LA_pregame.json": {
+    "bytes": 2394,
+    "sha256": "c23dfa2603032fce1eca4c6863550d6c64cce29b52685796904a53f04efd3abe"
+  },
+  "scout_tm_2025_baseline_graded.csv": {
+    "bytes": 35285,
+    "sha256": "8a43c28ab8902e579953ab0976f69c0a2b3776fe8375c4cb0a99f4be2f99fc2c"
+  },
+  "scout_tm_2025_baseline_predictions.csv": {
+    "bytes": 30418,
+    "sha256": "c3cda3adcf60e559469503773f7bbf03d46f6960f135b5808d699649db230aba"
+  },
+  "scout_unified_2025_comparison.csv": {
+    "bytes": 18255,
+    "sha256": "d3ce3b7dadb2695053c99ebe963a180d909e00aea31808a2fd7e81747a91a368"
+  },
+  "scout_unified_2025_manifest.json": {
+    "bytes": 1612,
+    "sha256": "fbef3d0014822519566d0104b47e48f9603aab5953c00845868e4f05a7cb5b0c"
+  },
+  "scout_unified_2025_picks.csv": {
+    "bytes": 297289,
+    "sha256": "79796c9b5667151e761753ca13647d220c5a02a5123736e37eb22b79c2f7fb7b"
+  },
+  "scout_unified_2025_summary.csv": {
+    "bytes": 772,
+    "sha256": "4bfeaddfcd262a3925aac2fd3439f6ed9baace55f8d4685cbae78a3b5f541fac"
+  },
+  "scout_v1_v3_2026_week5_frozen.csv": {
+    "bytes": 1286,
+    "sha256": "767f71231b1de97dedfe039f5d10e20b4f5b41dd52960006e26df43103ecc3fd"
+  },
+  "scout_v1_v3_2026_week5_graded.csv": {
+    "bytes": 1626,
+    "sha256": "63f942ad7cfbfd1f87b7e3ac0df99d2d1d1641519584337e806ef60fae8b3249"
+  },
+  "scout_v3_2025_backtest.csv": {
+    "bytes": 11431,
+    "sha256": "0619f22ec97408f8292867bf3d67095233ec6b2e84c443aad0c9c867dc667cc7"
+  },
+  "scout_v3_2025_week5_features.csv": {
+    "bytes": 1840,
+    "sha256": "fc90b19ff42c7e662b30eb282c7c70c3ea12eeccb50ee5b8746bcbeed4d7e638"
+  },
+  "scout_v3_vs_v1_2025.csv": {
+    "bytes": 12921,
+    "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
+  },
+  "site_views.py": {
+    "bytes": 3702,
+    "sha256": "7ddef3ea4a59bd0e8f7e7f3ed7930d345933eeb0f67438bcc23296edaefeba1a"
+  },
+  "static/Images/Branding/branding-preview.jpg": {
+    "bytes": 399116,
+    "sha256": "8a154df7d96d583dc7993e70319f57a5f6d50436bf1a528d728f9dec33832cf9"
+  },
+  "static/Images/Branding/conspiracy-dungeon.png": {
+    "bytes": 906808,
+    "sha256": "ad726ade53610d53cea3ea50fcf970302401a5b1e390898525fe2f51985c827e"
+  },
+  "static/Images/Branding/gravy-train-branding/README.txt": {
+    "bytes": 1011,
+    "sha256": "839fd6062d4c287d4dcefd110b0710a125c0d694aa19a08d8521e68b9ec6fce6"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-full.png": {
+    "bytes": 851979,
+    "sha256": "892256da6bddbc0aa78908dac8e5798b143f853e670a4eca249647846a6a3bd3"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-16.png": {
+    "bytes": 622,
+    "sha256": "1130299b908ce4847f502ab96fcc327e96f8969f659ffbb2ce94d2f10ede21b4"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-180.png": {
+    "bytes": 22891,
+    "sha256": "aec7df5c80cd89c10a3e8c599de3af8a93e6e4f265a4a8540ef5159fb228da78"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-192.png": {
+    "bytes": 25583,
+    "sha256": "a8de4fd309fefbb38d86fc0422de3def2f7593e852e42ed021a77f14b0218df5"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-32.png": {
+    "bytes": 1589,
+    "sha256": "0dcb99fb2d4cd0c3472b6a691b1add74aa207dfd133b6d4e796598a859047c52"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-48.png": {
+    "bytes": 2872,
+    "sha256": "6ef05bd99f7d8a74d094d318ca15a8d0d552400a5bce1647559f9fb645310902"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon-64.png": {
+    "bytes": 4320,
+    "sha256": "efa3e6c0a16d8dc224a6f86c1ef6f1d87393cc812a4e7e729f72b2a3717eb297"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-icon.png": {
+    "bytes": 128947,
+    "sha256": "216aa533e2d1f93388db7e9ab87a61960036ac0d0054e0e06dfdab2c50be1bce"
+  },
+  "static/Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png": {
+    "bytes": 839951,
+    "sha256": "973b0c7f701f5311d4cce120053a6a79c02943bc83ff39ee88bd34617e8dc78d"
+  },
+  "static/Images/Branding/gravy-train-branding/favicon.ico": {
+    "bytes": 131725,
+    "sha256": "ca586cb22bc28c4631d5e298503baa81ea5cd6ba14755c64438fba46ac39a2c2"
+  },
+  "static/Images/Branding/gravy-train-branding/generation-prompts.json": {
+    "bytes": 2156,
+    "sha256": "3c0564fd22e81224d6488bba43a76c350a921e87c44276478ec2b6c6c09197a6"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-full.png": {
+    "bytes": 811247,
+    "sha256": "1d8da16f7720e22d27ce3c3f174cef5c4c79c5736fa4ce5abfbbd036d7333185"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-16.png": {
+    "bytes": 834,
+    "sha256": "6b645d1af17d5e0b1bb9d8daad1db29955330150cdac27e37b2e4bc932d21968"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-180.png": {
+    "bytes": 47979,
+    "sha256": "aec84cc0419bcc59a2fd7e0b626431796b190059b4ed34216a00100176341d7a"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-192.png": {
+    "bytes": 53673,
+    "sha256": "0db3911c91eb1d78e49e1854fcf448292e87e934c26e5953996218093ef0cd3c"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-32.png": {
+    "bytes": 2438,
+    "sha256": "c1068e7c79e1413647a762006f1b1a67ae6e4e9b4c4c1cd6c1f2b8e15184f4b1"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-48.png": {
+    "bytes": 4825,
+    "sha256": "d17b8790e54a8788ff0f1810ced898fda8270254f5e1a8ccea9c9e6296b90a5e"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-64.png": {
+    "bytes": 7861,
+    "sha256": "bcc4867798153a70510516b705ec1878d6d239e0f6112d0c0c309d5b809c542b"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon.png": {
+    "bytes": 301853,
+    "sha256": "284e9a3c0934a306780f925f2b3d1d16348fa6c72648e1c571877b3927e93039"
+  },
+  "static/Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png": {
+    "bytes": 983122,
+    "sha256": "4d6d72a51388376c5c30ed55521bf915a855ca48f51738d4072c9288de5886a6"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-full.png": {
+    "bytes": 755521,
+    "sha256": "0b9ee7de59c5d2f891323980b0349b4af996051cbd78264bdc2262f4d81716b0"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-16.png": {
+    "bytes": 758,
+    "sha256": "4b96dd4f0de699a8c76aed3cdb2a30819aaf3f2ca830290bc9e694aea40dac83"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-180.png": {
+    "bytes": 36804,
+    "sha256": "a598fd1496e1a1b86d8bd7b017187bdb90514a4a5d5927824577824d202cc928"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-192.png": {
+    "bytes": 41298,
+    "sha256": "0628f50a04cbe86b1dda9b49a089b5d61ce814db3a5650505f5979d64180e457"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-32.png": {
+    "bytes": 2078,
+    "sha256": "13e8b07c093d79d2acc07aed7c2b2464bc0360f49f552f570eb0ce6ac63051b7"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-48.png": {
+    "bytes": 3975,
+    "sha256": "b1e943fdb34e5f67b1c15db9888a32d12660125bbfc1a53ecceb167eedd28cc7"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon-64.png": {
+    "bytes": 6303,
+    "sha256": "2c7ea590fdf58ee14e4b86502f64db9d2b02137a71f1c38eb107f66cb3b0692d"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-icon.png": {
+    "bytes": 236297,
+    "sha256": "cc77bd7a159e23ef62273edc93a903c4deeeb12754c0ff278672d80f76cb3dc8"
+  },
+  "static/Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png": {
+    "bytes": 1674707,
+    "sha256": "785b12b3db9568738f18e2bdc63cacf01605130c70ddabacaa9fdb94cd4cd086"
+  },
+  "static/Images/Branding/gravy-train-panels.zip": {
+    "bytes": 2576699,
+    "sha256": "d10f5d5e13bc6c87e3b6204a5fbdc586ef3603ff24917a1f512134f9ec86a33b"
+  },
+  "static/Images/Branding/gravy-train.png": {
+    "bytes": 865725,
+    "sha256": "ec00ce2892ed07cd44047925671e1b623adf1b81fa36566fdefd23096936b25b"
+  },
+  "static/Images/Branding/the-plug.png": {
+    "bytes": 803043,
+    "sha256": "9af877b93fa668b3e0a763a66e30b7fecf3a78806325fb65edb7b6957d769e56"
+  },
+  "static/Images/Branding/trend-findah-background.png": {
+    "bytes": 1793788,
+    "sha256": "f588f637d3fc3a4ebd99e1f23ce9f4f0d21a2e812bca70810312ed949bb9a1aa"
+  },
+  "static/Images/Branding/trend-findah-full.png": {
+    "bytes": 803189,
+    "sha256": "a47f54228d7dc82d0b5b1b14ca9247c66aeb55988f570065649673f7a2b54d5b"
+  },
+  "static/Images/Branding/trend-findah-icon.png": {
+    "bytes": 202793,
+    "sha256": "67cc211a438a350740c4992c2ad3b03a64a71ec69c83f6ad65bcfb60b013f5f8"
+  },
+  "static/Images/Branding/trend-findah-nav.png": {
+    "bytes": 215461,
+    "sha256": "194d218efb171167c457fe877fe2a30e7dfc1956d1ee82cae584f9ddd5624d4b"
+  },
+  "static/Images/Branding_2/Trend Findah 3000 Neon City Logo.png": {
+    "bytes": 1793788,
+    "sha256": "f588f637d3fc3a4ebd99e1f23ce9f4f0d21a2e812bca70810312ed949bb9a1aa"
+  },
+  "static/branding.css": {
+    "bytes": 2309,
+    "sha256": "2833794805d0dddda8d3d8c8b897c0847131574903df5562a0318f6d104c7b14"
+  },
+  "static/membership.css": {
+    "bytes": 783,
+    "sha256": "9a4ca5f758df931080c119dbfa5b3a80218fa1d76e0554b2919fee0abfa2a88b"
+  },
+  "static/membership.js": {
+    "bytes": 783,
+    "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
+  },
+  "static/navigation.css": {
+    "bytes": 4453,
+    "sha256": "4611e2b3c08696e19969bc68045981d85adb3889bd2558fc7d96b78612e66039"
+  },
+  "static/navigation.js": {
+    "bytes": 589,
+    "sha256": "808e9f474cb6a321a945252e4e0d22981a9b09bf2bc49402881cf04340e89f7a"
+  },
+  "static/scout4.css": {
+    "bytes": 6348,
+    "sha256": "3a5f7b7269709f7251d12f91c58f1b4f5cba32f5d40e31e2022442e51d9f3fa7"
+  },
+  "static/styles.css": {
+    "bytes": 20363,
+    "sha256": "7a652c983d9f8b3516a2f2cf061b2392865a9a1318eb4d58f92c022894f5b7c1"
+  },
+  "static/weekly_results.css": {
+    "bytes": 2674,
+    "sha256": "255027472395b4c16ff80a932bb5fd29dfdfb441eb0fc79ddd2db68609158c4b"
+  },
+  "sunday_matchups_2026-10-11.csv": {
+    "bytes": 2101,
+    "sha256": "61e41b204e79560efc3907f36d1ed155d9dfce166ee410668653460eccc43684"
+  },
+  "sunday_pregame_2026-10-11_1.csv": {
+    "bytes": 1476,
+    "sha256": "ae950c0c9bfe97a9a284ea119843dbd30fc06bf83ed3f218a12f6469c0ff1e71"
+  },
+  "sunday_pregame_2026-10-11_10.csv": {
+    "bytes": 1562,
+    "sha256": "e4b85631f27764498e5cf9dccb74a63fa5e5530e698541238841194ae5893640"
+  },
+  "sunday_pregame_2026-10-11_3.csv": {
+    "bytes": 1549,
+    "sha256": "3d97e19dfb3f460dc081de77edaa44dc3ebe3dc6b4f03a86eef19c0d7a77d3e2"
+  },
+  "sunday_pregame_2026-10-11_5.csv": {
+    "bytes": 1559,
+    "sha256": "1e019ba4b7744089aafbb2d04890e3cab44d410b2d8539478ac19fae53e46221"
+  },
+  "sunday_pregame_2026-10-11_all.csv": {
+    "bytes": 1582,
+    "sha256": "1877510f9ab332577da3e9b715fba8107e19ac13fceff2dadf509287b9b5f9d9"
+  },
+  "sunday_results_comparison.csv": {
+    "bytes": 601,
+    "sha256": "9aad9c60746a87f27ce8fe89babae747a05a6d07835290ba9ee9741b328e5bef"
+  },
+  "sunday_scout.py": {
+    "bytes": 10805,
+    "sha256": "e158c026126f8883ab857fde9c3cf0b0d65e4913155f162ea05af788f9ce7927"
+  },
+  "sunday_scout_pregame_2026-10-11.csv": {
+    "bytes": 1927,
+    "sha256": "565adafdfacc6aca2dd5e698be4c5154cdf3e5466d3ae221df23b30149ce293a"
+  },
+  "sunday_window_performance.csv": {
+    "bytes": 311,
+    "sha256": "621b2c37a239ec32e3215c4742fdd5413ccd34dcd780ed30c1819d78ec50da33"
+  },
+  "templates/_branding_head.html": {
+    "bytes": 1415,
+    "sha256": "5ef027803b634e23c58cb5afd01da883b4125a41880ec961479306bffdf77355"
+  },
+  "templates/_home_sections.html": {
+    "bytes": 1227,
+    "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
+  },
+  "templates/_site_navigation.html": {
+    "bytes": 3728,
+    "sha256": "7f16de4b6c3d81640378730018bb20e57d17cff7589c40f04d9ea1c98f688a49"
+  },
+  "templates/_trend_comparisons.html": {
+    "bytes": 2708,
+    "sha256": "06742e7a9229a9d31e72cf7a641e8ca723efe01b5ab1edbc6260ee4d8ba7a542"
+  },
+  "templates/_trend_evidence.html": {
+    "bytes": 621,
+    "sha256": "ccaf05691346d9a6dc0bd905c2ebc64486bc5f3fc3977b08a752c0eb5ac98177"
+  },
+  "templates/anomalies_section.html": {
+    "bytes": 12321,
+    "sha256": "8c28029a1537d7aece64691fc22dade4bdd2d407bd9c31581a4b79641929a1d7"
+  },
+  "templates/backtests.html": {
+    "bytes": 8965,
+    "sha256": "0af093f86f2cdc80d33efe0038b3d871782ebaf637f4d7464ed5a6e46269fe26"
+  },
+  "templates/conspiracy_dungeon.html": {
+    "bytes": 21546,
+    "sha256": "857ec15ddcdf367e9de071089e19cc1c914d7ef0c7afdce35f52ab8f9c8904e6"
+  },
+  "templates/index.html": {
+    "bytes": 25714,
+    "sha256": "3562a906cb31806e953d4dd863718db8235ec3a697a925f5bafd940a04ddaa4a"
+  },
+  "templates/membership.html": {
+    "bytes": 3928,
+    "sha256": "3cf464169e61567acd9d814b53b104fec9585828beef9c144011a46adc02026c"
+  },
+  "templates/movement_section.html": {
+    "bytes": 2750,
+    "sha256": "6e992d2e3fa07147da8f35604fd4740943727ccdc62655de915007d24cc05ac7"
+  },
+  "templates/password_recovery.html": {
+    "bytes": 2335,
+    "sha256": "f20320792b1004bdb931c64d1750e154e32e29d8f3dd9844daf925ec303b193f"
+  },
+  "templates/scout4_base.html": {
+    "bytes": 3233,
+    "sha256": "8f5e0748647ca1b3ae96ae27ea4e3dfc0930cb25fcb202a63f8ef64c698e6eb7"
+  },
+  "templates/scout4_capture_error.html": {
+    "bytes": 593,
+    "sha256": "ecaebb222e7af46822404b35b9319fe84463ad3870a0407ff887a908f64ac75f"
+  },
+  "templates/scout4_players.html": {
+    "bytes": 5800,
+    "sha256": "915e9862e131c6b117376e5db9b09adb2d1518ad8a37d24ded49f67c7bc181f2"
+  },
+  "templates/scout4_ratings.html": {
+    "bytes": 6792,
+    "sha256": "8650af849131909e095b756649b9fa1fd124421586fb0e56c85b2480be26e1d3"
+  },
+  "templates/scout4_shadow.html": {
+    "bytes": 9171,
+    "sha256": "847336147c27d56d38df5a95ee7d400ff743939591140c089dda2a5559a5450e"
+  },
+  "templates/scout4_teams.html": {
+    "bytes": 4075,
+    "sha256": "260e22ac1b1b34c473dadcad67431e6693cc701fdd5fe06326dfeeadb8b0e666"
+  },
+  "templates/sunday.html": {
+    "bytes": 8128,
+    "sha256": "c4d538a548141dae9a1ae7336b121e08d720eb7aebbc24296090b4000f8c8348"
+  },
+  "templates/sunday_results.html": {
+    "bytes": 6459,
+    "sha256": "d12929ff2d30d0cfe031897b53b0c885890c6588113f8f1004d265faab04f5ea"
+  },
+  "templates/sunday_scout.html": {
+    "bytes": 9483,
+    "sha256": "0ca0fb5f7b2e796e0ffe505292def3b43fe7e98231881a0acb93a84ed619b9f5"
+  },
+  "templates/trend_details.html": {
+    "bytes": 3841,
+    "sha256": "332a6b73fcdb6b683bdda2856962242d6dd60d97ab1c7087dc62e92d580a6a6b"
+  },
+  "templates/trend_games.html": {
+    "bytes": 4049,
+    "sha256": "54b4c1206ad105199adfadb181ef133a339a4d0b440350cd5c800165e0e65020"
+  },
+  "templates/trends.html": {
+    "bytes": 19343,
+    "sha256": "f97955da8a29aea29a952253d13f143a83828d7b48bf88595108a2987c3f6668"
+  },
+  "test_hosting.py": {
+    "bytes": 1997,
+    "sha256": "348a4b289c7e6f59ef7c6199081326bd86ad48fe294b785826fd0be8f99a6496"
+  },
+  "test_membership.py": {
+    "bytes": 12531,
+    "sha256": "52fa6e4872e3e8806376d12514df8538f75f5fcd66c927ab79a93efac68747f3"
+  },
+  "test_page_layouts.py": {
+    "bytes": 1776,
+    "sha256": "ea95f376126e044861d8666d53aceb8d2eb766d2f3ac4eaa1bfa6f882cdae0ef"
+  },
+  "test_site_sections.py": {
+    "bytes": 4391,
+    "sha256": "fc35343e68a35c82d9a5b5b760cefd994b234991120d98d195b4a1689c68384d"
+  },
+  "test_trend_filters.py": {
+    "bytes": 18681,
+    "sha256": "39f10ed8503c465f157c481946bdbae5bb3e6a79f590991a2e4dd6f7f8bfa175"
+  },
+  "time_machine_2025_v1_frozen.csv": {
+    "bytes": 29982,
+    "sha256": "1c2b6a9acaf599c6595c4ffbf3e011731f1a3a2159e7348186c0bd36be470d35"
+  },
+  "time_machine_2025_v1_graded.csv": {
+    "bytes": 34382,
+    "sha256": "e21da212a8faa390c1a42fe41dc5be1327cc9c09e9b33347730ad46f00772fc6"
+  },
+  "time_machine_2025_v2_frozen.csv": {
+    "bytes": 102915,
+    "sha256": "a93feb21e18113cbea6683b59795c3b38478abf33abc346bbeb74284d5088074"
+  },
+  "time_machine_2025_v2_graded.csv": {
+    "bytes": 107359,
+    "sha256": "5a1566f710987f7eb89ce6b7df61d0085189d18331ef41d2bc093954556fe4a3"
+  },
+  "trend_finder_2.py": {
+    "bytes": 77315,
+    "sha256": "404e982b9767d222bf73223c731bc534ff34984524a318628722f6fde7e18f39"
+  },
+  "trendfindah_scout_preview_2026-10-11.csv": {
+    "bytes": 1859,
+    "sha256": "c1dac919ac283212915dd7e4130ed79b2ed315aa606a60f9ebd43d8dddd83417"
+  },
+  "weekly_results.py": {
+    "bytes": 6603,
+    "sha256": "98537a4a7c834d3fd747ee0b9833b3a241f722d32bb6c4fa24448a61698ea8b9"
+  },
+  "world_event_notes.csv": {
+    "bytes": 274,
+    "sha256": "efb4b177fab2ba2c6223dc95c3f338f0bf53d6708d196748fa886afc0ce29a3d"
+  },
+  "wsgi.py": {
+    "bytes": 1521,
+    "sha256": "a74bd00425cfed31415d0ee93770a6e882d81a84f9f0421f18e752619bc070e3"
+  },
+  "LAUNCH_CHECKLIST.md": {
+    "bytes": 2099,
+    "sha256": "412f32f95ac47e8b5746919dc2cbb4e2316dbcc667fbf0bb526666c68fd021b3"
+  },
+  "test_launch_validation.py": {
+    "bytes": 1806,
+    "sha256": "d9940e0cf6c231b86e9de08e5a8e58e31db6e244e349819c0e4a5e023604503c"
+  },
+  "test_trend_evidence.py": {
+    "bytes": 7590,
+    "sha256": "1e51a8c048002682bc2d312266e427849683c9b09330ecea864a21be3e791425"
+  },
+  "test_dog_qb_filters.py": {
+    "bytes": 6022,
+    "sha256": "c4345153153c3b0a98b60ee4c56d38ce015ad6007bff436fb0cc228875140a83"
+  },
+  "scripts/prepare_release.py": {
+    "bytes": 4251,
+    "sha256": "1a8c33fadc011909daf917cb019360bd7cc5d32c781a3979503efaf60f5d6642"
+  }
+}

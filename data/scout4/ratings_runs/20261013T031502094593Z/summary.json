@@ -1,0 +1,63 @@
+{
+  "version": "scout4-ratings-1",
+  "training": 2024,
+  "evaluation": 2025,
+  "status": "DEVELOPMENT REPLAY \u2014 not untouched test",
+  "comparable_games": 208,
+  "models": {
+    "Scoring only": {
+      "games": 208,
+      "margin_mae": 10.434880637684282,
+      "margin_rmse": 12.947918234870196,
+      "total_mae": 10.37181029323774,
+      "ats_wins": 103,
+      "ats_losses": 104,
+      "pushes": 1,
+      "no_calls": 0,
+      "unavailable_lines": 0,
+      "ats_pct": 49.75845410628019
+    },
+    "Scoring + matchup EPA": {
+      "games": 208,
+      "margin_mae": 10.491495627607055,
+      "margin_rmse": 13.139021852247344,
+      "total_mae": 10.464275304778718,
+      "ats_wins": 104,
+      "ats_losses": 103,
+      "pushes": 1,
+      "no_calls": 0,
+      "unavailable_lines": 0,
+      "ats_pct": 50.24154589371981
+    }
+  },
+  "existing_models_same_games": {
+    "TM Baseline": {
+      "games": 208,
+      "wins": 95,
+      "losses": 112,
+      "pushes": 1,
+      "ats_pct": 45.893719806763286
+    },
+    "V1 Recent Form": {
+      "games": 208,
+      "wins": 116,
+      "losses": 91,
+      "pushes": 1,
+      "ats_pct": 56.03864734299517
+    },
+    "V3 Matchup EPA": {
+      "games": 208,
+      "wins": 112,
+      "losses": 95,
+      "pushes": 1,
+      "ats_pct": 54.106280193236714
+    }
+  },
+  "limitations": [
+    "2025 has already been used for development.",
+    "Historical saved lines are not authenticated quotes at the prediction cutoff.",
+    "Weekly inputs exclude current/future weeks; revised feeds lack historical availability proof.",
+    "No causal injury/replacement effects or calibrated ML/ATS/total probabilities.",
+    "No parameter or winner selection based on these evaluation results."
+  ]
+}

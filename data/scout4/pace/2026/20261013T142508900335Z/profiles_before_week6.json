@@ -1,0 +1,194 @@
+{
+  "ARI": {
+    "eligible_plays": 231,
+    "clock_pairs": 164,
+    "mean_game_clock_seconds_between_plays": 31.8109756097561,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "LAC": {
+    "eligible_plays": 250,
+    "clock_pairs": 178,
+    "mean_game_clock_seconds_between_plays": 31.3876404494382,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "PIT": {
+    "eligible_plays": 247,
+    "clock_pairs": 167,
+    "mean_game_clock_seconds_between_plays": 32.808383233532936,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "ATL": {
+    "eligible_plays": 237,
+    "clock_pairs": 188,
+    "mean_game_clock_seconds_between_plays": 35.638297872340424,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "IND": {
+    "eligible_plays": 252,
+    "clock_pairs": 198,
+    "mean_game_clock_seconds_between_plays": 32.7979797979798,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "BAL": {
+    "eligible_plays": 208,
+    "clock_pairs": 147,
+    "mean_game_clock_seconds_between_plays": 36.27891156462585,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "BUF": {
+    "eligible_plays": 245,
+    "clock_pairs": 176,
+    "mean_game_clock_seconds_between_plays": 32.09090909090909,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "HOU": {
+    "eligible_plays": 255,
+    "clock_pairs": 190,
+    "mean_game_clock_seconds_between_plays": 32.62105263157895,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "CHI": {
+    "eligible_plays": 287,
+    "clock_pairs": 218,
+    "mean_game_clock_seconds_between_plays": 33.11467889908257,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "CAR": {
+    "eligible_plays": 191,
+    "clock_pairs": 142,
+    "mean_game_clock_seconds_between_plays": 28.640845070422536,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "CLE": {
+    "eligible_plays": 220,
+    "clock_pairs": 156,
+    "mean_game_clock_seconds_between_plays": 30.71153846153846,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "JAX": {
+    "eligible_plays": 220,
+    "clock_pairs": 157,
+    "mean_game_clock_seconds_between_plays": 34.05095541401274,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "DAL": {
+    "eligible_plays": 261,
+    "clock_pairs": 202,
+    "mean_game_clock_seconds_between_plays": 30.004950495049506,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "NYG": {
+    "eligible_plays": 260,
+    "clock_pairs": 189,
+    "mean_game_clock_seconds_between_plays": 34.18518518518518,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "DEN": {
+    "eligible_plays": 231,
+    "clock_pairs": 160,
+    "mean_game_clock_seconds_between_plays": 31.5875,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "KC": {
+    "eligible_plays": 192,
+    "clock_pairs": 146,
+    "mean_game_clock_seconds_between_plays": 31.698630136986303,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "MIN": {
+    "eligible_plays": 271,
+    "clock_pairs": 186,
+    "mean_game_clock_seconds_between_plays": 33.98924731182796,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "GB": {
+    "eligible_plays": 208,
+    "clock_pairs": 146,
+    "mean_game_clock_seconds_between_plays": 33.25342465753425,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "MIA": {
+    "eligible_plays": 209,
+    "clock_pairs": 147,
+    "mean_game_clock_seconds_between_plays": 32.82312925170068,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "LV": {
+    "eligible_plays": 246,
+    "clock_pairs": 175,
+    "mean_game_clock_seconds_between_plays": 32.92,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "SEA": {
+    "eligible_plays": 246,
+    "clock_pairs": 169,
+    "mean_game_clock_seconds_between_plays": 35.366863905325445,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "NE": {
+    "eligible_plays": 219,
+    "clock_pairs": 163,
+    "mean_game_clock_seconds_between_plays": 32.515337423312886,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "DET": {
+    "eligible_plays": 218,
+    "clock_pairs": 167,
+    "mean_game_clock_seconds_between_plays": 29.682634730538922,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "NO": {
+    "eligible_plays": 234,
+    "clock_pairs": 178,
+    "mean_game_clock_seconds_between_plays": 30.134831460674157,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "NYJ": {
+    "eligible_plays": 238,
+    "clock_pairs": 171,
+    "mean_game_clock_seconds_between_plays": 34.04093567251462,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "TEN": {
+    "eligible_plays": 170,
+    "clock_pairs": 123,
+    "mean_game_clock_seconds_between_plays": 30.715447154471544,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "LA": {
+    "eligible_plays": 258,
+    "clock_pairs": 189,
+    "mean_game_clock_seconds_between_plays": 30.952380952380953,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "SF": {
+    "eligible_plays": 214,
+    "clock_pairs": 161,
+    "mean_game_clock_seconds_between_plays": 33.75155279503105,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "TB": {
+    "eligible_plays": 241,
+    "clock_pairs": 170,
+    "mean_game_clock_seconds_between_plays": 34.1,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "CIN": {
+    "eligible_plays": 266,
+    "clock_pairs": 196,
+    "mean_game_clock_seconds_between_plays": 33.91836734693877,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "WAS": {
+    "eligible_plays": 247,
+    "clock_pairs": 171,
+    "mean_game_clock_seconds_between_plays": 32.33918128654971,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  },
+  "PHI": {
+    "eligible_plays": 240,
+    "clock_pairs": 176,
+    "mean_game_clock_seconds_between_plays": 33.26136363636363,
+    "definition": "Within-drive consecutive qualifying snaps; game clock, not real elapsed time. Excludes final two minutes, overtime, kneels, spikes and margins over 14."
+  }
+}

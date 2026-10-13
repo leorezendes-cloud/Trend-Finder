@@ -1,0 +1,9 @@
+.membership { max-width: 650px; margin: 32px auto; }
+.membership > p { text-align: center; font-family: Arial, sans-serif; }
+.membership input:not([type=checkbox]) { box-sizing: border-box; width: 100%; padding: 12px; margin-bottom: 18px; border: 1px solid #4b5563; border-radius: 4px; font: 16px Arial, sans-serif; }
+.member-check { display: flex; align-items: flex-start; gap: 10px; -webkit-text-stroke: 0; font: 16px Arial, sans-serif; }
+.member-note, .member-account { color: white; font: 15px/1.5 Arial, sans-serif; }
+.member-message { padding: 12px; background: white; border: 2px solid black; border-radius: 8px; }
+.membership input:focus-visible, .membership button:focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
+
+.member-check[hidden] { display: none; }

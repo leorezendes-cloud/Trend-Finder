@@ -1,0 +1,129 @@
+{
+  "game_id": "2026_06_CAR_PHI",
+  "season": 2026,
+  "week": 6,
+  "away_team": "CAR",
+  "home_team": "PHI",
+  "kickoff_utc": "2026-10-18T17:00:00+00:00",
+  "decision_cutoff_utc": "2026-10-13T04:52:51.490778+00:00",
+  "market": "Spread",
+  "quote": {
+    "line": 1.5,
+    "odds": {
+      "away": -115.0,
+      "home": -105.0
+    },
+    "sportsbook": "DraftKings",
+    "source_url": "https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days&tb_page=1",
+    "captured_at_utc": "2026-10-13T04:52:51.139667+00:00",
+    "source_update_time": "Unavailable",
+    "kickoff_utc": "2026-10-18T17:00:00+00:00",
+    "market": "Spread"
+  },
+  "selected_side": "PHI",
+  "features": {
+    "scoring_strength_diff": 4.592013888888889,
+    "recent_margin_diff": 8.571428571428571,
+    "venue_scoring_diff": -2.616666666666667,
+    "venue_indicator": -1.0,
+    "passing_matchup_diff": 9.26393011748433,
+    "rushing_matchup_diff": -1.0654498630909008,
+    "away_handicap": 1.5
+  },
+  "prediction": {
+    "away_cover_probability": 0.4913502895610161,
+    "contributions": [
+      {
+        "feature": "recent_margin_diff",
+        "label": "Recent scoring margin difference",
+        "input": 8.571428571428571,
+        "log_odds": 0.09517431454823026
+      },
+      {
+        "feature": "venue_scoring_diff",
+        "label": "Venue scoring context difference",
+        "input": -2.616666666666667,
+        "log_odds": 0.08044693694173324
+      },
+      {
+        "feature": "venue_indicator",
+        "label": "Home / away / neutral context",
+        "input": -1.0,
+        "log_odds": -0.036515354922423006
+      },
+      {
+        "feature": "passing_matchup_diff",
+        "label": "Passing offense versus defense difference",
+        "input": 9.26393011748433,
+        "log_odds": -0.1333534790460907
+      },
+      {
+        "feature": "rushing_matchup_diff",
+        "label": "Rushing offense versus defense difference",
+        "input": -1.0654498630909008,
+        "log_odds": -0.02045840886029675
+      },
+      {
+        "feature": "away_handicap",
+        "label": "Saved away handicap",
+        "input": 1.5,
+        "log_odds": -0.019896302501666966
+      }
+    ]
+  },
+  "history_away": [
+    "2026_01_CHI_CAR",
+    "2026_02_CAR_ATL",
+    "2026_03_CAR_CLE",
+    "2026_04_DET_CAR"
+  ],
+  "history_home": [
+    "2026_01_WAS_PHI",
+    "2026_02_PHI_TEN",
+    "2026_03_PHI_CHI",
+    "2026_04_LA_PHI",
+    "2026_05_PHI_JAX"
+  ],
+  "model_sha256": "4f7d99f214523908a6ffe023c722d2f50d87f51a55a7eff0c657767f3d873e52",
+  "model_name": "Without scoring_strength_diff",
+  "stats_source_manifest": {
+    "schema_version": 1,
+    "season": 2026,
+    "retrieval_started_at": "2026-10-13T04:52:50.196779+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2026/20261013T045250196539Z/team.csv",
+        "rows": 158,
+        "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2026/20261013T045250196539Z/player.csv",
+        "rows": 5506,
+        "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c",
+        "missing_metrics": []
+      }
+    },
+    "retrieved_at": "2026-10-13T04:52:50.773813+00:00"
+  },
+  "schedule_snapshot_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "quote_snapshot_sha256": "cdb125aeea7bc11850769202b0f27f1e1eec56dcdc08b3edb70dd9196cf0ff44",
+  "input_snapshot_dir": "data/scout4/shadow/inputs/20261013T045251490778Z",
+  "pipeline_sha256": {
+    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6",
+    "scout4/ats_lab.py": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f",
+    "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+    "scout4/margin_lab.py": "a827d32fca6ccef6ccc93f1718d52a455eb5e16f5e66d530716684b5dd1d862c",
+    "scout4/stats.py": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba",
+    "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4"
+  },
+  "limitations": [
+    "Research forecast, not validated confidence or a betting recommendation.",
+    "No injury/replacement or forecast weather effects.",
+    "Source update timestamps may be unavailable; inputs were observed/retrieved before cutoff."
+  ],
+  "sealed_at_utc": "2026-10-13T04:52:51.554944+00:00",
+  "status": "SEALED_PREKICKOFF_RESEARCH"
+}

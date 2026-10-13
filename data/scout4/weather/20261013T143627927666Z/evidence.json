@@ -1,0 +1,930 @@
+{
+  "checked_at": "2026-10-13T14:36:30.319508+00:00",
+  "records": [
+    {
+      "game_id": "2026_06_SEA_DEN",
+      "away_team": "SEA",
+      "home_team": "DEN",
+      "kickoff_utc": "2026-10-16T00:15:00+00:00",
+      "stadium_id": "DEN00",
+      "stadium": "Empower Field at Mile High",
+      "requested_latitude": 39.7439402,
+      "requested_longitude": -105.0201065,
+      "grid_latitude": 39.74471,
+      "grid_longitude": -105.02203,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:28.252664+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-16T00:00:00+00:00",
+          "temperature_2m": 52.3,
+          "wind_speed_10m": 8.9,
+          "wind_gusts_10m": 15.2,
+          "precipitation": 0.0,
+          "precipitation_probability": 56.0
+        },
+        {
+          "valid_at_utc": "2026-10-16T01:00:00+00:00",
+          "temperature_2m": 51.1,
+          "wind_speed_10m": 2.7,
+          "wind_gusts_10m": 7.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 29.0
+        },
+        {
+          "valid_at_utc": "2026-10-16T02:00:00+00:00",
+          "temperature_2m": 50.5,
+          "wind_speed_10m": 0.5,
+          "wind_gusts_10m": 0.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 29.0
+        },
+        {
+          "valid_at_utc": "2026-10-16T03:00:00+00:00",
+          "temperature_2m": 50.0,
+          "wind_speed_10m": 2.8,
+          "wind_gusts_10m": 2.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 29.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "f84b57ef41580c43e6bbbcaaf88a7e8729903db03d855d46f76fe30799750ee9",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7439402&longitude=-105.0201065&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_HOU_JAX",
+      "away_team": "HOU",
+      "home_team": "JAX",
+      "kickoff_utc": "2026-10-18T13:30:00+00:00",
+      "stadium_id": "LON00",
+      "stadium": "Wembley Stadium",
+      "requested_latitude": 51.5559836,
+      "requested_longitude": -0.2795903,
+      "grid_latitude": 51.550354,
+      "grid_longitude": -0.27337646,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:28.391244+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T13:00:00+00:00",
+          "temperature_2m": 54.4,
+          "wind_speed_10m": 14.1,
+          "wind_gusts_10m": 28.0,
+          "precipitation": 0.0,
+          "precipitation_probability": 4.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T14:00:00+00:00",
+          "temperature_2m": 54.7,
+          "wind_speed_10m": 13.6,
+          "wind_gusts_10m": 27.3,
+          "precipitation": 0.0,
+          "precipitation_probability": 7.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T15:00:00+00:00",
+          "temperature_2m": 54.7,
+          "wind_speed_10m": 13.0,
+          "wind_gusts_10m": 25.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 8.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T16:00:00+00:00",
+          "temperature_2m": 54.3,
+          "wind_speed_10m": 12.1,
+          "wind_gusts_10m": 24.2,
+          "precipitation": 0.0,
+          "precipitation_probability": 7.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "a34b74526a622ddea21933b006847ce613276acf6d77f0ed366caab443c19a86",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=51.5559836&longitude=-0.2795903&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_CHI_ATL",
+      "away_team": "CHI",
+      "home_team": "ATL",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "ATL97",
+      "stadium": "Mercedes-Benz Stadium",
+      "requested_latitude": 33.7555052,
+      "requested_longitude": -84.4008484,
+      "grid_latitude": 33.759865,
+      "grid_longitude": -84.39586,
+      "roof_context": "Retractable roof; game setting unconfirmed",
+      "roof_source": "https://www.mercedesbenzstadium.com/news/the-roof-at-mercedes-benz-stadium-closes-for-the-first-time",
+      "observed_at": "2026-10-13T14:36:28.542237+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 65.4,
+          "wind_speed_10m": 11.8,
+          "wind_gusts_10m": 16.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 67.6,
+          "wind_speed_10m": 11.4,
+          "wind_gusts_10m": 14.5,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 68.9,
+          "wind_speed_10m": 11.0,
+          "wind_gusts_10m": 13.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 69.3,
+          "wind_speed_10m": 10.6,
+          "wind_gusts_10m": 12.8,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "bd64a8e4322dcc797d31f1c5356b9756f31f432ff43243ea6c0a9d26caf2cb64",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=33.7555052&longitude=-84.4008484&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_BAL_CLE",
+      "away_team": "BAL",
+      "home_team": "CLE",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "CLE00",
+      "stadium": "Huntington Bank Field",
+      "requested_latitude": 41.5060371,
+      "requested_longitude": -81.699586,
+      "grid_latitude": 41.502296,
+      "grid_longitude": -81.709496,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:28.714389+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 58.9,
+          "wind_speed_10m": 11.9,
+          "wind_gusts_10m": 17.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 61.6,
+          "wind_speed_10m": 12.2,
+          "wind_gusts_10m": 17.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 63.2,
+          "wind_speed_10m": 11.9,
+          "wind_gusts_10m": 17.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 63.9,
+          "wind_speed_10m": 11.2,
+          "wind_gusts_10m": 18.1,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "3937da174ca5639676802814405dfe37c98880d371562239439908ac7390612b",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=41.5060371&longitude=-81.699586&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_TEN_IND",
+      "away_team": "TEN",
+      "home_team": "IND",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "IND00",
+      "stadium": "Lucas Oil Stadium",
+      "requested_latitude": 39.7602037,
+      "requested_longitude": -86.1638068,
+      "grid_latitude": 39.770077,
+      "grid_longitude": -86.17878,
+      "roof_context": "Retractable roof; game setting unconfirmed",
+      "roof_source": "https://www.lucasoilstadium.com/tours-stadium-info/background-history/",
+      "observed_at": "2026-10-13T14:36:28.852113+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 61.0,
+          "wind_speed_10m": 8.4,
+          "wind_gusts_10m": 13.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 64.1,
+          "wind_speed_10m": 9.1,
+          "wind_gusts_10m": 14.3,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 65.9,
+          "wind_speed_10m": 9.7,
+          "wind_gusts_10m": 14.8,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 66.9,
+          "wind_speed_10m": 10.1,
+          "wind_gusts_10m": 15.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "438062e7b017cabe41853e67bd45a2bd959ebc97cc76abd5f5b71d61e6cc6774",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7602037&longitude=-86.1638068&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_NYJ_NE",
+      "away_team": "NYJ",
+      "home_team": "NE",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "BOS00",
+      "stadium": "Gillette Stadium",
+      "requested_latitude": 42.0909217,
+      "requested_longitude": -71.2643321,
+      "grid_latitude": 42.09629,
+      "grid_longitude": -71.24448,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:28.996832+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 54.8,
+          "wind_speed_10m": 11.8,
+          "wind_gusts_10m": 17.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 56.2,
+          "wind_speed_10m": 12.0,
+          "wind_gusts_10m": 18.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 56.3,
+          "wind_speed_10m": 11.4,
+          "wind_gusts_10m": 18.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 55.4,
+          "wind_speed_10m": 10.4,
+          "wind_gusts_10m": 18.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "bf717c9ff6483e47c3512161453fa2d3998e8539b10e85341a851923ad45f514",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=42.0909217&longitude=-71.2643321&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_NO_NYG",
+      "away_team": "NO",
+      "home_team": "NYG",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "NYC01",
+      "stadium": "MetLife Stadium",
+      "requested_latitude": 40.813507465,
+      "requested_longitude": -74.074342406,
+      "grid_latitude": 40.80899,
+      "grid_longitude": -74.06947,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:29.199580+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 57.4,
+          "wind_speed_10m": 11.4,
+          "wind_gusts_10m": 16.3,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 59.2,
+          "wind_speed_10m": 12.1,
+          "wind_gusts_10m": 17.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 60.1,
+          "wind_speed_10m": 12.3,
+          "wind_gusts_10m": 17.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 60.2,
+          "wind_speed_10m": 12.2,
+          "wind_gusts_10m": 17.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "873b8e06208b999a59a9dc33d234c845248603ed15b74fcadde9948928230d74",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=40.813507465&longitude=-74.074342406&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_CAR_PHI",
+      "away_team": "CAR",
+      "home_team": "PHI",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "PHI00",
+      "stadium": "Lincoln Financial Field",
+      "requested_latitude": 39.9007914,
+      "requested_longitude": -75.1674645,
+      "grid_latitude": 39.909508,
+      "grid_longitude": -75.17229,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:29.352857+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 57.6,
+          "wind_speed_10m": 8.6,
+          "wind_gusts_10m": 12.1,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 59.3,
+          "wind_speed_10m": 9.3,
+          "wind_gusts_10m": 13.0,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 60.1,
+          "wind_speed_10m": 9.8,
+          "wind_gusts_10m": 13.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 60.2,
+          "wind_speed_10m": 10.0,
+          "wind_gusts_10m": 13.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "4cc06258b78ecd527cfb91989d390a2056e2b7df10df51e083efcf540bc7d36b",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9007914&longitude=-75.1674645&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_PIT_TB",
+      "away_team": "PIT",
+      "home_team": "TB",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "stadium_id": "TAM00",
+      "stadium": "Raymond James Stadium",
+      "requested_latitude": 27.9759691,
+      "requested_longitude": -82.503356,
+      "grid_latitude": 27.964216,
+      "grid_longitude": -82.50329,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:29.503968+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T17:00:00+00:00",
+          "temperature_2m": 76.8,
+          "wind_speed_10m": 19.1,
+          "wind_gusts_10m": 29.5,
+          "precipitation": 0.0,
+          "precipitation_probability": 4.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T18:00:00+00:00",
+          "temperature_2m": 77.5,
+          "wind_speed_10m": 19.5,
+          "wind_gusts_10m": 28.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 4.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T19:00:00+00:00",
+          "temperature_2m": 78.2,
+          "wind_speed_10m": 19.6,
+          "wind_gusts_10m": 28.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 21.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 78.7,
+          "wind_speed_10m": 19.7,
+          "wind_gusts_10m": 28.2,
+          "precipitation": 0.0,
+          "precipitation_probability": 21.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "8ced822d62e43e83d1e0377c755eaea86165d8ce78c11eed9779228455a3ae20",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=27.9759691&longitude=-82.503356&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_ARI_LA",
+      "away_team": "ARI",
+      "home_team": "LA",
+      "kickoff_utc": "2026-10-18T20:05:00+00:00",
+      "stadium_id": "LAX01",
+      "stadium": "SoFi Stadium",
+      "requested_latitude": 33.953485,
+      "requested_longitude": -118.3390307,
+      "grid_latitude": 33.957516,
+      "grid_longitude": -118.33903,
+      "roof_context": "Covered venue; field exposure unverified",
+      "roof_source": "https://www.sofistadium.com/",
+      "observed_at": "2026-10-13T14:36:29.649084+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 80.9,
+          "wind_speed_10m": 7.7,
+          "wind_gusts_10m": 5.1,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T21:00:00+00:00",
+          "temperature_2m": 80.4,
+          "wind_speed_10m": 9.4,
+          "wind_gusts_10m": 5.8,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T22:00:00+00:00",
+          "temperature_2m": 79.0,
+          "wind_speed_10m": 10.0,
+          "wind_gusts_10m": 6.5,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T23:00:00+00:00",
+          "temperature_2m": 77.1,
+          "wind_speed_10m": 10.2,
+          "wind_gusts_10m": 7.4,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "ba969beb3c6a25bb48b2763dc3d63ae25dd4768401b0da7183cab8d2a2f40f33",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=33.953485&longitude=-118.3390307&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_LAC_KC",
+      "away_team": "LAC",
+      "home_team": "KC",
+      "kickoff_utc": "2026-10-18T20:25:00+00:00",
+      "stadium_id": "KAN00",
+      "stadium": "GEHA Field at Arrowhead Stadium",
+      "requested_latitude": 39.0489275,
+      "requested_longitude": -94.4839962,
+      "grid_latitude": 39.052387,
+      "grid_longitude": -94.483864,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:29.851951+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 65.7,
+          "wind_speed_10m": 15.6,
+          "wind_gusts_10m": 25.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T21:00:00+00:00",
+          "temperature_2m": 65.9,
+          "wind_speed_10m": 14.6,
+          "wind_gusts_10m": 25.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T22:00:00+00:00",
+          "temperature_2m": 64.5,
+          "wind_speed_10m": 13.0,
+          "wind_gusts_10m": 25.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T23:00:00+00:00",
+          "temperature_2m": 62.2,
+          "wind_speed_10m": 11.2,
+          "wind_gusts_10m": 26.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "f2d29cee973e13ea0fc4e17991300b279f4d2f912af991a6d9936144f7ebe931",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489275&longitude=-94.4839962&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_BUF_LV",
+      "away_team": "BUF",
+      "home_team": "LV",
+      "kickoff_utc": "2026-10-18T20:25:00+00:00",
+      "stadium_id": "VEG00",
+      "stadium": "Allegiant Stadium",
+      "requested_latitude": 36.0908515,
+      "requested_longitude": -115.1833441,
+      "grid_latitude": 36.10117,
+      "grid_longitude": -115.1967,
+      "roof_context": "Fixed dome; outside weather is context only",
+      "roof_source": "https://www.allegiantstadium.com/news/detail/construction-of-allegiant-stadium-achieves-certificate-of-occupancy-1",
+      "observed_at": "2026-10-13T14:36:29.986972+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-18T20:00:00+00:00",
+          "temperature_2m": 74.0,
+          "wind_speed_10m": 3.6,
+          "wind_gusts_10m": 4.0,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T21:00:00+00:00",
+          "temperature_2m": 75.7,
+          "wind_speed_10m": 3.6,
+          "wind_gusts_10m": 4.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T22:00:00+00:00",
+          "temperature_2m": 77.0,
+          "wind_speed_10m": 3.9,
+          "wind_gusts_10m": 5.1,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        },
+        {
+          "valid_at_utc": "2026-10-18T23:00:00+00:00",
+          "temperature_2m": 77.9,
+          "wind_speed_10m": 4.4,
+          "wind_gusts_10m": 4.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 0.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "70e1a67fee3310b2857eac2dc23ff0cd78fca438d3a435c83aea881b8f9e46f6",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=36.0908515&longitude=-115.1833441&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_DAL_GB",
+      "away_team": "DAL",
+      "home_team": "GB",
+      "kickoff_utc": "2026-10-19T00:20:00+00:00",
+      "stadium_id": "GNB00",
+      "stadium": "Lambeau Field",
+      "requested_latitude": 44.5014769,
+      "requested_longitude": -88.0621617,
+      "grid_latitude": 44.50524,
+      "grid_longitude": -88.049416,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:30.127753+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-19T00:00:00+00:00",
+          "temperature_2m": 56.9,
+          "wind_speed_10m": 19.2,
+          "wind_gusts_10m": 37.6,
+          "precipitation": 0.0,
+          "precipitation_probability": 1.0
+        },
+        {
+          "valid_at_utc": "2026-10-19T01:00:00+00:00",
+          "temperature_2m": 56.2,
+          "wind_speed_10m": 19.1,
+          "wind_gusts_10m": 38.5,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        },
+        {
+          "valid_at_utc": "2026-10-19T02:00:00+00:00",
+          "temperature_2m": 55.7,
+          "wind_speed_10m": 18.9,
+          "wind_gusts_10m": 38.9,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        },
+        {
+          "valid_at_utc": "2026-10-19T03:00:00+00:00",
+          "temperature_2m": 55.4,
+          "wind_speed_10m": 18.5,
+          "wind_gusts_10m": 38.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 3.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "2a13499692c49f5f87653c9364e7f0ebc6446ddf0f422daa5818e9b70e02afdb",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=44.5014769&longitude=-88.0621617&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    },
+    {
+      "game_id": "2026_06_WAS_SF",
+      "away_team": "WAS",
+      "home_team": "SF",
+      "kickoff_utc": "2026-10-20T00:15:00+00:00",
+      "stadium_id": "SFO01",
+      "stadium": "Levi's Stadium",
+      "requested_latitude": 37.4031837,
+      "requested_longitude": -121.9698094,
+      "grid_latitude": 37.411503,
+      "grid_longitude": -121.973076,
+      "roof_context": "Open-air metadata",
+      "roof_source": "https://raw.githubusercontent.com/greerreNFL/stadiums/main/data/stadiums.csv",
+      "observed_at": "2026-10-13T14:36:30.318232+00:00",
+      "model_issued_at": null,
+      "source": "Open-Meteo live forecast",
+      "units": {
+        "temperature_2m": "\u00b0F",
+        "wind_speed_10m": "mp/h",
+        "wind_gusts_10m": "mp/h",
+        "precipitation": "inch",
+        "precipitation_probability": "%"
+      },
+      "hours": [
+        {
+          "valid_at_utc": "2026-10-20T00:00:00+00:00",
+          "temperature_2m": 64.3,
+          "wind_speed_10m": 12.8,
+          "wind_gusts_10m": 17.2,
+          "precipitation": 0.0,
+          "precipitation_probability": 10.0
+        },
+        {
+          "valid_at_utc": "2026-10-20T01:00:00+00:00",
+          "temperature_2m": 62.8,
+          "wind_speed_10m": 12.5,
+          "wind_gusts_10m": 18.1,
+          "precipitation": 0.0,
+          "precipitation_probability": 13.0
+        },
+        {
+          "valid_at_utc": "2026-10-20T02:00:00+00:00",
+          "temperature_2m": 61.0,
+          "wind_speed_10m": 11.5,
+          "wind_gusts_10m": 19.0,
+          "precipitation": 0.0,
+          "precipitation_probability": 13.0
+        },
+        {
+          "valid_at_utc": "2026-10-20T03:00:00+00:00",
+          "temperature_2m": 59.5,
+          "wind_speed_10m": 10.6,
+          "wind_gusts_10m": 19.7,
+          "precipitation": 0.0,
+          "precipitation_probability": 13.0
+        }
+      ],
+      "status": "Separate pregame forecast evidence; not applied to predictions",
+      "limitations": [
+        "Provider model issuance time not returned; retrieval time controls availability.",
+        "Outside grid forecast, not measured on-field conditions.",
+        "Four hourly samples from kickoff hour through three hours later; not a full-game guarantee."
+      ],
+      "raw_response_sha256": "1b9173bb3900b2331ede85f517bca8e69be45775daefaa01fcb676fc3fd37f57",
+      "request_url": "https://api.open-meteo.com/v1/forecast?latitude=37.4031837&longitude=-121.9698094&hourly=temperature_2m%2Cwind_speed_10m%2Cwind_gusts_10m%2Cprecipitation%2Cprecipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=UTC&forecast_days=8"
+    }
+  ],
+  "pending": []
+}

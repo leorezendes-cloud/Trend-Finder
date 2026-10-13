@@ -1,0 +1,25 @@
+# Review this template before creating a service; this file deploys nothing itself.
+services:
+  - type: web
+    name: trend-findah-3000
+    runtime: python
+    plan: starter
+    autoDeployTrigger: off
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --config gunicorn.conf.py wsgi:app
+    healthCheckPath: /healthz
+    disk:
+      name: membership-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.7
+      - key: TREND_FINDAH_ENV
+        value: production
+      - key: TREND_FINDAH_SECRET_KEY
+        generateValue: true
+      - key: TREND_FINDAH_DATABASE
+        value: /var/data/members.sqlite3
+      - key: TREND_FINDAH_PROXY_HOPS
+        value: "0"

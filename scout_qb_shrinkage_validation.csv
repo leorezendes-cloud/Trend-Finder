@@ -1,0 +1,7 @@
+variant,evaluation_season,previous_season_weight,pseudo_dropbacks,qb_weeks,test_dropbacks,weighted_mse,weighted_mae
+raw_current,2024,0.0,0,437,14640,0.128166,0.268582
+raw_current,2025,0.0,0,434,14125,0.122471,0.269367
+original_exploratory,2024,0.5,150,437,14640,0.094564,0.239831
+original_exploratory,2025,0.5,150,434,14125,0.104746,0.253661
+selected_using_2024,2024,0.5,150,437,14640,0.094564,0.239831
+selected_using_2024,2025,0.5,150,434,14125,0.104746,0.253661

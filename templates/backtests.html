@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Backtest Explorer | Gravy Train</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+
+<body>
+    <main class="trend-dashboard">
+
+        <h1>📊 Backtest Explorer 🚂</h1>
+
+        {% include '_site_navigation.html' %}
+
+        <section class="trend-card">
+
+            <h2>Historical Trend Ranking Comparison</h2>
+            <p>This chart evaluates historical trend rankings, not Scout 4.0 or The Plug’s blended predictor. Top and bottom halves refer to ranked games; percentages exclude pushes.</p>
+            <p id="backtest-sample-note"></p>
+
+            <label for="window-select">
+                Ranking history
+            </label>
+
+            <select id="window-select">
+                <option value="3">Last 3 Seasons</option>
+                <option value="5">Last 5 Seasons</option>
+                <option value="10">Last 10 Seasons</option>
+                <option value="all">All History</option>
+                <option value="compare">Compare All Windows</option>
+            </select>
+
+            <div style="position: relative; height: 360px;">
+                <canvas id="backtest-chart"></canvas>
+            </div>
+            <div class="backtest-explanation">
+                <h3 id="chart-explanation-title">
+                    Understanding This Chart
+                </h3>
+                <p id="chart-explanation-text">
+                    Loading Chart Explanation...
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        async function loadBacktests() {
+
+            const response = await fetch("/api/backtests");
+            const results = await response.json();
+
+            const canvas = document.getElementById("backtest-chart");
+
+            const chart = new Chart(canvas, {
+                type: "line",
+
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Top-ranked half ATS",
+                            data: [],
+                            borderColor: "#fbbf24",
+                            tension: 0.2
+                        },
+                        {
+                            label: "Bottom-ranked half ATS",
+                            data: [],
+                            borderColor: "#38bdf8",
+                            tension: 0.2
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            labels: { color: "white" }
+                        }
+                    },
+
+                    scales: {
+                        x: {
+                            ticks: { color: "white" }
+                        },
+
+                        y: {
+                            ticks: {
+                                color: "white",
+                                callback: value => value + "%"
+                            }
+                        }
+                    }
+                }
+            });
+
+           
+            function updateChart() {
+
+                const selected = document.getElementById(
+                    "window-select"
+                ).value;
+
+                const years = [...new Set(
+                    results.map(row => row.year)
+                )].sort((a, b) => a - b);
+
+                chart.data.labels = years;
+
+                if (selected === "compare") {
+
+                    const windows = [
+                        ["3", "3 Years", "#fbbf24"],
+                        ["5", "5 Years", "#38bdf8"],
+                        ["10", "10 Years", "#a78bfa"],
+                        ["all", "All History", "#4ade80"]
+                    ];
+
+                    chart.data.datasets = windows.map(
+                        ([window, label, color]) => ({
+
+                            label: label,
+
+                            data: years.map(year => {
+
+                                const row = results.find(
+                                    r => r.year === year &&
+                                        r.window === window
+                                );
+
+                                if (!row ||
+                                    row.top_ats === null ||
+                                    row.bottom_ats === null) {
+                                    return null;
+                                }
+
+                                return +(
+                                    row.top_ats - row.bottom_ats
+                                ).toFixed(1);
+                            }),
+
+                            borderColor: color,
+                            backgroundColor: color,
+                            tension: 0.2
+                        })
+                    );
+
+                } else {
+
+                    const filtered = results.filter(
+                        row => row.window === selected
+                    );
+
+                    chart.data.datasets = [
+                        {
+                            label: "Top-ranked half ATS",
+                            data: years.map(year =>
+                                filtered.find(r => r.year === year)
+                                    ?.top_ats ?? null
+                            ),
+                            borderColor: "#fbbf24",
+                            tension: 0.2
+                        },
+                        {
+                            label: "Bottom-ranked half ATS",
+                            data: years.map(year =>
+                                filtered.find(r => r.year === year)
+                                    ?.bottom_ats ?? null
+                            ),
+                            borderColor: "#38bdf8",
+                            tension: 0.2
+                        }
+                    ];
+                }
+
+                chart.options.scales.y.ticks.callback = value =>
+                    selected === "compare"
+                        ? value + " pts"
+                        : value + "%";
+
+                chart.options.scales.y.beginAtZero =
+                    selected === "compare";
+
+                                
+                const shown = selected === 'compare' ? results : results.filter(row => row.window === selected);
+                const sampleNote = document.getElementById('backtest-sample-note');
+                if (sampleNote) sampleNote.textContent = shown.map(row => `${row.year} (${row.window}): ${row.games_evaluated} evaluated games`).join(' · ');
+                const explanationTitle = document.getElementById(
+                    "chart-explanation-title"
+                );
+
+                const explanationText = document.getElementById(
+                    "chart-explanation-text"
+                );
+
+                if (selected === "compare") {
+
+                    explanationTitle.textContent =
+                        "Comparing Historical Windows";
+
+                    explanationText.textContent =
+                        "Each line shows the ATS percentage-point difference " +
+                        "between the higher-ranked and lower-ranked categories. " +
+                        "Above zero means the higher-ranked categories performed " +
+                        "better. Below zero means the lower-ranked categories " +
+                        "performed better. This measures ranking performance, " +
+                        "not the probability of winning a future game.";
+
+                } else {
+
+                    const name = selected === "all"
+                        ? "all available history"
+                        : `the previous ${selected} seasons`;
+
+                    explanationTitle.textContent =
+                        "Historical ATS Performance";
+
+                    explanationText.textContent =
+                        `This chart shows how categories ranked using ${name} ` +
+                        "performed in each test season. The yellow line represents " +
+                        "the higher-ranked categories, while the blue line " +
+                        "represents the lower-ranked categories. " +
+                        "Pushes are excluded from ATS percentages.";
+                }
+
+                chart.update();
+
+
+            }
+            document.getElementById("window-select")
+                .addEventListener("change", updateChart);
+
+            updateChart();
+        }
+
+        loadBacktests();
+    </script>
+</body>
+</html>

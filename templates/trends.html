@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Trends | Gravy Train</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+
+<body>
+    <main class="trend-dashboard">
+
+        <h1>Discover Trends</h1>
+
+        {% include '_site_navigation.html' %}
+        <section class="discovery-upcoming">
+            <h2>Coming up within 7 days</h2>
+            <p class="discovery-note">Historical underdog patterns matched to scheduled games and saved market lines. These percentages describe past results.</p>
+            <div class="trend-card-grid">
+                {% for game in upcoming_previews %}
+                <a class="trend-card compact-card trend-link" href="{{ url_for('trend_details', location=game.trend.location, prime='yes' if game.trend.primetime else 'no', spread=game.trend.spread) }}">
+                    <span class="combination-soon">🏈 Upcoming matchup</span>
+                    <strong class="compact-title">{{ game.matchup }}</strong>
+                    <p>{{ game.kickoff }} | Underdog: {{ game.dog_team }} +{{ '%g'|format(game.dog_spread) }}</p>
+                    <p class="positive">Historical underdog ATS: {{ '%.2f'|format(game.trend.historical_ats_rate) }}%</p>
+                    <small>{{ game.trend.location }} dogs | {{ 'Primetime' if game.trend.primetime else 'Non-Primetime' }} | {{ game.trend.spread }} | {{ game.trend.historical_sample }} historical games</small>
+                    <p>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}</p><p>View trend details →</p>
+                </a>
+                {% else %}<p>No upcoming previews qualify. A game needs a saved spread and at least 30 matching historical games.</p>{% endfor %}
+            </div>
+        </section>
+        <p><a href="{{ url_for('backtest_page') }}">Explore historical ranking backtests</a></p>
+        <details class="discovery-guide">
+            <summary>About this discovery page</summary>
+            <p>This page compares predefined location, primetime, and spread patterns. The main Trend Finder explores grouped features. Historical cover rates and rankings describe past results; model forecasts are presented separately in The Plug.</p>
+        </details>
+        <section class="matchup-finder">
+            
+                <h2>🏈 Upcoming Matchup Finder 🏈</h2>
+    
+            <form method="GET" action="{{ url_for('trends_page') }}">
+                <label for="dog_location">Dog Side</label>
+                <select name="dog_location" id="dog_location" required>
+                    <option value="">Choose Side</option>
+                    <option value="Home"
+                        {% if matchup_location == "Home" %}selected{% endif %}>
+                        Home Dogs
+                    </option>
+                    <option value="Away"
+                        {% if matchup_location == "Away" %}selected{% endif %}>
+                        Away Dogs
+                    </option>
+                </select>
+                <label for="matchup_prime">Game Type</label>
+                <select name="matchup_prime" id="matchup_prime" required>
+                    <option value="">Choose Game Type</option>
+                    <option value="yes"
+                        {% if matchup_prime == "yes" %}selected{% endif %}>
+                        Primetime
+                    </option>
+                    <option value="no"
+                        {% if matchup_prime == "no" %}selected{% endif %}>
+                        Non-Primetime
+                    </option>
+                </select>
+                                
+                <select name="dog_spread" id="dog_spread" required>
+
+                    <option value="">Choose Spread</option>
+
+                    {% for number in range(1, 51) %}
+                        {% set spread = number / 2 %}
+
+                        <option
+                            value="{{ spread }}"
+                            {% if matchup_spread == spread|string %}selected{% endif %}
+                        >
+                            +{{ spread }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <button class="trend-button" type="submit">🧐 Find Matching Trends 🧐</button>
+
+            </form>
+        
+
+            {% if matchup_error %}
+                <p>{{ matchup_error }}</p>
+
+            {% elif matchup_matches is not none %}
+
+                
+                <h3>{{ matchup_matches|length }} Matching Trends</h3>
+
+                {% set baseline = matchup_matches
+                    | selectattr("spread", "equalto", "All Spreads")
+                    | first
+                    | default(none) %}
+
+                {% set specific = matchup_matches
+                    | rejectattr("spread", "equalto", "All Spreads")
+                    | list %}
+
+                {% if baseline %}
+
+                    <div class="trend-card">
+                        <h3>Historical Baseline — All Spreads</h3>
+
+                        <p>
+                            Historical ATS:
+                            {{ "%.1f"|format(baseline.historical_ats_rate) }}%
+                        </p>
+
+                        <p>
+                            2026 ATS:
+                            {{ "%.1f"|format(baseline.current_ats_rate) }}%
+                        </p>
+
+                        <p>
+                            Historical Games: {{ baseline.historical_sample }}
+                        </p>
+                    </div>
+
+                {% endif %}
+
+                {% if specific %}
+
+                    <details class="trend-card">
+
+                        <summary>
+                            View {{ specific|length }} Matching Spread Ranges
+                        </summary>
+
+                        
+                        {% for trend in specific %}
+
+                            <details class="matchup-range">
+
+                                <summary>
+                                    <strong>+{{ trend.spread }}</strong>
+
+                                    <span>
+                                        Historical:
+                                        {{ "%.1f"|format(trend.historical_ats_rate) }}%
+                                    </span>
+
+                                    <span>
+                                        Recent:
+                                        {{ trend.recent.wins }}-{{ trend.recent.losses }} ATS
+                                    </span>
+                                </summary>
+
+                                <div class="trend-details">
+
+
+                                <p>
+                                    Historical ATS:
+                                    {{ "%.1f"|format(trend.historical_ats_rate) }}%
+                                </p>
+
+                                {% if trend.baseline_difference is defined %}
+
+                                    <p>
+                                        Compared to Historical Baseline:
+
+                                        {% if trend.baseline_difference > 0 %}
+                                            <span class="ats-cover">
+                                                +{{ "%.1f"|format(trend.baseline_difference) }} pts
+                                            </span>
+
+                                        {% elif trend.baseline_difference < 0 %}
+                                            <span class="ats-loss">
+                                                {{ "%.1f"|format(trend.baseline_difference) }} pts
+                                            </span>
+
+                                        {% else %}
+                                            0.0 pts
+                                        {% endif %}
+
+                                    </p>
+                                 {% endif %}
+                                <h4>Recent Performance</h4>
+
+                                {% if trend.recent.sample > 0 %}
+
+                                    <p>
+                                        Last {{ trend.recent.sample }} ATS:
+                                        {{ trend.recent.wins }}-{{ trend.recent.losses }}
+                                        ({{ "%.0f"|format(trend.recent.rate) }}%)
+                                    </p>
+
+                                    <p>
+                                        Active Covering Streak:
+                                        {{ trend.active_streak }} games
+                                    </p>
+
+                                {% else %}
+
+                                    <p>No completed 2026 games in this category.</p>
+
+                                {% endif %}
+
+
+                               
+
+                                <p>
+                                    Historical 95% Lower Bound:
+                                    {{ "%.1f"|format(trend.historical_ci_low) }}%
+                                </p>
+
+                                <p>
+                                    2026 ATS:
+                                    {{ "%.1f"|format(trend.current_ats_rate) }}%
+                                </p>
+
+                                <p>
+                                    Historical Games: {{ trend.historical_sample }}
+                                    |
+                                    2026 Games: {{ trend.current_sample }}
+                                </p>
+
+                            </div>
+                        </details>
+                    {% endfor %}
+
+                    </details>
+
+                {% endif %}
+                
+                {% if not matchup_matches %}
+                    <p>No matching comparisons found.</p>
+                {% endif %}
+                {% endif %}
+
+
+
+        </section>
+        <details class="discovery-section">
+            <summary>Recent hot performance</summary>
+            <h2>🔥 Hot Performance ({{ hot_groups|length }} Groups)</h2>
+            <div class="trend-card-grid">
+
+
+            {% for group in hot_groups %}
+
+                {% set trend = group["main"] %}
+                {% set recent = trend["recent"] %}
+
+                
+                <a
+                    href="{{ url_for(
+                        'trend_details',
+                        location=trend.location,
+                        prime='yes' if trend.primetime else 'no',
+                        spread=trend.spread
+                    ) }}"
+                    class="trend-card compact-card trend-link"
+                >
+
+                    <div class="compact-summary">
+
+                        <span class="compact-heading">
+                            <strong class="compact-title">
+                                {{ trend.location }} |
+                                {{ "Primetime" if trend.primetime else "Non-Primetime" }}
+
+                                <span class="compact-spread">
+                                    {{ trend.spread if trend.spread == "All Spreads" else "+" ~ trend.spread }}
+                                </span>
+                            </strong>
+
+                            <span class="compact-arrow">➜</span>
+                        </span>
+
+                        <span class="compact-metrics">
+
+                            <span class="compact-stat">
+                                <small>Recent ATS</small>
+                                <strong>
+                                    {{ recent.wins }}-{{ recent.losses }}
+                                    ({{ "%.0f"|format(recent.rate) }}%)
+                                </strong>
+                            </span>
+
+                            <span class="compact-stat">
+                                <small>Active Streak</small>
+                                <strong>{{ trend.ats_streak|length }} Covers</strong>
+                            </span>
+
+                        </span>
+
+                        <span class="compact-related">
+                            {{ group["related"]|length }} Related Ranges
+                        </span>
+
+                    </div>
+
+                </a>
+
+                
+
+            {% else %}
+
+                <p>No hot performance patterns found.</p>
+
+            {% endfor %}
+            </div>
+        </details>
+
+        <details class="discovery-section">
+            <summary>Active ATS streaks</summary>
+            <h2>🔥 Active ATS Streaks ({{ streak_groups|length }} Groups)</h2>
+            <div class="trend-card-grid">
+           
+            {% for group in streak_groups %}
+            {% set trend = group['main'] %}
+
+                {% set streak = group["main"] %}
+
+                <a
+                    href="{{ url_for(
+                        'trend_details',
+                        location=streak.location,
+                        prime='yes' if streak.primetime else 'no',
+                        spread=streak.spread
+                    ) }}"
+                    class="trend-card compact-card trend-link"
+                >
+                    <div class="compact-summary">
+
+                        <span class="compact-heading">
+                            <strong class="compact-title">
+                                {{ streak.location }} |
+                                {{ "Primetime" if streak.primetime else "Non-Primetime" }}
+
+                                <span class="compact-spread">
+                                    {{ streak.spread if streak.spread == "All Spreads" else "+" ~ streak.spread }}
+                                </span>
+                            </strong>
+
+                            <span class="compact-arrow">▸</span>
+                        </span>
+
+                        <span class="compact-metrics">
+
+                            <span class="compact-stat">
+                                <small>Active ATS Streak</small>
+                                <strong>{{ streak.streak_length }} Covers</strong>
+                            </span>
+
+                            <span class="compact-stat">
+                                <small>Season ATS</small>
+                                <strong>
+                                    {{ "%.1f"|format(streak.season_ats) }}%
+                                </strong>
+                            </span>
+
+                        </span>
+
+                        <span class="compact-related">
+                            {{ group["related"]|length }} Related Ranges
+                        </span>
+
+                    </div>
+
+
+                  
+
+                </a>
+
+            {% else %}
+                <p>No active streaks currently meet the criteria.</p>
+            {% endfor %}
+            </div>
+        </details>
+
+        <details class="discovery-section">
+            <summary>Early-season watch</summary>
+            <h2>Early Watch 🚂</h2>
+            {% if watchlist %}
+            <div class="trend-card-grid">
+                {% for trend in watchlist %}
+
+                    
+            
+            <a
+                href="{{ url_for(
+                    'trend_details',
+                    location=trend.location,
+                    prime='yes' if trend.primetime else 'no',
+                    spread=trend.spread
+                ) }}"
+                class="trend-card compact-card early trend-link"
+            >
+
+               
+            <div class="compact-summary">
+
+                <span class="compact-heading">
+                    <strong class="compact-title">
+                        {{ trend.location }} |
+                        {{ "Primetime" if trend.primetime else "Non-Primetime" }}
+
+                        <span class="compact-spread">
+                            {{ trend.spread if trend.spread == "All Spreads" else "+" ~ trend.spread }}
+                        </span>
+                    </strong>
+
+                    <span class="compact-arrow">▸</span>
+                </span>
+
+                <span class="early-alert">
+                    {{ trend.alert }}
+                </span>
+
+                <span class="compact-metrics">
+
+                    <span class="compact-stat">
+                        <small>2026 SU</small>
+                        <strong>
+                            {{ "%.0f"|format(trend.current_su_rate) }}%
+                        </strong>
+                    </span>
+
+                    <span class="compact-stat">
+                        <small>2026 ATS</small>
+                        <strong>
+                            {{ "%.0f"|format(trend.current_ats_rate) }}%
+                        </strong>
+                    </span>
+
+                </span>
+
+                <span class="compact-related">
+                    {{ trend.current_sample }} Games |
+                    {{ trend.related|length }} Related Ranges
+                </span>
+
+            </div>
+
+
+                
+        </a>
+
+
+                {% endfor %}
+            </div>
+            {% else %}
+                <p>No early patterns meet our current watch criteria.</p>
+            {% endif %}
+
+
+        </details>
+
+        <details class="discovery-section">
+            <summary>All historical comparisons</summary>
+            <h2>All Trend Comparisons</h2>
+
+            {% for title, trends in comparison_sections %}
+
+                <details class="comparison-section">
+
+                    <summary>
+                        {{ title }} ({{ trends|length }})
+                    </summary>
+
+                    {% for trend in trends %}
+                <details class="trend-card">
+                    <summary>
+                        <h3>
+                            {{ trend.location }} |
+                            {{ "Primetime" if trend.primetime else "Non-Primetime" }} |
+                            {{ trend.spread }}
+                        </h3>
+
+                        <small>
+                            SU: {{ "%.0f"|format(trend.current_su_rate) }}% |
+                            ATS: {{ "%.0f"|format(trend.current_ats_rate) }}% |
+                            {{ trend.current_sample }} games
+                        </small>
+                    </summary>
+
+                    <div class="trend-details">
+                        <p>Historical SU: {{ "%.2f"|format(trend.historical_su_rate) }}%</p>
+                        <p>Historical ATS: {{ "%.2f"|format(trend.historical_ats_rate) }}%</p>
+
+                        <p>SU Difference: {{ "%+.2f"|format(trend.su_difference) }} pts</p>
+                        <p>ATS Difference: {{ "%+.2f"|format(trend.ats_difference) }} pts</p>
+
+                        <p>Historical sample: {{ trend.historical_sample }} games</p>
+                        <p>Status: {{ trend.status }}</p>
+                        
+                        {% if trend.note %}
+                            <small>{{ trend.note }}</small>
+                        {% endif %}
+                    </div>
+                </details>
+                    {% endfor %}
+                </details>
+            {% endfor %}
+        </details>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "created_utc": "2026-10-12T22:58:29.025067+00:00",
+  "season": 2025,
+  "weeks": [
+    5,
+    18
+  ],
+  "source_files_sha256": {
+    "nfl_games.csv": "4d9abf19986e158b6574d44deb305f98dd9891f23a01a4c50f33f3dfb52f8389",
+    "scout_unified.py": "1adaf1a2b5610d20383a4f764157ac60b1821d636e0ee5f294bc56111e3fc23d",
+    "scout_time_machine.py": "6b1959b39aea79b7bdc33253c7110aa9d0f0b2ea6ed21ca0641755e5261ffb08",
+    "time_machine_2025_v1.py": "ede66e6d171374309e2319776e7ceef79621d1c89d110ca750519bee637d8df3",
+    "scout_v3_features.py": "6967b472ceab3e2580db89008f4c39fc172a4570f80cbe6bda2c2c7e86c1f3ca",
+    "scout_v3_backtest.py": "494a937ca6450a2c0aeb6e5b3cdab4c2f887efca1ac5a980f5a13eed1f1b1951",
+    "scout_opponent_adjustment.py": "2b251329caefefd9be26e078ed5fbe90e52b1719db10c79fbdc70d4ed9ee3f6d",
+    "scout_kickoff_lab.py": "769dd2f54ee3c49fd64b2c80ec28d97ef4fd2fe416fd0311bd27b0b79f1ae0ec",
+    "time_machine_2025_v1_frozen.csv": "1c2b6a9acaf599c6595c4ffbf3e011731f1a3a2159e7348186c0bd36be470d35",
+    "scout_v3_2025_backtest.csv": "0619f22ec97408f8292867bf3d67095233ec6b2e84c443aad0c9c867dc667cc7",
+    "scout_unified_v3_cache_2025.csv": null
+  },
+  "rebuild_epa_requested": false,
+  "warning": "Cached frozen prediction files may have been created by earlier script versions. Their values are used as-is. Recompute with --rebuild-epa to align current formulas.",
+  "not_deployable": [
+    "Lab +QB HISTORY",
+    "Lab +QB SITUATIONS"
+  ],
+  "excluded_from_model": [
+    "unverified player/injury adjustments",
+    "unverified ATS money",
+    "V2 team-passing-EPA-only diagnostic (no ATS output)"
+  ]
+}

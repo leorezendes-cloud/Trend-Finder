@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{% endblock %} | Gravy Train</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='scout4.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body class="scout4"><main>
+<header><p class="eyebrow">THE PLUG · GRAVY TRAIN</p><h1>{% block heading %}{% endblock %}</h1>
+{% include '_site_navigation.html' %}
+<p>Explore what happened, compare matchups, and see how much evidence supports each number.</p></header>
+{% block filter_form %}<form method="get" class="stats-filters">
+<label>Season<select name="season">{% for year in view.years %}<option value="{{ year }}" {% if year==view.season %}selected{% endif %}>{{ year }}{% if year in view.cache_years %} · detailed stats{% endif %}</option>{% endfor %}</select></label>
+<label>Window<select name="before_week">{% for w in range(1,20) %}<option value="{{ w }}" {% if w==view.before_week %}selected{% endif %}>{% if w==19 %}Full regular season{% else %}Before Week {{ w }}{% endif %}</option>{% endfor %}</select></label>
+<label>Venue<select name="venue">{% for value in ['All','Home','Away','Neutral'] %}<option {% if value==view.venue %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+<label>Team<select name="team"><option value="">All teams</option>{% for value in view.teams %}<option {% if value==team %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+{% block filters %}{% endblock %}<button type="submit">Apply filters</button></form>{% endblock %}
+{% block data_notes %}<aside class="stats-note"><strong>{{ view.season }} · {% if view.coverage_week %}Completed games through Week {{ view.coverage_week }}{% else %}No completed games in this window{% endif %} · {{ view.venue }} venues</strong>
+{% if view.manifest %}<p>Statistics retrieved: {{ view.manifest.retrieved_at|eastern_time }}. Coverage varies by team.</p>{% endif %}
+<details><summary>Data coverage and methodology</summary>
+<p>Selected window: Weeks 1–{{ view.before_week - 1 }}. Completed regular-season games only. Neutral venues remain separate. Historical filters use revised data; original publication times are unverified.</p>
+{% if view.manifest %}<p>Source: nflverse. Player coverage includes recorded stat lines, not every active player or snap.</p>{% else %}<p>Detailed player and efficiency data has not been imported for this season. Missing statistics are shown as —.</p>{% endif %}
+<p>Excluded player feed rows: {{ view.diagnostics.unidentified_players }} unattributed; {{ view.diagnostics.unmatched_games }} unmatched to the schedule.</p>
+<p>Smoothed averages use four games of the same team/player's all-venue average within this window. This is descriptive smoothing, not validated prediction confidence. No injury adjustments or betting probabilities are applied.</p>
+</details></aside>{% endblock %}
+{% block content %}{% endblock %}
+<footer><p>Historical underdog trends remain in the Trend finder. These pages are the statistics foundation for Scout 4.0.</p></footer>
+</main></body></html>

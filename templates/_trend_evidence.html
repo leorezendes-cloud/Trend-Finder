@@ -1,0 +1,12 @@
+{% macro record_table(rows) %}
+<div class="evidence-table-scroll">
+    <table class="evidence-table">
+        <thead><tr><th scope="col">Period</th><th scope="col">Games</th><th scope="col">ATS record</th><th scope="col">Cover rate</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+        <tr><th scope="row">{{ row.label }}</th><td>{{ row.sample }}</td><td>{{ row.ats_wins }}–{{ row.ats_losses }}–{{ row.ats_pushes }}</td><td>{% if row.ats_rate is not none %}{{ '%.2f'|format(row.ats_rate) }}%{% else %}—{% endif %}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}

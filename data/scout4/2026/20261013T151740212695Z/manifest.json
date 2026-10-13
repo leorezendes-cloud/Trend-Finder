@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "season": 2026,
+  "retrieval_started_at": "2026-10-13T15:17:40.212936+00:00",
+  "source": "nflverse via nflreadpy weekly stats",
+  "availability": "Retrieved now; historical publication times are unverified.",
+  "files": {
+    "team": {
+      "path": "2026/20261013T151740212695Z/team.csv",
+      "rows": 158,
+      "sha256": "5acdf24ea619f7f535b363e3f59574bd8a81574661f26cea11ff46134f53a784",
+      "missing_metrics": []
+    },
+    "player": {
+      "path": "2026/20261013T151740212695Z/player.csv",
+      "rows": 5506,
+      "sha256": "9b5dc2354a7c2d9f507cb7c27097bc92977af4ad8ecd7aaceb5f2b5d4d69e62d",
+      "missing_metrics": []
+    }
+  },
+  "retrieved_at": "2026-10-13T15:17:40.898939+00:00"
+}

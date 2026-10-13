@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membership | Gravy Train</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='membership.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body>
+<h1>Gravy Train</h1>
+{% include '_site_navigation.html' %}
+<main class="membership">
+<h2>{{ {'register':'Join Free', 'login':'Welcome Back', 'preferences':'My Membership'}[mode] }}</h2>
+<p>Explore trends and matchups freely. Membership lets you save newsletter preferences.</p>
+{% if error %}<p class="member-message" role="alert">{{ error }}</p>{% endif %}
+{% if saved %}<p class="member-message" role="status">Preferences saved.</p>{% endif %}
+{% if mode == 'login' and request.args.get('reset') == 'complete' %}<p class="member-message" role="status">Password updated. Log in with your new password.</p>{% endif %}
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% if mode != 'preferences' %}
+<label for="email">Email</label>
+<input id="email" type="email" name="email" maxlength="254" required autocomplete="email" value="{{ request.form.get('email', '') }}">
+<label for="password">Password</label>
+<input id="password" type="password" name="password" required maxlength="128" {% if mode == 'register' %}minlength="10" aria-describedby="password-help" autocomplete="new-password"{% else %}autocomplete="current-password"{% endif %}>
+{% if mode == 'register' %}
+<p id="password-help" class="member-note">Use at least 10 characters (maximum 128). Numbers, special characters, and capital letters are optional. Spaces are allowed, so you can use a memorable phrase.</p>
+{% endif %}
+{% endif %}
+{% if mode == 'register' %}
+<label for="password_confirm">Confirm password</label>
+<input id="password_confirm" type="password" name="password_confirm" required maxlength="128" autocomplete="new-password">
+{% endif %}
+{% if mode != 'preferences' %}
+<label class="member-check" id="password-visibility-control" hidden>
+<input id="show-password" type="checkbox" aria-controls="password{% if mode == 'register' %} password_confirm{% endif %}"> Show password
+</label>
+{% endif %}
+{% if mode != 'login' %}
+{% if mode == 'preferences' %}<p class="member-account">{{ g.member.email }}</p>{% endif %}
+<label class="member-check"><input type="checkbox" name="newsletter_opt_in" value="yes" {% if (mode == 'preferences' and g.member.newsletter_opt_in) or (mode == 'register' and request.form.get('newsletter_opt_in') == 'yes') %}checked{% endif %}> I want to receive the Trend Findah newsletter by email.</label>
+{% if mode == 'preferences' %}
+<label for="newsletter_frequency">Preferred frequency</label>
+<select id="newsletter_frequency" name="newsletter_frequency">
+{% for frequency in ['weekly', 'monthly'] %}<option value="{{ frequency }}" {% if g.member.newsletter_frequency == frequency %}selected{% endif %}>{{ frequency|capitalize }}</option>{% endfor %}
+</select>
+{% endif %}
+<p class="member-note">Optional. You can opt out here at any time. Newsletter delivery is not active; saving these preferences sends no email.</p>
+{% endif %}
+<button type="submit">{{ {'register':'Create account','login':'Log in','preferences':'Save preferences'}[mode] }}</button>
+</form>
+{% if mode == 'login' %}<p><a href="{{ url_for('membership.forgot_password') }}">Forgot password?</a></p><p><a href="{{ url_for('membership.register') }}">Create a free account</a></p>{% endif %}
+{% if mode == 'register' %}<p><a href="{{ url_for('membership.login') }}">Already a member? Log in</a></p>{% endif %}
+</main>
+{% if mode != 'preferences' %}
+<script src="{{ url_for('static', filename='membership.js') }}" defer></script>
+{% endif %}
+</body></html>

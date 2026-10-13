@@ -1,0 +1,46 @@
+{% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
+{% set plug_section = request.endpoint == 'plug_page' or request.endpoint == 'sunday_scout.sunday_scout_page' or (request.endpoint or '').startswith('scout4.') %}
+<div class="site-header">
+<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="Gravy Train — Home"></a>
+<details class="site-menu" id="site-menu">
+<summary><span aria-hidden="true">☰</span> Menu</summary>
+<div class="site-menu-panel">
+<nav class="site-navigation" aria-label="Main navigation">
+    <a href="{{ url_for('home') }}" {% if request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt=""><span>Home</span></a>
+    <a href="{{ url_for('trend_finder') }}" {% if request.endpoint in trend_endpoints %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/trend-findah-nav.png') }}" alt=""><span>Trend Finder</span></a>
+    <a href="{{ url_for('plug_page') }}" {% if plug_section %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png') }}" alt=""><span>The Plug</span></a>
+    <a href="{{ url_for('conspiracy_dungeon_page') }}" {% if request.endpoint == 'conspiracy_dungeon_page' %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png') }}" alt=""><span>Conspiracy Dungeon</span></a>
+    {% if g.member %}
+    <a href="{{ url_for('membership.preferences') }}" {% if request.blueprint == 'membership' %}aria-current="page"{% endif %}>My Membership</a>
+    <form class="member-logout" method="post" action="{{ url_for('membership.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button>
+    </form>
+    {% else %}
+    <a href="{{ url_for('membership.login') }}">Log in</a>
+    <a href="{{ url_for('membership.register') }}">Join Free</a>
+    {% endif %}
+</nav>
+{% if request.endpoint in trend_endpoints %}
+<nav class="section-navigation" aria-label="Trend Finder navigation">
+    <a href="{{ url_for('trend_finder') }}" {% if request.endpoint == 'trend_finder' %}aria-current="page"{% endif %}>Trend Findah 3000</a>
+    <a href="{{ url_for('trends_page') }}" {% if request.endpoint == 'trends_page' %}aria-current="page"{% endif %}>Discover Trends</a>
+    <a href="{{ url_for('backtest_page') }}" {% if request.endpoint == 'backtest_page' %}aria-current="page"{% endif %}>Backtests</a>
+</nav>
+{% elif plug_section %}
+<nav class="section-navigation" aria-label="The Plug navigation">
+    <a href="{{ url_for('plug_page') }}">Matchup Analysis</a>
+    <a href="{{ url_for('scout4.teams_page') }}">Team Stats</a>
+    <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
+    <a href="{{ url_for('scout4.ratings_page') }}">Team Ratings</a>
+    {% if config.get('SCOUT4_SHADOW_ENABLED') %}<a href="{{ url_for('scout4.shadow_page') }}">Forecast Tracker</a>{% endif %}
+</nav>
+{% elif request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}
+<nav class="section-navigation" aria-label="Home navigation">
+    <a href="{{ url_for('home') }}">Upcoming Matchups</a>
+    <a href="{{ url_for('sunday_results_page') }}">Results</a>
+</nav>
+{% endif %}
+
+</div>
+</details>
+</div>

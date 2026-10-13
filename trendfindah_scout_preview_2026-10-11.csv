@@ -1,0 +1,14 @@
+date,kickoff_et,away,home,underdog,favorite,spread,rank_3y,rank_5y,rank_10y,rank_all,dog_games,dog_pf_per_game,dog_pa_per_game,dog_ats_record,favorite_games,favorite_pf_per_game,favorite_pa_per_game,favorite_ats_record,form_projection_dog,form_projection_favorite,form_cover_cushion,form_lean,note
+2026-10-11,09:30,PHI,JAX,PHI,JAX,7.5,,,,,4,18.8,23.2,0-4-0,4,26.0,13.2,3-1-0,16.0,24.6,-1.1,Form sees a close spread,London — designated home team may not have normal home-field advantage
+2026-10-11,13:00,CHI,GB,GB,CHI,1.5,,,,,4,18.2,26.2,0-3-1,4,28.0,16.2,3-1-0,17.2,27.1,-8.4,Form leans favorite,
+2026-10-11,13:00,CIN,MIA,MIA,CIN,6.5,,,,,4,11.5,25.2,1-3-0,4,24.2,21.2,2-2-0,16.4,24.7,-1.8,Form sees a close spread,
+2026-10-11,13:00,CLE,NYJ,CLE,NYJ,2.5,,,,,4,20.2,23.8,3-1-0,4,19.0,21.0,2-1-1,20.6,21.4,1.7,Form sees a close spread,
+2026-10-11,13:00,HOU,TEN,TEN,HOU,7.5,,,,,4,13.8,20.8,2-2-0,4,21.0,27.2,0-4-0,20.5,20.9,7.1,Form leans underdog,
+2026-10-11,13:00,IND,PIT,IND,PIT,2.5,,,,,4,25.5,26.0,3-1-0,4,19.2,21.8,2-2-0,23.6,22.6,3.5,Form leans underdog,
+2026-10-11,13:00,LV,NE,LV,NE,3.5,,,,,4,28.8,21.0,4-0-0,4,16.2,19.2,2-1-1,24.0,18.6,8.9,Form leans underdog,
+2026-10-11,13:00,MIN,NO,NO,MIN,2.5,,,,,4,26.2,32.0,2-2-0,4,21.5,12.8,3-1-0,19.5,26.8,-4.8,Form leans favorite,
+2026-10-11,13:00,NYG,WAS,NYG,WAS,4.5,,,,,4,20.5,19.8,3-1-0,4,22.0,30.5,2-2-0,25.5,20.9,9.1,Form leans underdog,
+2026-10-11,16:05,DEN,LAC,LAC,DEN,3.5,,,,,4,16.8,26.5,0-3-1,4,18.5,23.5,2-2-0,20.1,22.5,1.1,Form sees a close spread,
+2026-10-11,16:25,DET,ARI,ARI,DET,5.5,,,,,4,21.8,29.2,2-2-0,4,29.8,31.8,0-3-1,26.8,29.5,2.8,Form sees a close spread,
+2026-10-11,16:25,SF,SEA,SF,SEA,3.0,,,,,4,30.5,16.0,3-1-0,4,26.2,18.2,1-1-2,24.4,21.1,6.3,Form leans underdog,
+2026-10-11,20:20,BAL,ATL,BAL,ATL,3.0,,,,,4,29.0,24.0,1-2-1,4,24.0,23.0,2-2-0,26.0,24.0,5.0,Form leans underdog,

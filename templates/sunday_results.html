@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunday Results | Gravy Train</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='weekly_results.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body>
+     {% include '_site_navigation.html' %}
+
+<h1>🏈 Weekly Results 🚂</h1>
+<form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
+<div class="weekly-result-tallies"><div><span>Dog ATS</span><strong>{{ tally.covers }}–{{ tally.losses }}–{{ tally.pushes }}</strong></div><div><span>{{ model_label }}</span><strong>{{ tally.correct }}–{{ tally.wrong }}–{{ tally.pick_pushes }}</strong></div><div><span>Completed games</span><strong>{{ tally.finals }} / {{ tally.games }}</strong></div></div>
+<p class="weekly-results-note">{{ model_note }} · Each saved pick is graded against its original captured line.</p>
+
+
+{% if has_blend %}<p class="weekly-results-note">Scout totals: {{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }} · ATS blend and totals remain separate.</p>{% endif %}
+<h2>Week {{ selected_week }} Matchups</h2>
+{% if games %}
+<div class="tf-desktop-results weekly-results-table-wrap">
+<table class="weekly-results-table"><thead><tr><th>Matchup</th><th>Score / status</th><th>Underdog</th><th>Dog ATS</th><th>{{ model_label }} pick</th><th>Pick result</th>{% if has_blend %}<th>Scout total</th>{% endif %}<th>Details</th></tr></thead><tbody>
+{% for game in games %}<tr>
+<td><strong>{{ game.matchup }}</strong><br><small>{{ game.gameday }}</small></td>
+<td>{{ game.live_score }}<br><small>{{ game.game_status }}</small></td>
+<td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
+<td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.ats_result }}</span></td>
+<td>{{ game.scout_pick }}</td><td><span class="result-badge result-{{ game.scout_result|lower }}">{{ game.scout_result }}</span></td>
+<td>{% if has_blend %}{{ game.total_pick }}<br>{{ game.total_result }}</td><td>{% endif %}<details><summary>View details</summary><p>Dog straight-up: {{ game.su_result }}</p><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>{% if game.has_rankings %}<p>Historical ranks: 3Y #{{ game.rank_3y }} • 5Y #{{ game.rank_5y }} • 10Y #{{ game.rank_10y }} • All #{{ game.rank_all }}</p>{% else %}<p>No saved rankings for this game.</p>{% endif %}</details></td>
+</tr>{% endfor %}</tbody></table></div>
+
+<!-- MOBILE SUNDAY RESULTS -->
+
+<div class="tf-mobile-results">
+
+    {% for game in games %}
+
+    <article class="tf-game-card">
+
+        <div class="tf-card-heading">
+            <strong>{{ game.matchup }}</strong>
+            <span class="tf-game-status tf-status-{{ game.game_status|lower }}">
+                {{ game.game_status }}
+            </span>
+        </div>
+
+        <p class="tf-game-score">
+            {{ game.live_score }}
+        </p>
+
+        <p class="tf-game-spread">
+            Underdog:
+            {{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}
+        </p>
+
+        <div class="tf-card-stats">
+
+            <div>
+                <span class="tf-stat-label">
+                    {{ model_label }} pick
+                </span>
+                <strong>{{ game.scout_pick }}</strong>
+                <small>
+                    Cushion: {{ game.scout_cushion }}
+                </small>
+            </div>
+
+            <div>
+                <span class="tf-stat-label">
+                    Pick result
+                </span>
+                <strong class="tf-scout-{{ game.scout_result|lower }}">{{ game.scout_result }}</strong>
+            </div>
+
+        </div>
+
+        {% if has_blend %}<p>Scout total: <strong>{{ game.total_pick }}</strong> · {{ game.total_result }}</p>{% endif %}
+        <p class="tf-game-result">
+            Dog ATS: {{ game.ats_result }}
+            | SU: {{ game.su_result }}
+        </p>
+
+        <details class="tf-card-details">
+            <summary>Game details</summary><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>
+            {% if game.has_rankings %}
+
+            <div class="tf-history-grid">
+                <div>
+                    <span>3Y</span>
+                    <strong>#{{ game.rank_3y }}</strong>
+                </div>
+
+                <div>
+                    <span>5Y</span>
+                    <strong>#{{ game.rank_5y }}</strong>
+                </div>
+
+                <div>
+                    <span>10Y</span>
+                    <strong>#{{ game.rank_10y }}</strong>
+                </div>
+
+                <div>
+                    <span>All</span>
+                    <strong>#{{ game.rank_all }}</strong>
+                </div>
+            </div>
+            {% else %}<p>No saved rankings for this game.</p>{% endif %}
+        </details>
+
+    </article>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+<p>No games recorded for this week.</p>
+{% endif %}
+
+<details class="weekly-performance"><summary>Historical Window Performance</summary>
+
+{% if performance %}
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Window</th>
+            <th>Rank #1 ATS</th>
+            <th>Other ATS</th>
+            <th>Advantage</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in performance %}
+        <tr>
+            <td>{{ row.window }}</td>
+            <td>{{ row.top_covers }}-{{ row.top_losses }}</td>
+            <td>{{ row.other_covers }}-{{ row.other_losses }}</td>
+            <td>{{ row.advantage_pts }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No performance report found.</p>
+{% endif %}
+
+</details>
+</body>
+</html>

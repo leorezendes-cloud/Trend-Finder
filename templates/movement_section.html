@@ -1,0 +1,19 @@
+<section class="money-scoreboard">
+    <h2>Market Tallies</h2>
+    <div class="money-tally-grid">{% for tally in view.movement.markets.tallies %}<div class="stat"><span class="stat-label">{{ tally.label }}</span><span class="stat-value">{{ tally.wins }}-{{ tally.losses }}-{{ tally.pushes }}</span><p>{{ tally.qualifying }} reverse-line fades • {{ tally.pending }} pending</p><p>{% if tally.profit is not none %}{{ "%+.2f"|format(tally.profit) }}u • {{ "%+.1f"|format(tally.roi) }}% ROI{% else %}Awaiting results{% endif %}</p></div>{% endfor %}</div>
+    <p class="active-filters" style="font-size: 13px;">Latest public dollars ≥65%, with movement against that side since our first observation. First recorded quotes are not necessarily opening quotes. Moneyline changes use implied probability, including the bookmaker margin. One unit risked per fade.</p>
+    <p class="active-filters"><a href="{{ url_for('conspiracy_dungeon_page',panel='movement',week='all') }}" style="color: inherit;">All recorded weeks</a></p>
+</section>
+<div class="money-matchups">{% for game in view.movement.markets.cards %}
+<section class="trend-card">
+    <strong class="compact-title">{{ game.matchup }}</strong><p>Week {{ game.week }} • {{ game.gameday }}</p>
+    {% for market in game.markets %}
+    <div class="market-row">
+        <div><strong class="market-name">{{ market.market_label }}</strong><br>{{ market.first_quote }} → {{ market.latest_quote }}<small>Change: {{ "%+.2f"|format(market.change) }} {{ market.unit }}</small></div>
+        <div><strong>Public money</strong><br>{{ market.side_a }} {{ market.handle_a }}% • {{ market.side_b }} {{ market.handle_b }}%<small>{{ market.snapshot_count }} pregame observations</small></div>
+        <div><strong class="{{ 'fade-qualified' if market.qualifies else '' }}">{{ market.status }}</strong>{% if market.qualifies %}<small>{{ market.pick }} • {{ market.result }}</small>{% endif %}</div>
+    </div>
+    <details><summary>Movement history — {{ market.market_label }}</summary><div class="sunday-table-wrapper"><table class="sunday-trend-table"><thead><tr><th>Captured (UTC)</th><th>{{ market.side_a }}</th><th>{{ market.side_b }}</th><th>Public money</th></tr></thead><tbody>{% for quote in market.history %}<tr><td>{{ quote.captured_at_utc }}</td><td>{{ quote.line_a }} ({{ quote.odds_a }})</td><td>{{ quote.line_b }} ({{ quote.odds_b }})</td><td>{{ quote.handle_a }}% / {{ quote.handle_b }}%</td></tr>{% endfor %}</tbody></table></div></details>
+    {% endfor %}
+    <p><a href="{{ game.source_url }}" target="_blank" rel="noopener noreferrer">View Source</a></p>
+</section>{% else %}<p class="active-filters">Awaiting three-market pregame observations for this week.</p>{% endfor %}</div>

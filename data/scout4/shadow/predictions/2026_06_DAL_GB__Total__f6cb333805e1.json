@@ -1,0 +1,188 @@
+{
+  "game_id": "2026_06_DAL_GB",
+  "season": 2026,
+  "week": 6,
+  "away_team": "DAL",
+  "home_team": "GB",
+  "kickoff_utc": "2026-10-19T00:20:00+00:00",
+  "decision_cutoff_utc": "2026-10-13T04:52:51.490778+00:00",
+  "market": "Total",
+  "quote": {
+    "line": 52.5,
+    "odds": {
+      "Over": -115.0,
+      "Under": -105.0
+    },
+    "sportsbook": "DraftKings",
+    "source_url": "https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days&tb_page=2",
+    "captured_at_utc": "2026-10-13T04:52:51.402771+00:00",
+    "source_update_time": "Unavailable",
+    "kickoff_utc": "2026-10-19T00:20:00+00:00",
+    "market": "Total"
+  },
+  "selected_side": "Under",
+  "features": {
+    "league_total": 46.63291139240506,
+    "neutral_site": 0.0,
+    "market_total": 52.5,
+    "off_score_sum": 2.185302390998593,
+    "def_score_sum": -2.4908579465541485,
+    "off_pass_sum": 4.921429883345428,
+    "off_rush_sum": -1.749979129625549,
+    "def_pass_sum": -7.052731030111688,
+    "def_rush_sum": -1.6110307005797386,
+    "recent_total_deviation": 0.5144665461121167,
+    "volume_deviation": -2.4106891701828443,
+    "pass_share_deviation": 0.04845963297699365
+  },
+  "prediction": {
+    "total": 50.43104680244286,
+    "contributions": [
+      {
+        "label": "Fitted total baseline",
+        "feature": "intercept",
+        "input": 1,
+        "points": 44.93028846153846
+      },
+      {
+        "label": "Prior-validation bias adjustment",
+        "feature": "validation_bias",
+        "input": 1,
+        "points": 0.2352076385600274
+      },
+      {
+        "label": "Earlier-game league scoring baseline",
+        "feature": "league_total",
+        "input": 46.63291139240506,
+        "points": -0.6233150890581743
+      },
+      {
+        "label": "Combined adjusted scoring offense",
+        "feature": "off_score_sum",
+        "input": 2.185302390998593,
+        "points": 0.6646810547686323
+      },
+      {
+        "label": "Combined adjusted scoring defense",
+        "feature": "def_score_sum",
+        "input": -2.4908579465541485,
+        "points": -0.224702888490604
+      },
+      {
+        "label": "Recent combined-score deviation",
+        "feature": "recent_total_deviation",
+        "input": 0.5144665461121167,
+        "points": -0.1337810219423441
+      },
+      {
+        "label": "Neutral venue",
+        "feature": "neutral_site",
+        "input": 0.0,
+        "points": 0.12180379800207684
+      },
+      {
+        "label": "Combined passing EPA strength",
+        "feature": "off_pass_sum",
+        "input": 4.921429883345428,
+        "points": -1.441713049077434
+      },
+      {
+        "label": "Combined rushing EPA strength",
+        "feature": "off_rush_sum",
+        "input": -1.749979129625549,
+        "points": 0.012407054957762604
+      },
+      {
+        "label": "Combined passing suppression",
+        "feature": "def_pass_sum",
+        "input": -7.052731030111688,
+        "points": -1.1197021419266
+      },
+      {
+        "label": "Combined rushing suppression",
+        "feature": "def_rush_sum",
+        "input": -1.6110307005797386,
+        "points": 0.18853191568979427
+      },
+      {
+        "label": "Offensive play-volume proxy deviation",
+        "feature": "volume_deviation",
+        "input": -2.4106891701828443,
+        "points": -0.17355348462107736
+      },
+      {
+        "label": "Passing-share deviation",
+        "feature": "pass_share_deviation",
+        "input": 0.04845963297699365,
+        "points": -1.2520865097212834
+      },
+      {
+        "label": "Quoted total",
+        "feature": "market_total",
+        "input": 52.5,
+        "points": 9.246981063763624
+      }
+    ],
+    "line": 52.5,
+    "over_probability": 0.43634037515607416,
+    "under_probability": 0.5636596248439258,
+    "lean": "Under",
+    "plausible": true
+  },
+  "history_away": [
+    "2026_01_DAL_NYG",
+    "2026_02_WAS_DAL",
+    "2026_03_BAL_DAL",
+    "2026_04_DAL_HOU",
+    "2026_05_TB_DAL"
+  ],
+  "history_home": [
+    "2026_01_GB_MIN",
+    "2026_02_GB_NYJ",
+    "2026_03_ATL_GB",
+    "2026_04_GB_TB",
+    "2026_05_CHI_GB"
+  ],
+  "model_sha256": "f6cb333805e1686ea7bc7d0bc869e0e8e201c0195a51f4da74a271225ba60781",
+  "model_name": "Market + statistics",
+  "stats_source_manifest": {
+    "schema_version": 1,
+    "season": 2026,
+    "retrieval_started_at": "2026-10-13T04:52:50.196779+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2026/20261013T045250196539Z/team.csv",
+        "rows": 158,
+        "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2026/20261013T045250196539Z/player.csv",
+        "rows": 5506,
+        "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c",
+        "missing_metrics": []
+      }
+    },
+    "retrieved_at": "2026-10-13T04:52:50.773813+00:00"
+  },
+  "schedule_snapshot_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "quote_snapshot_sha256": "cdb125aeea7bc11850769202b0f27f1e1eec56dcdc08b3edb70dd9196cf0ff44",
+  "input_snapshot_dir": "data/scout4/shadow/inputs/20261013T045251490778Z",
+  "pipeline_sha256": {
+    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6",
+    "scout4/ats_lab.py": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f",
+    "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+    "scout4/margin_lab.py": "a827d32fca6ccef6ccc93f1718d52a455eb5e16f5e66d530716684b5dd1d862c",
+    "scout4/stats.py": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba",
+    "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4"
+  },
+  "limitations": [
+    "Research forecast, not validated confidence or a betting recommendation.",
+    "No injury/replacement or forecast weather effects.",
+    "Source update timestamps may be unavailable; inputs were observed/retrieved before cutoff."
+  ],
+  "sealed_at_utc": "2026-10-13T04:52:51.571352+00:00",
+  "status": "SEALED_PREKICKOFF_RESEARCH"
+}

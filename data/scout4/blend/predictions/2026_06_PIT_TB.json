@@ -1,0 +1,413 @@
+{
+  "game_id": "2026_06_PIT_TB",
+  "away_team": "PIT",
+  "home_team": "TB",
+  "season": 2026,
+  "week": 6,
+  "kickoff_utc": "2026-10-18T17:00:00+00:00",
+  "decision_cutoff_utc": "2026-10-13T15:17:41.586802+00:00",
+  "version": "scout4-plug-margin-blend-1",
+  "configuration_sha256": "dc36cfe321de81030c503ca04d0547d7c85fc35747c9fca32ee11c3939e82fb1",
+  "weights": {
+    "scout_scoring": 0.5,
+    "plug_points_only": 0.5
+  },
+  "quote": {
+    "line": -3.0,
+    "odds": {
+      "away": -102.0,
+      "home": -118.0
+    },
+    "sportsbook": "DraftKings",
+    "source_url": "https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days&tb_page=1",
+    "captured_at_utc": "2026-10-13T15:17:41.177801+00:00",
+    "source_update_time": "Unavailable",
+    "kickoff_utc": "2026-10-18T17:00:00+00:00",
+    "market": "Spread"
+  },
+  "components": {
+    "Scout scoring": {
+      "away_margin": -0.03627229291629064,
+      "ats_edge": -3.0362722929162906,
+      "pick": "TB"
+    },
+    "The Plug": {
+      "away_margin": 1.4,
+      "ats_edge": -1.6,
+      "pick": "TB"
+    },
+    "Blend": {
+      "away_margin": 0.6818638535418546,
+      "ats_edge": -2.318136146458145,
+      "pick": "TB"
+    }
+  },
+  "scout_scoring": {
+    "first": "PIT",
+    "second": "TB",
+    "first_venue": "Away",
+    "second_venue": "Home",
+    "first_estimate": {
+      "score": 21.612600124533607,
+      "contributions": [
+        {
+          "label": "Fitted scoring baseline",
+          "feature": "intercept",
+          "value": 1.0,
+          "points": 23.326923076923077
+        },
+        {
+          "label": "Own opponent-adjusted scoring offense",
+          "feature": "off_scoring",
+          "value": -0.5879043600562588,
+          "points": -0.08758417608969944
+        },
+        {
+          "label": "Opponent adjusted scoring defense",
+          "feature": "opp_def_scoring",
+          "value": 0.4212376933895921,
+          "points": -0.1362493798248317
+        },
+        {
+          "label": "Own recent scoring margin",
+          "feature": "recent_net",
+          "value": 1.7142857142857142,
+          "points": 0.3798077688264485
+        },
+        {
+          "label": "Opponent recent scoring margin",
+          "feature": "opp_recent_net",
+          "value": -0.2857142857142857,
+          "points": 0.01793918548614768
+        },
+        {
+          "label": "Own venue scoring context",
+          "feature": "venue_scoring",
+          "value": -2.9,
+          "points": 0.07839664309019183
+        },
+        {
+          "label": "Home / away / neutral context",
+          "feature": "venue_indicator",
+          "value": -1.0,
+          "points": -0.9410001820013365
+        },
+        {
+          "label": "Own passing EPA strength",
+          "feature": "off_pass",
+          "value": -3.0646501839466094,
+          "points": -1.802715443607808
+        },
+        {
+          "label": "Own rushing EPA strength",
+          "feature": "off_rush",
+          "value": 1.1437696815739846,
+          "points": 0.5022318154922499
+        },
+        {
+          "label": "Opponent passing EPA suppression",
+          "feature": "opp_def_pass",
+          "value": 2.8920137178854013,
+          "points": 0.3241254153659554
+        },
+        {
+          "label": "Opponent rushing EPA suppression",
+          "feature": "opp_def_rush",
+          "value": 0.06359343129000826,
+          "points": -0.049274599126786875
+        }
+      ],
+      "plausible": true,
+      "status": "EXPERIMENTAL \u2014 not calibrated probabilities"
+    },
+    "second_estimate": {
+      "score": 21.648872417449898,
+      "contributions": [
+        {
+          "label": "Fitted scoring baseline",
+          "feature": "intercept",
+          "value": 1.0,
+          "points": 23.326923076923077
+        },
+        {
+          "label": "Own opponent-adjusted scoring offense",
+          "feature": "off_scoring",
+          "value": -1.3795710267229255,
+          "points": -0.20774920570780717
+        },
+        {
+          "label": "Opponent adjusted scoring defense",
+          "feature": "opp_def_scoring",
+          "value": 0.8240154711673698,
+          "points": -0.27923161330059354
+        },
+        {
+          "label": "Own recent scoring margin",
+          "feature": "recent_net",
+          "value": -0.2857142857142857,
+          "points": -0.06330129480440809
+        },
+        {
+          "label": "Opponent recent scoring margin",
+          "feature": "opp_recent_net",
+          "value": 1.7142857142857142,
+          "points": -0.10763511291688609
+        },
+        {
+          "label": "Own venue scoring context",
+          "feature": "venue_scoring",
+          "value": -1.5714285714285718,
+          "points": 0.04131206958339137
+        },
+        {
+          "label": "Home / away / neutral context",
+          "feature": "venue_indicator",
+          "value": 1.0,
+          "points": 0.9410001820013365
+        },
+        {
+          "label": "Own passing EPA strength",
+          "feature": "off_pass",
+          "value": -4.44822048398183,
+          "points": -2.6140620685778826
+        },
+        {
+          "label": "Own rushing EPA strength",
+          "feature": "off_rush",
+          "value": 1.4296912263484685,
+          "points": 0.6266555820265228
+        },
+        {
+          "label": "Opponent passing EPA suppression",
+          "feature": "opp_def_pass",
+          "value": -0.4092587934700631,
+          "points": -0.05046805859283052
+        },
+        {
+          "label": "Opponent rushing EPA suppression",
+          "feature": "opp_def_rush",
+          "value": -0.029274333796405747,
+          "points": 0.03542886081597828
+        }
+      ],
+      "plausible": true,
+      "status": "EXPERIMENTAL \u2014 not calibrated probabilities"
+    },
+    "margin_first": -0.03627229291629064,
+    "total": 43.26147254198351,
+    "features_first": {
+      "off_scoring": -0.5879043600562588,
+      "opp_def_scoring": 0.4212376933895921,
+      "recent_net": 1.7142857142857142,
+      "opp_recent_net": -0.2857142857142857,
+      "venue_scoring": -2.9,
+      "venue_indicator": -1.0,
+      "off_pass": -3.0646501839466094,
+      "off_rush": 1.1437696815739846,
+      "opp_def_pass": 2.8920137178854013,
+      "opp_def_rush": 0.06359343129000826
+    },
+    "features_second": {
+      "off_scoring": -1.3795710267229255,
+      "opp_def_scoring": 0.8240154711673698,
+      "recent_net": -0.2857142857142857,
+      "opp_recent_net": 1.7142857142857142,
+      "venue_scoring": -1.5714285714285718,
+      "venue_indicator": 1.0,
+      "off_pass": -4.44822048398183,
+      "off_rush": 1.4296912263484685,
+      "opp_def_pass": -0.4092587934700631,
+      "opp_def_rush": -0.029274333796405747
+    }
+  },
+  "plug_points_only": {
+    "away_points": 22.3,
+    "home_points": 20.9,
+    "away_margin": 1.4,
+    "history": {
+      "away": [
+        "2026_01_ATL_PIT",
+        "2026_02_PIT_NE",
+        "2026_03_CIN_PIT",
+        "2026_04_PIT_CLE",
+        "2026_05_IND_PIT"
+      ],
+      "home": [
+        "2026_01_TB_CIN",
+        "2026_02_CLE_TB",
+        "2026_03_MIN_TB",
+        "2026_04_GB_TB",
+        "2026_05_TB_DAL"
+      ]
+    },
+    "inputs": {
+      "away": {
+        "games": 5,
+        "pf": 22.2,
+        "pa": 21.8
+      },
+      "home": {
+        "games": 5,
+        "pf": 20.0,
+        "pa": 22.4
+      }
+    }
+  },
+  "totals": {
+    "quote": {
+      "line": 40.5,
+      "odds": {
+        "Over": -110.0,
+        "Under": -110.0
+      },
+      "sportsbook": "DraftKings",
+      "source_url": "https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days&tb_page=1",
+      "captured_at_utc": "2026-10-13T15:17:41.177801+00:00",
+      "source_update_time": "Unavailable",
+      "kickoff_utc": "2026-10-18T17:00:00+00:00",
+      "market": "Total"
+    },
+    "prediction": {
+      "total": 43.260856369456825,
+      "contributions": [
+        {
+          "label": "Fitted total baseline",
+          "feature": "intercept",
+          "input": 1,
+          "points": 44.93028846153846
+        },
+        {
+          "label": "Prior-validation bias adjustment",
+          "feature": "validation_bias",
+          "input": 1,
+          "points": 0.2352076385600274
+        },
+        {
+          "label": "Earlier-game league scoring baseline",
+          "feature": "league_total",
+          "input": 46.63291139240506,
+          "points": -0.6233150890581743
+        },
+        {
+          "label": "Combined adjusted scoring offense",
+          "feature": "off_score_sum",
+          "input": -1.9674753867791843,
+          "points": -0.5959516749015648
+        },
+        {
+          "label": "Combined adjusted scoring defense",
+          "feature": "def_score_sum",
+          "input": 1.245253164556962,
+          "points": 0.10452742438017057
+        },
+        {
+          "label": "Recent combined-score deviation",
+          "feature": "recent_total_deviation",
+          "input": -0.41410488245931387,
+          "points": 0.27367101779323844
+        },
+        {
+          "label": "Neutral venue",
+          "feature": "neutral_site",
+          "input": 0.0,
+          "points": 0.12180379800207684
+        },
+        {
+          "label": "Combined passing EPA strength",
+          "feature": "off_pass_sum",
+          "input": -7.512870667928439,
+          "points": 2.2201679689922638
+        },
+        {
+          "label": "Combined rushing EPA strength",
+          "feature": "off_rush_sum",
+          "input": 2.573460907922453,
+          "points": -0.018504433178994646
+        },
+        {
+          "label": "Combined passing suppression",
+          "feature": "def_pass_sum",
+          "input": 2.482754924415338,
+          "points": 0.38380034420714504
+        },
+        {
+          "label": "Combined rushing suppression",
+          "feature": "def_rush_sum",
+          "input": 0.03431909749360251,
+          "points": -0.002080617420869112
+        },
+        {
+          "label": "Offensive play-volume proxy deviation",
+          "feature": "volume_deviation",
+          "input": -0.9662447257383988,
+          "points": -0.07013114015642835
+        },
+        {
+          "label": "Passing-share deviation",
+          "feature": "pass_share_deviation",
+          "input": 0.01836165103664997,
+          "points": -0.47473726776143155
+        },
+        {
+          "label": "Quoted total",
+          "feature": "market_total",
+          "input": 40.5,
+          "points": -3.223890061539092
+        }
+      ],
+      "line": 40.5,
+      "over_probability": 0.5846667562438009,
+      "under_probability": 0.41533324375619907,
+      "lean": "Over",
+      "plausible": true
+    },
+    "features": {
+      "league_total": 46.63291139240506,
+      "neutral_site": 0.0,
+      "market_total": 40.5,
+      "off_score_sum": -1.9674753867791843,
+      "def_score_sum": 1.245253164556962,
+      "off_pass_sum": -7.512870667928439,
+      "off_rush_sum": 2.573460907922453,
+      "def_pass_sum": 2.482754924415338,
+      "def_rush_sum": 0.03431909749360251,
+      "recent_total_deviation": -0.41410488245931387,
+      "volume_deviation": -0.9662447257383988,
+      "pass_share_deviation": 0.01836165103664997
+    },
+    "model": "Scout totals only; not blended"
+  },
+  "stats_manifest": {
+    "schema_version": 1,
+    "season": 2026,
+    "retrieval_started_at": "2026-10-13T15:17:40.212936+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2026/20261013T151740212695Z/team.csv",
+        "rows": 158,
+        "sha256": "5acdf24ea619f7f535b363e3f59574bd8a81574661f26cea11ff46134f53a784",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2026/20261013T151740212695Z/player.csv",
+        "rows": 5506,
+        "sha256": "9b5dc2354a7c2d9f507cb7c27097bc92977af4ad8ecd7aaceb5f2b5d4d69e62d",
+        "missing_metrics": []
+      }
+    },
+    "retrieved_at": "2026-10-13T15:17:40.898939+00:00"
+  },
+  "input_hashes": {
+    "nfl_games.csv": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+    "public_money_snapshots.csv": "c8c2b49c086cdf4c23ff31fa4996f9547956609aa22792507b5389b1a603fd3e"
+  },
+  "limitations": [
+    "Experimental equal weighting; no validated probability or confidence.",
+    "Scout scoring component is not the separate frozen ATS probability model.",
+    "No injury, confirmed QB replacement or weather adjustments."
+  ],
+  "sealed_at_utc": "2026-10-13T15:17:41.732832+00:00",
+  "status": "SEALED_PREKICKOFF_RESEARCH"
+}

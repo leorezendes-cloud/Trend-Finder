@@ -1,0 +1,188 @@
+{
+  "game_id": "2026_06_ARI_LA",
+  "season": 2026,
+  "week": 6,
+  "away_team": "ARI",
+  "home_team": "LA",
+  "kickoff_utc": "2026-10-18T20:05:00+00:00",
+  "decision_cutoff_utc": "2026-10-13T04:52:51.490778+00:00",
+  "market": "Total",
+  "quote": {
+    "line": 52.5,
+    "odds": {
+      "Over": -105.0,
+      "Under": -115.0
+    },
+    "sportsbook": "DraftKings",
+    "source_url": "https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days&tb_page=1",
+    "captured_at_utc": "2026-10-13T04:52:51.139667+00:00",
+    "source_update_time": "Unavailable",
+    "kickoff_utc": "2026-10-18T20:05:00+00:00",
+    "market": "Total"
+  },
+  "selected_side": "Under",
+  "features": {
+    "league_total": 46.63291139240506,
+    "neutral_site": 0.0,
+    "market_total": 52.5,
+    "off_score_sum": -0.4674753867791841,
+    "def_score_sum": -4.782524613220816,
+    "off_pass_sum": 0.8528146413899407,
+    "off_rush_sum": 0.172992009258629,
+    "def_pass_sum": 0.01542556609302892,
+    "def_rush_sum": -0.8459380324708179,
+    "recent_total_deviation": 5.943037974683544,
+    "volume_deviation": 7.478199718706043,
+    "pass_share_deviation": 0.03395796585662253
+  },
+  "prediction": {
+    "total": 50.33465614725854,
+    "contributions": [
+      {
+        "label": "Fitted total baseline",
+        "feature": "intercept",
+        "input": 1,
+        "points": 44.93028846153846
+      },
+      {
+        "label": "Prior-validation bias adjustment",
+        "feature": "validation_bias",
+        "input": 1,
+        "points": 0.2352076385600274
+      },
+      {
+        "label": "Earlier-game league scoring baseline",
+        "feature": "league_total",
+        "input": 46.63291139240506,
+        "points": -0.6233150890581743
+      },
+      {
+        "label": "Combined adjusted scoring offense",
+        "feature": "off_score_sum",
+        "input": -0.4674753867791841,
+        "points": -0.1406060735491189
+      },
+      {
+        "label": "Combined adjusted scoring defense",
+        "feature": "def_score_sum",
+        "input": -4.782524613220816,
+        "points": -0.4266471324447967
+      },
+      {
+        "label": "Recent combined-score deviation",
+        "feature": "recent_total_deviation",
+        "input": 5.943037974683544,
+        "points": -2.515808331165744
+      },
+      {
+        "label": "Neutral venue",
+        "feature": "neutral_site",
+        "input": 0.0,
+        "points": 0.12180379800207684
+      },
+      {
+        "label": "Combined passing EPA strength",
+        "feature": "off_pass_sum",
+        "input": 0.8528146413899407,
+        "points": -0.24351256623487444
+      },
+      {
+        "label": "Combined rushing EPA strength",
+        "feature": "off_rush_sum",
+        "input": 0.172992009258629,
+        "points": -0.0013416958126208694
+      },
+      {
+        "label": "Combined passing suppression",
+        "feature": "def_pass_sum",
+        "input": 0.01542556609302892,
+        "points": -0.005234450877126369
+      },
+      {
+        "label": "Combined rushing suppression",
+        "feature": "def_rush_sum",
+        "input": -0.8459380324708179,
+        "points": 0.09989650715635803
+      },
+      {
+        "label": "Offensive play-volume proxy deviation",
+        "feature": "volume_deviation",
+        "input": 7.478199718706043,
+        "points": 0.5344917967138265
+      },
+      {
+        "label": "Passing-share deviation",
+        "feature": "pass_share_deviation",
+        "input": 0.03395796585662253,
+        "points": -0.8775477793333725
+      },
+      {
+        "label": "Quoted total",
+        "feature": "market_total",
+        "input": 52.5,
+        "points": 9.246981063763624
+      }
+    ],
+    "line": 52.5,
+    "over_probability": 0.433401618863424,
+    "under_probability": 0.566598381136576,
+    "lean": "Under",
+    "plausible": true
+  },
+  "history_away": [
+    "2026_01_ARI_LAC",
+    "2026_02_SEA_ARI",
+    "2026_03_ARI_SF",
+    "2026_04_ARI_NYG",
+    "2026_05_DET_ARI"
+  ],
+  "history_home": [
+    "2026_01_SF_LA",
+    "2026_02_NYG_LA",
+    "2026_03_LA_DEN",
+    "2026_04_LA_PHI",
+    "2026_05_BUF_LA"
+  ],
+  "model_sha256": "f6cb333805e1686ea7bc7d0bc869e0e8e201c0195a51f4da74a271225ba60781",
+  "model_name": "Market + statistics",
+  "stats_source_manifest": {
+    "schema_version": 1,
+    "season": 2026,
+    "retrieval_started_at": "2026-10-13T04:52:50.196779+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2026/20261013T045250196539Z/team.csv",
+        "rows": 158,
+        "sha256": "faaa9c7b8b8678eb192c6d498d4bcc8d6100a5dc68d5dea95a3b71e34104d68c",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2026/20261013T045250196539Z/player.csv",
+        "rows": 5506,
+        "sha256": "e9e6ad6e6ed33144e6d87c661c13322578e929e931e85ed754e041e57530950c",
+        "missing_metrics": []
+      }
+    },
+    "retrieved_at": "2026-10-13T04:52:50.773813+00:00"
+  },
+  "schedule_snapshot_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "quote_snapshot_sha256": "cdb125aeea7bc11850769202b0f27f1e1eec56dcdc08b3edb70dd9196cf0ff44",
+  "input_snapshot_dir": "data/scout4/shadow/inputs/20261013T045251490778Z",
+  "pipeline_sha256": {
+    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6",
+    "scout4/ats_lab.py": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f",
+    "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+    "scout4/margin_lab.py": "a827d32fca6ccef6ccc93f1718d52a455eb5e16f5e66d530716684b5dd1d862c",
+    "scout4/stats.py": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba",
+    "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4"
+  },
+  "limitations": [
+    "Research forecast, not validated confidence or a betting recommendation.",
+    "No injury/replacement or forecast weather effects.",
+    "Source update timestamps may be unavailable; inputs were observed/retrieved before cutoff."
+  ],
+  "sealed_at_utc": "2026-10-13T04:52:51.563262+00:00",
+  "status": "SEALED_PREKICKOFF_RESEARCH"
+}

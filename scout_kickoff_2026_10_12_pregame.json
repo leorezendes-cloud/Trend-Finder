@@ -1,0 +1,224 @@
+{
+  "generated_at_edt": "2026-10-12T18:32:17.865338-04:00",
+  "kickoff_edt": "2026-10-12T20:15:00-04:00",
+  "mode": "FROZEN_PREKICKOFF",
+  "game_id": "2026_05_BUF_LA",
+  "matchup": "BUF @ LA",
+  "saved_away_spread": 2.5,
+  "alternative_market_away_spread": 3.5,
+  "alternative_market_note": "+3.5 was published Mon 10/12; not a live-book quote; model below uses saved +2.5 ONLY",
+  "source_name": "nfl_games.csv",
+  "source_sha256": "3023a7e75d5dfd576ee891b74e54d0ad9e3974e5ae439f0bce88f01dfbc18742",
+  "supplemented_prior_games": 15,
+  "supplement_source_sha256": "9352a0f389fff067e6fa6812d8bb8cd1a5d45a46ac871ef0f3f23cdc1d005073",
+  "team_2026_weeks_1_4": {
+    "BUF": {
+      "games": 4,
+      "ppg": 31.75,
+      "opp_ppg": 26.75,
+      "net_ppg": 5.0
+    },
+    "LA": {
+      "games": 4,
+      "ppg": 21.25,
+      "opp_ppg": 20.75,
+      "net_ppg": 0.5
+    }
+  },
+  "net_advantage_buf": 4.5,
+  "illustrative_half_point_scorecard_buffalo": 2.25,
+  "qb_dog_history": {
+    "dog_all": [
+      21,
+      31
+    ],
+    "dog_prime": [
+      5,
+      7
+    ],
+    "dog_conf": [
+      6,
+      9
+    ],
+    "fav_all": [
+      64,
+      127
+    ]
+  },
+  "quarterbacks": {
+    "BUF": "Josh Allen",
+    "LA": "Matthew Stafford"
+  },
+  "stafford_home_primetime_regular_season_ats": {
+    "covers": 9,
+    "losses": 14,
+    "pushes": 0,
+    "total": 23
+  },
+  "pregame_qb_validation": "QB listed for target is from nfl_games.csv and checked against public team matchup reports; historical QB identity may reflect actual starter after game",
+  "qb_dog_streak_before_kickoff": 3,
+  "models_compared": [
+    {
+      "model": "NET+SPREAD",
+      "train": {
+        "wins": 1968,
+        "losses": 1931,
+        "pushes": 0,
+        "n": 3899,
+        "ats_pct": 50.47,
+        "brier": 0.2498,
+        "high_sample": 8,
+        "high_pct": 75.0
+      },
+      "eval_2023_25": {
+        "wins": 316,
+        "losses": 295,
+        "pushes": 0,
+        "n": 611,
+        "ats_pct": 51.72,
+        "brier": 0.25036,
+        "high_sample": 1,
+        "high_pct": 0.0
+      },
+      "eval_2025": {
+        "wins": 99,
+        "losses": 108,
+        "pushes": 0,
+        "n": 207,
+        "ats_pct": 47.83,
+        "brier": 0.25104,
+        "high_sample": 0,
+        "high_pct": null
+      },
+      "tonight_dog_cover_estimate_pct": 49.3
+    },
+    {
+      "model": "+REST/PRIMETIME",
+      "train": {
+        "wins": 1968,
+        "losses": 1931,
+        "pushes": 0,
+        "n": 3899,
+        "ats_pct": 50.47,
+        "brier": 0.24973,
+        "high_sample": 20,
+        "high_pct": 65.0
+      },
+      "eval_2023_25": {
+        "wins": 307,
+        "losses": 304,
+        "pushes": 0,
+        "n": 611,
+        "ats_pct": 50.25,
+        "brier": 0.25034,
+        "high_sample": 0,
+        "high_pct": null
+      },
+      "eval_2025": {
+        "wins": 101,
+        "losses": 106,
+        "pushes": 0,
+        "n": 207,
+        "ats_pct": 48.79,
+        "brier": 0.25079,
+        "high_sample": 0,
+        "high_pct": null
+      },
+      "tonight_dog_cover_estimate_pct": 48.2
+    },
+    {
+      "model": "+QB HISTORY",
+      "train": {
+        "wins": 1974,
+        "losses": 1925,
+        "pushes": 0,
+        "n": 3899,
+        "ats_pct": 50.63,
+        "brier": 0.24971,
+        "high_sample": 36,
+        "high_pct": 52.8
+      },
+      "eval_2023_25": {
+        "wins": 306,
+        "losses": 305,
+        "pushes": 0,
+        "n": 611,
+        "ats_pct": 50.08,
+        "brier": 0.25065,
+        "high_sample": 5,
+        "high_pct": 40.0
+      },
+      "eval_2025": {
+        "wins": 99,
+        "losses": 108,
+        "pushes": 0,
+        "n": 207,
+        "ats_pct": 47.83,
+        "brier": 0.25085,
+        "high_sample": 0,
+        "high_pct": null
+      },
+      "tonight_dog_cover_estimate_pct": 48.5
+    },
+    {
+      "model": "+QB SITUATIONS",
+      "train": {
+        "wins": 2027,
+        "losses": 1872,
+        "pushes": 0,
+        "n": 3899,
+        "ats_pct": 51.99,
+        "brier": 0.24919,
+        "high_sample": 279,
+        "high_pct": 54.8
+      },
+      "eval_2023_25": {
+        "wins": 296,
+        "losses": 315,
+        "pushes": 0,
+        "n": 611,
+        "ats_pct": 48.45,
+        "brier": 0.25249,
+        "high_sample": 53,
+        "high_pct": 45.3
+      },
+      "eval_2025": {
+        "wins": 102,
+        "losses": 105,
+        "pushes": 0,
+        "n": 207,
+        "ats_pct": 49.28,
+        "brier": 0.25148,
+        "high_sample": 15,
+        "high_pct": 40.0
+      },
+      "tonight_dog_cover_estimate_pct": 49.3
+    }
+  ],
+  "selected_model": "NET+SPREAD (designated baseline before evaluation comparisons)",
+  "selected_model_2023_2025": {
+    "wins": 316,
+    "losses": 295,
+    "pushes": 0,
+    "n": 611,
+    "ats_pct": 51.72,
+    "brier": 0.25036,
+    "high_sample": 1,
+    "high_pct": 0.0
+  },
+  "experimental_cover_probability_buf": 49.3,
+  "experimental_cover_probability_buf_at_published_plus_3_5": 49.6,
+  "selected_side": "NO CONFIDENT CALL",
+  "directional_lean": "LA -2.5",
+  "confidence_status": "NEUTRAL — no validated ATS edge",
+  "context_unscored": [
+    "Ed Oliver (DL) and Joshua Palmer (WR) out for BUF; DJ Moore questionable as of 10/11 Reuters (verify official inactives).",
+    "BetMGM reported 54% of spread money on BUF in an Oct 12 afternoon report; reports differ across sportsbooks.",
+    "Mike/Gemini 75% Buffalo ATS money: unverified sportsbook/timestamp; not scored.",
+    "Indoor SoFi Stadium: do not apply outdoor weather penalties.",
+    "Historical QB trends are conditional on listed QB starter, not independently verified pre-kickoff for all games.",
+    "No injury, betting-handle, or QB-streak points added absent positive historical validation.",
+    "Historical spread not necessarily available before kickoff; selection is experimental, NOT validated as an edge.",
+    "If a model was selected based on 2023–2025 results, that period would become development, not untouched test."
+  ]
+}

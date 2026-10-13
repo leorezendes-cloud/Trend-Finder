@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-10-13T03:15:02.173629+00:00",
+  "version": "scout4-ratings-1",
+  "models_path": "data/scout4/ratings_runs/20261013T031502094593Z/models.json",
+  "summary_path": "data/scout4/ratings_runs/20261013T031502094593Z/summary.json",
+  "source_sha256": {
+    "nfl_games.csv": "4dfb6cb4e40c6f8ae44b9534afc721a3d8cba1bd0873838babd9e2d442c40dca",
+    "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+    "scout4/replay.py": "0277943d3632111bbad9b86115bd439357655ed9f42e8389f44ebe543098d999",
+    "scout4/stats.py": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba"
+  },
+  "training_data": {
+    "schema_version": 1,
+    "season": 2024,
+    "retrieved_at": "2026-10-13T03:12:07.905530+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2024/20261013T031207905248Z/team.csv",
+        "rows": 570,
+        "sha256": "6c4ac463c872d009d24444aec9a5f56bba21fe210e2aa3fc0054f79ce42a7a1b",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2024/20261013T031207905248Z/player.csv",
+        "rows": 18983,
+        "sha256": "9a58b56d5be5b4f5ed8d3be63efe5694cbf9468d2bc25b1b3f64d0d83f335045",
+        "missing_metrics": []
+      }
+    }
+  },
+  "evaluation_data": {
+    "schema_version": 1,
+    "season": 2025,
+    "retrieved_at": "2026-10-13T02:10:57.941744+00:00",
+    "source": "nflverse via nflreadpy weekly stats",
+    "availability": "Retrieved now; historical publication times are unverified.",
+    "files": {
+      "team": {
+        "path": "2025/20261013T021057941414Z/team.csv",
+        "rows": 570,
+        "sha256": "91551442bafea1bcdb4840ff85889da0c1cbdc378229fd6d2d3daba86090ca06",
+        "missing_metrics": []
+      },
+      "player": {
+        "path": "2025/20261013T021057941414Z/player.csv",
+        "rows": 19422,
+        "sha256": "c192c13c6cd54ca32d6dcb37826e38d3bd81aa8b72e987a167e302937df23c10",
+        "missing_metrics": []
+      }
+    }
+  },
+  "model_sha256": "0da67d8b982e514ce3355cca5f3a134c6d94a5732b7b9c11721cdad44b1b309f"
+}

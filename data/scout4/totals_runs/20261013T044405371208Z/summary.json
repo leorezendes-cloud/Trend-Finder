@@ -1,0 +1,401 @@
+{
+  "specification": {
+    "training": "Two seasons preceding the validation season",
+    "validation": "Immediately prior season; bias and residual scale fit here",
+    "evaluation_years": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "candidates": {
+      "Scoring totals": [
+        "league_total",
+        "off_score_sum",
+        "def_score_sum",
+        "recent_total_deviation",
+        "neutral_site"
+      ],
+      "Production + volume": [
+        "league_total",
+        "off_score_sum",
+        "def_score_sum",
+        "recent_total_deviation",
+        "neutral_site",
+        "off_pass_sum",
+        "off_rush_sum",
+        "def_pass_sum",
+        "def_rush_sum",
+        "volume_deviation",
+        "pass_share_deviation"
+      ],
+      "Market + statistics": [
+        "league_total",
+        "off_score_sum",
+        "def_score_sum",
+        "recent_total_deviation",
+        "neutral_site",
+        "off_pass_sum",
+        "off_rush_sum",
+        "def_pass_sum",
+        "def_rush_sum",
+        "volume_deviation",
+        "pass_share_deviation",
+        "market_total"
+      ]
+    },
+    "ridge": 8,
+    "selection": "Lowest prior-validation Brier among three candidates; no target-year selection",
+    "pace_definition": "Offensive play-volume proxy: attempts + sacks suffered + carries; not seconds per play",
+    "excluded": "Actual target-game weather, starters and injury flags; no verified as-of versions",
+    "probabilities": "Normal residual assumption, pushes not modeled; nonpush probability scoring",
+    "status": "DEVELOPMENT REPLAY \u2014 no validated confidence or edge"
+  },
+  "folds": {
+    "2022": {
+      "training": [
+        2019,
+        2020
+      ],
+      "validation": 2021,
+      "selected": "Market + statistics",
+      "validation_brier": {
+        "Scoring totals": 0.2587964828311361,
+        "Production + volume": 0.25873663125702734,
+        "Market + statistics": 0.25349579803458705
+      },
+      "common_games": 207,
+      "excluded_game_ids": [],
+      "models": {
+        "Scoring totals": {
+          "games": 207,
+          "wins": 104,
+          "losses": 101,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 50.73170731707317,
+          "mae": 10.778067546101997,
+          "brier": 0.2649615008235271,
+          "mean_predicted_total": 44.54325062726156
+        },
+        "Production + volume": {
+          "games": 207,
+          "wins": 105,
+          "losses": 100,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 51.21951219512195,
+          "mae": 10.800128316760768,
+          "brier": 0.2667360154512257,
+          "mean_predicted_total": 44.5728136698616
+        },
+        "Market + statistics": {
+          "games": 207,
+          "wins": 111,
+          "losses": 94,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 54.146341463414636,
+          "mae": 10.204268702677977,
+          "brier": 0.24773957683825779,
+          "mean_predicted_total": 43.79659734596309
+        },
+        "Selected on prior validation": {
+          "games": 207,
+          "wins": 111,
+          "losses": 94,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 54.146341463414636,
+          "mae": 10.204268702677977,
+          "brier": 0.24773957683825779,
+          "mean_predicted_total": 43.79659734596309
+        },
+        "Market total benchmark": {
+          "games": 207,
+          "wins": 0,
+          "losses": 0,
+          "pushes": 2,
+          "no_calls": 205,
+          "accuracy": null,
+          "mae": 10.256038647342995,
+          "brier": 0.25,
+          "mean_predicted_total": 43.77777777777778
+        }
+      }
+    },
+    "2023": {
+      "training": [
+        2020,
+        2021
+      ],
+      "validation": 2022,
+      "selected": "Market + statistics",
+      "validation_brier": {
+        "Scoring totals": 0.25999773626936035,
+        "Production + volume": 0.2622872239082753,
+        "Market + statistics": 0.24722138695146023
+      },
+      "common_games": 208,
+      "excluded_game_ids": [],
+      "models": {
+        "Scoring totals": {
+          "games": 208,
+          "wins": 106,
+          "losses": 100,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 51.45631067961165,
+          "mae": 10.711085850516554,
+          "brier": 0.2573155874942646,
+          "mean_predicted_total": 43.57735784740078
+        },
+        "Production + volume": {
+          "games": 208,
+          "wins": 98,
+          "losses": 108,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 47.57281553398058,
+          "mae": 10.924174727775684,
+          "brier": 0.2628668789275707,
+          "mean_predicted_total": 43.59797872317717
+        },
+        "Market + statistics": {
+          "games": 208,
+          "wins": 107,
+          "losses": 99,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 51.94174757281554,
+          "mae": 10.581863019672996,
+          "brier": 0.25349002869563986,
+          "mean_predicted_total": 42.31863311727966
+        },
+        "Selected on prior validation": {
+          "games": 208,
+          "wins": 107,
+          "losses": 99,
+          "pushes": 2,
+          "no_calls": 0,
+          "accuracy": 51.94174757281554,
+          "mae": 10.581863019672996,
+          "brier": 0.25349002869563986,
+          "mean_predicted_total": 42.31863311727966
+        },
+        "Market total benchmark": {
+          "games": 208,
+          "wins": 0,
+          "losses": 0,
+          "pushes": 2,
+          "no_calls": 206,
+          "accuracy": null,
+          "mae": 10.40625,
+          "brier": 0.25,
+          "mean_predicted_total": 42.63221153846154
+        }
+      }
+    },
+    "2024": {
+      "training": [
+        2021,
+        2022
+      ],
+      "validation": 2023,
+      "selected": "Market + statistics",
+      "validation_brier": {
+        "Scoring totals": 0.2603785669841124,
+        "Production + volume": 0.26345078389942395,
+        "Market + statistics": 0.2586172811142677
+      },
+      "common_games": 208,
+      "excluded_game_ids": [],
+      "models": {
+        "Scoring totals": {
+          "games": 208,
+          "wins": 106,
+          "losses": 99,
+          "pushes": 3,
+          "no_calls": 0,
+          "accuracy": 51.707317073170735,
+          "mae": 10.168923968204801,
+          "brier": 0.258426533217953,
+          "mean_predicted_total": 44.661301029191854
+        },
+        "Production + volume": {
+          "games": 208,
+          "wins": 113,
+          "losses": 92,
+          "pushes": 3,
+          "no_calls": 0,
+          "accuracy": 55.1219512195122,
+          "mae": 10.097804522518258,
+          "brier": 0.2585266247037852,
+          "mean_predicted_total": 44.634441144209475
+        },
+        "Market + statistics": {
+          "games": 208,
+          "wins": 100,
+          "losses": 105,
+          "pushes": 3,
+          "no_calls": 0,
+          "accuracy": 48.78048780487805,
+          "mae": 10.101539962651609,
+          "brier": 0.25837057803543334,
+          "mean_predicted_total": 45.30885042444478
+        },
+        "Selected on prior validation": {
+          "games": 208,
+          "wins": 100,
+          "losses": 105,
+          "pushes": 3,
+          "no_calls": 0,
+          "accuracy": 48.78048780487805,
+          "mae": 10.101539962651609,
+          "brier": 0.25837057803543334,
+          "mean_predicted_total": 45.30885042444478
+        },
+        "Market total benchmark": {
+          "games": 208,
+          "wins": 0,
+          "losses": 0,
+          "pushes": 3,
+          "no_calls": 205,
+          "accuracy": null,
+          "mae": 9.783653846153847,
+          "brier": 0.25,
+          "mean_predicted_total": 44.57211538461539
+        }
+      }
+    },
+    "2025": {
+      "training": [
+        2022,
+        2023
+      ],
+      "validation": 2024,
+      "selected": "Scoring totals",
+      "validation_brier": {
+        "Scoring totals": 0.25413362561916497,
+        "Production + volume": 0.2626513977323782,
+        "Market + statistics": 0.26439754508924557
+      },
+      "common_games": 208,
+      "excluded_game_ids": [],
+      "models": {
+        "Scoring totals": {
+          "games": 208,
+          "wins": 97,
+          "losses": 111,
+          "pushes": 0,
+          "no_calls": 0,
+          "accuracy": 46.63461538461539,
+          "mae": 11.046622702730957,
+          "brier": 0.2772072469223483,
+          "mean_predicted_total": 42.050988790086876
+        },
+        "Production + volume": {
+          "games": 208,
+          "wins": 97,
+          "losses": 111,
+          "pushes": 0,
+          "no_calls": 0,
+          "accuracy": 46.63461538461539,
+          "mae": 11.06118975841004,
+          "brier": 0.2763964063089065,
+          "mean_predicted_total": 41.9436685160083
+        },
+        "Market + statistics": {
+          "games": 208,
+          "wins": 100,
+          "losses": 108,
+          "pushes": 0,
+          "no_calls": 0,
+          "accuracy": 48.07692307692308,
+          "mae": 10.899483738073453,
+          "brier": 0.27332062992170447,
+          "mean_predicted_total": 41.50334104134428
+        },
+        "Selected on prior validation": {
+          "games": 208,
+          "wins": 97,
+          "losses": 111,
+          "pushes": 0,
+          "no_calls": 0,
+          "accuracy": 46.63461538461539,
+          "mae": 11.046622702730957,
+          "brier": 0.2772072469223483,
+          "mean_predicted_total": 42.050988790086876
+        },
+        "Market total benchmark": {
+          "games": 208,
+          "wins": 0,
+          "losses": 0,
+          "pushes": 0,
+          "no_calls": 208,
+          "accuracy": null,
+          "mae": 10.08173076923077,
+          "brier": 0.25,
+          "mean_predicted_total": 44.8125
+        }
+      }
+    }
+  },
+  "pooled": {
+    "Scoring totals": {
+      "games": 831,
+      "wins": 413,
+      "losses": 411,
+      "pushes": 7,
+      "no_calls": 0,
+      "accuracy": 50.12135922330097,
+      "mae": 10.676052402533328,
+      "brier": 0.2645153705851582,
+      "mean_predicted_total": 43.70721972865521
+    },
+    "Production + volume": {
+      "games": 831,
+      "wins": 413,
+      "losses": 411,
+      "pushes": 7,
+      "no_calls": 0,
+      "accuracy": 50.12135922330097,
+      "mae": 10.720728899374135,
+      "brier": 0.2661648917513463,
+      "mean_predicted_total": 43.68615982359507
+    },
+    "Market + statistics": {
+      "games": 831,
+      "wins": 418,
+      "losses": 406,
+      "pushes": 7,
+      "no_calls": 0,
+      "accuracy": 50.728155339805824,
+      "mae": 10.447080697108468,
+      "brier": 0.25827939160694546,
+      "mean_predicted_total": 43.23117588916083
+    },
+    "Selected on prior validation": {
+      "games": 831,
+      "wins": 415,
+      "losses": 409,
+      "pushes": 7,
+      "no_calls": 0,
+      "accuracy": 50.36407766990291,
+      "mae": 10.483909703906013,
+      "brier": 0.2592604793935157,
+      "mean_predicted_total": 43.3682525819869
+    },
+    "Market total benchmark": {
+      "games": 831,
+      "wins": 0,
+      "losses": 0,
+      "pushes": 7,
+      "no_calls": 824,
+      "accuracy": null,
+      "mae": 10.131768953068592,
+      "brier": 0.25,
+      "mean_predicted_total": 43.9488567990373
+    }
+  }
+}

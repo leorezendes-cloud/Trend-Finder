@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Conspiracy Dungeon | Gravy Train</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        
+        .dungeon {
+            max-width: 1400px;
+            width: 100%;
+            margin: auto;
+            box-sizing: border-box;
+        }
+
+        .top-text {
+            font-size: 25px;
+            font-weight: bolder;
+            -webkit-text-stroke: 0.25px white;
+            text-align: center;
+        }
+
+        
+        .dungeon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        /* Tablets */
+        @media (max-width: 1100px) {
+            .dungeon-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Phones */
+        @media (max-width: 650px) {
+            .dungeon-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dungeon-card {
+            background: #1f2937;
+            color: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #64748b;
+            font-family: Arial, sans-serif;
+        }
+
+        .dungeon-card h2 {
+            color: white;
+            font-size: 24px;
+        }
+
+        .dungeon-card p {
+            line-height: 1.6;
+        }
+
+        .dungeon-card-link { text-decoration: none; display: block; }
+        .dungeon-card-link[aria-current="page"], .anomaly-category-grid .dungeon-card[aria-current="page"] { outline: 3px solid white; outline-offset: 3px; }
+        .dungeon-card-link:focus-visible { outline: 3px solid white; }
+        .weekly-history { color: black; font-size: 14px; text-align: center; font-weight: bold; margin: 12px 0; -webkit-text-stroke: 0; }
+        .weekly-history summary { cursor: pointer; }
+
+        .primetime-grid { max-width: 1200px; margin: 30px auto; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        .primetime-grid .trend-card { min-height: 350px; padding: 26px; -webkit-text-stroke: 0; font-family: Arial, sans-serif; }
+        .primetime-grid h3 { color: white; font-size: 22px; }
+        .primetime-grid .profile-rate { font-size: 32px; font-weight: bold; margin: 18px 0 8px; }
+        .primetime-grid .profile-note { font-size: 13px; line-height: 1.5; color: #d1d5db; }
+        @media (max-width: 760px) { .primetime-grid { grid-template-columns: 1fr !important; } }
+        .dungeon a {
+            color: white;
+        }
+        .money-scoreboard { max-width: 1000px; margin: 24px auto; }
+        .money-scoreboard .stat { color: white; -webkit-text-stroke: 0; font-family: Arial, sans-serif; }
+        .money-scoreboard .stat p { color: white; -webkit-text-stroke: 0; }
+        .money-tally-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+        .money-matchups { max-width: 1200px; margin: 24px auto; }
+        .market-row { display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 12px; padding: 18px 0; border-top: 1px solid #64748b; line-height: 1.5; }
+        .market-row small { display: block; color: #d1d5db; }
+        .market-name { font-weight: bold; color: #fbbf24; }
+        .fade-qualified { color: #86efac; font-weight: bold; }
+        .money-matchups .trend-card { -webkit-text-stroke: 0; font-family: Arial, sans-serif; }
+        @media(max-width:650px) { .money-tally-grid { grid-template-columns: 1fr; } .market-row { grid-template-columns: 1fr; gap: 6px; } }
+        @media (max-width:650px) { .anomaly-category-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; } .anomaly-category-grid .dungeon-card { padding: 14px; } .anomaly-category-grid h3 { font-size: 16px; } .anomaly-category-grid p { font-size: 13px; } }
+        .anomaly-type { display: inline-block; padding: 6px 9px; background: #fbbf24; color: #111827; border-radius: 5px; font: bold 12px Arial,sans-serif; margin-bottom: 12px; }
+        .anomaly-highlight { background: #111827; border-left: 4px solid #fbbf24; padding: 16px; margin: 16px 0; line-height: 1.5; }
+        .anomaly-key-fact { display: block; font-size: 27px; color: #fde68a; }
+        .international-team-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+        .international-team-record { display:flex; flex-direction:column; gap:8px; background:#111827; padding:16px; border-radius:8px; }
+        .international-team-record small, .anomaly-meta { color:#d1d5db; font-size:13px; line-height:1.5; }
+        .anomaly-details { margin-top:18px; padding-top:12px; border-top:1px solid #64748b; }
+        .anomaly-details summary { cursor:pointer; }
+        @media(max-width:450px) { .international-team-grid { grid-template-columns:1fr; } }
+        .mobile-dungeon-back { display: none !important; }
+        @media (max-width: 650px) {
+            body.mobile-menu .dungeon-results { display: none; }
+            body.mobile-results .dungeon > .dungeon-grid,
+            body.mobile-results .dungeon > h1,
+            body.mobile-results .top-text,
+            body.mobile-results .desktop-home-back { display: none; }
+            body.mobile-results .mobile-dungeon-back { display: inline-block !important; }
+            body.mobile-results .dungeon-results > .results:first-child { margin-top: 12px; }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+
+<body{% if request.args.get('mobile_results') == '1' %} class="mobile-results"{% endif %}>
+
+<main class="dungeon">
+    {% include '_site_navigation.html' %}
+   
+    <h1>🕵🏾‍♂️ The Conspiracy Dungeon 🕵🏾‍♂️</h1>
+
+    <p class="top-text">
+        Question everything. Test everything.
+        Follow the evidence.
+    </p>
+
+    <div class="dungeon-grid">
+
+        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='money') }}" {% if view.panel == 'money' %}aria-current="page"{% endif %}>
+            <h2>💰 Mike's Fade the Public</h2>
+
+            <p>
+                Fade teams receiving 65% or more
+                of public dollars: spread, moneyline, or totals.
+            </p>
+
+            <p>Status: Collecting evidence</p>
+        </a>
+
+        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='primetime') }}" {% if view.panel == 'primetime' %}aria-current="page"{% endif %}>
+            <h2>🌙 Primetime Underdogs</h2>
+
+            <p>
+                Investigating underdog performance
+                in nationally televised games.
+            </p>
+
+            <p>Status: Weekly results</p>
+        </a>
+
+        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='movement') }}" {% if view.panel == 'movement' %}aria-current="page"{% endif %}>
+            <h2>📉 Reverse Line Movement</h2>
+
+            <p>
+                Investigating games where betting
+                lines move against the heavily
+                backed side.
+            </p>
+
+            <p>Status: Tracking recorded lines</p>
+        </a>
+
+        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}" {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
+            <h2>🏈 NFL Anomalies</h2>
+
+            <p>
+                Unusual fumbles, turnovers,
+                penalties, and other patterns.
+            </p>
+
+            <p>Status: Four event categories</p>
+        </a>
+
+    </div>
+    <div class="dungeon-results" id="dungeon-results">
+    <section class="results">
+        <h2>{{ view.title }}</h2>
+        <p class="active-filters">{{ view.week_label }}</p>
+        {% if view.ready and view.panel != 'anomalies' %}
+        {% if view.panel == 'primetime' %}
+        <div class="weekly-history">
+            {% if view.panel == 'primetime' %}
+            <p><a href="{{ url_for('conspiracy_dungeon_page', panel='primetime', week='all') }}" style="color: inherit;">All weeks — {{ view.season }} primetime dogs</a></p>
+            <p><a href="{{ url_for('conspiracy_dungeon_page', panel='primetime', week=view.current_week, stage=view.current_stage) }}" style="color: inherit;">View this week's dogs and completed games</a>{% if view.archive_week is not none %} • <a href="{{ url_for('conspiracy_dungeon_page', panel='primetime') }}" style="color: inherit;">Back to upcoming dogs</a>{% endif %}</p>
+            {% endif %}
+            Previous weeks: {{ view.previous.wins }}-{{ view.previous.losses }}-{{ view.previous.pushes }} ATS
+            {% if view.previous.ats_pct is not none %} • {{ view.previous.ats_pct }}% covers{% endif %}
+            {% if view.previous.pending %} • {{ view.previous.pending }} pending{% endif %}
+            {% if view.history %}
+            <details>
+                <summary>View previous weeks</summary>
+                {% for week in view.history %}
+                <p><a href="{{ url_for('conspiracy_dungeon_page', panel=view.panel, week=week.week, stage=week.stage) }}" style="color: inherit;">{{ week.label }}</a>: {{ week.summary.wins }}-{{ week.summary.losses }}-{{ week.summary.pushes }} ATS{% if week.summary.ats_pct is not none %} • {{ week.summary.ats_pct }}%{% endif %}{% if week.summary.pending %} • {{ week.summary.pending }} pending{% endif %}</p>
+                {% endfor %}
+            </details>
+            {% else %}<p>No previous-week records yet.</p>{% endif %}
+        </div>
+        {% endif %}
+        <p class="active-filters">{% if view.panel == 'money' %}DraftKings • Public money ≥ 65% • Three markets{% elif view.panel == 'movement' %}DraftKings • Public money ≥ 65% • Line moves against the backed side{% else %}Underdogs • Kickoff at 7 p.m. Eastern or later • Pick’ems excluded{% endif %}</p>
+        <p class="active-filters" style="font-size: 14px;">{% if view.panel == 'primetime' and view.archive_week is none %}{{ view.season }} season results{% elif view.archive_week is not none %}Selected archive results{% else %}This week's results{% endif %}</p>
+        {% if view.panel == 'primetime' %}
+        <div class="results-grid">
+            {% for label, value in [
+                ('Qualifying Games', view.summary.qualifying),
+                ('Pending Games', view.summary.pending),
+                ('Reverse-line Covers' if view.panel == 'movement' else 'Dog Covers', view.summary.wins),
+                ('ATS Losses', view.summary.losses),
+                ('Pushes', view.summary.pushes)
+            ] %}
+            <div class="stat"><span class="stat-label">{{ label }}</span><span class="stat-value">{{ value }}</span></div>
+            {% endfor %}
+            <div class="stat"><span class="stat-label">ATS Cover Rate</span><span class="stat-value">{% if view.summary.ats_pct is not none %}{{ view.summary.ats_pct }}%{% else %}N/A{% endif %}</span></div>
+        </div>
+        {% endif %}
+        <p class="active-filters" style="font-size: 14px;">New week appears Wednesday at noon Eastern. Cover rate excludes pushes.</p>
+        {% else %}
+        <p class="active-filters">Explore game, world, player, and team events below.</p>
+        {% endif %}
+    </section>
+
+    {% if view.panel == 'money' %}
+    <section class="money-scoreboard">
+        <h2>Market Tallies</h2>
+        <p class="active-filters" style="font-size: 15px;">{{ view.week_label }} • {{ view.public_markets.total.qualifying }} qualifying fades • {{ view.public_markets.total.pending }} pending</p>
+        <div class="money-tally-grid">
+            {% for tally in view.public_markets.tallies %}
+            <div class="stat">
+                <span class="stat-label">{{ tally.label }}</span>
+                <span class="stat-value">{{ tally.wins }}-{{ tally.losses }}-{{ tally.pushes }}</span>
+                <p>{{ tally.qualifying }} fades • {{ tally.pending }} pending</p>
+                <p>{% if tally.rate is not none %}{{ tally.rate }}%{% else %}N/A{% endif %} {{ 'SU wins' if 'Moneyline' in tally.label else 'covers' }}</p>
+                <p>Profit: {% if tally.profit is not none %}{{ "%+.2f"|format(tally.profit) }}u • ROI {{ "%+.1f"|format(tally.roi) }}%{% else %}Awaiting results{% endif %}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="active-filters" style="font-size: 13px;">One unit risked per qualifying fade at its saved odds. Pushes refund the stake and are excluded from win/cover rates. Tallies count selections, so one game can qualify in three markets.</p>
+        <details class="weekly-history">
+            <summary>Previous weeks</summary>
+            {% for week in view.public_markets.history %}
+            <p><a href="{{ url_for('conspiracy_dungeon_page', panel='money', week=week.week, stage=week.stage) }}" style="color: inherit;">{{ week.label }}</a></p>
+            {% for tally in week.tallies %}<p>{{ tally.label }}: {{ tally.wins }}-{{ tally.losses }}-{{ tally.pushes }} • {{ tally.pending }} pending</p>{% endfor %}
+            {% else %}<p>No previous-week three-market quotes recorded yet.</p>{% endfor %}
+        </details>
+        <details class="weekly-history">
+            <summary>Running tallies — started Week 6, 2026*</summary>
+            {% for tally in view.public_markets.running %}<p>{{ tally.label }}: {{ tally.wins }}-{{ tally.losses }}-{{ tally.pushes }} • {{ tally.pending }} pending{% if tally.profit is not none %} • {{ "%+.2f"|format(tally.profit) }}u{% endif %}</p>{% endfor %}
+            <p>* All three-market quotes are retained from collection onward. Earlier ATS-only snapshots remain saved separately.</p>
+        </details>
+        <p class="active-filters" style="font-size: 15px;"><a href="{{ url_for('conspiracy_dungeon_page', panel='money', week='all') }}" style="color: inherit;">View all recorded weeks</a></p>
+    </section>
+    <div class="money-matchups">
+        {% for game in view.public_markets.cards %}
+        <section class="trend-card">
+            <strong class="compact-title">{{ game.matchup }}</strong>
+            <p>Week {{ game.week }} • {{ game.gameday }}</p>
+            {% for market in game.markets %}
+            <div class="market-row">
+                <div class="market-name">{{ market.market_label }}</div>
+                <div><strong>Public money</strong><br>{{ market.side_a }} {{ market.handle_a }}% • {{ market.side_b }} {{ market.handle_b }}%<small>Bets: {{ market.side_a }} {{ market.bets_a }}% • {{ market.side_b }} {{ market.bets_b }}%</small></div>
+                <div><span class="{{ 'fade-qualified' if market.qualifies else '' }}">{{ market.pick }}</span><small>{{ 'Cover' if market.result == 'Win' and market.market != 'Moneyline' else 'SU Win' if market.result == 'Win' else market.result }}{% if market.profit is not none %} • {{ "%+.2f"|format(market.profit) }}u{% endif %}</small></div>
+            </div>
+            {% endfor %}
+            <p><a href="{{ game.source_url }}" target="_blank" rel="noopener noreferrer">View Source</a></p>
+        </section>
+        {% else %}<p class="active-filters">Awaiting recorded public-money quotes for this week.</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if view.panel == 'movement' %}{% include 'movement_section.html' %}{% endif %}
+    {% if view.panel == 'anomalies' %}{% include 'anomalies_section.html' %}{% endif %}
+
+    {% if view.ready and view.panel != 'anomalies' %}
+    {% if view.panel == 'primetime' %}
+    <h2>{% if view.archive_week is none %}Upcoming Primetime Dogs{% else %}Primetime Dogs — {{ view.week_label }}{% endif %}</h2>
+    <div class="trend-card-grid sunday-game-grid primetime-grid">
+        {% for game in view.games %}
+        <section class="trend-card compact-card">
+            <div class="compact-summary">
+                <strong class="compact-title">{{ game.matchup }}</strong>
+                <p>Week {{ game.week }} • {{ game.gameday }}</p>
+                <span class="compact-spread">Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}</span>
+                <h3>{{ game.profile.description }}</h3>
+                <p>ATS Result: {{ 'Cover' if game.result == 'Win' else game.result }}</p>
+                {% set baseline = game.profile.baseline %}
+                <p class="profile-rate">{% if baseline.ats_pct is not none %}{{ baseline.ats_pct }}% ATS{% else %}No historical ATS rate{% endif %}</p>
+                <p>{{ baseline.wins }}-{{ baseline.losses }}-{{ baseline.pushes }} ATS • {{ baseline.graded }} prior games of this type</p>
+                <h4>Relevant Historical Comparisons</h4>
+                {% if game.profile.comparisons %}
+                <div class="sunday-table-wrapper">
+                    <table class="sunday-trend-table">
+                        <thead><tr><th>Filter / comparison</th><th>ATS</th><th>Games</th><th>Change</th></tr></thead>
+                        <tbody>{% for comparison in game.profile.comparisons %}
+                        <tr><td>{{ comparison.label }}</td><td>{{ comparison.summary.ats_pct }}%</td><td>{{ comparison.summary.graded }}</td><td>{{ "%+.1f"|format(comparison.delta) }} pts</td></tr>
+                        {% endfor %}</tbody>
+                    </table>
+                </div>
+                {% else %}<p>Not enough prior games for additional comparisons.</p>{% endif %}
+                <p class="profile-note">Team{% if game.qb %} + quarterback{% endif %} history before this matchup. Baseline: {{ game.location.lower() }} dogs. Comparisons are exploratory, exclude pushes from rates, and require at least five decided games; small samples can swing sharply.</p>
+            </div>
+        </section>
+        {% else %}<p class="active-filters">No {% if view.archive_week is none %}upcoming {% endif %}primetime underdogs with a recorded spread for this week.</p>{% endfor %}
+    </div>
+    {% elif view.panel not in ['money', 'movement'] %}
+    {% for game in view.games %}
+    <section class="results">
+        <h2>{{ game.matchup }}</h2>
+        <p class="active-filters">Week {{ game.week }} • {{ game.gameday }}{% if view.panel == 'money' %} • Fade {{ game.heavily_backed }}{% endif %}</p>
+        <div class="results-grid">
+            {% if view.panel == 'money' %}
+            <div class="stat"><span class="stat-label">ATS Handle on {{ game.heavily_backed }}</span><span class="stat-value">{{ game.handle_pct }}%</span></div>
+            {% endif %}
+            <div class="stat"><span class="stat-label">{{ 'Fade Selection' if view.panel == 'money' else 'Underdog' }}</span><span class="stat-value">{{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}</span></div>
+            <div class="stat"><span class="stat-label">ATS Result</span><span class="stat-value">{{ 'Cover' if game.result == 'Win' else game.result }}</span></div>
+            {% if view.panel == 'money' %}
+            <div class="stat"><span class="stat-label">Sportsbook</span><span class="stat-value">DraftKings</span></div>
+            {% endif %}
+        </div>
+        {% if view.panel == 'money' %}
+        <p class="active-filters" style="font-size: 14px;">
+            <a href="{{ game.source_url }}" target="_blank" rel="noopener noreferrer" style="color: inherit;">View Source</a>
+        </p>
+        {% endif %}
+    </section>
+    {% else %}
+    <section class="results"><p class="active-filters">{% if view.panel == 'money' %}No recorded DraftKings games meet the 65% threshold for this week.{% else %}No primetime underdogs with a recorded spread for this week.{% endif %}</p></section>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+
+    </div>
+</main>
+
+<script>
+(function () {
+    const mobile = window.matchMedia('(max-width: 650px)');
+    const cards = document.querySelectorAll('.dungeon-card-link');
+    const resultsOnly = new URL(window.location.href).searchParams.get('mobile_results') === '1';
+    const originalLinks = Array.from(cards, card => card.getAttribute('href'));
+    function updateNavigation() {
+        document.body.classList.toggle('mobile-menu', mobile.matches && !resultsOnly);
+        cards.forEach((card, index) => {
+            if (mobile.matches) {
+                const destination = new URL(originalLinks[index], window.location.href);
+                destination.searchParams.set('mobile_results', '1');
+                card.href = destination.href;
+                card.removeAttribute('target');
+                card.removeAttribute('rel');
+            } else {
+                card.setAttribute('href', originalLinks[index]);
+                card.removeAttribute('target');
+                card.removeAttribute('rel');
+            }
+        });
+        document.querySelectorAll('.dungeon-results a').forEach(link => {
+            const destination = new URL(link.href, window.location.href);
+            if (destination.origin === window.location.origin && destination.pathname === window.location.pathname) {
+                if (mobile.matches && resultsOnly) destination.searchParams.set('mobile_results', '1');
+                else destination.searchParams.delete('mobile_results');
+                link.href = destination.href;
+            }
+        });
+    }
+    updateNavigation();
+    mobile.addEventListener('change', updateNavigation);
+}());
+</script>
+</body>
+</html>

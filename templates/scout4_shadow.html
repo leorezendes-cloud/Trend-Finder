@@ -1,0 +1,60 @@
+{% extends 'scout4_base.html' %}
+{% block title %}Forecast Tracker{% endblock %}{% block heading %}Forecast Tracker{% endblock %}
+{% block filter_form %}
+
+<form method="get" action="{{ url_for('scout4.shadow_page') }}" class="stats-filters">
+  <label for="forecast-market">Forecast view
+    <select id="forecast-market" name="market" onchange="this.form.submit()">
+      {% for value,label in [('All','ATS & totals'),('Spread','ATS only'),('Total','Over / under only')] %}
+      <option value="{{ value }}"{% if market==value %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <noscript><button type="submit">Apply filter</button></noscript>
+</form>
+
+
+{% endblock %}
+{% block data_notes %}<aside class="stats-note"><strong>Standalone Scout research forecasts · separate from The Plug's blend</strong>
+<p>Original ATS and totals forecasts are locked before kickoff. They may use different lines and times from the public blend.</p>
+<details><summary>Methodology and experiment details</summary><p>2026 shadow testing · first eligible pre-kickoff forecast stays frozen. These are experimental estimates, not validated confidence ratings. Pushes are graded separately. No injury, replacement-QB or weather adjustments enter these forecasts.</p><p>Totals use scoring, efficiency and play-volume proxies, not clock pace. Probabilities assume a continuous error distribution and do not estimate push likelihood.</p><p>Source timestamps, quoted odds and contribution breakdowns are preserved. Personnel/weather updates are separate evidence. Captures are maintained locally.</p></details></aside>{% endblock %}
+{% block content %}
+{% if tracker.status.checked_at_utc %}<p>Last capture check: {{ tracker.status.checked_at_utc|eastern_time }} · {{ tracker.status.saved }} new forecasts · {{ tracker.status.preserved }} preserved.</p>{% endif %}
+<h2>{{ games|length }} games with frozen forecasts</h2><div class="stats-grid">
+{% for game in games %}<article class="stats-card"><h3>{{ game.away }} @ {{ game.home }}</h3><p>{{ game.kickoff|eastern_time }}</p><div class="card-body">
+<details><summary>Pregame weather forecast</summary>
+{% set w=game.weather %}{% if w %}
+<p><strong>{{ w.stadium }}</strong> · {{ w.roof_context }}</p><p>Captured: {{ w.observed_at|eastern_time }}{% if w.stale %} · <strong>Stale: refresh before use.</strong>{% endif %}</p>
+<p>Outside grid forecast from <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Model issuance time unavailable. This update was not used in the frozen prediction; no weather point adjustment is applied.</p>
+<div class="table-scroll"><table><thead><tr><th>Forecast hour</th><th>Temperature</th><th>Wind / gusts</th><th>Precipitation / chance</th></tr></thead><tbody>{% for h in w.hours %}<tr><td>{{ h.valid_at_utc|eastern_time }}</td><td>{{ h.temperature_2m|stat }} °F</td><td>{{ h.wind_speed_10m|stat }} / {{ h.wind_gusts_10m|stat }} mph</td><td>{{ h.precipitation|stat(2) }} in / {{ h.precipitation_probability|stat }}%</td></tr>{% endfor %}</tbody></table></div>
+<p>Hourly samples span kickoff hour through three hours later. Outside conditions may differ from the field, particularly under a roof. <a href="{{ w.roof_source }}" target="_blank" rel="noopener noreferrer">Roof context source</a>.</p>
+{% else %}<p>Weather forecast pending{% if game.weather_pending %}: {{ game.weather_pending }}{% endif %}.</p>{% endif %}
+</details>
+<details><summary>Quarterbacks &amp; injury evidence</summary>
+{% set evidence=game.personnel_evidence %}
+{% if evidence %}
+<p>Personnel observed: {{ evidence.observed_at|eastern_time }}. This separate update was not used in the frozen forecasts above.</p>
+{% for team,r in evidence.personnel.items() %}
+<h3>{{ team }}</h3>
+{% set pace=game.pace.get(team) %}{% if pace %}<p>Prior-game clock pace: {{ pace.mean_game_clock_seconds_between_plays|stat }} seconds between qualifying snaps · {{ pace.clock_pairs }} measured pairs. Research only; excludes final two minutes, overtime and margins over 14. This is game-clock pace, not real elapsed time, and was not used in the frozen forecast.</p>{% endif %}
+{% set report=game.starter_reports.get(team) %}
+{% if report %}<p><strong>Recorded expected QB:</strong> {% for q in r.qb_depth_order %}{% if q.gsis_id==report.expected_qb_id %}{{ q.player_name }}{% endif %}{% endfor %} ({{ report.expected_qb_id }}). {% if report.stale %}Report is stale.{% endif %}</p><p>{{ report.source_evidence }}</p><p><a href="{{ report.source_url }}" target="_blank" rel="noopener noreferrer">Source report</a> · Published: {{ report.published_at|eastern_time }} · Recorded: {{ report.observed_at|eastern_time }}.</p><p>User-recorded report; not independently verified or applied to predictions.</p>{% endif %}
+<p><strong>Starter confirmation: unavailable.</strong> Depth-chart order lists candidates, not a verified starter.{% if r.depth_stale %} Depth chart is stale or missing.{% endif %}</p>
+{% if r.depth_updated_at %}<p>Depth chart updated: {{ r.depth_updated_at|eastern_time }}</p>{% endif %}
+{% for q in r.qb_depth_order %}<p>#{{ q.pos_rank }} {{ q.player_name }}{% set profile=r.qb_profiles[loop.index0] %} · {{ profile.prior_attempts|int }} earlier pass attempts{% if profile.raw_epa_per_attempt is not none %} · {{ profile.shrunk_epa_per_attempt|stat(3) }} smoothed passing EPA / attempt{% else %} · No prior sample{% endif %}</p>{% endfor %}
+<details><summary>Record a sourced expected quarterback</summary>
+</details>
+<p><strong>Injury coverage: {{ r.injury_coverage }}.</strong> Missing reports do not mean healthy.</p>
+{% for injury in r.injury_rows %}<p>{{ injury.full_name }} · {{ injury.position }} · Game status: {{ injury.report_status or 'Unreported' }} · Practice: {{ injury.practice_status or 'Unreported' }} · {{ injury.report_primary_injury or injury.practice_primary_injury or 'Injury details unreported' }}</p>{% endfor %}
+{% endfor %}
+{% else %}<p>No saved pregame personnel evidence is available.</p>{% endif %}
+</details>
+{% for kind,label in [('Spread','ATS'),('Total','Over / under')] %}{% if market=='All' or market==kind %}{% set r=game[kind] %}<details><summary>{{ label }}{% if r %}: {{ r.selected_side or 'No call' }} · {{ r.result }}{% else %}: Pending{% endif %}</summary>
+{% if r %}<p>Frozen {{ r.quote.sportsbook }} line: {% if kind=='Spread' %}{{ game.away }} {{ '%+g'|format(r.quote.line) }}{% else %}{{ r.quote.line|stat }} points{% endif %}. Quoted odds: {% for side,odds in r.quote.odds.items() %}{{ side }} {{ '%+g'|format(odds) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+{% if kind=='Spread' %}<p>Experimental {{ game.away }} cover estimate: {{ (100*r.prediction.away_cover_probability)|stat }}%</p>{% else %}<p>Estimated total: <strong>{{ r.prediction.total|stat }} points</strong> · Over estimate: {{ (100*r.prediction.over_probability)|stat }}% · Under estimate: {{ (100*r.prediction.under_probability)|stat }}%</p>{% endif %}
+<p>Forecast sealed: {{ r.sealed_at_utc|eastern_time }}<br>Quote observed: {{ r.quote.captured_at_utc|eastern_time }}<br>Statistics retrieved: {{ r.stats_source_manifest.retrieved_at|eastern_time }}</p>
+<h3>Contribution breakdown</h3><p>{% if kind=='Spread' %}Values contribute to log odds, not point bonuses.{% else %}Point contributions add to the unrounded total estimate.{% endif %}</p><div class="table-scroll"><table><thead><tr><th>Factor</th><th>Input</th><th>{% if kind=='Spread' %}Log odds{% else %}Points{% endif %}</th></tr></thead><tbody>{% for c in r.prediction.contributions %}<tr><td>{{ c.label }}</td><td>{{ c.input|stat(3) }}</td><td>{% if kind=='Spread' %}{{ c.log_odds|stat(3) }}{% else %}{{ c.points|stat(2) }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p>No eligible forecast was sealed for this market.</p>{% endif %}</details>{% endif %}{% endfor %}</div></article>{% else %}<p>No pre-kickoff forecasts have been captured yet.</p>{% endfor %}</div>
+{% if tracker.status.pending %}<section><h2>Pending inputs</h2>{% for p in tracker.status.pending %}<p>{{ p.game_id }} · {{ p.market }}: {{ p.reason }}</p>{% endfor %}</section>{% endif %}
+{% if totals_report %}<section><h2>Over / under development comparison</h2><p>831 historical games across 2022–2025. Fits and probability adjustments use earlier seasons. These results do not establish a dependable totals edge.</p><article class="stats-card"><div class="card-body"><div class="table-scroll"><table><thead><tr><th>Model</th><th>Wins–losses–pushes</th><th>Accuracy</th><th>Total error / game</th><th>Probability error (Brier)</th></tr></thead><tbody>{% for name,s in totals_report.pooled.items() %}<tr><td>{{ name }}</td><td>{{ s.wins }}–{{ s.losses }}–{{ s.pushes }}</td><td>{% if s.accuracy is not none %}{{ s.accuracy|stat }}%{% else %}No calls{% endif %}</td><td>{{ s.mae|stat }} points</td><td>{{ s.brier|stat(4) }}</td></tr>{% endfor %}</tbody></table></div></div></article><p>Lower Brier is better. The historical market-total benchmark currently beats the tested models on average total error and probability error.</p></section>{% endif %}
+{% endblock %}
