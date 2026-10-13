@@ -58,3 +58,6 @@ html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 3
     .landing-welcome .home-section-card { padding: 18px 14px; }
     .landing-welcome .home-section-card strong { font-size: 20px; }
 }
+
+.landing-logo { max-width: 720px; margin: 0 auto 16px; }
+.landing-slogan { text-align: center; color: #fbbf24; font-size: clamp(22px, 4vw, 32px); margin: 0 0 24px; }

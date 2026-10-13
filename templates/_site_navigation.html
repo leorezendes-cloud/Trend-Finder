@@ -1,7 +1,7 @@
 {% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
 {% set plug_section = request.endpoint == 'plug_page' or request.endpoint == 'sunday_scout.sunday_scout_page' or (request.endpoint or '').startswith('scout4.') %}
 <div class="site-header">
-<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/trend-findah-nav.png' if request.endpoint == 'home' else 'Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="{{ 'Trend Findah 3000' if request.endpoint == 'home' else 'Gravy Train' }} — Home"></a>
+<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="Gravy Train — Home"></a>
 <details class="site-menu" id="site-menu">
 <summary><span aria-hidden="true">☰</span> Menu</summary>
 <div class="site-menu-panel">

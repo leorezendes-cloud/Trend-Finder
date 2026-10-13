@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 5710,
-    "sha256": "e88282bca77bba1e00882dbd8021dd20a3a44764f168dc062cdc2d9c1a2a6560"
+    "bytes": 5877,
+    "sha256": "98191df62bf11a2d46a2ede643db33d3f16a91c442107e0e9e08c66aa42a1dfb"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -988,8 +988,8 @@
     "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
   },
   "templates/_site_navigation.html": {
-    "bytes": 3872,
-    "sha256": "9b8fd84e143f8bdb8fe0f4abc2166ff8df29ac4c9caaca02653a67d20d38f9f0"
+    "bytes": 3735,
+    "sha256": "69ba298e2df348e382d51cb76e96771835d53a508353634ef2041b769329a73b"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2708,
@@ -1156,7 +1156,7 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 2576,
-    "sha256": "2a3291b60ae3b418e73e67176553d5e9f3b3c4e9beddb44ff38c408349b47b9f"
+    "bytes": 2851,
+    "sha256": "7773cfbcc447d8891c52f29dd6a051f84b7799a3f584856db9480672c24357ab"
   }
 }
