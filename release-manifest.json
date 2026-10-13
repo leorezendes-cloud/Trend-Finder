@@ -1060,8 +1060,8 @@
     "sha256": "d12929ff2d30d0cfe031897b53b0c885890c6588113f8f1004d265faab04f5ea"
   },
   "templates/sunday_scout.html": {
-    "bytes": 9483,
-    "sha256": "0ca0fb5f7b2e796e0ffe505292def3b43fe7e98231881a0acb93a84ed619b9f5"
+    "bytes": 9673,
+    "sha256": "25c97837c3e760ee8b17ab26904a4fcf5b9495f4f24969b7caff78cbafd8499a"
   },
   "templates/trend_details.html": {
     "bytes": 3841,

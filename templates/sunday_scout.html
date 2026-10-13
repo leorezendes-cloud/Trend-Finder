@@ -9,6 +9,7 @@
     .scout-intro button { color: #fbbf24; border: 1px solid #64748b; background: #1f2937; border-radius: 9px; padding: 10px 14px; cursor: pointer; font: bold 1rem Arial,sans-serif; }
     .scout-page { max-width: 1180px; margin: 0 auto; padding: 20px 16px 50px; color: #f1f5f9; }
     .scout-page h1 { text-align: center; margin: 10px 0 18px; }
+    .scout-powered { text-align: center; color: #cbd5e1; font: 13px/1.5 Arial,sans-serif; margin: -10px 0 22px; -webkit-text-stroke: 0; }
     .scout-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
     .scout-actions a { color: #fbbf24; border: 1px solid #64748b; background: #1f2937; border-radius: 9px; padding: 10px 14px; text-decoration: none; font-family: Arial,sans-serif; -webkit-text-stroke: 0; }
     .scout-intro { border-left: 4px solid #fbbf24; background: #1f2937; border-radius: 10px; padding: 18px; line-height: 1.6; margin: 16px 0 22px; }
@@ -41,6 +42,7 @@
 {% include '_site_navigation.html' %}
 <main class="scout-page">
   <h1>🔌 The Plug 🔌</h1>
+  <p class="scout-powered">Powered by Scout 4.0</p>
   <nav class="scout-actions">
     <a href="{{ url_for('sunday_page') }}">← Upcoming Matchups</a>
     <a href="{{ url_for('sunday_results_page') }}">Results Report</a>
