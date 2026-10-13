@@ -1,5 +1,9 @@
-"""Local accounts and consent preferences. No email delivery or Scout dependencies."""
+"""Local accounts and consent preferences. Transactional recovery email; no Scout dependencies."""
 import hashlib
+import json
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
 import time
 import os
 import re
@@ -55,12 +59,20 @@ def csrf_token():
 
 def init_membership(app):
     app.config.update(
+        RESEND_API_KEY=os.environ.get('RESEND_API_KEY', ''),
+        RECOVERY_FROM=os.environ.get('TREND_FINDAH_EMAIL_FROM', 'Trend Findah <noreply@mail.trendfindah.com>'),
+        PUBLIC_ORIGIN=os.environ.get('TREND_FINDAH_PUBLIC_ORIGIN', 'https://trendfindah.com'),
         SECRET_KEY=os.environ.get('TREND_FINDAH_SECRET_KEY'),
         SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax',
         SESSION_COOKIE_SECURE=os.environ.get('TREND_FINDAH_ENV') == 'production',
         PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
         MEMBERSHIP_DATABASE=os.environ.get('TREND_FINDAH_DATABASE', str(Path(app.instance_path) / 'members.sqlite3')),
     )
+    origin = urlsplit(app.config['PUBLIC_ORIGIN'])
+    if (origin.scheme != 'https' or not origin.hostname or origin.username
+            or origin.password or origin.query or origin.fragment or origin.path not in ('', '/')):
+        raise RuntimeError('TREND_FINDAH_PUBLIC_ORIGIN must be an HTTPS origin without a path')
+    app.config['PUBLIC_ORIGIN'] = app.config['PUBLIC_ORIGIN'].rstrip('/')
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
     if not app.config['SECRET_KEY']:
         if os.environ.get('TREND_FINDAH_ENV') == 'production':
@@ -255,16 +267,57 @@ def issue_reset(member_id):
     return token
 
 
+def send_recovery_email(email, token):
+    # Never build recovery links from the request Host or forwarded headers.
+    link = current_app.config['PUBLIC_ORIGIN'] + url_for('membership.reset_password', token=token)
+    payload = {
+        'from': current_app.config['RECOVERY_FROM'],
+        'to': [email],
+        'subject': 'Reset your Trend Findah password',
+        'text': ('Reset your Trend Findah password using this link:\n\n' + link +
+                 '\n\nThis link expires in 15 minutes and works once. '
+                 'If you did not request this, you can ignore this email. '
+                 'Your password has not changed.'),
+    }
+    request_data = Request('https://api.resend.com/emails',
+        data=json.dumps(payload).encode(), method='POST', headers={
+            'Authorization': 'Bearer ' + current_app.config['RESEND_API_KEY'],
+            'Content-Type': 'application/json', 'User-Agent': 'TrendFindah/1.0'})
+    try:
+        with urlopen(request_data, timeout=8) as response:
+            result = json.loads(response.read(65536))
+        if not isinstance(result, dict) or not result.get('id'):
+            raise ValueError('Missing email ID')
+        return True
+    except (HTTPError, URLError, TimeoutError, OSError, ValueError):
+        # Do not log recipient, provider response bodies, credentials or reset links.
+        current_app.logger.error('Password recovery email was not confirmed by Resend')
+        return False
+
+
 @bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     message = None
+    enabled = bool(current_app.config['RESEND_API_KEY'])
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         if not allow_attempt('recovery', email):
-            return render_template('password_recovery.html', mode='forgot', error='Too many requests. Please try again in 15 minutes.'), 429
-        # No email service is configured. Never expose account existence or tokens here.
-        message = 'Email recovery is not active yet. No email has been sent. For local testing, use the reset-link command described in the setup guide.'
-    return render_template('password_recovery.html', mode='forgot', message=message)
+            return render_template('password_recovery.html', mode='forgot', recovery_enabled=enabled,
+                error='Too many requests. Please try again in 15 minutes.'), 429
+        if enabled:
+            member = db().execute('SELECT id FROM members WHERE email=?', (email,)).fetchone() if len(email) <= 254 else None
+            if member:
+                token = issue_reset(member['id'])
+                if not send_recovery_email(email, token):
+                    with db():
+                        db().execute('DELETE FROM password_resets WHERE token_hash=?',
+                                     (hashlib.sha256(token.encode()).hexdigest(),))
+            message = ('If an account exists for that email, a password-reset link will be sent. '
+                       'Check your inbox and spam folder. The link expires in 15 minutes.')
+        else:
+            message = 'Email recovery is temporarily unavailable. No email has been sent. Please try again later.'
+    return render_template('password_recovery.html', mode='forgot', message=message,
+                           recovery_enabled=enabled)
 
 
 @bp.route('/reset-password/<token>', methods=['GET', 'POST'])

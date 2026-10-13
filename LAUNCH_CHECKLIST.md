@@ -11,7 +11,7 @@
 
 1. Follow HOSTING.md and deploy the reviewed release using `wsgi:app`, not the development server. No service was created or deployed in this pass.
 2. Configure the production environment, stable session secret, persistent membership database, HTTPS, and the verified proxy-hop count. Verify login, registration, logout, and `/healthz` on the real host.
-3. Configure and test transactional password-recovery email with a verified sender and trusted public origin. Current recovery delivery is local-only; do not present it as completed public email recovery.
+3. Configure and test transactional password-recovery email with a verified sender and trusted public origin. Resend delivery is implemented; actual inbox delivery still needs verification after configuring the key.
 4. Verify hosted write restrictions reject research edits/captures while allowing the read-only analysis form and protected membership actions.
 5. Arrange database backups and verify restoration. Keep local credentials, account databases, and research backups out of the published release.
 6. Publish a reviewed, current NFL/market data snapshot and decide who updates it. Hosted browsing does not automatically refresh the research data.

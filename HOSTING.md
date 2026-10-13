@@ -56,7 +56,7 @@ The hosted WSGI entry point blocks all write requests except membership routes a
 
 ## Email and release prerequisites
 
-Password recovery is implemented for local testing only. Public email delivery and newsletter delivery remain inactive. Choose a transactional email provider and verify a sending address/domain, then implement and test its recovery delivery with a configured trusted public origin. Do not present the current local-only recovery screen as a completed public recovery feature.
+Password recovery sends transactional email through Resend when `RESEND_API_KEY` is set. Set that private key in Render Environment settings. `TREND_FINDAH_EMAIL_FROM` defaults to `Trend Findah <noreply@mail.trendfindah.com>`; that sending domain must be verified in Resend. `TREND_FINDAH_PUBLIC_ORIGIN` defaults to `https://trendfindah.com` and must be an HTTPS origin without a path. Never generate links from incoming Host headers. Without the key, recovery clearly reports temporary unavailability. Provider failures are logged without recipients, tokens, keys, or response bodies. Gunicorn access logs omit URL paths to protect reset tokens. Test actual inbox delivery after deployment; automated checks mock Resend. Newsletter delivery remains inactive.
 
 Before public launch: reconcile current Scout work, confirm the release-data manifest, choose the host and email provider, configure HTTPS/proxy/storage/backups, test email recovery, and approve the deployment. No user account or local session secret is included in the release.
 

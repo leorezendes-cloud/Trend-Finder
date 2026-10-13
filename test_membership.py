@@ -21,6 +21,7 @@ class MembershipTests(unittest.TestCase):
                 self.app.add_url_rule('/' + endpoint, endpoint, lambda: 'public')
             init_membership(self.app)
         self.app.config['TESTING'] = True
+        self.app.config['RESEND_API_KEY'] = ''
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -159,6 +160,50 @@ class MembershipTests(unittest.TestCase):
             self.assertIn('No email has been sent', response.text)
             results.append(response.text)
         self.assertEqual(results[0], results[1])
+        with self.app.app_context():
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM password_resets').fetchone()[0], 0)
+
+    def test_email_recovery_round_trip_and_trusted_origin(self):
+        import json
+        from unittest.mock import MagicMock
+        self.register()
+        self.app.config.update(RESEND_API_KEY='test-key', PUBLIC_ORIGIN='https://trendfindah.com')
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"id":"email-id"}'
+        path = '/members/forgot-password'
+        with patch('membership.urlopen', return_value=response) as sender:
+            pages = []
+            for email in ['person@example.com', 'unknown@example.com']:
+                reply = self.client.post(path, data={'csrf_token':self.token(path), 'email':email},
+                                         headers={'X-Forwarded-Host':'untrusted.example'})
+                self.assertEqual(reply.status_code, 200)
+                pages.append(reply.text)
+            self.assertEqual(pages[0], pages[1])
+            self.assertEqual(sender.call_count, 1)
+            request = sender.call_args.args[0]
+            payload = json.loads(request.data)
+            self.assertEqual(payload['to'], ['person@example.com'])
+            self.assertEqual(request.full_url, 'https://api.resend.com/emails')
+            self.assertEqual(sender.call_args.kwargs['timeout'], 8)
+            link = re.search(r'https://trendfindah.com/members/reset-password/[^\s]+', payload['text']).group()
+        reset_path = link.removeprefix('https://trendfindah.com')
+        reply = self.client.post(reset_path, data={'csrf_token':self.token(reset_path),
+            'password':'recovered password phrase', 'password_confirm':'recovered password phrase'})
+        self.assertEqual(reply.status_code, 302)
+        self.assertEqual(self.client.get(reset_path).status_code, 400)
+        self.assertEqual(self.client.post('/members/login', data={'csrf_token':self.token('/members/login'),
+            'email':'person@example.com', 'password':'recovered password phrase'}).status_code, 302)
+
+    def test_delivery_failure_revokes_token_and_does_not_expose_details(self):
+        from urllib.error import URLError
+        self.register()
+        self.app.config['RESEND_API_KEY'] = 'test-key'
+        path = '/members/forgot-password'
+        with patch('membership.urlopen', side_effect=URLError('private provider detail')):
+            with self.assertLogs(self.app.logger, level='ERROR') as logs:
+                reply = self.client.post(path, data={'csrf_token':self.token(path), 'email':'person@example.com'})
+        self.assertEqual(reply.status_code, 200)
+        self.assertNotIn('private provider detail', reply.text + ''.join(logs.output))
         with self.app.app_context():
             self.assertEqual(db().execute('SELECT COUNT(*) FROM password_resets').fetchone()[0], 0)
 

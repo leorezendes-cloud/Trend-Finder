@@ -1,19 +1,19 @@
 {
   ".env.example": {
-    "bytes": 368,
-    "sha256": "bc1206aa26bcf70b7a088bba62fffa8d1515ea51073d0e1f5a639bfd17e84596"
+    "bytes": 608,
+    "sha256": "f3b362c79c396d229460f9b9fd902077d3f5a2620966a1215a82b52cc544f15f"
   },
   ".gitignore": {
     "bytes": 161,
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 5744,
-    "sha256": "651fae439dddafa061befda89c25a76c2821ca169cdb5d157e40e40dc48b47d6"
+    "bytes": 6128,
+    "sha256": "d801fb060f2cac0a84cd4245220db19d5302f440c9247ea8b9a76169019eca63"
   },
   "MEMBERSHIP.md": {
-    "bytes": 4942,
-    "sha256": "3966b16db8f2931c39ec6ba73ca51305337b68400739a29923135dba8d5be85f"
+    "bytes": 5081,
+    "sha256": "54405b3bf8e5b55f87a1ee251850a7f2b063e260db393b35a09f72472b922a56"
   },
   "anomaly_analysis.py": {
     "bytes": 8461,
@@ -516,8 +516,8 @@
     "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
   },
   "gunicorn.conf.py": {
-    "bytes": 687,
-    "sha256": "a9c28f722c0c2d37704ed135457724120c8331ae182ded44c1104a0a1188f0e9"
+    "bytes": 818,
+    "sha256": "1344dab43bed7e2cf5f37afa112381136252dbf0300e6450563bed8b5e59db34"
   },
   "home_results.py": {
     "bytes": 3550,
@@ -532,8 +532,8 @@
     "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
   },
   "membership.py": {
-    "bytes": 14388,
-    "sha256": "d3cce650cdd187c9a00b74547f3afab2e1aead31ed91fed5eefe10c020358382"
+    "bytes": 17368,
+    "sha256": "4fd54bf28b8c35ee91f11439301c5d69ed2d0e1458ae490fb4a20a2393d3b30d"
   },
   "nfl_games.csv": {
     "bytes": 2190111,
@@ -1024,8 +1024,8 @@
     "sha256": "6e992d2e3fa07147da8f35604fd4740943727ccdc62655de915007d24cc05ac7"
   },
   "templates/password_recovery.html": {
-    "bytes": 2335,
-    "sha256": "f20320792b1004bdb931c64d1750e154e32e29d8f3dd9844daf925ec303b193f"
+    "bytes": 2377,
+    "sha256": "120145d94629af35010ad828e45ddaafc13ef083b5d81196db08416a62296675"
   },
   "templates/scout4_base.html": {
     "bytes": 3233,
@@ -1080,8 +1080,8 @@
     "sha256": "1fa28b2e1c0f281b5de7e925c57d8c424693619c0fe9b81a3e6f90ca7a4eb62b"
   },
   "test_membership.py": {
-    "bytes": 12531,
-    "sha256": "52fa6e4872e3e8806376d12514df8538f75f5fcd66c927ab79a93efac68747f3"
+    "bytes": 15347,
+    "sha256": "ce39b9d0c33b2f0ef55bd0ceb309f3364743e7be1c34877956f246f1f8ef743d"
   },
   "test_page_layouts.py": {
     "bytes": 1776,
@@ -1132,8 +1132,8 @@
     "sha256": "1e1acf8582c76e2a3eceaa7178d4bb9f83a3e2048a45daa8e141b5073a72283f"
   },
   "LAUNCH_CHECKLIST.md": {
-    "bytes": 2099,
-    "sha256": "412f32f95ac47e8b5746919dc2cbb4e2316dbcc667fbf0bb526666c68fd021b3"
+    "bytes": 2110,
+    "sha256": "b4dfeb752a99c0f4154596682baa5a737546b2540fe854d4f672e8b1ffdd2824"
   },
   "test_launch_validation.py": {
     "bytes": 1806,

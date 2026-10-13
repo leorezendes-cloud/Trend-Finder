@@ -14,7 +14,7 @@ Use the project's existing Python environment and Flask dependencies. Membership
 
 Schema version 2 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
 
-Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors, refresh data, or send email. Password recovery and login rate limiting are implemented. Email delivery and email verification remain unconfigured.
+Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors or refresh research data. Password recovery sends through Resend when RESEND_API_KEY is configured. Email verification and newsletters remain inactive.
 
 ## Verification
 
@@ -29,7 +29,7 @@ Membership tests cover validation, duplicate emails, hashed passwords, login fai
 
 ## Password recovery and request limits
 
-The login page now links to `/members/forgot-password`. Until an email provider is configured, that page clearly states that no email is sent and returns the same response for existing and unknown accounts. It does not expose reset tokens.
+The login page now links to `/members/forgot-password`. With RESEND_API_KEY configured, existing accounts receive a Resend recovery email and unknown accounts receive the same public response without email. Without a key, the page reports temporary unavailability. Links use the trusted configured public origin and tokens are never displayed on the recovery page. See HOSTING.md for settings.
 
 For local testing, create an account and then run this from the membership checkout using the project Python environment:
 
@@ -43,7 +43,7 @@ Login and recovery are each limited to 5 requests per normalized email and 30 re
 
 ## Persistent storage and backups
 
-Local account storage already persists in `instance/members.sqlite3`. On a host, mount durable storage and set `TREND_FINDAH_DATABASE` to a file on that mount. Keep the session secret stable across deployments. A host and email provider still need to be selected; neither has been provisioned or contacted.
+Local account storage already persists in `instance/members.sqlite3`. On a host, mount durable storage and set `TREND_FINDAH_DATABASE` to a file on that mount. Keep the session secret stable across deployments. The hosted service uses Render and Resend recovery delivery. Configure and verify the key and sender before testing real delivery.
 
 Create a consistent backup to a new file with:
 
@@ -53,4 +53,4 @@ python -m flask --app app backup-membership-db /absolute/path/to/new-backup.sqli
 
 The command uses SQLite's backup API, restricts the new file to its owner, and refuses to overwrite existing files. Store backups separately from the host's main disk and arrange a retention schedule during hosting setup. Backups contain private account data; don't commit or upload them to public repositories. To restore, stop the membership app, preserve the existing database, copy the backup to the configured database path, then restart. No scheduled backup job is installed.
 
-Before public release, connect a transactional email provider to recovery, use a trusted configured public origin for reset URLs, apply the host's trusted-proxy settings, and test real delivery. Newsletter email remains disabled.
+Before public release, configure the Resend key, verify the sending domain, apply the host's trusted-proxy settings, and test real delivery. Newsletter email remains disabled.
