@@ -1,11 +1,11 @@
 {% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
 {% set plug_section = request.endpoint == 'plug_page' or request.endpoint == 'sunday_scout.sunday_scout_page' or (request.endpoint or '').startswith('scout4.') %}
 <div class="site-header">
-<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="Gravy Train — Home"></a>
-<div class="site-header-actions">
 {% if g.member %}
 <a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
 {% endif %}
+<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="Gravy Train — Home"></a>
+<div class="site-header-actions">
 <details class="site-menu" id="site-menu">
 <summary><span aria-hidden="true">☰</span> Menu</summary>
 <div class="site-menu-panel">

@@ -71,3 +71,7 @@ html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 3
     .site-header-actions { gap: 6px; }
     .site-profile { padding: 8px; }
 }
+
+.site-header:has(> .site-profile) { gap: 12px; }
+.site-header:has(> .site-profile) > .site-brand { margin: 0 auto; min-width: 0; flex: 1; }
+.site-header > .site-profile, .site-header-actions { flex-shrink: 0; }

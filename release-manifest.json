@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 6593,
-    "sha256": "299b6f8a04deabc07bada78cfd3777d6d5a8dd862606f1242a6c782ae753fefa"
+    "bytes": 6805,
+    "sha256": "d70512a439a20d94a49b41447fd4f82a27550c979ddb88b49d5dde3907e8cd50"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -989,7 +989,7 @@
   },
   "templates/_site_navigation.html": {
     "bytes": 4007,
-    "sha256": "ba70452f8a8e223d10c7dc2978e8b5f1b135630d2f479522b808e96671bc349c"
+    "sha256": "1a2166305f4d635a25ffc11c4e3bffe3cd7517b0dde46d98309fb9d3d517adc8"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2708,
