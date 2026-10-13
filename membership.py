@@ -178,7 +178,7 @@ def register():
                 session.clear()
                 session['member_id'] = cursor.lastrowid
                 session.permanent = True
-                return redirect(url_for('membership.preferences'))
+                return redirect(url_for('home'))
             except sqlite3.IntegrityError:
                 error = 'An account with that email already exists. Please log in.'
     return render_template('membership.html', mode='register', error=error), 400 if error else 200
@@ -201,7 +201,7 @@ def login():
             session['member_id'] = member['id']
             session['member_version'] = member['session_version']
             session.permanent = True
-            return redirect(url_for('membership.preferences'))
+            return redirect(url_for('home'))
         error = 'Email or password is incorrect.'
     return render_template('membership.html', mode='login', error=error), 400 if error else 200
 

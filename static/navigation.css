@@ -61,3 +61,13 @@ html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 3
 
 .landing-logo { max-width: 720px; margin: 0 auto 16px; }
 .landing-slogan { text-align: center; color: #fbbf24; font-size: clamp(22px, 4vw, 32px); margin: 0 0 24px; }
+
+.site-header-actions { display: flex; align-items: center; gap: 10px; }
+.site-profile { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border: 1px solid #c99c3a; border-radius: 8px; background: #111827; color: white; text-decoration: none; text-align: center; font: 700 14px Arial,sans-serif; -webkit-text-stroke: 0; }
+.site-profile small { font-size: 11px; font-weight: normal; color: #86efac; white-space: nowrap; }
+.site-profile:hover, .site-profile:focus-visible { outline: 2px solid #fbbf24; outline-offset: 3px; }
+@media (max-width: 600px) {
+    .site-header:has(.site-profile) .site-brand { max-width: 48%; }
+    .site-header-actions { gap: 6px; }
+    .site-profile { padding: 8px; }
+}

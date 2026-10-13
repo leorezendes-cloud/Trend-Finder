@@ -81,6 +81,20 @@ class MembershipTests(unittest.TestCase):
             self.assertIn('Email or password is incorrect.', response.text)
         self.assertEqual(self.client.post('/members/login', data={'email':'PERSON@example.com','password':'long secure password','csrf_token':self.token('/members/login')}).status_code, 302)
 
+    def test_login_returns_home_and_profile_indicates_session(self):
+        self.assertEqual(self.register().location, '/')
+        self.assertIn('Signed in', self.client.get('/members/preferences').text)
+        self.client.post('/members/logout', data={'csrf_token': self.token('/members/preferences')})
+        bad = self.client.post('/members/login', data={'email':'wrong@example.com',
+            'password':'wrong', 'csrf_token':self.token('/members/login')})
+        self.assertEqual(bad.status_code, 400)
+        self.assertNotIn('Welcome Back', bad.text)
+        self.assertNotIn('Signed in', bad.text)
+        good = self.client.post('/members/login', data={'email':'person@example.com',
+            'password':'long secure password', 'csrf_token':self.token('/members/login')})
+        self.assertEqual(good.location, '/')
+        self.assertIn('Signed in', self.client.get('/members/preferences').text)
+
     def test_preferences_persistence_opt_out_and_migration(self):
         self.register(newsletter_opt_in='yes')
         self.assertEqual(self.row()['newsletter_opt_in'], 1)

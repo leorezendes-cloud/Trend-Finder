@@ -12,7 +12,8 @@
 <h1>Gravy Train</h1>
 {% include '_site_navigation.html' %}
 <main class="membership">
-<h2>{{ {'register':'Join Free', 'login':'Welcome Back', 'preferences':'My Membership'}[mode] }}</h2>
+{% if mode == 'preferences' %}<p><a href="{{ url_for('home') }}">Back to main menu</a></p>{% endif %}
+<h2>{{ {'register':'Join Free', 'login':'Sign in', 'preferences':'My Profile'}[mode] }}</h2>
 <p>Explore trends and matchups freely. Membership lets you save newsletter preferences.</p>
 {% if error %}<p class="member-message" role="alert">{{ error }}</p>{% endif %}
 {% if saved %}<p class="member-message" role="status">Preferences saved.</p>{% endif %}

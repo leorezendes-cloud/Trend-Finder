@@ -532,8 +532,8 @@
     "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
   },
   "membership.py": {
-    "bytes": 17368,
-    "sha256": "4fd54bf28b8c35ee91f11439301c5d69ed2d0e1458ae490fb4a20a2393d3b30d"
+    "bytes": 17332,
+    "sha256": "ef75fceda144ef6312d2d68cf37dab096a8ee7ddfae5d7de24c66c4355c25f28"
   },
   "nfl_games.csv": {
     "bytes": 2190111,
@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 5877,
-    "sha256": "98191df62bf11a2d46a2ede643db33d3f16a91c442107e0e9e08c66aa42a1dfb"
+    "bytes": 6593,
+    "sha256": "299b6f8a04deabc07bada78cfd3777d6d5a8dd862606f1242a6c782ae753fefa"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -988,8 +988,8 @@
     "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
   },
   "templates/_site_navigation.html": {
-    "bytes": 3735,
-    "sha256": "69ba298e2df348e382d51cb76e96771835d53a508353634ef2041b769329a73b"
+    "bytes": 4007,
+    "sha256": "ba70452f8a8e223d10c7dc2978e8b5f1b135630d2f479522b808e96671bc349c"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2708,
@@ -1016,8 +1016,8 @@
     "sha256": "3562a906cb31806e953d4dd863718db8235ec3a697a925f5bafd940a04ddaa4a"
   },
   "templates/membership.html": {
-    "bytes": 3928,
-    "sha256": "3cf464169e61567acd9d814b53b104fec9585828beef9c144011a46adc02026c"
+    "bytes": 4022,
+    "sha256": "78be38f619476a0f0f0a4022128a922ec4588005f2d87eda6263d2330c2ae958"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
@@ -1080,8 +1080,8 @@
     "sha256": "1fa28b2e1c0f281b5de7e925c57d8c424693619c0fe9b81a3e6f90ca7a4eb62b"
   },
   "test_membership.py": {
-    "bytes": 15347,
-    "sha256": "ce39b9d0c33b2f0ef55bd0ceb309f3364743e7be1c34877956f246f1f8ef743d"
+    "bytes": 16264,
+    "sha256": "5862b078823cd13581a237ede9c51454af98b5215aed39ef38867acc5077f492"
   },
   "test_page_layouts.py": {
     "bytes": 1776,
@@ -1156,7 +1156,7 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 2849,
-    "sha256": "9c02d684b4099f37adacd83480b1110154c459359f6957622eec9bf766d4675c"
+    "bytes": 2846,
+    "sha256": "e7cc217d8ec64e1c1d7fef9bd4cdd41b606a4825feb2d7f11b09a2bc5e9f89b2"
   }
 }
