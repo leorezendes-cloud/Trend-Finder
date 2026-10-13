@@ -1,6 +1,9 @@
 from pregame_lines import effective_rows
 #!/usr/bin/env python3
 import math
+from copy import deepcopy
+from functools import lru_cache
+from threading import RLock
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -1636,7 +1639,32 @@ def scan_grouped_combinations(season=None, max_depth=3, beam_width=150, limit=10
         group['validation_label'] = 'Emerging · Exploratory' if group['sample'] < 30 else 'Exploratory historical pattern' 
     return groups
 
+_basic_trends_lock = RLock()
+
+
+def _trend_data_signature():
+    root = game_file.resolve().parent
+    paths = (game_file.resolve(), root / 'manual_spread_overrides.csv',
+             root / 'public_money_snapshots.csv')
+    return tuple((str(path), path.stat().st_mtime_ns, path.stat().st_size)
+                 if path.exists() else (str(path), None, None) for path in paths)
+
+
+@lru_cache(maxsize=32)
+def _cached_basic_trends(signature, season, scope):
+    return _scan_basic_trends(season=season, **dict(scope))
+
+
 def scan_basic_trends(season=None, **scope):
+    # Avoid duplicate scans on concurrent visits; callers receive their own copy.
+    if isinstance(season, list):
+        season = tuple(season)
+    with _basic_trends_lock:
+        return deepcopy(_cached_basic_trends(
+            _trend_data_signature(), season, tuple(sorted(scope.items()))))
+
+
+def _scan_basic_trends(season=None, **scope):
     trends = []
     with open(game_file, newline='') as game_check:
         games = effective_rows(csv.DictReader(game_check), game_file)

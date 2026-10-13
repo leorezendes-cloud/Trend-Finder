@@ -13,3 +13,10 @@ timeout = 120
 accesslog = None
 errorlog = '-'
 capture_output = True
+
+
+def post_worker_init(worker):
+    # Prepare the default homepage before this worker accepts public requests.
+    from trend_finder_2 import scan_basic_trends
+    scan_basic_trends(season='2026')
+    scan_basic_trends(season=(1999, 2025))

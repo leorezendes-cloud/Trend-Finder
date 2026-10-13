@@ -516,8 +516,8 @@
     "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
   },
   "gunicorn.conf.py": {
-    "bytes": 447,
-    "sha256": "52f4eee1ea243a580dc07f9a7304e25185a20a67200ea8663f58de4a552e431d"
+    "bytes": 687,
+    "sha256": "a9c28f722c0c2d37704ed135457724120c8331ae182ded44c1104a0a1188f0e9"
   },
   "home_results.py": {
     "bytes": 3550,
@@ -1112,8 +1112,8 @@
     "sha256": "5a1566f710987f7eb89ce6b7df61d0085189d18331ef41d2bc093954556fe4a3"
   },
   "trend_finder_2.py": {
-    "bytes": 77315,
-    "sha256": "404e982b9767d222bf73223c731bc534ff34984524a318628722f6fde7e18f39"
+    "bytes": 78262,
+    "sha256": "ddbee1221985f22f903f1cda35515d5344dabb5fa301f634be2487131d09849f"
   },
   "trendfindah_scout_preview_2026-10-11.csv": {
     "bytes": 1859,
@@ -1150,5 +1150,9 @@
   "scripts/prepare_release.py": {
     "bytes": 4251,
     "sha256": "1a8c33fadc011909daf917cb019360bd7cc5d32c781a3979503efaf60f5d6642"
+  },
+  "test_trend_cache.py": {
+    "bytes": 1361,
+    "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   }
 }
