@@ -28,8 +28,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 34903,
-    "sha256": "8d3216f1143f27a0a5cca8e48975818afee7415042c66c211da5dd09bf20aa51"
+    "bytes": 35616,
+    "sha256": "ce9bbd58ba0e38d0483b7bca4c8651897e88b2cd7831305954870024b1bab669"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -1088,8 +1088,8 @@
     "sha256": "ea95f376126e044861d8666d53aceb8d2eb766d2f3ac4eaa1bfa6f882cdae0ef"
   },
   "test_site_sections.py": {
-    "bytes": 4739,
-    "sha256": "bf606faffb8b127964287fe8ed427c42d9189ca97a66bc33c1a904e6dea4bb31"
+    "bytes": 5404,
+    "sha256": "0c38ec2180cc571ded42813d9d7f56a12a9596eb70f9c727b206c16e06772bde"
   },
   "test_trend_filters.py": {
     "bytes": 18681,

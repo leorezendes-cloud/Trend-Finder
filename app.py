@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, abort, Response, url_for, red
 from trend_finder_2 import run_analysis, scan_sunday_matchups, match_upcoming_game, scan_basic_trends, compare_trends, load_finished_games, scan_hot_performance, group_hot_trends, scan_active_streaks, group_active_streaks, evaluate_trend, find_recent_form, find_active_streak
 from trend_finder_2 import CSV_FILTER_FIELDS, get_csv_filter_options, scan_grouped_combinations, combination_min_games, describe_combination, find_matching_trend_games, build_trend_evidence, trend_data_status, upcoming_combination_contexts, game_file, get_current_qb_options
 import csv
+import hashlib
+from functools import lru_cache
 import calendar
 import math
 from pathlib import Path
@@ -22,6 +24,29 @@ from sunday_scout import scout_bp
 app.register_blueprint(scout_bp)
 from scout4.web import bp as scout4_bp
 app.register_blueprint(scout4_bp)
+
+
+@lru_cache(maxsize=128)
+def static_asset_version(path, modified_ns, size):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()[:12]
+
+
+@app.url_defaults
+def version_static_assets(endpoint, values):
+    if endpoint != 'static':
+        return
+    filename = values.get('filename', '')
+    if Path(filename).suffix not in {'.css', '.js'}:
+        return
+    root = Path(app.static_folder).resolve()
+    path = (root / filename).resolve()
+    if not path.is_relative_to(root):
+        return
+    try:
+        stat = path.stat()
+        values.setdefault('v', static_asset_version(str(path), stat.st_mtime_ns, stat.st_size))
+    except OSError:
+        pass
 
 
 @app.template_filter('display_trend_filters')

@@ -24,6 +24,19 @@ class NavigationParser(HTMLParser):
 
 
 class SiteSectionsTests(unittest.TestCase):
+    def test_navigation_stylesheet_is_versioned_and_available(self):
+        import hashlib
+        from pathlib import Path
+        from flask import url_for
+        with app.test_request_context():
+            url = url_for('static', filename='navigation.css')
+        expected = hashlib.sha256((Path(app.static_folder) / 'navigation.css').read_bytes()).hexdigest()[:12]
+        self.assertTrue(url.endswith('v=' + expected))
+        with app.test_client().get(url) as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('.home-section-card img', response.text)
+        self.assertIn(url, app.test_client().get('/').text)
+
     def test_home_head_probe_does_not_build_matchup_page(self):
         from unittest.mock import patch
         with patch('app.sunday_page', side_effect=AssertionError('Probe ran trend analysis')):
