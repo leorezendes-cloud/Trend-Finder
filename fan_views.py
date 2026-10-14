@@ -129,11 +129,18 @@ def fantasy():
     v = view_data()
     from flask import request
     position = request.args.get('position', '')
+    week_value = request.args.get('week', '')
+    try:
+        week = int(week_value) if week_value else None
+    except ValueError:
+        abort(400, description='Choose a week from 1 to 18.')
+    if week is not None and not 1 <= week <= 18:
+        abort(400, description='Choose a week from 1 to 18.')
     if position not in ('', 'QB', 'RB', 'WR', 'TE', 'FB'):
         abort(400)
     grouped = defaultdict(list)
     for row in v['players']:
-        if row['position'] in ('QB', 'RB', 'WR', 'TE', 'FB') and (not position or row['position'] == position):
+        if row['position'] in ('QB', 'RB', 'WR', 'TE', 'FB') and (not position or row['position'] == position) and (week is None or row.get('week') == week):
             grouped[(row['player_id'], row['team'])].append(row)
     weights = {'passing_yards': .04, 'passing_tds': 4, 'passing_interceptions': -2,
                'rushing_yards': .1, 'rushing_tds': 6, 'receiving_yards': .1,
@@ -147,7 +154,7 @@ def fantasy():
         cards.append({'id': pid, 'team': code, 'name': games[-1]['name'], 'position': games[-1]['position'],
                       'points': points, 'games': len(complete), 'per_game': points / len(complete)})
     cards.sort(key=lambda c: (-c['points'], c['name'], c['id']))
-    return render_template('fantasy.html', view=v, cards=cards[:100], position=position)
+    return render_template('fantasy.html', view=v, cards=cards[:100], position=position, selected_week=week)
 
 
 def data_freshness():

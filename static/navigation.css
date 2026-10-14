@@ -105,3 +105,5 @@ html body .fantasy-coverage { margin-bottom: 24px; }
 html body .fantasy-rankings { padding: 16px; box-sizing: border-box; }
 html body .fantasy-rankings :is(td,th):first-child { padding-left: 14px; padding-right: 14px; }
 .data-freshness { margin: 20px 0; padding: 12px 16px; background: #1f2937; border-radius: 8px; color: #cbd5e1; font: 13px/1.6 Arial,sans-serif; -webkit-text-stroke: 0; }
+
+html body .data-freshness a { color: #fbbf24; -webkit-text-stroke: 0; }

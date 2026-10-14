@@ -89,6 +89,22 @@ class FanViewsTests(unittest.TestCase):
         self.assertEqual(groups[0]['ats']['Pending'], 1)
         self.assertEqual(recent, [])
 
+    def test_fantasy_week_selection_filters_results_and_rejects_invalid_week(self):
+        from copy import deepcopy
+        row = {'player_id':'test','team':'BUF','name':'Week four player','position':'RB','week':4,
+               'passing_yards':0,'passing_tds':0,'passing_interceptions':0,'rushing_yards':80,
+               'rushing_tds':1,'receiving_yards':30,'receiving_tds':0,'receptions':4}
+        other = deepcopy(row);other.update(player_id='other',name='Week five player',week=5)
+        view = {'players':[row,other], 'cache_years':[2026], 'season':2026,'coverage_week':5,
+                'before_week':19,'venue':'All','manifest':None,'diagnostics':{'unidentified_players':0,'unmatched_games':0}}
+        with patch('fan_views.view_data',return_value=view):
+            response=app.test_client().get('/fantasy?week=4')
+            self.assertEqual(response.status_code,200)
+            self.assertIn('Week four player',response.text)
+            self.assertNotIn('Week five player',response.text)
+            self.assertEqual(app.test_client().get('/fantasy?week=bad').status_code,400)
+            self.assertEqual(app.test_client().get('/fantasy?week=19').status_code,400)
+
     def test_ppr_formula_and_missing_stat_exclusion(self):
         row = {'player_id':'test', 'team':'BUF', 'name':'Test player','position':'RB',
                'passing_yards':0,'passing_tds':0,'passing_interceptions':0,

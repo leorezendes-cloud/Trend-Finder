@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 8985,
-    "sha256": "1d0e4fc2a0667eab82859b5ec1645c7f917c0a38ae13663b5caf2551a6a35556"
+    "bytes": 9058,
+    "sha256": "acbe2f1f2fce0b28a4b460fa4341b7e329af2c05e7691681441820c8655fb302"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1160,8 +1160,8 @@
     "sha256": "d140b74020541ea26ab952523b1d7d94025b20eb713be211125ccc733ddcf596"
   },
   "fan_views.py": {
-    "bytes": 10879,
-    "sha256": "c3292168b9418ac2077306254743845222cedc41ce4fdd160a84dbb3927df074"
+    "bytes": 11251,
+    "sha256": "39bf7e1820c5572a208a1d85519965b7ea6163f3159c3978b7c12ea8c0455658"
   },
   "static/scores.js": {
     "bytes": 2635,
@@ -1172,19 +1172,19 @@
     "sha256": "7a775b5201bb9e1413c4c0cf5b93b28b96271beade89b7ead381fca93bf61770"
   },
   "templates/fantasy.html": {
-    "bytes": 2176,
-    "sha256": "a30f83558d7cac543d634b7110a2c9547b5dd6bb1cbd05ab5ba41c0b0a2bc931"
+    "bytes": 2518,
+    "sha256": "e99d5230858d004c21e642438705a02baf378d859d26df00504725f11d63933e"
   },
   "test_fan_views.py": {
-    "bytes": 6188,
-    "sha256": "021fc7278f6f7f7d29e88f5f25ac07d654e762a9937f56c0a83d98d22048bd6b"
+    "bytes": 7377,
+    "sha256": "f8bae43c937c9033794db6baeb9c065fd7771930276d9841ae93ad36c65d32ad"
   },
   "test_coast_filters.py": {
     "bytes": 1556,
     "sha256": "de9a31e0a0d0e9e49afeadef9374cb2eb3dd72900b807d5dc2d055b253743649"
   },
   "templates/prediction_results.html": {
-    "bytes": 2262,
-    "sha256": "9faa194eb8a588b528d146624ceb16306eabc651bb0e97960aec4a951c71dcd0"
+    "bytes": 2354,
+    "sha256": "611d84957bb51ea33595c69b1ca275a3b8c84284ef4f9ea952dce9048308dc0c"
   }
 }
