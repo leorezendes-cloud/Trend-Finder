@@ -1086,3 +1086,7 @@ h2 {
     font: inherit; text-decoration: underline; cursor: pointer;
 }
 .combination-card .trend-verification-link:hover { color: #fde68a; background: transparent; }
+
+.combination-details a, .combination-impact a {
+    font-weight: 400; -webkit-text-stroke: 0; color: #fbbf24;
+}

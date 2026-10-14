@@ -32,8 +32,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 38302,
-    "sha256": "51fc06271652ac03c7c8f531cfe2786970752673455ddb168c3217b87cafc8c8"
+    "bytes": 38455,
+    "sha256": "f62c78f7b7ccb39e954b530115b29070ae4027859e5ce7954c7fcfb6e5554fbe"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -964,8 +964,8 @@
     "sha256": "3a5f7b7269709f7251d12f91c58f1b4f5cba32f5d40e31e2022442e51d9f3fa7"
   },
   "static/styles.css": {
-    "bytes": 21086,
-    "sha256": "f1f50a60c066f61851dcabc020dd70573e5a7e6d44b4f6f831b460a3c63bb097"
+    "bytes": 21199,
+    "sha256": "90f41e50acedc8ef3e785387a7b436598d0db361dad22750b6859aafcbeb2da2"
   },
   "static/weekly_results.css": {
     "bytes": 2674,
@@ -1064,8 +1064,8 @@
     "sha256": "d79724aacb86663c64feeb0397365689a80ed894f004b65b0ff1fe8f56049e76"
   },
   "templates/index.html": {
-    "bytes": 27555,
-    "sha256": "6813b6341ed422f69a446bdaa403834255b8656200895c6c005cb6bdaa701654"
+    "bytes": 27700,
+    "sha256": "3b9a885c1ebefdcf47aaa2dce5027284e4b133727ce0a73360ad49cc5c606cf9"
   },
   "templates/matchup.html": {
     "bytes": 3928,

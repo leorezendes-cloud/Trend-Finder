@@ -335,6 +335,8 @@ def trend_finder():
     active_filters.extend(f"{'Underdog QB' if field == 'dog_qb_name' else field.replace('_', ' ').title()}: {value}" for field, value in csv_filters.items())
     from home_results import qb_summaries, results_freshness
     filter_chips=[]
+    if combination_conditions:
+        filter_chips.append(dict(label=display_trend_filters(combination_conditions), fields=['combination_conditions']))
     if season_mode=='single' and season:filter_chips.append(dict(label=f'Season {season}',fields=['season']))
     elif start_season is not None and end_season is not None:filter_chips.append(dict(label=f'{start_season}–{end_season}',fields=['start_season','end_season']))
     if location:filter_chips.append(dict(label=f'{location} Dogs',fields=['location']))
