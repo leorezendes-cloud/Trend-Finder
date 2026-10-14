@@ -1,0 +1,17 @@
+{% if seo %}
+<meta name="description" content="{{ seo.description }}">
+<meta name="robots" content="{{ 'index, follow' if seo.indexable else 'noindex, follow' }}">
+{% if seo.canonical %}<link rel="canonical" href="{{ seo.canonical }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gravy Train">
+<meta property="og:title" content="{{ seo.title or 'Gravy Train' }}">
+<meta property="og:description" content="{{ seo.description }}">
+{% if seo.canonical %}<meta property="og:url" content="{{ seo.canonical }}">{% endif %}
+<meta property="og:image" content="{{ seo.image }}">
+<meta property="og:image:alt" content="Gravy Train logo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ seo.title or 'Gravy Train' }}">
+<meta name="twitter:description" content="{{ seo.description }}">
+<meta name="twitter:image" content="{{ seo.image }}">
+{% if request.endpoint=='home' %}<script type="application/ld+json">{{ {'@context':'https://schema.org','@type':'WebSite','name':'Gravy Train','alternateName':'Trend Findah','url':seo.origin+'/'}|tojson }}</script>{% endif %}
+{% endif %}

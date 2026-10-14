@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Beta Feedback | Gravy Train</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% if seo and seo.title %}{{ seo.title }}{% else %}Beta Feedback | Gravy Train{% endif %}</title>
 <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">{% include '_branding_head.html' %}</head><body>
 {% include '_site_navigation.html' %}<main class="membership"><h1>Beta Feedback</h1><p>Tell us what went wrong, what you expected, or what you’d like to see. Reports are private and visible to the site owner. Don’t include passwords or other sensitive information.</p>
 {% if request.args.get('sent')=='1' %}<p class="member-message" role="status">Thanks—your feedback has been saved.</p>{% endif %}

@@ -992,5 +992,8 @@ def site_week_context():
     from market_views import read
     return {'current_site_week':active_week(read(Path(__file__).resolve().parent/'nfl_games.csv'))}
 
+from seo import init_seo
+init_seo(app)
+
 if __name__ == '__main__':
     app.run(port=5001)

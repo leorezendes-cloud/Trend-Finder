@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}{% endblock %} | Gravy Train</title>
+<title>{% if seo and seo.title %}{{ seo.title }}{% else %}{% block title %}{% endblock %} | Gravy Train{% endif %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='scout4.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
 <link rel="stylesheet" href="{{ url_for('static',filename='member_picks.css') }}"><script src="{{ url_for('static',filename='member_picks.js') }}" defer></script></head>
