@@ -17,7 +17,7 @@ class MembershipTests(unittest.TestCase):
             self.app = Flask(__name__, instance_path=self.temp.name)
             self.app.add_url_rule('/', 'home', lambda: 'public')
             # Shared navigation references public endpoints.
-            for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page']:
+            for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page','fans.fantasy']:
                 self.app.add_url_rule('/' + endpoint, endpoint, lambda: 'public')
             init_membership(self.app)
         self.app.config['TESTING'] = True

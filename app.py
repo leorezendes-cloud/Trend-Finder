@@ -20,6 +20,8 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 from membership import init_membership
 init_membership(app)
+from fan_views import bp as fans_bp
+app.register_blueprint(fans_bp)
 from sunday_scout import scout_bp
 app.register_blueprint(scout_bp)
 from scout4.web import bp as scout4_bp

@@ -175,6 +175,7 @@
 
                     
                     {% if not archive %}<p>{{ game.gameday }} · {{ game.gametime_et }} ET{% if game.neutral %} · Neutral venue{% endif %}<br>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}{% if game.line_stale %} · Saved quote is over 24 hours old{% endif %}</p>{% endif %}
+                    {% if game.game_id %}<p><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">Compare teams, player leaders &amp; prediction →</a></p>{% endif %}
                     <h4>Exploratory Matching Ranges</h4>
 
                     {% if game.top_trends %}

@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 6128,
-    "sha256": "d801fb060f2cac0a84cd4245220db19d5302f440c9247ea8b9a76169019eca63"
+    "bytes": 6809,
+    "sha256": "33860b22ad8eb59b0c7c1c1a6e208d8087f88a18a2be863238b4a5cb53f9e220"
   },
   "MEMBERSHIP.md": {
     "bytes": 5081,
@@ -28,8 +28,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 35631,
-    "sha256": "e204b8f60b6e5cc44c2e925f039b583fae4d9f28d71756b629b420150dc3bcdd"
+    "bytes": 35699,
+    "sha256": "a1bd829054c006b4af3264530455596d4fb5fd5d3b3575cae2438abd8d94d99d"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -616,8 +616,8 @@
     "sha256": "0d44d0f583f6154684b65910475db2876c76e146bdd33b00b01c418ae80e49e7"
   },
   "scout4/stats.py": {
-    "bytes": 8983,
-    "sha256": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba"
+    "bytes": 9770,
+    "sha256": "b751caeeca7894c19cfe6c774f193baf1abe03cfe45ee58bd8b8198b9d0f4dee"
   },
   "scout4/totals.py": {
     "bytes": 8289,
@@ -628,8 +628,8 @@
     "sha256": "811eabe38a0c084e2332535c58eb8ee7a5d694c7bdea515031d7fc5970a50610"
   },
   "scout4/web.py": {
-    "bytes": 14140,
-    "sha256": "9e35a3d12b50f9caa39e2bb66f34162ec9cdd1eb3c78954644f955e7b80fcde9"
+    "bytes": 14181,
+    "sha256": "cc86cf6c8e7c14f7f51e0d844309a2273ec39ae51fe0fa731cff3cceb2f0d71f"
   },
   "scout_kickoff_2026_10_12_model_comparison.csv": {
     "bytes": 272,
@@ -908,8 +908,8 @@
     "sha256": "f588f637d3fc3a4ebd99e1f23ce9f4f0d21a2e812bca70810312ed949bb9a1aa"
   },
   "static/branding.css": {
-    "bytes": 2352,
-    "sha256": "c80392cdc50dbbbbe21131361ccd47dd2e4fb57cf911e5c5bbd0534e77a93eb0"
+    "bytes": 2747,
+    "sha256": "e1fc100c6aa6a92d2ad8cdd3a91c7474a2a0003708ac6099201228b6cf7160a3"
   },
   "static/membership.css": {
     "bytes": 783,
@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 6805,
-    "sha256": "d70512a439a20d94a49b41447fd4f82a27550c979ddb88b49d5dde3907e8cd50"
+    "bytes": 7614,
+    "sha256": "b15114442c0bbd02b28b64ff0f785cf2df0e37a9a05ea399b1b1e490edd21efc"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -980,16 +980,16 @@
     "sha256": "621b2c37a239ec32e3215c4742fdd5413ccd34dcd780ed30c1819d78ec50da33"
   },
   "templates/_branding_head.html": {
-    "bytes": 1422,
-    "sha256": "d9edc332d031fcfc9b051ac73a38a3bbb66c186f5238df011413dca01ee96f71"
+    "bytes": 1456,
+    "sha256": "ad3646363eaedf3ead08f3e90d8f7bbf636d199550311d277acef33b8bdf2750"
   },
   "templates/_home_sections.html": {
     "bytes": 1227,
     "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
   },
   "templates/_site_navigation.html": {
-    "bytes": 4007,
-    "sha256": "1a2166305f4d635a25ffc11c4e3bffe3cd7517b0dde46d98309fb9d3d517adc8"
+    "bytes": 4120,
+    "sha256": "0492dce8c79e2a767f330e851d145cf017ecf802bffa767349d7e380f3272d4a"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2708,
@@ -1036,8 +1036,8 @@
     "sha256": "ecaebb222e7af46822404b35b9319fe84463ad3870a0407ff887a908f64ac75f"
   },
   "templates/scout4_players.html": {
-    "bytes": 5800,
-    "sha256": "915e9862e131c6b117376e5db9b09adb2d1518ad8a37d24ded49f67c7bc181f2"
+    "bytes": 5831,
+    "sha256": "bcd1abafcc11657f35d716a1b5411e62c8a566c6f4c2381b64879bf0b1b88c2c"
   },
   "templates/scout4_ratings.html": {
     "bytes": 6792,
@@ -1048,20 +1048,20 @@
     "sha256": "847336147c27d56d38df5a95ee7d400ff743939591140c089dda2a5559a5450e"
   },
   "templates/scout4_teams.html": {
-    "bytes": 4075,
-    "sha256": "260e22ac1b1b34c473dadcad67431e6693cc701fdd5fe06326dfeeadb8b0e666"
+    "bytes": 4904,
+    "sha256": "17d90a2d730b391e898e0cf07b6d43b40a2e8341f599dca63404505147a415cb"
   },
   "templates/sunday.html": {
-    "bytes": 8128,
-    "sha256": "c4d538a548141dae9a1ae7336b121e08d720eb7aebbc24296090b4000f8c8348"
+    "bytes": 8303,
+    "sha256": "a7f3314f074118b2f9d8c9f1c6cbb9cace9fbbcbe1b7a89931d269cc31e3a82f"
   },
   "templates/sunday_results.html": {
     "bytes": 6459,
     "sha256": "d12929ff2d30d0cfe031897b53b0c885890c6588113f8f1004d265faab04f5ea"
   },
   "templates/sunday_scout.html": {
-    "bytes": 9673,
-    "sha256": "25c97837c3e760ee8b17ab26904a4fcf5b9495f4f24969b7caff78cbafd8499a"
+    "bytes": 9855,
+    "sha256": "1c164b1371ad0ca78c0b8803b8c7985e2926c21be946fb1bac23b85d0788fd51"
   },
   "templates/trend_details.html": {
     "bytes": 3841,
@@ -1080,8 +1080,8 @@
     "sha256": "1fa28b2e1c0f281b5de7e925c57d8c424693619c0fe9b81a3e6f90ca7a4eb62b"
   },
   "test_membership.py": {
-    "bytes": 16264,
-    "sha256": "5862b078823cd13581a237ede9c51454af98b5215aed39ef38867acc5077f492"
+    "bytes": 16279,
+    "sha256": "1aa627ed283d8865ed6e526f41dcd5a4ff6c28294f5175f407a33c46dd4efa9b"
   },
   "test_page_layouts.py": {
     "bytes": 1776,
@@ -1156,7 +1156,27 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 2846,
-    "sha256": "e7cc217d8ec64e1c1d7fef9bd4cdd41b606a4825feb2d7f11b09a2bc5e9f89b2"
+    "bytes": 3759,
+    "sha256": "cb323e2b5cc2895e021f721d096b41028a9591294422567184e010b5b10f838c"
+  },
+  "fan_views.py": {
+    "bytes": 7085,
+    "sha256": "c3ec4d613e47e4754e9f3acd27ccaa60766e4435d4211a67a827723cc6baa4b0"
+  },
+  "static/scores.js": {
+    "bytes": 1729,
+    "sha256": "5aeb6ddf783e9db101c9f06eea3173b333be7292e41e89ee419e4323a4362d18"
+  },
+  "templates/matchup.html": {
+    "bytes": 3275,
+    "sha256": "08b060a76c55fc8952910fab4c3be9de6af5b949faf9d5ca11ad2937b62ad414"
+  },
+  "templates/fantasy.html": {
+    "bytes": 2142,
+    "sha256": "316fd29da4d900ee6558a8b4e5b86c694fe15d5f8575cef39a07bd5bf7ae6f01"
+  },
+  "test_fan_views.py": {
+    "bytes": 3585,
+    "sha256": "9abf086ee5451b5d0c119c43ddea31655231545f49b87bf4df0c1fe77f854c84"
   }
 }

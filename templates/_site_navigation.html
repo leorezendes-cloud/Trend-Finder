@@ -1,5 +1,5 @@
 {% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
-{% set plug_section = request.endpoint == 'plug_page' or request.endpoint == 'sunday_scout.sunday_scout_page' or (request.endpoint or '').startswith('scout4.') %}
+{% set plug_section = request.endpoint == 'plug_page' or request.endpoint == 'sunday_scout.sunday_scout_page' or ((request.endpoint or '').startswith('scout4.') or (request.endpoint or '').startswith('fans.')) %}
 <div class="site-header">
 {% if g.member %}
 <a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
@@ -36,6 +36,7 @@
     <a href="{{ url_for('scout4.teams_page') }}">Team Stats</a>
     <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
     <a href="{{ url_for('scout4.ratings_page') }}">Team Ratings</a>
+    <a href="{{ url_for('fans.fantasy') }}">Fantasy · PPR</a>
     {% if config.get('SCOUT4_SHADOW_ENABLED') %}<a href="{{ url_for('scout4.shadow_page') }}">Forecast Tracker</a>{% endif %}
 </nav>
 {% elif request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}

@@ -196,3 +196,18 @@ def summarize_player(rows, baseline):
             'yards_per_attempt': rate('passing_yards', 'attempts'),
             'yards_per_carry': rate('rushing_yards', 'carries'),
             'catch_rate': rate('receptions', 'targets', 100)}
+
+
+def recent_form(rows):
+    ordered = sorted(rows, key=lambda r: (r['date'], r['week'], r['game_id']))
+    recent = ordered[-5:][::-1]
+    outcomes = ['W' if r['net_points'] > 0 else 'L' if r['net_points'] < 0 else 'T' for r in ordered]
+    count = 0
+    for result in reversed(outcomes):
+        if result != outcomes[-1]:
+            break
+        count += 1
+    return {'games': recent, 'sequence': ' · '.join(outcomes[-5:]),
+            'streak': f'{count} straight ' + ({'W':'win','L':'loss','T':'tie'}[outcomes[-1]] if count == 1 else {'W':'wins','L':'losses','T':'ties'}[outcomes[-1]]) if outcomes else 'No completed games',
+            'recent_points': mean_metric(ordered[-3:], 'points_for')['value'],
+            'season_points': mean_metric(ordered, 'points_for')['value']}

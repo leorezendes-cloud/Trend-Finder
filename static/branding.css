@@ -24,3 +24,8 @@ html body :is(button, input, select, option, .clear-button, .watchlist-rank,
 .anomaly-type, .member-message, .stats-note) { -webkit-text-stroke: 0; }
 html body .stats-note :is(h2, h3, p) { color: #172234; -webkit-text-stroke: 0; }
 .home-filter-form .search-panel-title { margin: 0 0 24px; font-size: clamp(28px, 5vw, 50px); text-align: center; color: white; -webkit-text-stroke: 1px black; }
+
+/* Statistics panels use the same dark cards as the rest of the site. */
+html body.scout4 main, html body.scout4 h2, html body.scout4 footer p,
+html body.scout4 .stats-note, html body.scout4 .stats-note :is(h2,h3,p) { color: #f1f5f9; -webkit-text-stroke: 0; }
+html body.scout4 main a:not(.site-brand):not(.site-profile), .scout-page .scout-card h2 a { color: #fbbf24; -webkit-text-stroke: 0; }

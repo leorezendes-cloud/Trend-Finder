@@ -44,6 +44,19 @@
             </div>
             <a class="landing-matchups" href="{{ url_for('sunday_page') }}">View upcoming matchups →</a>
         </section>
+        <nav class="fan-shortcuts" aria-label="Scores, predictions and statistics">
+            <a href="{{ url_for('plug_page') }}">Predictions</a>
+            <a href="{{ url_for('scout4.teams_page') }}">Team Stats</a>
+            <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
+            <a href="{{ url_for('fans.fantasy') }}">Fantasy · PPR</a>
+        </nav>
+        <section id="home-scores" data-url="{{ url_for('fans.scores') }}" aria-labelledby="scores-title">
+            <h2 id="scores-title">NFL Scores &amp; Matchups</h2>
+            <p class="score-update" role="status">Loading score updates…</p>
+            <div class="score-grid"></div>
+            <noscript><p>Score updates require JavaScript. <a href="{{ url_for('sunday_page') }}">View scheduled matchups</a>.</p></noscript>
+        </section>
     </main>
+<script src="{{ url_for('static', filename='scores.js') }}" defer></script>
 </body>
 </html>

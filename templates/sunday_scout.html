@@ -43,6 +43,7 @@
 <main class="scout-page">
   <h1>🔌 The Plug 🔌</h1>
   <p class="scout-powered">Powered by Scout 4.0</p>
+  <p class="section-intro">Predictions, team comparisons and player leaders. Select a matchup to explore its stats.</p>
   <nav class="scout-actions">
     <a href="{{ url_for('sunday_page') }}">← Upcoming Matchups</a>
     <a href="{{ url_for('sunday_results_page') }}">Results Report</a>
@@ -57,7 +58,7 @@
   <div class="scout-grid">
   {% for r in blends %}{% set b=r.components['Blend'] %}
     <article class="scout-card">
-      <div class="scout-muted">{{ r.kickoff_utc|eastern_time }}</div><h2>{{ r.away_team }} @ {{ r.home_team }}</h2>
+      <div class="scout-muted">{{ r.kickoff_utc|eastern_time }}</div><h2><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></h2>
       <div class="scout-section-label">Scout 4.0 + The Plug · blended ATS pick</div>
       <div class="scout-proj"><p><strong>{{ b.pick or 'No pick · exact tie' }}</strong>{% if b.pick %} {{ '%+g'|format(r.quote.line if b.pick==r.away_team else -r.quote.line) }}{% endif %}</p><p>Projected winner: {% if b.away_margin>0 %}{{ r.away_team }}{% elif b.away_margin<0 %}{{ r.home_team }}{% else %}Even{% endif %}{% if b.away_margin!=0 %} by {{ '%.1f'|format(b.away_margin|abs) }} points{% endif %}. · Spread edge: {{ '%.1f'|format(b.ats_edge|abs) }} points.</p><p>Result: {{ r.results['Blend'] }}</p></div>
       {% if r.totals %}<div class="scout-divider"></div><div class="scout-section-label">Scout over / under pick</div><p><strong>{{ r.totals.prediction.lean }} {{ r.totals.quote.line }}</strong> · Estimated total: {{ '%.1f'|format(r.totals.prediction.total) }} points.</p>{% else %}<p>Totals pending: no eligible quote or estimate at capture.</p>{% endif %}

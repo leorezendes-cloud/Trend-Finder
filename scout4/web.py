@@ -4,7 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 from flask import Blueprint, abort, render_template, request
 from .stats import (read_csv, team_records, player_records, summarize_team,
-                    summarize_player, adjusted_defense, mean_metric)
+                    summarize_player, adjusted_defense, mean_metric, recent_form)
 
 ROOT = Path(__file__).resolve().parents[1]
 bp = Blueprint('scout4', __name__)
@@ -73,7 +73,7 @@ def teams_page():
         baseline = [r for r in v['records'] if r['team'] == code]
         games = filtered(baseline, v['venue'])
         cards.append({'team': code, 'games': games, 'summary': summarize_team(games, baseline),
-                      'defense': defense.get(code, {})})
+                      'defense': defense.get(code, {}), 'form': recent_form(games)})
     matchup = []
     if team and opponent and team != opponent:
         for attacker, defender in ((team, opponent), (opponent, team)):

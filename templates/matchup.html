@@ -1,0 +1,17 @@
+{% extends 'scout4_base.html' %}
+{% block title %}{{ game.away_team }} vs {{ game.home_team }}{% endblock %}
+{% block heading %}{{ game.away_team }} @ {{ game.home_team }}{% endblock %}
+{% block filter_form %}{% endblock %}
+{% block data_notes %}<p class="stats-note">{{ game.gameday }} · {{ game.gametime }} ET · Week {{ week }}. Comparison uses completed regular-season games before Week {{ week }}.{% if manifest %} Stats retrieved {{ manifest.retrieved_at|eastern_time }}.{% endif %} Missing statistics stay —.</p>{% endblock %}
+{% block content %}
+{% if game.away_score != '' and game.home_score != '' %}<p class="stats-note">Saved final score: {{ game.away_team }} {{ game.away_score }} · {{ game.home_team }} {{ game.home_score }}</p>{% endif %}
+<section class="stats-card"><h2>Prediction</h2>
+{% if forecast %}{% set prediction = forecast.components['Blend'] %}<p><strong>{{ prediction.pick or 'No ATS pick' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p><p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p><p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% else %}<p>No saved prediction for this matchup yet.</p>{% endif %}
+<a href="{{ url_for('plug_page') }}">See predictions and model details →</a></section>
+<section class="stats-card"><h2>Team comparison</h2><div class="table-scroll"><table><thead><tr><th>Per game</th>{% for side in teams %}<th><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} →</a></th>{% endfor %}</tr></thead><tbody>
+<tr><td>Record</td>{% for side in teams %}<td>{{ side.summary.wins }}–{{ side.summary.losses }}–{{ side.summary.ties }}</td>{% endfor %}</tr>
+{% for key,label in [('points_for','Points scored'),('points_against','Points allowed'),('passing_yards','Passing yards'),('rushing_yards','Rushing yards'),('passing_yards_allowed','Passing yards allowed'),('rushing_yards_allowed','Rushing yards allowed')] %}<tr><td>{{ label }}</td>{% for side in teams %}<td>{{ side.summary.metrics[key].value|stat }} <small>({{ side.summary.metrics[key].n }} games)</small></td>{% endfor %}</tr>{% endfor %}
+</tbody></table></div></section>
+<div class="stats-grid">{% for side in teams %}<section class="stats-card"><h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
+{% for leader in side.leaders %}<h3>{{ leader.role }}</h3><p><a href="{{ url_for('scout4.players_page',player=leader.id,team=side.code,season=season,before_week=week) }}">{{ leader.name }} →</a></p><p>{% for key in leader.fields %}{{ key|replace('_',' ')|title }}: {{ leader.summary.metrics[key].total|stat(0) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% else %}<p>No recorded player leaders before this matchup.</p>{% endfor %}</section>{% endfor %}</div>
+{% endblock %}

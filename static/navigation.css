@@ -75,3 +75,10 @@ html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 3
 .site-header:has(> .site-profile) { gap: 12px; }
 .site-header:has(> .site-profile) > .site-brand { margin: 0 auto; min-width: 0; flex: 1; }
 .site-header > .site-profile, .site-header-actions { flex-shrink: 0; }
+
+.fan-shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 12px auto 28px; }
+.fan-shortcuts a { padding: 10px 16px; border: 1px solid #64748b; border-radius: 8px; background: #1f2937; color: #fff; text-decoration: none; font: 15px Arial,sans-serif; }
+.score-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; }
+.score-card { display: flex; flex-direction: column; gap: 8px; background: #1f2937; border: 1px solid #64748b; border-radius: 10px; padding: 16px; color: white; text-decoration: none; font: 15px/1.4 Arial,sans-serif; -webkit-text-stroke: 0; }
+.score-card span, .score-update { color: #cbd5e1; font: 13px/1.5 Arial,sans-serif; -webkit-text-stroke: 0; }
+a.score-card:hover, .fan-shortcuts a:hover { border-color: #fbbf24; }
