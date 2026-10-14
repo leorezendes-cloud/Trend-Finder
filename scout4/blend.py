@@ -3,7 +3,7 @@
 Scout scoring margin is distinct from the probability-only frozen ATS model.
 No descriptive historical ranking, injury or weather bonus enters this blend.
 """
-import argparse,hashlib,json
+import argparse,hashlib,json,os
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from .web import ROOT
@@ -41,7 +41,7 @@ def plug_prediction(schedule,game):
 
 
 def configuration(root):
-    base=root/'data/scout4/blend';path=base/'config.json'
+    base=root/'data/scout4/blend';path=Path(os.environ['TREND_FINDAH_AUTO_MODEL_CONFIG']) if os.environ.get('TREND_FINDAH_AUTO_MODEL_CONFIG') else base/'config.json'
     if path.exists():config=json.loads(path.read_text())
     else:
         pointer=json.loads((root/'data/scout4/ratings_latest.json').read_text())

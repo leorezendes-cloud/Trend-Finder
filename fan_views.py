@@ -167,7 +167,12 @@ def data_freshness():
         record = json.loads(path.read_text())
         if record.get('sealed_at_utc'):
             stamps.append(record['sealed_at_utc'])
-    return {'stats': manifest.get('retrieved_at'), 'predictions': max(stamps, default=None)}
+    status_path = ROOT/'logs/auto_update_status.json'
+    try:
+        automatic = json.loads(status_path.read_text()) if status_path.exists() else None
+    except (OSError, ValueError):
+        automatic = None
+    return {'stats': manifest.get('retrieved_at'), 'predictions': max(stamps, default=None), 'automatic':automatic}
 
 
 def prediction_performance(records, schedule):

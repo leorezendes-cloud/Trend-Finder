@@ -1,15 +1,15 @@
 {
   ".env.example": {
-    "bytes": 608,
-    "sha256": "f3b362c79c396d229460f9b9fd902077d3f5a2620966a1215a82b52cc544f15f"
+    "bytes": 697,
+    "sha256": "c3e9c9242dbc49bbe31c195869b0f529e53279828f01301dae28fdc5744f41f0"
   },
   ".gitignore": {
     "bytes": 161,
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 6809,
-    "sha256": "33860b22ad8eb59b0c7c1c1a6e208d8087f88a18a2be863238b4a5cb53f9e220"
+    "bytes": 7882,
+    "sha256": "c6acc060dd2805f269324508f0a2cb223b2f734c542585fa5a8591365934aa8d"
   },
   "MEMBERSHIP.md": {
     "bytes": 5415,
@@ -516,8 +516,8 @@
     "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
   },
   "gunicorn.conf.py": {
-    "bytes": 818,
-    "sha256": "1344dab43bed7e2cf5f37afa112381136252dbf0300e6450563bed8b5e59db34"
+    "bytes": 887,
+    "sha256": "71797a2fffeb5f46c0ba0a6a38747e96be56e6460a96010c45bfaff06874e688"
   },
   "home_results.py": {
     "bytes": 3550,
@@ -568,8 +568,8 @@
     "sha256": "15ea69966d1a7e4f92a3b11e90ee42765d461c47c5137cdc4a1d3fa788096f1b"
   },
   "requirements.txt": {
-    "bytes": 46,
-    "sha256": "c4007934a0ecfd74b130d918ed43221c19e267e8e33b65993a88f1382bd041fa"
+    "bytes": 63,
+    "sha256": "244f83792eaef88ebc74538f7f17b31b719aeb08b922061347e6605c8b045148"
   },
   "reverse_line_analysis.py": {
     "bytes": 4093,
@@ -584,8 +584,8 @@
     "sha256": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f"
   },
   "scout4/blend.py": {
-    "bytes": 9476,
-    "sha256": "e12d8159a432c2b81d0c6c447bc278cb950d79387b9b29a3485d2abc02cfbff7"
+    "bytes": 9587,
+    "sha256": "9b69eab10ba494db06ccff217ed99780cbcbdbab8bf7632f65b3d2947c736f33"
   },
   "scout4/blend_results.py": {
     "bytes": 2770,
@@ -1128,8 +1128,8 @@
     "sha256": "efb4b177fab2ba2c6223dc95c3f338f0bf53d6708d196748fa886afc0ce29a3d"
   },
   "wsgi.py": {
-    "bytes": 1958,
-    "sha256": "1e1acf8582c76e2a3eceaa7178d4bb9f83a3e2048a45daa8e141b5073a72283f"
+    "bytes": 2039,
+    "sha256": "9ef25860916f02f9e4faed5bd93c20479fb324b718e3d206c1ff2155bc0e4ef6"
   },
   "LAUNCH_CHECKLIST.md": {
     "bytes": 2110,
@@ -1148,20 +1148,20 @@
     "sha256": "c4345153153c3b0a98b60ee4c56d38ce015ad6007bff436fb0cc228875140a83"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4251,
-    "sha256": "1a8c33fadc011909daf917cb019360bd7cc5d32c781a3979503efaf60f5d6642"
+    "bytes": 4301,
+    "sha256": "0a41c20aac0e4c53555b5fe39f128ccb304ae55551e57ab8e624a013c9ff254f"
   },
   "test_trend_cache.py": {
     "bytes": 1361,
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 4163,
-    "sha256": "d140b74020541ea26ab952523b1d7d94025b20eb713be211125ccc733ddcf596"
+    "bytes": 4307,
+    "sha256": "0e62b0761483495d1f8a1f1497e9ffaa18a49fac52ee449436a56e8f4fb2e75d"
   },
   "fan_views.py": {
-    "bytes": 11251,
-    "sha256": "39bf7e1820c5572a208a1d85519965b7ea6163f3159c3978b7c12ea8c0455658"
+    "bytes": 11486,
+    "sha256": "a0a8556f3e0fd8bd213fd1399cfe0783a5a9ea800158f3a970b70fb4594cc3f7"
   },
   "static/scores.js": {
     "bytes": 2635,
@@ -1186,5 +1186,21 @@
   "templates/prediction_results.html": {
     "bytes": 2392,
     "sha256": "34e56ce6839ae38fe609fd44e3433d942579f3cfeca22fc206e1253601fbe89c"
+  },
+  "hosted_updates.py": {
+    "bytes": 5871,
+    "sha256": "ac231c5a7f315c5d978ce50510cb08a2ddf2e5b100e9b2f715d6363128c80f12"
+  },
+  "automatic_model.json": {
+    "bytes": 10844,
+    "sha256": "59367d9453a20f1c3d3c2db8c18de5d9966c917cf3bf959fdaf4e34a6763b306"
+  },
+  "update_nfl_games.py": {
+    "bytes": 10897,
+    "sha256": "026c2a987a4481198b35e9810b4b5faf55655ec75bba3471992381ac11ba990c"
+  },
+  "test_hosted_updates.py": {
+    "bytes": 2353,
+    "sha256": "b2254b076961da15066c2168c6cb452ea98473dd729174e55952915c349b2c85"
   }
 }

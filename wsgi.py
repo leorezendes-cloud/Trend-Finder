@@ -8,6 +8,8 @@ from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 # Legacy public analysis reads several files relative to the project directory.
 os.chdir(Path(__file__).resolve().parent)
+from hosted_updates import configure_persistent_data
+configure_persistent_data()
 from app import app
 
 

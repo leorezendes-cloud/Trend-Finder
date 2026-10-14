@@ -20,6 +20,8 @@ def post_worker_init(worker):
     from trend_finder_2 import scan_basic_trends
     scan_basic_trends(season='2026')
     scan_basic_trends(season=(1999, 2025))
+    from hosted_updates import start_scheduler
+    start_scheduler()
 
 # Reset tokens live in URL paths; exclude paths and query strings from access logs.
 access_log_format = '%(h)s %(m)s %(s)s %(L)s'

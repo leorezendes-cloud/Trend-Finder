@@ -1,0 +1,318 @@
+{
+  "version": "scout4-plug-margin-blend-2-automatic-updates",
+  "created_at": "2026-10-13T15:17:41.587064+00:00",
+  "weights": {
+    "scout_scoring": 0.5,
+    "plug_points_only": 0.5
+  },
+  "score_model": {
+    "version": "scout4-ratings-1",
+    "columns": [
+      "off_scoring",
+      "opp_def_scoring",
+      "recent_net",
+      "opp_recent_net",
+      "venue_scoring",
+      "venue_indicator",
+      "off_pass",
+      "off_rush",
+      "opp_def_pass",
+      "opp_def_rush"
+    ],
+    "means": [
+      -0.010885630413884751,
+      0.037426214890419,
+      -2.0016040107424697e-17,
+      -2.0016040107424697e-17,
+      -0.09140520555155397,
+      0.0,
+      0.009478025168177112,
+      -0.01034179182272283,
+      0.03551354271943286,
+      0.009569405594650342
+    ],
+    "scales": [
+      3.3318070045703743,
+      2.7187727516006963,
+      4.108014718736577,
+      4.108014718736577,
+      1.4337277928545669,
+      0.9903379376602871,
+      3.3936692666973136,
+      1.7287555031191066,
+      2.8178421212173554,
+      1.4240755895054478
+    ],
+    "coefficients": [
+      23.326923076923077,
+      0.5057263419612854,
+      -0.9651381525606045,
+      0.9101492777005706,
+      -0.2579305330673409,
+      -0.040019815705376986,
+      0.9319081795811585,
+      1.9900991700453818,
+      0.7522982267201537,
+      0.31973890844315933,
+      -1.2988805054036017
+    ],
+    "ridge": 8.0,
+    "training_team_rows": 416,
+    "training_season": 2024,
+    "training_weeks": [
+      5,
+      18
+    ],
+    "prior_games": 4,
+    "availability": "Retrospective training data; original publication times unverified."
+  },
+  "totals_candidate": {
+    "created_at": "2026-10-13T04:44:06.461703+00:00",
+    "name": "Market + statistics",
+    "model": {
+      "version": "scout4-totals-1",
+      "columns": [
+        "league_total",
+        "off_score_sum",
+        "def_score_sum",
+        "recent_total_deviation",
+        "neutral_site",
+        "off_pass_sum",
+        "off_rush_sum",
+        "def_pass_sum",
+        "def_rush_sum",
+        "volume_deviation",
+        "pass_share_deviation",
+        "market_total"
+      ],
+      "means": [
+        44.384369358804484,
+        -0.0042906987153350645,
+        0.05907419993693881,
+        0.20958346161126412,
+        0.019230769230769232,
+        0.02594221663471826,
+        -0.01466448171431227,
+        0.04862340465919682,
+        0.0163593998943508,
+        0.013239314251948374,
+        -1.9577039764153893e-05,
+        43.60216346153846
+      ],
+      "scales": [
+        0.9208836675463343,
+        4.716569934223641,
+        3.6759427182628888,
+        2.543518327709639,
+        0.1373351620873625,
+        4.850354759165876,
+        2.277177950744622,
+        3.8238946705646404,
+        1.8744765901422806,
+        3.0428646040308487,
+        0.023440519588444102,
+        4.3628700121033965
+      ],
+      "coefficients": [
+        44.93028846153846,
+        -0.25527683124060496,
+        1.4317795820132864,
+        0.32392820642553544,
+        -1.1160818638632148,
+        -0.8698531057565222,
+        -1.4284214821937793,
+        -0.016281238689191846,
+        0.6029304821300726,
+        -0.21715669915421376,
+        0.21786936316433025,
+        -0.6054050457382266,
+        4.534065804782447
+      ],
+      "ridge": 8.0,
+      "training_team_rows": 416,
+      "training_seasons": [
+        2023,
+        2024
+      ],
+      "bias": 0.2352076385600274,
+      "sigma": 12.910437289168303,
+      "status": "EXPERIMENTAL TOTALS \u2014 reliability not established",
+      "calibration_seasons": [
+        2025
+      ],
+      "probability_assumption": "Continuous normal residual model; push mass unmodeled, nonpush grading only"
+    },
+    "target_season": 2026,
+    "first_eligible_week": 6,
+    "status": "FROZEN SHADOW RESEARCH \u2014 not validated recommendations",
+    "selection": {
+      "Scoring totals": 0.2593925224933838,
+      "Production + volume": 0.25778112089161925,
+      "Market + statistics": 0.25120280575774057
+    },
+    "source_manifests": {
+      "2019": {
+        "schema_version": 1,
+        "season": 2019,
+        "retrieved_at": "2026-10-13T04:12:21.140619+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2019/20261013T041221140326Z/team.csv",
+            "rows": 534,
+            "sha256": "43498f8e4535a680945147f0fbafa55b6ed7ed7e4f39c50c1312079805372468",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2019/20261013T041221140326Z/player.csv",
+            "rows": 17362,
+            "sha256": "26154fb375ae7d24e037a99cd9d45c0b89992dd3b8995d981f40dd5c31bf836f",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2020": {
+        "schema_version": 1,
+        "season": 2020,
+        "retrieved_at": "2026-10-13T04:12:21.915122+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2020/20261013T041221914901Z/team.csv",
+            "rows": 538,
+            "sha256": "59254b7389912175931e00c9f3172f70b934eedb1815197234503c893cef84ba",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2020/20261013T041221914901Z/player.csv",
+            "rows": 17602,
+            "sha256": "5c8b9b86d14d2cfb30675a00c7f75eb512b25d4856cce4dce39d51473f34164e",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2021": {
+        "schema_version": 1,
+        "season": 2021,
+        "retrieved_at": "2026-10-13T03:55:28.287151+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2021/20261013T035528286788Z/team.csv",
+            "rows": 570,
+            "sha256": "e9caf43e82982cc535672b82900bf432713b6f7bbd7a796dd054a55b11d1cb01",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2021/20261013T035528286788Z/player.csv",
+            "rows": 18969,
+            "sha256": "c515d9f539a147b730d3de4621688792b18d6b050d142fad1a6996b915712934",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2022": {
+        "schema_version": 1,
+        "season": 2022,
+        "retrieved_at": "2026-10-13T03:55:32.621035+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2022/20261013T035532620748Z/team.csv",
+            "rows": 568,
+            "sha256": "66db0f53316f259c9945f446ccd182ca9dcebc172742318d45544831f289d284",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2022/20261013T035532620748Z/player.csv",
+            "rows": 18831,
+            "sha256": "f57cc58e3c551aeb73fddf5971cbfe131e6888a9f0019913de815749a6d17d8f",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2023": {
+        "schema_version": 1,
+        "season": 2023,
+        "retrieved_at": "2026-10-13T03:55:40.422710+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2023/20261013T035540422462Z/team.csv",
+            "rows": 570,
+            "sha256": "8aebaf16335662166bdd785b05503b1b4e3c35ba687332e64a893df5af6b68f7",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2023/20261013T035540422462Z/player.csv",
+            "rows": 18643,
+            "sha256": "a8bd2e0c4d30890a91f4ea290486d8160f4e30f01e29483f3caa3c596bc104f9",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2024": {
+        "schema_version": 1,
+        "season": 2024,
+        "retrieved_at": "2026-10-13T03:12:07.905530+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2024/20261013T031207905248Z/team.csv",
+            "rows": 570,
+            "sha256": "6c4ac463c872d009d24444aec9a5f56bba21fe210e2aa3fc0054f79ce42a7a1b",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2024/20261013T031207905248Z/player.csv",
+            "rows": 18983,
+            "sha256": "9a58b56d5be5b4f5ed8d3be63efe5694cbf9468d2bc25b1b3f64d0d83f335045",
+            "missing_metrics": []
+          }
+        }
+      },
+      "2025": {
+        "schema_version": 1,
+        "season": 2025,
+        "retrieved_at": "2026-10-13T02:10:57.941744+00:00",
+        "source": "nflverse via nflreadpy weekly stats",
+        "availability": "Retrieved now; historical publication times are unverified.",
+        "files": {
+          "team": {
+            "path": "2025/20261013T021057941414Z/team.csv",
+            "rows": 570,
+            "sha256": "91551442bafea1bcdb4840ff85889da0c1cbdc378229fd6d2d3daba86090ca06",
+            "missing_metrics": []
+          },
+          "player": {
+            "path": "2025/20261013T021057941414Z/player.csv",
+            "rows": 19422,
+            "sha256": "c192c13c6cd54ca32d6dcb37826e38d3bd81aa8b72e987a167e302937df23c10",
+            "missing_metrics": []
+          }
+        }
+      }
+    },
+    "code_sha256": {
+      "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4",
+      "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+      "scout4/stats.py": "0cb9c43a641c6987e746a06aaf493b0eff82ba54683974719e629c1faee469ba"
+    }
+  },
+  "score_model_file_sha256": "0da67d8b982e514ce3355cca5f3a134c6d94a5732b7b9c11721cdad44b1b309f",
+  "totals_model_file_sha256": "f6cb333805e1686ea7bc7d0bc869e0e8e201c0195a51f4da74a271225ba60781",
+  "code_sha256": {
+    "scout4/blend.py": "9b69eab10ba494db06ccff217ed99780cbcbdbab8bf7632f65b3d2947c736f33",
+    "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
+    "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4",
+    "scout4/stats.py": "4c748b37e8b17028e7806476068305e280709c65a399607c56ceda8c60375a69",
+    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6"
+  },
+  "policy": "First eligible capture per game; identical cutoff, inputs and quote for all components. Totals use Scout only. Automatic refresh uses the same frozen coefficients; original game forecasts are never replaced."
+}
