@@ -1,4 +1,4 @@
-"""Free member picks with owner-published common lines; no money or collectors."""
+"""Free member picks with automatically frozen common weekly lines."""
 import csv
 import math
 from datetime import datetime,timezone
@@ -58,6 +58,12 @@ def init_picks(app):
         if request.blueprint=='member_picks' and request.method=='POST':
             token=request.form.get('csrf_token','');expected=session.get('_csrf','')
             if not expected or not secrets.compare_digest(expected,token):abort(400)
+
+    @app.before_request
+    def open_automatic_week():
+        if request.blueprint=='member_picks':
+            from weekly_pick_lines import publish_saved_snapshot
+            publish_saved_snapshot(db(),Path(current_app.config['PICKS_SOURCE_ROOT']),now_utc())
 
     @app.after_request
     def protect_private_picks(response):
@@ -157,69 +163,19 @@ def save_pick(game_id):
     return redirect(url_for('member_picks.my_picks',week_id=game['week_id']))
 
 
-@bp.route('/admin',methods=['GET','POST'])
+@bp.get('/admin')
 def admin():
-    owner();error=None
-    if request.method=='POST':
-        season=request.form.get('season',type=int);week=request.form.get('week',type=int)
-        if season is None or week is None or not 1999<=season<=2100 or not 1<=week<=22:abort(400)
-        rows=schedule();now=now_utc();candidates=[]
-        for row in rows.values():
-            if str(row.get('season'))!=str(season) or str(row.get('week'))!=str(week) or row.get('game_type')!='REG':continue
-            try:time=kickoff(row)
-            except (KeyError,ValueError):continue
-            if time<=now or row.get('away_score') or row.get('home_score'):continue
-            spread=number(row.get('spread_line'));total=number(row.get('total_line'))
-            candidates.append((row,time,spread,total))
-        if not candidates:error='No unstarted regular-season games with known kickoff times were found.'
-        else:
-            with db():
-                cursor=db().execute('INSERT OR IGNORE INTO pick_weeks(season,week,owner_id) VALUES(?,?,?)',(season,week,g.member['id']))
-                sheet=db().execute('SELECT * FROM pick_weeks WHERE season=? AND week=? AND stage="REG"',(season,week)).fetchone()
-                rebuilding=request.form.get('action')=='rebuild'
-                if rebuilding and sheet['published_at']:abort(409)
-                if cursor.rowcount or rebuilding:
-                    if rebuilding:db().execute('DELETE FROM pick_games WHERE week_id=?',(sheet['id'],))
-                    for row,time,spread,total in candidates:
-                        if db().execute('SELECT 1 FROM pick_games WHERE game_id=?',(row['game_id'],)).fetchone():continue
-                        db().execute('INSERT INTO pick_games(week_id,game_id,away,home,kickoff_at,lock_at,away_spread,total,line_source) VALUES(?,?,?,?,?,?,?,?,?)',
-                            (sheet['id'],row['game_id'],row['away_team'],row['home_team'],time.isoformat(),time.isoformat(),spread,total,'Saved schedule; owner review required'))
-            return redirect(url_for('member_picks.review_week',week_id=sheet['id']))
+    owner()
     sheets=db().execute('SELECT * FROM pick_weeks ORDER BY season DESC,week DESC').fetchall()
-    return render_template('pick_week_admin.html',sheets=sheets,error=error)
+    return render_template('pick_week_admin.html',sheets=sheets)
 
 
-@bp.route('/admin/weeks/<int:week_id>',methods=['GET','POST'])
+@bp.get('/admin/weeks/<int:week_id>')
 def review_week(week_id):
     owner();sheet=db().execute('SELECT * FROM pick_weeks WHERE id=?',(week_id,)).fetchone()
     if sheet is None:abort(404)
-    error=None
-    if request.method=='POST':
-        games=db().execute('SELECT * FROM pick_games WHERE week_id=?',(week_id,)).fetchall();values=[]
-        for game in games:
-            spread=number(request.form.get(f'spread_{game["id"]}'));total=number(request.form.get(f'total_{game["id"]}'))
-            if spread is None or total is None or abs(spread)>60 or not 1<=total<=150 or spread*2!=int(spread*2) or total*2!=int(total*2):
-                error='Enter a spread from -60 to +60 and a total from 1 to 150, using half-point increments for every game.';break
-            values.append((spread,total,game['id']))
-        if not error:
-            connection=db();connection.execute('BEGIN IMMEDIATE')
-            try:
-                current=connection.execute('SELECT * FROM pick_weeks WHERE id=?',(week_id,)).fetchone()
-                if current['published_at']:abort(409,description='Published weekly lines cannot be changed.')
-                now=now_utc()
-                if not games or any(now>=datetime.fromisoformat(game['kickoff_at']) for game in games):abort(409,description='A game has started. Prepare a new sheet before kickoff; no retroactive picks are allowed.')
-                rows=schedule()
-                for game in games:
-                    row=rows.get(game['game_id'])
-                    if not row or row.get('away_team')!=game['away'] or row.get('home_team')!=game['home'] or row.get('away_score') or row.get('home_score') or kickoff(row)!=datetime.fromisoformat(game['kickoff_at']):abort(409,description='The saved schedule changed. Review it before publication.')
-                connection.executemany('UPDATE pick_games SET away_spread=?,total=?,line_source="Owner-approved weekly lines" WHERE id=?',values)
-                if request.form.get('action')=='publish':connection.execute('UPDATE pick_weeks SET published_at=? WHERE id=?',(now.isoformat(),week_id))
-                connection.commit()
-            except Exception:
-                connection.rollback();raise
-            return redirect(url_for('member_picks.review_week',week_id=week_id))
     games=db().execute('SELECT * FROM pick_games WHERE week_id=? ORDER BY kickoff_at',(week_id,)).fetchall()
-    return render_template('pick_week_review.html',sheet=sheet,games=games,error=error)
+    return render_template('pick_week_review.html',sheet=sheet,games=games)
 
 
 @bp.post('/admin/games/<int:game_id>/void')

@@ -22,7 +22,7 @@ def initialize_data(source, target):
             temporary = path.with_suffix('.persistent-link')
             temporary.symlink_to(saved)
             temporary.replace(path)
-    for relative in ('data/scout4', 'logs'):
+    for relative in ('data/scout4', 'data/member_lines', 'logs'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
             continue
@@ -116,8 +116,37 @@ def update_once(root):
 def start_scheduler():
     if os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         return
+    def weekly_loop():
+        # Separate timer: a long statistics update cannot delay the 8 a.m. check.
+        from site_week import week_window
+        checked=None
+        while True:
+            now=datetime.now(timezone.utc)
+            cutoff=week_window(now)[0].astimezone(timezone.utc)
+            if checked!=cutoff:
+                try:
+                    subprocess.run([sys.executable,str(SOURCE/'weekly_pick_lines.py')],
+                        cwd=SOURCE,timeout=180,check=True,env={**os.environ,'POLARS_MAX_THREADS':'1'})
+                    status=Path('/var/data/site-data/logs/weekly_lines_status.json')
+                    if status.exists():
+                        result=json.loads(status.read_text())
+                        if result.get('state')=='ready' and result.get('scheduled_cutoff')==cutoff.isoformat():checked=cutoff
+                except (OSError,ValueError,subprocess.SubprocessError) as error:
+                    path=Path('/var/data/site-data/logs/weekly_lines_status.json')
+                    path.write_text(json.dumps({'state':'pending','reason':type(error).__name__}))
+            threading.Event().wait(30)
     def loop():
         while True:
+            # Keep the shared update lock free around the scheduled weekly capture.
+            from site_week import week_window
+            now=datetime.now(timezone.utc)
+            current_cutoff,next_cutoff=week_window(now)
+            current_cutoff=current_cutoff.astimezone(timezone.utc)
+            next_cutoff=next_cutoff.astimezone(timezone.utc)
+            if 0<=(now-current_cutoff).total_seconds()<180:
+                threading.Event().wait(180-(now-current_cutoff).total_seconds())
+            if 0<=(next_cutoff-now).total_seconds()<=600:
+                threading.Event().wait((next_cutoff-now).total_seconds()+180)
             try:
                 subprocess.run([sys.executable,str(SOURCE/'hosted_updates.py'),'--once'],
                     cwd=SOURCE, timeout=600, check=True,
@@ -127,6 +156,7 @@ def start_scheduler():
                 path.write_text(json.dumps({'finished':datetime.now(timezone.utc).isoformat(),
                     'state':'needs attention','stages':{'worker':type(error).__name__}}))
             threading.Event().wait(21600)
+    threading.Thread(target=weekly_loop,name='automatic-weekly-lines',daemon=True).start()
     threading.Thread(target=loop, name='automatic-data-updates', daemon=True).start()
 
 

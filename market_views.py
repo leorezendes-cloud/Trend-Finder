@@ -19,7 +19,7 @@ def stamp(value):
     if t.tzinfo is None:raise ValueError('Unverified timestamp')
     return t.astimezone(timezone.utc)
 
-def market_games(root,now=None):
+def market_games(root,now=None,quote_cutoff=None):
     root=Path(root);now=now or datetime.now(timezone.utc);schedule=read(root/'nfl_games.csv');week=active_week(schedule,now);quotes=read(root/'public_money_snapshots.csv');output=[]
     for row in schedule:
         try:
@@ -32,7 +32,7 @@ def market_games(root,now=None):
             if q.get('game_id')!=row['game_id'] or any(q.get(k)!=row.get(k) for k in ('away_team','home_team')):continue
             try:t=stamp(q['captured_at_utc']);qko=stamp(q['kickoff_utc'])
             except (ValueError,KeyError,TypeError,AttributeError):continue
-            if not t<=now<ko or qko!=ko:continue
+            if not t<=now<ko or qko!=ko or (quote_cutoff is not None and t>quote_cutoff):continue
             market=q.get('market');a,b=num(q.get('line_a')),num(q.get('line_b'))
             if a is None or b is None:continue
             if market=='Spread' and {q.get('side_a'),q.get('side_b')}=={row['away_team'],row['home_team']} and abs(a+b)<1e-8:value=a if q['side_a']==row['away_team'] else b
@@ -45,6 +45,7 @@ def market_games(root,now=None):
             game[key]=quote[1] if quote else num(row.get(field))
             game[key+'_source']='Saved market quote' if quote else 'Saved schedule' if game[key] is not None else 'Unavailable'
             game[key+'_time']=quote[0].isoformat() if quote else None
+            game[key+'_quote']=quote[2] if quote else None
             game[key+'_stale']=bool(quote and now-quote[0]>timedelta(hours=24))
         output.append(game)
     return sorted(output,key=lambda g:g['kickoff_utc'])

@@ -2,13 +2,11 @@
 
 Members can use **Menu → My Picks** or `/picks/` to submit free straight-up, against-the-spread, and over/under picks. Their profile links to this page. Their own record is shown separately for each category; other members' choices and records are not exposed. There are no wagers, payments, prizes, competitions or leaderboards.
 
-## Publish common weekly lines
+## Automatic common weekly lines
 
-A site owner uses **Menu → Manage Weekly Picks** (`/picks/admin`) to prepare a regular-season year/week from the saved NFL schedule. Only games with known future kickoff times and no saved scores are included. This does not fetch odds or refresh game data. Initial spread/total values come from the saved schedule and may be blank; the owner must review/fill every value before publishing.
+Wednesday at 8 a.m. Eastern, the hosted worker captures the market and freezes shared spreads and totals for all unstarted games in the new NFL week. No manual line entry or publish button is required. Everyone uses the same immutable sheet. See [WEEKLY_POLICY.md](WEEKLY_POLICY.md) for observed timestamps, missing-quote behavior and the one-time 2026 Week 6 exception.
 
-On the review page, enter the away-team spread (positive means the away team is an underdog; negative means favored) and the total, both in half-point increments. A spread of zero is allowed. Save the draft or publish. Published spreads and totals are permanent for that week and identical for all members. Missing/invalid lines prevent publication; games that have started or schedules that changed prevent publication. Drafts are not accessible to members.
-
-If the schedule changes before publication, **Rebuild this unpublished week** explicitly discards the draft lines and recreates only the still-unstarted games from current saved data. Published weeks cannot be rebuilt. Postseason weeks are not included in this first milestone.
+`/picks/admin` lists the sheets and lets the owner void a canceled/unplayed game with an explanation. Published lines cannot be edited, including after market movement. Existing published sheets are preserved.
 
 ## Members and locking
 
@@ -42,4 +40,4 @@ Tests use temporary schedules and member databases. They cover private drafts, c
 
 ## Site week and shortcuts
 
-See [WEEKLY_POLICY.md](WEEKLY_POLICY.md). The default sheet and submission window switch Wednesday at 8 a.m. Eastern. Publishing a future sheet does not open it early. Members can reach picks from the homepage, Upcoming Matchups, market and team comparison pages; game-specific links narrow the current sheet.
+See [WEEKLY_POLICY.md](WEEKLY_POLICY.md). The default sheet and submission window switch Wednesday at 8 a.m. Eastern. Automatic publication opens only the active week. Members can reach picks from the homepage, Upcoming Matchups, market and team comparison pages; game-specific links narrow the current sheet.

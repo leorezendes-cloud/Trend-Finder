@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 8006,
-    "sha256": "40bf25039a0ddd74639f3e785d84dbd60a6c113c947853167a297ce543faa65c"
+    "bytes": 8543,
+    "sha256": "af8e9eda5ab94eebd9fcf3f0eeee98745715b4c94eba12b3edb20afaef9b54b4"
   },
   "LAUNCH_CHECKLIST.md": {
     "bytes": 2110,
@@ -20,16 +20,16 @@
     "sha256": "8cd14f10b2991a13cdcfefa95dbebca3d1d709e84ef610e35d531b5a6a2ee5ae"
   },
   "MEMBER_PICKS.md": {
-    "bytes": 4929,
-    "sha256": "d5a4cc5583ac67bf8bb8b230affb7aefed63984e9ec56719cff2ca36aa73d1b5"
+    "bytes": 4382,
+    "sha256": "e30ba0961b8ccef640a40aa81bb609f51934834c9a96fc28b3f0d1a451afde78"
   },
   "NEWSLETTER.md": {
     "bytes": 8053,
     "sha256": "7fd7a1046f79d9cf1849267fab11149a25cc914bb0ab02cdeda15a1084a3bb6a"
   },
   "WEEKLY_POLICY.md": {
-    "bytes": 2550,
-    "sha256": "a826e2f841ddb3b5a59df0161e3eb2f31e152dc1c4920eb2bc12c07a0979426d"
+    "bytes": 3691,
+    "sha256": "11c8a2f4226cfe6660727f58db803566a79a4cfe7deb5ad3c99316a4617a9471"
   },
   "anomaly_analysis.py": {
     "bytes": 8461,
@@ -552,8 +552,8 @@
     "sha256": "7500f203903cb6d398d44520d4ec0444bd198a009cb82a56b80577793d4a0be8"
   },
   "hosted_updates.py": {
-    "bytes": 6335,
-    "sha256": "d046f63542518b3761d4751556dc87475f835984cf391e188790fa73933ed437"
+    "bytes": 8235,
+    "sha256": "24d3d43ae2c42671da2b6255243e5d3b2e4bbafa5ada620652a07832fed91434"
   },
   "manual_spread_overrides.csv": {
     "bytes": 344,
@@ -564,12 +564,16 @@
     "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
   },
   "market_views.py": {
-    "bytes": 2789,
-    "sha256": "0ddff511065a6bc429b54e054158b666c0edb44bba5ddfe4da6eb60e736ee8b0"
+    "bytes": 2915,
+    "sha256": "c724fe98a2b12af1acdc3b5b08c462cc5a5e49ae4c0e1cc4ee5cf4c734574550"
+  },
+  "member_lines_exception.json": {
+    "bytes": 41626,
+    "sha256": "9ea8fea5124d50aa088288ffb634ed28ff871721775a73d930c2d0da78e1183b"
   },
   "member_picks.py": {
-    "bytes": 15063,
-    "sha256": "80814cdd0faef7c4dd3f13b364482a296edd663e807c705da6c76388e60fedce"
+    "bytes": 11087,
+    "sha256": "fff571fc786e108dc999bb5370718c0998a9a377412ab6a91cc147613be17686"
   },
   "membership.py": {
     "bytes": 25609,
@@ -800,8 +804,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4505,
-    "sha256": "e8b514a2afe432920930407a9650474aef99a8318979e48b1b7f0a469f06d607"
+    "bytes": 4534,
+    "sha256": "6416562eff735ead962ae819ff68eeda6dca6106caa5bf5cfde7cf421e3d4835"
   },
   "site_views.py": {
     "bytes": 1962,
@@ -1116,8 +1120,8 @@
     "sha256": "32d65e2c85ca6aaa4a39c8a3b5ff50656ea2f9b23c724c7726a1631eb17eb7d7"
   },
   "templates/member_picks.html": {
-    "bytes": 3308,
-    "sha256": "ab4ac95a599c497f79b4c7dbad839acafa4a8a9e65bd9336c514f9088cdae54f"
+    "bytes": 3369,
+    "sha256": "abbcdaf7d141d2142b7e4910f43186fcaa51b2e5c12fd632f983920629197e8c"
   },
   "templates/membership.html": {
     "bytes": 5221,
@@ -1148,12 +1152,12 @@
     "sha256": "27afa106f1834519249451789ef6411935bbe6d1585c67d9d4e3f01f5e8c63f9"
   },
   "templates/pick_week_admin.html": {
-    "bytes": 892,
-    "sha256": "3c925b60617d697bd77ae3d6e47f166eef35d382bb07be7a709ac83a7f1f70bc"
+    "bytes": 809,
+    "sha256": "1f5d5e28831772403d9f1c24d9e7fe7c7b5b71087c2117a50e2d7d8cdffbf50d"
   },
   "templates/pick_week_review.html": {
-    "bytes": 2612,
-    "sha256": "e6794e4cfb2180f65e94774aab034866ecfef8a770df7e6e879e23a8aacdf24d"
+    "bytes": 1292,
+    "sha256": "cba02cdccb09bd44349bde51b34983a3c31faa9808706b1e7dabdb4ae67e9fc5"
   },
   "templates/picks_base.html": {
     "bytes": 597,
@@ -1228,8 +1232,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_hosted_updates.py": {
-    "bytes": 2353,
-    "sha256": "b2254b076961da15066c2168c6cb452ea98473dd729174e55952915c349b2c85"
+    "bytes": 2653,
+    "sha256": "0865401cee47e4e6f86c4aeed02cd564c70aa48dc2483e97a10b8cfd9381d382"
   },
   "test_hosting.py": {
     "bytes": 4349,
@@ -1240,8 +1244,8 @@
     "sha256": "d9940e0cf6c231b86e9de08e5a8e58e31db6e244e349819c0e4a5e023604503c"
   },
   "test_member_picks.py": {
-    "bytes": 8278,
-    "sha256": "e4d68c21271b9244cb2dacbfd34535433fd2c26d53b89ba9eee0dfb1751e9e28"
+    "bytes": 8417,
+    "sha256": "c307fe7b18083d32c1b551cdbd50b2ff2fc7c59988137570dcf6afe0fd4cdcec"
   },
   "test_membership.py": {
     "bytes": 22256,
@@ -1287,6 +1291,10 @@
     "bytes": 5343,
     "sha256": "af6fc97ca862841e35b527d15b594e96ae1d17c4b9c21f3fb87b0aebf52383fc"
   },
+  "test_weekly_pick_lines.py": {
+    "bytes": 6646,
+    "sha256": "af0618dfa1762720636b1f8b6c465a46cbb988f88acd208ad3fafe294b2abb77"
+  },
   "time_machine_2025_v1_frozen.csv": {
     "bytes": 29982,
     "sha256": "1c2b6a9acaf599c6595c4ffbf3e011731f1a3a2159e7348186c0bd36be470d35"
@@ -1314,6 +1322,10 @@
   "update_nfl_games.py": {
     "bytes": 10897,
     "sha256": "026c2a987a4481198b35e9810b4b5faf55655ec75bba3471992381ac11ba990c"
+  },
+  "weekly_pick_lines.py": {
+    "bytes": 7226,
+    "sha256": "4471e502caea1b1f05dc6e9fe2d3e79402d93132244cc2e34fb8f8f3f3c69b5f"
   },
   "weekly_results.py": {
     "bytes": 6718,

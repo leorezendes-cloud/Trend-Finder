@@ -28,13 +28,15 @@ class MemberPicksTests(unittest.TestCase):
         return re.search('name="csrf_token" value="([^"]+)"',response.text).group(1)
 
     def sheet(self,publish=True):
-        response=self.client.post('/picks/admin',data={'csrf_token':self.token('/picks/admin'),'season':2030,'week':6})
-        self.assertEqual(response.status_code,302)
-        path=response.location
-        with self.app.app_context():game=db().execute('SELECT * FROM pick_games').fetchone()
-        data={'csrf_token':self.token(path),f'spread_{game["id"]}':3,f'total_{game["id"]}':40,'action':'publish' if publish else 'save'}
-        self.assertEqual(self.client.post(path,data=data).status_code,302)
-        return game['id'],path
+        # Frozen DB fixture for grading/locking tests; public UI is read-only.
+        with self.app.app_context():
+            with db():
+                cursor=db().execute('INSERT INTO pick_weeks(season,week,owner_id,published_at) VALUES(?,?,?,?)',(2030,6,1,self.now.isoformat() if publish else None))
+                sheet=cursor.lastrowid
+                cursor=db().execute('INSERT INTO pick_games(week_id,game_id,away,home,kickoff_at,lock_at,away_spread,total,line_source) VALUES(?,?,?,?,?,?,?,?,?)',
+                    (sheet,'2030_06_A_B','A','B','2030-10-18T00:15:00+00:00','2030-10-18T00:15:00+00:00',3,40,'Wednesday snapshot'))
+                game=cursor.lastrowid
+        return game,f'/picks/admin/weeks/{sheet}'
 
     def member(self,member_id=2):
         client=self.app.test_client()
@@ -49,7 +51,7 @@ class MemberPicksTests(unittest.TestCase):
         guest=self.app.test_client()
         self.assertEqual(guest.get('/picks/').location,'/members/login')
         self.assertEqual(self.member().get('/picks/admin').status_code,403)
-        self.assertEqual(self.client.post('/picks/admin',data={}).status_code,400)
+        self.assertEqual(self.client.post('/picks/admin',data={}).status_code,405)
         game_id,_=self.sheet(publish=False)
         client=self.member()
         self.assertNotIn('A at B',client.get('/picks/').text)
@@ -61,8 +63,8 @@ class MemberPicksTests(unittest.TestCase):
         other=self.member(3)
         self.assertEqual(self.pick(other,game_id,su='B',ats='B',ou='Under').status_code,302)
         self.assertIn('A +3 / B -3',client.get('/picks/').text)
-        data={'csrf_token':self.token(path),f'spread_{game_id}':10,f'total_{game_id}':50,'action':'publish'}
-        self.assertEqual(self.client.post(path,data=data).status_code,409)
+        data={'csrf_token':self.token('/members/preferences'),f'spread_{game_id}':10,f'total_{game_id}':50,'action':'publish'}
+        self.assertEqual(self.client.post(path,data=data).status_code,405)
         with self.app.app_context():
             self.assertEqual(db().execute('SELECT away_spread FROM pick_games').fetchone()[0],3)
             self.assertEqual(db().execute('SELECT su FROM member_picks WHERE member_id=2').fetchone()[0],'A')
@@ -92,7 +94,10 @@ class MemberPicksTests(unittest.TestCase):
 
     def test_tie_and_push_grading_and_incomplete_results(self):
         game_id,path=self.sheet(publish=False)
-        self.client.post(path,data={'csrf_token':self.token(path),f'spread_{game_id}':0,f'total_{game_id}':40,'action':'publish'})
+        with self.app.app_context():
+            with db():
+                db().execute('UPDATE pick_games SET away_spread=0 WHERE id=?',(game_id,))
+                db().execute('UPDATE pick_weeks SET published_at=?',(self.now.isoformat(),))
         client=self.member();self.pick(client,game_id)
         self.clock.return_value=datetime(2030,10,18,5,tzinfo=timezone.utc)
         self.rows[0].update(away_score='20',home_score='20',result='');self.write_schedule()
@@ -120,11 +125,12 @@ class MemberPicksTests(unittest.TestCase):
             self.assertEqual(db().execute('SELECT su_result FROM member_picks').fetchone()[0],'Void')
         self.assertEqual(self.pick(client,game_id).status_code,409)
 
-    def test_publication_refuses_schedule_changes_and_rebuild_preserves_source(self):
+    def test_manual_line_entry_is_unavailable(self):
         game_id,path=self.sheet(publish=False)
-        self.rows[0]['gameday']='2030-10-19';self.write_schedule();before=(self.root/'nfl_games.csv').read_bytes()
-        self.assertEqual(self.client.post(path,data={'csrf_token':self.token(path),f'spread_{game_id}':3,f'total_{game_id}':40,'action':'publish'}).status_code,409)
-        self.assertEqual(self.client.post('/picks/admin',data={'csrf_token':self.token('/picks/admin'),'season':2030,'week':6,'action':'rebuild'}).status_code,302)
+        before=(self.root/'nfl_games.csv').read_bytes()
+        self.assertNotIn('type="number"',self.client.get('/picks/admin').text)
+        self.assertNotIn('name="spread_',self.client.get(path).text)
+        self.assertEqual(self.client.post(path,data={'action':'publish'}).status_code,405)
         self.assertEqual((self.root/'nfl_games.csv').read_bytes(),before)
 
 

@@ -12,12 +12,16 @@ class HostedUpdatesTests(unittest.TestCase):
             source.mkdir();(source/'nfl_games.csv').write_text('seed')
             predictions=source/'data/scout4/blend/predictions';predictions.mkdir(parents=True)
             (predictions/'game.json').write_text('sealed')
+            weekly=source/'data/member_lines';weekly.mkdir(parents=True)
+            (weekly/'week.json').write_text('frozen lines')
             initialize_data(source,target)
             (target/'nfl_games.csv').write_text('updated')
             self.assertEqual((source/'nfl_games.csv').read_text(),'updated')
             initialize_data(source,target)
             self.assertEqual((source/'nfl_games.csv').read_text(),'updated')
             self.assertEqual((source/'data/scout4/blend/predictions/game.json').read_text(),'sealed')
+            self.assertEqual((source/'data/member_lines/week.json').read_text(),'frozen lines')
+            self.assertTrue((source/'data/member_lines').is_symlink())
 
     def test_upstream_failure_skips_new_predictions_and_reports_status(self):
         with tempfile.TemporaryDirectory() as directory:
