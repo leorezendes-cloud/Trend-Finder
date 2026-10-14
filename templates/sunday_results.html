@@ -18,22 +18,25 @@
 {% if tally.finals<tally.games %}<p>Results appear after verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
 {% if latest_completed_week is not none and latest_completed_week!=selected_week %}<p><a class="archive-link" href="{{ url_for('sunday_results_page',week=latest_completed_week) }}">View Week {{ latest_completed_week }} completed results →</a></p>{% endif %}
 <form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
-<div class="weekly-result-tallies"><div><span>Dog ATS</span><strong>{{ tally.covers }}–{{ tally.losses }}–{{ tally.pushes }}</strong></div><div><span>{{ model_label }}</span><strong>{{ tally.correct }}–{{ tally.wrong }}–{{ tally.pick_pushes }}</strong></div><div><span>Completed games</span><strong>{{ tally.finals }} / {{ tally.games }}</strong></div></div>
+<div class="weekly-result-tallies"><div><span>Underdog results</span><strong>{{ tally.covers }}–{{ tally.losses }}–{{ tally.pushes }}</strong></div><div><span>Plug ATS picks</span><strong>{{ tally.correct }}–{{ tally.wrong }}–{{ tally.pick_pushes }}</strong></div><div><span>Completed games</span><strong>{{ tally.finals }} / {{ tally.games }}</strong></div></div>
 <p class="weekly-results-note">{{ model_note }} · Each saved pick is graded against its original captured line.</p>
 
 
-{% if has_blend %}<p class="weekly-results-note">Scout totals: {{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }} · ATS blend and totals remain separate.</p>{% endif %}
-<h2>Week {{ selected_week }} Matchups</h2>
+{% if has_blend %}<p class="weekly-results-note">Plug totals: {{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }} · ATS blend and totals remain separate.</p>{% endif %}
+<h2>Week {{ selected_week }} Matchups</h2><p class="weekly-results-note">ATS as Dog is the team’s {{ season }} regular-season cover–loss–push record as an underdog entering Week {{ selected_week }}. Result is its ATS outcome in this matchup. Scores are saved finals, not a live scoreboard.</p>
 {% if games %}
 <div class="tf-desktop-results weekly-results-table-wrap">
-<table class="weekly-results-table"><thead><tr><th>Matchup</th><th>Score / status</th><th>Underdog</th><th>Dog ATS</th><th>{{ model_label }} pick</th><th>Pick result</th>{% if has_blend %}<th>Scout total</th>{% endif %}<th>Details</th></tr></thead><tbody>
+<table class="weekly-results-table"><thead><tr><th>Matchup</th><th>Scores</th><th>Underdog</th><th>ATS as Dog</th><th>Result</th><th>Plug's Pick</th><th>Plug Total</th><th>Plug Result</th><th>Details</th></tr></thead><tbody>
 {% for game in games %}<tr>
 <td><strong>{{ game.matchup }}</strong><br><small>{{ game.gameday }}</small></td>
-<td>{{ game.live_score }}<br><small>{{ game.game_status }}</small></td>
+<td>{{ game.live_score }}</td>
 <td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
+<td>{{ game.dog_ats_record }}</td>
 <td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</span></td>
-<td>{{ game.scout_pick }}</td><td><span class="result-badge result-{{ game.scout_result|lower }}">{{ game.scout_result }}</span></td>
-<td>{% if has_blend %}{{ game.total_pick }}<br>{{ game.total_result }}</td><td>{% endif %}<details><summary>View details</summary><p>Dog straight-up: {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>{% if game.has_rankings %}<p>Historical ranks: 3Y #{{ game.rank_3y }} • 5Y #{{ game.rank_5y }} • 10Y #{{ game.rank_10y }} • All #{{ game.rank_all }}</p>{% else %}<p>No saved rankings for this game.</p>{% endif %}</details></td>
+<td>{{ game.scout_pick }}</td>
+<td>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</td>
+<td><small>ATS</small><br><span class="result-badge result-{{ game.scout_result|lower }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</span>{% if game.total_result!='—' %}<br><small>Total</small><br><span class="result-badge result-{{ game.total_result|lower }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</span>{% endif %}</td>
+<td><details><summary>View details</summary><p>Dog straight-up: {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>{% if game.has_rankings %}<p>Historical ranks: 3Y #{{ game.rank_3y }} • 5Y #{{ game.rank_5y }} • 10Y #{{ game.rank_10y }} • All #{{ game.rank_all }}</p>{% else %}<p>No saved rankings for this game.</p>{% endif %}</details></td>
 </tr>{% endfor %}</tbody></table></div>
 
 <!-- MOBILE SUNDAY RESULTS -->
@@ -46,49 +49,26 @@
 
         <div class="tf-card-heading">
             <strong>{{ game.matchup }}</strong>
-            <span class="tf-game-status tf-status-{{ game.game_status|lower }}">
-                {{ game.game_status }}
-            </span>
+
         </div>
 
-        <p class="tf-game-score">
-            {{ game.live_score }}
-        </p>
+        <p class="tf-game-score">Scores: {{ game.live_score }}</p>
 
         <p class="tf-game-spread">
             Underdog:
             {{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}
         </p>
 
+        <p>ATS as Dog: <strong>{{ game.dog_ats_record }}</strong></p>
+        <p class="tf-game-result">Result: {{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</p>
         <div class="tf-card-stats">
-
-            <div>
-                <span class="tf-stat-label">
-                    {{ model_label }} pick
-                </span>
-                <strong>{{ game.scout_pick }}</strong>
-                <small>
-                    Cushion: {{ game.scout_cushion }}
-                </small>
-            </div>
-
-            <div>
-                <span class="tf-stat-label">
-                    Pick result
-                </span>
-                <strong class="tf-scout-{{ game.scout_result|lower }}">{{ game.scout_result }}</strong>
-            </div>
-
+            <div><span class="tf-stat-label">Plug's Pick</span><strong>{{ game.scout_pick }}</strong><small>Cushion: {{ game.scout_cushion }}</small></div>
+            <div><span class="tf-stat-label">Plug Total</span><strong>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</strong></div>
         </div>
-
-        {% if has_blend %}<p>Scout total: <strong>{{ game.total_pick }}</strong> · {{ game.total_result }}</p>{% endif %}
-        <p class="tf-game-result">
-            Dog ATS: {{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}
-            | SU: {{ game.pending_note if game.su_result=='Pending' else game.su_result }}
-        </p>
+        <p>Plug Result: ATS — {{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}{% if game.total_result!='—' %} · Total — {{ game.pending_note if game.total_result=='Pending' else game.total_result }}{% endif %}</p>
 
         <details class="tf-card-details">
-            <summary>Game details</summary><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>
+            <summary>Details</summary><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>
             {% if game.has_rankings %}
 
             <div class="tf-history-grid">

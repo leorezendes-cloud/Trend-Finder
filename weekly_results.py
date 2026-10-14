@@ -9,6 +9,22 @@ def read_csv(path):
  if not path.exists():return []
  with path.open(newline='') as f:return list(csv.DictReader(f))
 def grade(margin):return 'Cover' if margin>1e-8 else 'Loss' if margin<-1e-8 else 'Push'
+def underdog_records(rows,season,before_week):
+ """Current-season regular-season W-L-P when a team was a dog before this week."""
+ records={}
+ for row in rows:
+  try:
+   if int(row['season'])!=season or int(row['week'])>=before_week or row['game_type']!='REG':continue
+   spread=float(row['spread_line']);away=float(row['away_score']);home=float(row['home_score'])
+   if not all(math.isfinite(value) for value in (spread,away,home)) or spread==0 or min(away,home)<0 or not away.is_integer() or not home.is_integer():continue
+  except (KeyError,ValueError,TypeError):continue
+  team=row['away_team'] if spread>0 else row['home_team']
+  margin=away-home if spread>0 else home-away
+  result=grade(margin+abs(spread))
+  record=records.setdefault(team,{'Cover':0,'Loss':0,'Push':0})
+  record[result]+=1
+ return records
+
 def build_results(root,week=None):
  rows=list(load_games(root/'nfl_games.csv').values())
  all_frozen={}
@@ -34,6 +50,7 @@ def build_results(root,week=None):
  has_blend=any(r['week']==selected for r in frozen.values())
  model_label='Blended ATS' if has_blend else 'Original Plug ATS' if scouts else 'Saved ATS picks'
  model_note='Scout 4.0 scoring + The Plug points-only · fixed 50/50 blend · version 1' if has_blend else 'Original points-only Plug snapshot · October 11, 2026' if scouts else 'No saved model forecasts for this week.'
+ dog_records=underdog_records(rows,season,selected)
  games=[]
  for g in sorted(rows,key=lambda g:(g['gameday'],g.get('gametime',''))):
   if int(g['season'])!=season or g['game_type']!='REG' or int(g['week'])!=selected:continue
@@ -51,6 +68,8 @@ def build_results(root,week=None):
   dog_margin=margin if dog==g['away_team'] else -margin if margin is not None else None
   matchup=f"{g['away_team']} @ {g['home_team']}"
   item=dict(g,matchup=matchup,underdog=dog or ('Pick’em' if spread==0 else 'Unavailable'),spread=abs(spread) if spread is not None else None,ats_result=grade(dog_margin+abs(spread)) if final and dog else 'Pick’em' if spread==0 else 'Unavailable' if spread is None else 'Pending',su_result='Win' if dog_margin is not None and dog_margin>0 else 'Loss' if dog_margin is not None and dog_margin<0 else 'Tie' if dog_margin==0 else 'Pending',game_status='Final' if final else 'Scheduled',live_score=f"{g['away_team']} {g['away_score']} – {g['home_team']} {g['home_score']}" if final else '—',scout_pick='No saved pick',scout_result='—',scout_cushion='—')
+  dog_record=dog_records.get(dog,{'Cover':0,'Loss':0,'Push':0})
+  item['dog_ats_record']=f"{dog_record['Cover']}–{dog_record['Loss']}–{dog_record['Push']}" if dog else '—'
   try:started=datetime.fromisoformat(g['gameday']+'T'+g.get('gametime','13:00')).replace(tzinfo=ZoneInfo('America/New_York'))<=datetime.now(timezone.utc)
   except ValueError:started=True
   item['pending_note']='Awaiting verified final score' if started else 'Not played yet'

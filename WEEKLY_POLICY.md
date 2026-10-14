@@ -15,3 +15,5 @@ On Render, the existing `TREND_FINDAH_AUTO_UPDATE=1` worker refreshes saved inpu
 Weekly Results defaults to the current week. Upcoming games show “Not played yet”; past kickoff without verified finals shows “Awaiting verified final score”. A link leads to the latest week with completed games, and the historical week selector remains available.
 
 Weekly evidence persists under `/var/data/site-data/data/member_lines/`. Check `logs/weekly_lines_status.json` for ready/pending state. `TREND_FINDAH_AUTO_UPDATE=1` and a running Render instance with its existing persistent disk are required for the scheduled capture.
+
+The weekly matchup table separates **ATS as Dog** (current-season regular-season cover–loss–push record entering the selected week, excluding favorites, pick’em, missing lines and unfinished games) from **Result** (that matchup’s underdog ATS outcome). Saved final Scores are not a live status feed. Plug ATS/total pick outcomes share the Plug Result column; original grading lines remain unchanged.
