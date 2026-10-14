@@ -174,7 +174,8 @@
 
 
                     
-                    {% if not archive %}<p>{{ game.gameday }} · {{ game.gametime_et }} ET{% if game.neutral %} · Neutral venue{% endif %}<br>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}{% if game.line_stale %} · Saved quote is over 24 hours old{% endif %}</p>{% endif %}
+                    {% if not archive %}<p>{{ game.gameday }} · {{ game.gametime_et }} ET{% if game.neutral %} · Neutral venue{% endif %}</p>
+                    <details class="saved-line-details"><summary>Saved line details{% if game.line_stale %} · over 24 hours old{% endif %}</summary><p>{{ game.line_source }}{% if game.line_time %} · Captured {{ game.line_time|eastern_time }}{% endif %}. Historical trends use this saved line, not live odds.</p></details>{% endif %}
                     {% if game.game_id %}<p><a class="matchup-comparison-link" href="{{ url_for('fans.matchup',game_id=game.game_id) }}">Compare teams, player leaders &amp; prediction →</a></p>{% endif %}
                     <h4>Exploratory Matching Ranges</h4>
 

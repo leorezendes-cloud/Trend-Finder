@@ -1052,8 +1052,8 @@
     "sha256": "c89f5af0147236ec426a472954e7e1d1f2bbfc21c81d6d86f13ee0ec4b57571a"
   },
   "templates/sunday.html": {
-    "bytes": 8335,
-    "sha256": "cf0df5724f6d11cd16a56b8bdfff3ea2524458d316c5e06a15f5926da570dd8a"
+    "bytes": 8491,
+    "sha256": "e554d199a72889e0d74a59554401ef73fea22a13fd503a5399268933ff2a54ea"
   },
   "templates/sunday_results.html": {
     "bytes": 6459,
