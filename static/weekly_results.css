@@ -12,3 +12,5 @@ form.weekly-results-selector { align-items:center; }
 .weekly-results-selector select,
 .weekly-results-selector button { height:36px; margin:0; box-sizing:border-box; vertical-align:middle; }
 .weekly-results-selector label { margin:0; line-height:36px; }
+
+.dog-ats-record { white-space: nowrap; }

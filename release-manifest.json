@@ -1020,8 +1020,8 @@
     "sha256": "97fa163074337d1f01bed25cdc48aa33f260793c8ceb5644bd8d21b1930c2910"
   },
   "static/weekly_results.css": {
-    "bytes": 2674,
-    "sha256": "255027472395b4c16ff80a932bb5fd29dfdfb441eb0fc79ddd2db68609158c4b"
+    "bytes": 2716,
+    "sha256": "b1fa868e0d7f8e4d337ad88e3c5b57658119ad8fe6197592ba077ccc19d97498"
   },
   "sunday_matchups_2026-10-11.csv": {
     "bytes": 2101,
@@ -1212,8 +1212,8 @@
     "sha256": "6b9dfd2cdf1c85d9ecbf9b3827586da55a53ab54a7cb9e4761b989bde94c911a"
   },
   "templates/sunday_results.html": {
-    "bytes": 7296,
-    "sha256": "3ae0b3eba6d639d44b138f6065d82d4c30990b8a8e3b0a1499b93d3ada3d4f45"
+    "bytes": 7342,
+    "sha256": "1685b88414fb30fa1a913de2a902bcb96f02d0c25e1af36806387bd6d9f51e7f"
   },
   "templates/sunday_scout.html": {
     "bytes": 10577,

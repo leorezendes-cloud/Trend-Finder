@@ -31,7 +31,7 @@
 <td><strong>{{ game.matchup }}</strong><br><small>{{ game.gameday }}</small></td>
 <td>{{ game.live_score }}</td>
 <td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
-<td>{{ game.dog_ats_record }}</td>
+<td class="dog-ats-record">{{ game.dog_ats_record }}</td>
 <td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</span></td>
 <td>{{ game.scout_pick }}</td>
 <td>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</td>
@@ -59,7 +59,7 @@
             {{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}
         </p>
 
-        <p>ATS as Dog: <strong>{{ game.dog_ats_record }}</strong></p>
+        <p>ATS as Dog: <strong class="dog-ats-record">{{ game.dog_ats_record }}</strong></p>
         <p class="tf-game-result">Result: {{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</p>
         <div class="tf-card-stats">
             <div><span class="tf-stat-label">Plug's Pick</span><strong>{{ game.scout_pick }}</strong><small>Cushion: {{ game.scout_cushion }}</small></div>
