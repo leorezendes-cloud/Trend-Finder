@@ -14,10 +14,15 @@
 <main class="membership">
 {% if mode == 'preferences' %}<p><a href="{{ url_for('home') }}">Back to main menu</a></p>{% endif %}
 <h2>{{ {'register':'Join Free', 'login':'Sign in', 'preferences':'My Profile'}[mode] }}</h2>
-<p>Explore trends and matchups freely. Membership lets you save newsletter preferences.</p>
+<p>{% if mode == 'preferences' %}Your saved teams and trends, plus newsletter preferences.{% else %}Explore freely. Sign in to save teams and trends to My Watchlist.{% endif %}</p>
 {% if error %}<p class="member-message" role="alert">{{ error }}</p>{% endif %}
 {% if saved %}<p class="member-message" role="status">Preferences saved.</p>{% endif %}
 {% if mode == 'login' and request.args.get('reset') == 'complete' %}<p class="member-message" role="status">Password updated. Log in with your new password.</p>{% endif %}
+{% if mode == 'preferences' %}
+<section id="my-watchlist"><h2>My Watchlist</h2><p>Saved teams reopen current stats. Saved trends reopen the original filters; their results may change as new games arrive.</p>
+{% for kind,label in [('team','Teams'),('trend','Trends')] %}<h3>{{ label }}</h3><ul class="watchlist-items">{% for item in watchlist if item.kind == kind %}<li><a href="{{ item.target }}">{{ item.title }}</a><form action="{{ url_for('membership.remove_watchlist',item_id=item.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" aria-label="Remove {{ item.title }}">Remove</button></form></li>{% else %}<li>No saved {{ label|lower }} yet.</li>{% endfor %}</ul>{% endfor %}
+</section><h2>Newsletter preferences</h2>
+{% endif %}
 <form method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 {% if mode != 'preferences' %}

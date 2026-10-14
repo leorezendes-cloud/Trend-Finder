@@ -103,6 +103,42 @@ class MembershipTests(unittest.TestCase):
         self.assertIn('Signed up in the last 7 days: 1', result.output)
         self.assertNotIn('person@example.com', result.output)
 
+    def test_watchlist_deduplication_csrf_and_member_isolation(self):
+        self.register()
+        path='/members/watchlist/save'
+        data={'kind':'team','target':'BUF','title':'ignored','csrf_token':self.token('/members/preferences')}
+        self.assertEqual(self.client.post(path,data=data).status_code,302)
+        self.client.post(path,data=data)
+        with self.app.app_context():
+            item=db().execute('SELECT * FROM watchlist').fetchone()
+            item_id=item['id']
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM watchlist').fetchone()[0],1)
+        self.assertIn('BUF',self.client.get('/members/preferences').text)
+        self.assertEqual(self.client.post(path,data={'kind':'team','target':'BUF'}).status_code,400)
+        other=self.app.test_client()
+        csrf=re.search(r'name="csrf_token" value="([^"]+)"',other.get('/members/register').text).group(1)
+        other.post('/members/register',data={'email':'other@example.com','password':'another safe phrase',
+                   'password_confirm':'another safe phrase','csrf_token':csrf})
+        self.assertNotIn('>BUF</a>',other.get('/members/preferences').text)
+        csrf=re.search(r'name="csrf_token" value="([^"]+)"',other.get('/members/preferences').text).group(1)
+        other.post(f'/members/watchlist/{item_id}/remove',data={'csrf_token':csrf})
+        with self.app.app_context():
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM watchlist').fetchone()[0],1)
+        self.client.post(f'/members/watchlist/{item_id}/remove',data={'csrf_token':self.token('/members/preferences')})
+        with self.app.app_context():
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM watchlist').fetchone()[0],0)
+
+    def test_watchlist_rejects_external_and_script_targets(self):
+        self.register()
+        for target in ('https://evil.example/trend-details','//evil.example/trend-details','javascript:alert(1)'):
+            reply=self.client.post('/members/watchlist/save',data={'kind':'trend','target':target,'title':'Example',
+                'csrf_token':self.token('/members/preferences')})
+            self.assertEqual(reply.status_code,400)
+        self.assertEqual(self.client.post('/members/watchlist/save',data={'kind':'trend',
+            'target':'/combination-details?conditions=%5B%22Month%3A%2010%22%5D','title':'October underdogs',
+            'csrf_token':self.token('/members/preferences')}).status_code,302)
+        self.assertIn('October underdogs',self.client.get('/members/preferences').text)
+
     def test_preferences_persistence_opt_out_and_migration(self):
         self.register(newsletter_opt_in='yes')
         self.assertEqual(self.row()['newsletter_opt_in'], 1)
@@ -244,7 +280,7 @@ class MembershipTests(unittest.TestCase):
             self.assertEqual(row['email'], 'legacy@example.com')
             self.assertEqual(row['password_hash'], 'existing-hash')
             self.assertEqual(row['session_version'], 0)
-            self.assertEqual(db().execute('PRAGMA user_version').fetchone()[0], 2)
+            self.assertEqual(db().execute('PRAGMA user_version').fetchone()[0], 3)
 
     def test_backup_and_local_reset_cli(self):
         self.register()
@@ -259,7 +295,7 @@ class MembershipTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         with closing(sqlite3.connect(destination)) as connection:
             self.assertEqual(connection.execute('SELECT email FROM members').fetchone()[0], 'person@example.com')
-            self.assertEqual(connection.execute('PRAGMA user_version').fetchone()[0], 2)
+            self.assertEqual(connection.execute('PRAGMA user_version').fetchone()[0], 3)
         self.assertNotEqual(runner.invoke(args=['backup-membership-db',destination]).exit_code, 0)
 
     def test_public_access_and_secure_settings(self):

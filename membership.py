@@ -3,7 +3,7 @@ import hashlib
 import json
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qsl, urlencode
 import time
 import os
 import re
@@ -30,7 +30,7 @@ def migrate():
     """Transactional, versioned schema initialization; safe to repeat."""
     connection = db()
     version = connection.execute('PRAGMA user_version').fetchone()[0]
-    if version > 2:
+    if version > 3:
         raise RuntimeError('Membership database is newer than this application')
     if version == 0:
         with connection:
@@ -49,6 +49,11 @@ def migrate():
             connection.execute('CREATE TABLE password_resets (token_hash TEXT PRIMARY KEY, member_id INTEGER NOT NULL REFERENCES members(id), expires_at INTEGER NOT NULL)')
             connection.execute('CREATE TABLE auth_limits (bucket TEXT PRIMARY KEY, started_at INTEGER NOT NULL, attempts INTEGER NOT NULL)')
             connection.execute('PRAGMA user_version = 2')
+        version = 2
+    if version == 2:
+        with connection:
+            connection.execute('CREATE TABLE IF NOT EXISTS watchlist (id INTEGER PRIMARY KEY, member_id INTEGER NOT NULL REFERENCES members(id), kind TEXT NOT NULL CHECK(kind IN ("team","trend")), target TEXT NOT NULL, title TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(member_id,kind,target))')
+            connection.execute('PRAGMA user_version = 3')
 
 
 def csrf_token():
@@ -130,7 +135,7 @@ def init_membership(app):
     @app.cli.command('init-membership-db')
     def initialize():
         migrate()
-        click.echo('Membership database initialized (schema version 2).')
+        click.echo('Membership database initialized (schema version 3).')
 
     @app.cli.command('membership-reset-link')
     @click.argument('email')
@@ -255,7 +260,7 @@ def preferences():
                 db().execute('UPDATE members SET newsletter_opt_in=?,newsletter_frequency=?,consent_updated_at=CURRENT_TIMESTAMP WHERE id=?', (int(opt_in == 'yes'), frequency, g.member['id']))
             g.member = db().execute('SELECT * FROM members WHERE id=?', (g.member['id'],)).fetchone()
             saved = True
-    return render_template('membership.html', mode='preferences', error=error, saved=saved), 400 if error else 200
+    return render_template('membership.html', mode='preferences', error=error, saved=saved, watchlist=db().execute('SELECT * FROM watchlist WHERE member_id=? ORDER BY created_at DESC,id DESC', (g.member['id'],)).fetchall()), 400 if error else 200
 
 
 def allow_attempt(action, email):
@@ -381,3 +386,46 @@ def reset_password(token):
     response.headers['Cache-Control'] = 'no-store'
     response.headers['Referrer-Policy'] = 'no-referrer'
     return response
+
+
+@bp.post('/watchlist/save')
+def save_watchlist():
+    if g.member is None:
+        return redirect(url_for('membership.login'))
+    kind = request.form.get('kind')
+    target = request.form.get('target', '')
+    title = request.form.get('title', '').strip()
+    if kind == 'team':
+        from scout4.stats import team_code
+        code = team_code(target)
+        if code not in {'ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LA','LAC','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS'}:
+            abort(400)
+        target = url_for('scout4.teams_page', team=code)
+        title = code
+    elif kind == 'trend':
+        parts = urlsplit(target)
+        if parts.scheme or parts.netloc or parts.fragment or parts.path not in ('/combination-details','/trend-games','/trend-details') or len(target)>4000 or not 1<=len(title)<=200:
+            abort(400)
+        try:
+            target = parts.path + '?' + urlencode(sorted(parse_qsl(parts.query, max_num_fields=30)))
+        except ValueError:
+            abort(400)
+    else:
+        abort(400)
+    connection = db()
+    with connection:
+        count = connection.execute('SELECT COUNT(*) FROM watchlist WHERE member_id=?', (g.member['id'],)).fetchone()[0]
+        exists = connection.execute('SELECT 1 FROM watchlist WHERE member_id=? AND kind=? AND target=?', (g.member['id'],kind,target)).fetchone()
+        if count >= 100 and not exists:
+            abort(400, description='Your watchlist is full. Remove an item before saving another.')
+        connection.execute('INSERT INTO watchlist(member_id,kind,target,title) VALUES(?,?,?,?) ON CONFLICT(member_id,kind,target) DO NOTHING', (g.member['id'],kind,target,title))
+    return redirect(url_for('membership.preferences') + '#my-watchlist')
+
+
+@bp.post('/watchlist/<int:item_id>/remove')
+def remove_watchlist(item_id):
+    if g.member is None:
+        return redirect(url_for('membership.login'))
+    with db():
+        db().execute('DELETE FROM watchlist WHERE id=? AND member_id=?', (item_id,g.member['id']))
+    return redirect(url_for('membership.preferences') + '#my-watchlist')

@@ -12,7 +12,7 @@ Use the project's existing Python environment and Flask dependencies. Membership
 - `TREND_FINDAH_ENV=production`: Requires the explicit secret and enables secure cookies; serve over HTTPS.
 - `TREND_FINDAH_DATABASE`: Optional absolute SQLite file path. Defaults to `instance/members.sqlite3`. Its parent directory must exist and be writable. Keep this file on durable storage and back it up; exclude accounts and keys from source control.
 
-Schema version 2 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
+Schema version 3 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
 
 Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors or refresh research data. Password recovery sends through Resend when RESEND_API_KEY is configured. Email verification and newsletters remain inactive.
 
@@ -64,3 +64,7 @@ In the Render service's Shell, run `python -m flask --app wsgi membership-count`
 With hosted automatic updates enabled, the account database is backed up every six hours into `/var/data/account-backups`. The SQLite backup API produces a consistent copy while users are active. Every snapshot is integrity checked and restored into a temporary database; full rows and counts are compared before it becomes a retained backup. The directory is private (0700) and snapshots are private (0600). The newest 112 snapshots are retained, approximately 28 days at the six-hour schedule. In Render Shell, run `python -m flask --app wsgi membership-backup-status` to check the latest verification. These backups share the service disk: they do not protect against loss of the entire disk. Arrange a separate private storage destination before treating disaster recovery as complete. No automatic upload of member data occurs.
 
 For recovery, verify a selected copy in isolation with `membership_backups.verify_restore`, then stop the web service before an operator replaces the account database. Keep the current database separately. Do not restore over a running service, and do not use an entire disk rollback for routine account recovery because it would also roll back stats and sealed predictions.
+
+## My Watchlist
+
+Profiles contain a private team/trend watchlist, up to 100 saved items per member. Save teams on their statistics or matchup pages; save trends on their detail pages. Duplicate saves do not create duplicate items. Membership CSRF protection and authenticated owner checks protect save/remove actions. Saved team links show current statistics; saved trend URLs retain their original filters and recalculate results against available data. Schema version 3 adds the watchlist without altering existing accounts. Verified account backups include watchlist rows and continue supporting older version-2 snapshots.

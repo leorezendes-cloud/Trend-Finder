@@ -19,10 +19,12 @@ class MembershipBackupTests(unittest.TestCase):
             with app.app_context():
                 with db():
                     db().execute("INSERT INTO members(email,password_hash,newsletter_opt_in) VALUES('test@example.com','test-hash',1)")
+                    db().execute("INSERT INTO watchlist(member_id,kind,target,title) VALUES(1,'team','/scout4/teams?team=BUF','BUF')")
                 # Keep the live connection open to exercise SQLite's consistent backup API.
                 backup_database(database,folder,keep=2)
             snapshots=list(folder.glob('accounts-*.sqlite3'))
             self.assertEqual(verify_restore(snapshots[0])['members'],1)
+            self.assertEqual(verify_restore(snapshots[0])['watchlist'],1)
             self.assertEqual(snapshots[0].stat().st_mode & 0o777,0o600)
             self.assertEqual(folder.stat().st_mode & 0o777,0o700)
             backup_database(database,folder,keep=2);backup_database(database,folder,keep=2)

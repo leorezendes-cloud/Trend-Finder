@@ -16,9 +16,10 @@ TABLES = ('members', 'password_resets', 'auth_limits')
 def checked_database(connection):
     if connection.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
         raise ValueError('Database integrity check failed')
-    if connection.execute('PRAGMA user_version').fetchone()[0] != 2:
+    if connection.execute('PRAGMA user_version').fetchone()[0] not in (2,3):
         raise ValueError('Unsupported account schema')
-    return {table: connection.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0] for table in TABLES}
+    tables = TABLES + (('watchlist',) if connection.execute('PRAGMA user_version').fetchone()[0] == 3 else ())
+    return {table: connection.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0] for table in tables}
 
 
 def verify_restore(backup):
@@ -32,7 +33,7 @@ def verify_restore(backup):
                 if checked_database(target) != expected:
                     raise ValueError('Restored account counts do not match')
                 # Compare complete rows, including hashes, tokens and preferences.
-                for table in TABLES:
+                for table in expected:
                     if source.execute('SELECT * FROM ' + table + ' ORDER BY 1').fetchall() != target.execute('SELECT * FROM ' + table + ' ORDER BY 1').fetchall():
                         raise ValueError('Restored account contents do not match')
     return expected

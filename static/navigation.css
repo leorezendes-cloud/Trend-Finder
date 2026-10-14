@@ -109,3 +109,11 @@ html body .fantasy-rankings :is(td,th):first-child { padding-left: 14px; padding
 html body .data-freshness a { color: #fbbf24; -webkit-text-stroke: 0; }
 
 html body .matchup-panel .prediction-brand { color: #fbbf24; }
+
+html body .save-watchlist { margin: 16px 0; padding: 0; border: 0; background: transparent; max-width: none; }
+html body .save-watchlist button { padding: 9px 14px; border: 1px solid #fbbf24; border-radius: 8px; background: #1f2937; color: #fbbf24; font: 14px Arial,sans-serif; cursor: pointer; }
+.watchlist-items { list-style: none; padding: 0; }
+.watchlist-items li { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 14px; border-radius: 8px; background: #1f2937; overflow-wrap: anywhere; }
+.watchlist-items a { color: #fbbf24; font: 15px/1.5 Arial,sans-serif; }
+html body .watchlist-items form { margin: 0; padding: 0; background: transparent; border: 0; }
+html body .watchlist-items button { padding: 8px 12px; font: 13px Arial,sans-serif; cursor: pointer; }

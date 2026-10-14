@@ -13,10 +13,12 @@
 {% include '_branding_head.html' %}
 </head>
 
+{% from '_save_watchlist.html' import save_item with context %}
 <body>
     <main class="trend-dashboard">
 
         {% include '_site_navigation.html' %}
+{{ save_item('trend',request.full_path.rstrip('?'),'Trend: ' ~ request.args.get('location','All locations') ~ ' | ' ~ request.args.get('spread','All spreads')) }}
 
         <h1 class="label">Trend Details</h1>
 

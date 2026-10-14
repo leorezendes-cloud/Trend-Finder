@@ -1,4 +1,5 @@
 {% extends 'scout4_base.html' %}
+{% from '_save_watchlist.html' import save_item with context %}
 {% block title %}{{ game.away_team }} vs {{ game.home_team }}{% endblock %}
 {% block heading %}{{ game.away_team }} @ {{ game.home_team }}{% endblock %}
 {% block filter_form %}{% endblock %}
@@ -15,5 +16,6 @@
 {% for key,label in [('points_for','Points scored'),('points_against','Points allowed'),('passing_yards','Passing yards'),('rushing_yards','Rushing yards'),('passing_yards_allowed','Passing yards allowed'),('rushing_yards_allowed','Rushing yards allowed')] %}<tr><td>{{ label }}</td>{% for side in teams %}<td>{{ side.summary.metrics[key].value|stat }} <small>({{ side.summary.metrics[key].n }} games)</small></td>{% endfor %}</tr>{% endfor %}
 </tbody></table></div></section>
 <div class="stats-grid">{% for side in teams %}<section class="stats-card matchup-panel"><h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
+{{ save_item('team',side.code,side.code) }}
 {% for leader in side.leaders %}<h3>{{ leader.role }}</h3><p><a href="{{ url_for('scout4.players_page',player=leader.id,team=side.code,season=season,before_week=week) }}">{{ leader.name }} →</a></p><p>{% for key in leader.fields %}{{ key|replace('_',' ')|title }}: {{ leader.summary.metrics[key].total|stat(0) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% else %}<p>No recorded player leaders before this matchup.</p>{% endfor %}</section>{% endfor %}</div>
 {% endblock %}

@@ -12,8 +12,8 @@
     "sha256": "c6acc060dd2805f269324508f0a2cb223b2f734c542585fa5a8591365934aa8d"
   },
   "MEMBERSHIP.md": {
-    "bytes": 6655,
-    "sha256": "b6bf655ece8c12e9eddd43006ac6d4c84ad609fc4b2c58ed1f28d894a5341a8b"
+    "bytes": 7282,
+    "sha256": "7f9bf8e2e052e36add7348cde7b4771b626b35e4d0a5d3988977c823233bfd5e"
   },
   "anomaly_analysis.py": {
     "bytes": 8461,
@@ -532,8 +532,8 @@
     "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
   },
   "membership.py": {
-    "bytes": 18838,
-    "sha256": "76ba5db08b278254dd203e28469f5c2574a05ba03c56eb879167ab9581262f35"
+    "bytes": 21612,
+    "sha256": "dedbca68c09addccc0b8d65cfe4ddb4a83f4cdf7928c4e56563aeae9732d0f33"
   },
   "nfl_games.csv": {
     "bytes": 2190111,
@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 9122,
-    "sha256": "0e640060e7564f9573905596f303017ca3b46c1db57440f13d7a5fd318376fbe"
+    "bytes": 9946,
+    "sha256": "cb6622427dd2138ff6562d1cbc7e59210b83ab53b2bc03c6ca4f7cdb0642e8bf"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1016,8 +1016,8 @@
     "sha256": "19122e8f6fcacadebe2acb2a3151f4e7baa30f8b9a8c57c07ff9317124d0fdd3"
   },
   "templates/membership.html": {
-    "bytes": 4022,
-    "sha256": "78be38f619476a0f0f0a4022128a922ec4588005f2d87eda6263d2330c2ae958"
+    "bytes": 4904,
+    "sha256": "63c977a948ace658e2e74c8ca8b4de429d9fecb9e40ddf4135528309d6356c3d"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
@@ -1048,8 +1048,8 @@
     "sha256": "847336147c27d56d38df5a95ee7d400ff743939591140c089dda2a5559a5450e"
   },
   "templates/scout4_teams.html": {
-    "bytes": 5445,
-    "sha256": "738e0b9ceba203fc713776f6a69780c304544a0a378450bed6040921f5c80e06"
+    "bytes": 5552,
+    "sha256": "c89f5af0147236ec426a472954e7e1d1f2bbfc21c81d6d86f13ee0ec4b57571a"
   },
   "templates/sunday.html": {
     "bytes": 8335,
@@ -1064,12 +1064,12 @@
     "sha256": "909198d0408d4b483a4be8f86fa3a1123d4f96aa5cb3ad29af9606322be50805"
   },
   "templates/trend_details.html": {
-    "bytes": 3841,
-    "sha256": "332a6b73fcdb6b683bdda2856962242d6dd60d97ab1c7087dc62e92d580a6a6b"
+    "bytes": 4068,
+    "sha256": "f24ecfe822d964eeee43d5c56d777c64de8e4a4c3f8a23624f908a6d99d30205"
   },
   "templates/trend_games.html": {
-    "bytes": 4049,
-    "sha256": "54b4c1206ad105199adfadb181ef133a339a4d0b440350cd5c800165e0e65020"
+    "bytes": 4217,
+    "sha256": "d7504da2548b420d5eaebf0d2b7c695fb2110b6ae4879c3155b1d7c4f10fc502"
   },
   "templates/trends.html": {
     "bytes": 19343,
@@ -1080,8 +1080,8 @@
     "sha256": "1fa28b2e1c0f281b5de7e925c57d8c424693619c0fe9b81a3e6f90ca7a4eb62b"
   },
   "test_membership.py": {
-    "bytes": 16686,
-    "sha256": "c3cabd2f182330696476efc217e62251b3dcc3168dd3438cd52be734d2d6488b"
+    "bytes": 19237,
+    "sha256": "bf42313cf73ff16de7a3ae45df34da7f3ee49c5521bdf581fe920bc1016e09b1"
   },
   "test_page_layouts.py": {
     "bytes": 1776,
@@ -1156,8 +1156,8 @@
     "sha256": "5a358788473f1ecc4bd6c41ccddaa0d91ae7e0eff9cd98ab57d0124f3066bf8c"
   },
   "templates/home.html": {
-    "bytes": 4307,
-    "sha256": "0e62b0761483495d1f8a1f1497e9ffaa18a49fac52ee449436a56e8f4fb2e75d"
+    "bytes": 4322,
+    "sha256": "c28e61e27b8b031fc69e7f716deac6bb9c522eaad4115694ad03c7169a2806ab"
   },
   "fan_views.py": {
     "bytes": 11677,
@@ -1168,8 +1168,8 @@
     "sha256": "e1882320f2500762fd00ddca73ae67f24aa35632cb6abd3d52871d685375b782"
   },
   "templates/matchup.html": {
-    "bytes": 3820,
-    "sha256": "7a775b5201bb9e1413c4c0cf5b93b28b96271beade89b7ead381fca93bf61770"
+    "bytes": 3928,
+    "sha256": "a3c272975442ca17c8dd8f2e3e90ac797c5d70735def16755c2f37fb5b6711f4"
   },
   "templates/fantasy.html": {
     "bytes": 2518,
@@ -1204,11 +1204,15 @@
     "sha256": "b2254b076961da15066c2168c6cb452ea98473dd729174e55952915c349b2c85"
   },
   "membership_backups.py": {
-    "bytes": 3733,
-    "sha256": "4688776f2c81a90eded8943bbda21feb4c38744d1c99416cbb3d41a15b8c7da0"
+    "bytes": 3854,
+    "sha256": "8274cf4a64163b41d2a13a4b90ec168311b239ea1a8661d8ef1ffa7478e23ce7"
   },
   "test_membership_backups.py": {
-    "bytes": 2538,
-    "sha256": "1b625fecfb5b1913ad616cc8e8e001b16f5bc0ae399950e51648cb60988b4613"
+    "bytes": 2747,
+    "sha256": "1b08788af7bdc6a7a68850794ca32ab65b1072b503a019ba878037deea036a4c"
+  },
+  "templates/_save_watchlist.html": {
+    "bytes": 640,
+    "sha256": "c5f90902350db36f5349e447959a464180eaadf668ef7b469c285c7058a0a1b2"
   }
 }

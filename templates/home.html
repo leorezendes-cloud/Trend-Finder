@@ -36,7 +36,7 @@
             </nav>
             <div class="landing-account">
                 {% if g.member %}
-                <a class="landing-signin" href="{{ url_for('membership.preferences') }}">My Profile</a>
+                <a class="landing-signin" href="{{ url_for('membership.preferences') }}#my-watchlist">My Watchlist</a>
                 {% else %}
                 <a class="landing-signin" href="{{ url_for('membership.login') }}">Sign in</a>
                 <p>New here? <a href="{{ url_for('membership.register') }}">Join free</a></p>

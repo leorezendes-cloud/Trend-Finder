@@ -1,4 +1,5 @@
 {% from '_trend_evidence.html' import record_table %}
+{% from '_save_watchlist.html' import save_item with context %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,7 @@
     {% include '_site_navigation.html' %}
     <section class="combination-card">
         <h2>{{ conditions | display_trend_filters }}</h2>
+        {{ save_item('trend',request.full_path.rstrip('?'),(conditions|display_trend_filters)[:200]) }}
         <p>{% if season is none %}All seasons{% elif season is number %}Season {{ season }}{% else %}Seasons {{ season[0] }}–{{ season[1] }}{% endif %}{% if scope_labels %} | {{ scope_labels | display_trend_filters }}{% endif %}</p>
         <p>These are completed games matching every condition and manual filter. The ATS result belongs to the underdog; the score is shown away team first. Pushes are excluded from the cover rate.</p>
         <p class="combination-description">{{ trend.description }}</p>
