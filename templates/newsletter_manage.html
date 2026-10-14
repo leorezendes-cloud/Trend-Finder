@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Newsletter | Gravy Train</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">{% include '_branding_head.html' %}
+<style>.newsletter-editor{max-width:900px;margin:auto}.newsletter-editor textarea{box-sizing:border-box;width:100%;min-height:140px;padding:12px;margin-bottom:20px;font:16px/1.5 Arial,sans-serif}.newsletter-editor a{color:#fbbf24}.newsletter-editor article{padding:16px;margin:12px 0;background:#111b2b;border-radius:10px}.newsletter-editor form{max-width:none}.newsletter-editor input{box-sizing:border-box;width:100%;padding:12px;margin-bottom:18px}</style></head>
+<body>{% include '_site_navigation.html' %}<main class="newsletter-editor"><h1>Trendfindah Newsletter</h1>
+<p>Predictions lead the way, followed by upcoming matchups and notable trends.</p>
+<p>Opted in: {{ counts.get('weekly',0) }} weekly · {{ counts.get('monthly',0) }} monthly</p>
+{% if not config.NEWSLETTER_ENABLED %}<p>Live sending is disabled. You can create, preview, and approve drafts here.</p>{% endif %}
+{% if not config.NEWSLETTER_ADDRESS %}<p>Add your business mailing address before sending.</p>{% endif %}
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="subject">Subject</label><input id="subject" name="subject" required minlength="5" maxlength="150" value="{{ request.form.get('subject',defaults.get('subject','Trendfindah: This week’s prediction highlights')) }}">
+<label for="frequency">Audience</label><select id="frequency" name="frequency">{% for value in ['weekly','monthly'] %}<option value="{{ value }}" {% if request.form.get('frequency',defaults.get('frequency','weekly'))==value %}selected{% endif %}>{{ value|capitalize }} subscribers</option>{% endfor %}</select>
+{% for key,heading in headings %}<label for="{{ key }}">{{ heading }}{{ ' (required)' if key=='predictions' else ' (optional)' }}</label><textarea id="{{ key }}" name="{{ key }}" maxlength="6000" {% if key=='predictions' %}required minlength="20"{% endif %}>{{ request.form.get(key,defaults.get(key,'')) }}</textarea>{% endfor %}
+<p>Use published predictions and saved evidence. This editor never runs models or refreshes data. Write plain text; HTML is escaped.</p><button>{{ 'Save draft' if editing else 'Create draft' }}</button></form>
+<h2>Recent issues</h2>{% for issue in issues %}<article><a href="{{ url_for('newsletter.issue_page',issue_id=issue.id) }}">{{ issue.subject }}</a><p>{{ issue.frequency|capitalize }} · {{ issue.status|capitalize }} · {{ issue.created_at }}</p></article>{% else %}<p>No issues yet.</p>{% endfor %}
+</main></body></html>

@@ -12,6 +12,9 @@ class HostingTests(unittest.TestCase):
         members = Blueprint('membership', __name__)
         members.add_url_rule('/members/login', 'login', lambda: 'login', methods=['POST'])
         application.register_blueprint(members)
+        newsletters = Blueprint('newsletter', __name__)
+        newsletters.add_url_rule('/newsletter/manage','manage',lambda:'owner checks live in the newsletter module',methods=['POST'])
+        application.register_blueprint(newsletters)
         application.add_url_rule('/', 'home', lambda: 'analysis', methods=['GET','POST'])
         application.add_url_rule('/trend-finder', 'trend_finder', lambda: 'analysis', methods=['GET','POST'])
         application.add_url_rule('/refresh', 'refresh', lambda: self.fail('Collector was executed'), methods=['POST'])
@@ -26,6 +29,7 @@ class HostingTests(unittest.TestCase):
         self.assertEqual(client.post('/members/login').status_code, 200)
         self.assertEqual(client.post('/').status_code, 200)
         self.assertEqual(client.post('/trend-finder').status_code, 200)
+        self.assertEqual(client.post('/newsletter/manage').status_code, 200)
 
     def test_static_files_bypass_application_work_and_are_cacheable(self):
         from flask import request

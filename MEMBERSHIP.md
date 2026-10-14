@@ -1,6 +1,6 @@
 # Gravy Train membership
 
-Public trend, matchup, results, and Scout pages remain available without an account. Members can register, log in, log out with a POST form, and save explicit newsletter consent and weekly/monthly preferences. Newsletter delivery and comments are not implemented.
+Public trend, matchup, results, and Scout pages remain available without an account. Members can register, log in, log out with a POST form, and save explicit newsletter consent and weekly/monthly preferences. Newsletter drafting, previews, unsubscribe and operator-controlled Resend delivery are implemented; live sending is disabled by default. See NEWSLETTER.md. Comments are not implemented.
 
 Accounts use SQLite, Werkzeug scrypt password hashes, unique case-insensitive email addresses, parameterized queries, and session rotation at login/registration/logout. Membership POST forms require session-bound CSRF tokens. Existing Scout and analysis POST endpoints retain their existing behavior; this module does not secure or change those endpoints.
 
@@ -14,7 +14,7 @@ Use the project's existing Python environment and Flask dependencies. Membership
 
 Schema version 4 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
 
-Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors or refresh research data. Password recovery sends through Resend when RESEND_API_KEY is configured. Email verification and newsletters remain inactive.
+Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors or refresh research data. Password recovery sends through Resend when RESEND_API_KEY is configured. Email verification remains inactive. Newsletter delivery is separately opt-in and disabled by default; see NEWSLETTER.md.
 
 ## Verification
 

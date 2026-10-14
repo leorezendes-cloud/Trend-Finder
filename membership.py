@@ -205,6 +205,8 @@ def init_membership(app):
 
     with app.app_context():
         migrate()
+    from newsletter import init_newsletter
+    init_newsletter(app)
 
 
 @bp.route('/register', methods=['GET', 'POST'])

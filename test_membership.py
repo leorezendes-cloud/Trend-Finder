@@ -20,6 +20,8 @@ class MembershipTests(unittest.TestCase):
             for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page','fans.fantasy']:
                 self.app.add_url_rule('/' + endpoint, endpoint, lambda: 'public')
             init_membership(self.app)
+            from scout4.web import eastern_time
+            self.app.jinja_env.filters['eastern_time'] = eastern_time
         self.app.config['TESTING'] = True
         self.app.config['RESEND_API_KEY'] = ''
         self.client = self.app.test_client()

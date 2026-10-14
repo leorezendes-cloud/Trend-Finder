@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ issue.subject }}</title></head>
+<body style="margin:0;background:#080e18;color:#eef3fa;font-family:Arial,sans-serif">
+<table role="presentation" style="width:100%;max-width:640px;margin:auto;border-collapse:collapse"><tr><td style="padding:28px;background:#111b2b">
+<p style="color:#fbbf24;letter-spacing:2px;font-weight:bold">TRENDFINDAH · GRAVY TRAIN</p>
+<h1 style="font-size:28px;line-height:1.3">{{ issue.subject }}</h1>
+{% for key,heading in headings %}{% if sections.get(key) %}
+<h2 style="color:#fbbf24;font-size:{{ '24' if key=='predictions' else '20' }}px;margin-top:28px">{{ heading }}</h2>
+{% for paragraph in sections[key].split('\n') %}{% if paragraph %}<p style="font-size:16px;line-height:1.65">{{ paragraph }}</p>{% endif %}{% endfor %}
+{% endif %}{% endfor %}
+<p style="margin:30px 0"><a href="{{ origin }}" style="background:#fbbf24;color:#111827;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Explore Gravy Train</a></p>
+<p style="font-size:13px;line-height:1.6;color:#cbd5e1">You’re receiving this because you opted into the Trendfindah newsletter. Predictions are estimates, not guaranteed outcomes.</p>
+<p style="font-size:13px;line-height:1.6;color:#cbd5e1">{{ address }}</p>
+<p><a href="{{ unsubscribe_url }}" style="color:#fbbf24">Unsubscribe</a> · <a href="{{ origin }}/members/preferences" style="color:#fbbf24">Manage preferences</a></p>
+</td></tr></table></body></html>

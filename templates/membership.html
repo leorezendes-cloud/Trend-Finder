@@ -46,14 +46,14 @@
 {% endif %}
 {% if mode != 'login' %}
 {% if mode == 'preferences' %}<p class="member-account">{{ g.member.email }}</p>{% endif %}
-<label class="member-check"><input type="checkbox" name="newsletter_opt_in" value="yes" {% if (mode == 'preferences' and g.member.newsletter_opt_in) or (mode == 'register' and request.form.get('newsletter_opt_in') == 'yes') %}checked{% endif %}> I want to receive the Trend Findah newsletter by email.</label>
+<label class="member-check"><input type="checkbox" name="newsletter_opt_in" value="yes" {% if (mode == 'preferences' and g.member.newsletter_opt_in) or (mode == 'register' and request.form.get('newsletter_opt_in') == 'yes') %}checked{% endif %}> I want to receive the Trendfindah newsletter by email.</label>
 {% if mode == 'preferences' %}
 <label for="newsletter_frequency">Preferred frequency</label>
 <select id="newsletter_frequency" name="newsletter_frequency">
 {% for frequency in ['weekly', 'monthly'] %}<option value="{{ frequency }}" {% if g.member.newsletter_frequency == frequency %}selected{% endif %}>{{ frequency|capitalize }}</option>{% endfor %}
 </select>
 {% endif %}
-<p class="member-note">Optional. You can opt out here at any time. Newsletter delivery is not active; saving these preferences sends no email.</p>
+<p class="member-note">Optional. You can opt out here at any time. Weekly or monthly roundups highlight predictions, upcoming matchups, and notable trends. You can also unsubscribe directly from any newsletter. Saving preferences does not send an email.</p>
 {% endif %}
 <button type="submit">{{ {'register':'Create account','login':'Log in','preferences':'Save preferences'}[mode] }}</button>
 </form>
