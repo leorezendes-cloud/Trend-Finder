@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import patch, MagicMock
 from app import app
-from fan_views import parse_scores, _score_cache, leaders
+from fan_views import parse_scores, _score_cache, leaders, prediction_performance
 from scout4.stats import recent_form, betting_result, team_records, summarize_team
 
 
@@ -65,6 +65,29 @@ class FanViewsTests(unittest.TestCase):
         game.update(spread_line='', total_line='')
         self.assertIsNone(betting_result(game)['home_ats'])
         self.assertIsNone(betting_result(game)['ou'])
+
+    def test_prediction_results_exclude_late_records_and_separate_versions(self):
+        from copy import deepcopy
+        record = {'game_id':'game','away_team':'BUF','home_team':'LV',
+                  'kickoff_utc':'2026-10-18T20:00:00+00:00',
+                  'sealed_at_utc':'2026-10-17T20:00:00+00:00',
+                  'decision_cutoff_utc':'2026-10-17T19:00:00+00:00',
+                  'quote':{'line':3, 'captured_at_utc':'2026-10-17T18:00:00+00:00'},
+                  'version':'v1','configuration_sha256':'config1',
+                  'components':{'Blend':{'pick':'BUF'}}}
+        game = {'game_id':'game','away_team':'BUF','home_team':'LV','away_score':'20','home_score':'21'}
+        late = deepcopy(record);late['sealed_at_utc'] = '2026-10-19T00:00:00+00:00'
+        other = deepcopy(record);other['configuration_sha256']='config2';other['components']['Blend']['pick']='LV'
+        groups, recent, excluded = prediction_performance([record,late,other], [game])
+        self.assertEqual(excluded, 1)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(groups[0]['ats']['rate'], 100)
+        self.assertEqual(groups[1]['ats']['rate'], 0)
+        game['away_score'] = ''
+        groups, recent, excluded = prediction_performance([record], [game])
+        self.assertIsNone(groups[0]['ats']['rate'])
+        self.assertEqual(groups[0]['ats']['Pending'], 1)
+        self.assertEqual(recent, [])
 
     def test_ppr_formula_and_missing_stat_exclusion(self):
         row = {'player_id':'test', 'team':'BUF', 'name':'Test player','position':'RB',

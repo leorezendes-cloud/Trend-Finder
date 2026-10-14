@@ -46,7 +46,8 @@
   <p class="section-intro">Predictions, team comparisons and player leaders. Select a matchup to explore its stats.</p>
   <nav class="scout-actions">
     <a href="{{ url_for('sunday_page') }}">← Upcoming Matchups</a>
-    <a href="{{ url_for('sunday_results_page') }}">Results Report</a>
+    <a href="{{ url_for('fans.prediction_results') }}">Prediction Results</a>
+    <a href="{{ url_for('sunday_results_page') }}">Matchup Results</a>
     <a href="{{ url_for('sunday_scout.sunday_scout_page', download=1) }}">⬇️ Save The Plug's Snapshot</a>
   </nav>
 

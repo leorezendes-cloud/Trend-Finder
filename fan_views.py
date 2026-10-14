@@ -148,3 +148,62 @@ def fantasy():
                       'points': points, 'games': len(complete), 'per_game': points / len(complete)})
     cards.sort(key=lambda c: (-c['points'], c['name'], c['id']))
     return render_template('fantasy.html', view=v, cards=cards[:100], position=position)
+
+
+def data_freshness():
+    pointers = list((ROOT / 'data/scout4').glob('*/latest.json'))
+    pointers = [p for p in pointers if p.parent.name.isdigit()]
+    latest = max(pointers, key=lambda p: int(p.parent.name), default=None)
+    manifest = json.loads(latest.read_text()) if latest else {}
+    stamps = []
+    for path in (ROOT / 'data/scout4/blend/predictions').glob('*.json'):
+        record = json.loads(path.read_text())
+        if record.get('sealed_at_utc'):
+            stamps.append(record['sealed_at_utc'])
+    return {'stats': manifest.get('retrieved_at'), 'predictions': max(stamps, default=None)}
+
+
+def prediction_performance(records, schedule):
+    """Evaluate only verifiably saved pre-kickoff picks, separated by model version."""
+    from scout4.blend import grade_components
+    from scout4.blend_results import total_result
+    groups = {}
+    games = {g['game_id']:g for g in schedule}
+    excluded = 0
+    recent = []
+    for record in records:
+        try:
+            kickoff = datetime.fromisoformat(record['kickoff_utc'])
+            stamps = [datetime.fromisoformat(record[k]) for k in ('sealed_at_utc','decision_cutoff_utc')]
+            stamps.append(datetime.fromisoformat(record['quote']['captured_at_utc']))
+            if kickoff.tzinfo is None or any(stamp.tzinfo is None or stamp >= kickoff for stamp in stamps):
+                raise ValueError('Not a verified pregame pick')
+            game = games.get(record['game_id'])
+            ats = grade_components(record, game)['Blend']
+            total = total_result(record, game)
+        except (KeyError, TypeError, ValueError):
+            excluded += 1
+            continue
+        key = (record.get('version','Unknown version'), record.get('configuration_sha256','Unknown configuration'))
+        group = groups.setdefault(key, {'version':key[0], 'configuration':key[1], 'ats':{}, 'totals':{}})
+        for name, result in (('ats',ats), ('totals',total)):
+            group[name][result] = group[name].get(result,0) + 1
+        recent.append({'id':record['game_id'], 'away':record['away_team'], 'home':record['home_team'],
+                       'date':record['kickoff_utc'], 'saved':record['sealed_at_utc'],
+                       'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total})
+    for group in groups.values():
+        for name in ('ats','totals'):
+            counts = group[name]
+            decisions = counts.get('Win',0) + counts.get('Loss',0)
+            counts['decisions'] = decisions
+            counts['rate'] = 100 * counts.get('Win',0) / decisions if decisions else None
+    graded = [r for r in recent if r['ats'] != 'Pending' or r['total'] not in ('Pending','Unavailable')]
+    return list(groups.values()), sorted(graded,key=lambda r:r['date'],reverse=True)[:10], excluded
+
+
+@bp.get('/predictions/results')
+def prediction_results():
+    records = [json.loads(p.read_text()) for p in (ROOT / 'data/scout4/blend/predictions').glob('*.json')]
+    groups, recent, excluded = prediction_performance(records, read_csv(ROOT / 'nfl_games.csv'))
+    return render_template('prediction_results.html', groups=groups, recent=recent,
+                           excluded=excluded, freshness=data_freshness())

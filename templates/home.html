@@ -50,6 +50,7 @@
             <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
             <a href="{{ url_for('fans.fantasy') }}">Fantasy · PPR</a>
         </nav>
+        <p class="data-freshness">Team/player stats retrieved: {{ freshness.stats|eastern_time if freshness.stats else 'Not available' }}.<br>Latest prediction saved: {{ freshness.predictions|eastern_time if freshness.predictions else 'None yet' }}.<br>Stats and predictions are saved snapshots; scores update separately. <a href="{{ url_for('fans.prediction_results') }}">Prediction results →</a></p>
         <section id="home-scores" data-url="{{ url_for('fans.scores') }}" aria-labelledby="scores-title">
             <h2 id="scores-title">NFL Scores &amp; Matchups</h2>
             <p class="score-update" role="status">Loading score updates…</p>
