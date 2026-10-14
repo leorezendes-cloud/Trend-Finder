@@ -60,8 +60,8 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertIn('66.7% covers across 30 decisions',sections['trends'])
 
     def test_eastern_week_period_boundary(self):
-        self.assertEqual(period_key('weekly',datetime(2030,10,14,1,tzinfo=timezone.utc)),'2030-W41')
-        self.assertEqual(period_key('weekly',datetime(2030,10,14,5,tzinfo=timezone.utc)),'2030-W42')
+        self.assertEqual(period_key('weekly',datetime(2030,10,16,11,59,tzinfo=timezone.utc)),'2030-W41')
+        self.assertEqual(period_key('weekly',datetime(2030,10,16,12,tzinfo=timezone.utc)),'2030-W42')
 
 
 class DraftWorkflowTests(unittest.TestCase):

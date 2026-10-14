@@ -33,11 +33,19 @@ class FanViewsTests(unittest.TestCase):
                 self.assertIsNotNone(client.get('/scores.json').json['updated'])
 
     def test_live_games_use_fifteen_second_cache_without_browser_cache(self):
-        with patch.dict(_score_cache, {'expires':9999999,'games':[{'state':'in','date':'2026-10-18T20:00Z','away':'BUF','home':'LV','away_score':'7','home_score':'3','status':'Q1'}], 'updated':'2026-10-18T20:05:00Z'}, clear=True):
-            with patch('fan_views.time.monotonic',return_value=0):
+        with patch.dict(_score_cache, {'expires':9999999,'games':[{'state':'in','date':'2026-10-18T20:00Z','away':'BUF','home':'LV','away_score':'7','home_score':'3','status':'Q1'}], 'updated':'2026-10-18T20:05:00Z','week':(2026,6)}, clear=True):
+            with patch('fan_views.time.monotonic',return_value=0), patch('site_week.active_week',return_value=(2026,6)):
                 response=app.test_client().get('/scores.json')
                 self.assertEqual(response.json['refresh_seconds'],15)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')
+
+    def test_week_switch_discards_previous_scoreboard_cache(self):
+        response=MagicMock()
+        response.__enter__.return_value.read.return_value=json.dumps({'events':[]}).encode()
+        with patch.dict(_score_cache,{'expires':9999999,'games':[{'state':'in'}],'updated':'old','week':(2026,5)},clear=True), patch('site_week.active_week',return_value=(2026,6)), patch('fan_views.urlopen',return_value=response) as provider:
+            result=app.test_client().get('/scores.json')
+            self.assertEqual(result.json['games'],[])
+            self.assertIn('week=6',provider.call_args.args[0].full_url)
 
     def test_matchup_stats_stop_before_game_week_and_link_to_players(self):
         response = app.test_client().get('/matchup/2026_06_BUF_LV')

@@ -56,11 +56,15 @@
     <p><strong>One blended ATS pick per game, plus Scout's over/under pick.</strong> Experimental forecasts, saved before kickoff. Picks use their original saved lines, which may differ from newer lines on the score cards.</p>
     <details><summary>About these picks</summary><p>ATS uses 50% Scout 4.0 scoring margin + 50% The Plug points-only margin. These are not calibrated cover probabilities. No injury/weather adjustment is applied.</p><p>Component forecasts are saved separately locally against the same quoted line. Totals use Scout's separate model. Existing standalone ATS probability forecasts remain a separate experiment.</p><p>First eligible forecast stays locked; source times and original lines are preserved for grading.</p></details>
   </section>
+  {% if daily.pending %}<p>Some daily forecasts are pending fresh quotes or verified statistics.</p>{% endif %}
+  {% if daily.generated_at %}<p>Daily forecast review: {{ daily.generated_at|eastern_time }}. Original picks remain unchanged for grading.</p>{% endif %}
   <div class="scout-grid">
   {% for r in blends %}{% set b=r.components['Blend'] %}
     <article class="scout-card">
       <div class="scout-muted">{{ r.kickoff_utc|eastern_time }}</div><h2><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></h2>
-      <div class="scout-section-label">Scout 4.0 + The Plug · blended ATS pick</div>
+      {% set revision=daily.records.get(r.game_id) if daily else none %}
+      {% if revision %}{% set latest=revision.components['Blend'] %}<div class="scout-proj"><h3>Latest daily forecast{% if r.game_id in daily.changes %} · Changed{% endif %}</h3><p>{{ latest.pick or 'No ATS lean' }}{% if latest.pick %} {{ '%+g'|format(revision.quote.line if latest.pick==revision.away_team else -revision.quote.line) }}{% endif %} · Away scoring margin {{ '%+.1f'|format(latest.away_margin) }}</p>{% if revision.totals %}<p>{{ revision.totals.prediction.lean }} {{ revision.totals.quote.line }} · Estimated total {{ '%.1f'|format(revision.totals.prediction.total) }}</p>{% endif %}{% if r.game_id in daily.changes %}{% set old=daily.changes[r.game_id].previous %}<p>Changed {{ daily.changes[r.game_id].observed_at|eastern_time }}. Previously: {{ old.components['Blend'].pick or 'No ATS lean' }} against away spread {{ '%+g'|format(old.quote.line) }}{% if old.totals %}; {{ old.totals.prediction.lean }} {{ old.totals.quote.line }}{% endif %}.</p>{% endif %}<p>Saved {{ revision.sealed_at_utc|eastern_time }}</p></div>{% endif %}
+      <div class="scout-section-label">Original locked pick · used for grading</div>
       <div class="scout-proj"><p><strong>{{ b.pick or 'No pick · exact tie' }}</strong>{% if b.pick %} {{ '%+g'|format(r.quote.line if b.pick==r.away_team else -r.quote.line) }}{% endif %}</p><p>Projected winner: {% if b.away_margin>0 %}{{ r.away_team }}{% elif b.away_margin<0 %}{{ r.home_team }}{% else %}Even{% endif %}{% if b.away_margin!=0 %} by {{ '%.1f'|format(b.away_margin|abs) }} points{% endif %}. · Spread edge: {{ '%.1f'|format(b.ats_edge|abs) }} points.</p><p>Result: {{ r.results['Blend'] }}</p></div>
       {% if r.totals %}<div class="scout-divider"></div><div class="scout-section-label">Scout over / under pick</div><p><strong>{{ r.totals.prediction.lean }} {{ r.totals.quote.line }}</strong> · Estimated total: {{ '%.1f'|format(r.totals.prediction.total) }} points.</p>{% else %}<p>Totals pending: no eligible quote or estimate at capture.</p>{% endif %}
       <p class="scout-muted">{{ r.quote.sportsbook }} · Quote observed: {{ r.quote.captured_at_utc|eastern_time }}<br>Forecast sealed: {{ r.sealed_at_utc|eastern_time }}</p>
@@ -68,6 +72,7 @@
   {% else %}<article class="scout-card"><p>No blended picks are available yet.</p></article>{% endfor %}
   </div>
 {% endif %}
+  <details class="scout-intro"><summary>Archived locked forecasts ({{ archived_blends|length }})</summary>{% for old in archived_blends %}<p>{{ old.away_team }} at {{ old.home_team }} · {{ old.kickoff_utc|eastern_time }} · {{ old.components['Blend'].pick or 'No ATS lean' }} · {{ old.results['Blend'] }}</p>{% endfor %}</details>
   <details class="scout-intro"><summary>Previous saved matchups · original points-only view</summary>
   <p>The original scoring baseline ignores opponent quality, injuries, weather, QB changes and home-field effects. It is <em>not</em> a calibrated cover probability or recommendation. Historical rankings remain descriptive evidence.</p>
   <div class="scout-grid">

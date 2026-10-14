@@ -426,10 +426,10 @@ def save_watchlist():
         title = code
     elif kind == 'trend':
         parts = urlsplit(target)
-        if parts.scheme or parts.netloc or parts.fragment or parts.path not in ('/combination-details','/trend-games','/trend-details') or len(target)>4000 or not 1<=len(title)<=200:
+        if parts.scheme or parts.netloc or parts.fragment or parts.path not in ('/combination-details','/trend-games','/trend-details','/trend-finder') or len(target)>4000 or not 1<=len(title)<=200:
             abort(400)
         try:
-            target = parts.path + '?' + urlencode(sorted(parse_qsl(parts.query, max_num_fields=30)))
+            target = parts.path + '?' + urlencode(sorted(parse_qsl(parts.query, max_num_fields=100)))
         except ValueError:
             abort(400)
     else:

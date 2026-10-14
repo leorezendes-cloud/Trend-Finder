@@ -19,6 +19,9 @@ def build_results(root,week=None):
  completed=[int(g['week']) for g in rows if int(g['season'])==season and g['game_type']=='REG' and g.get('away_score') not in ('',None)]
  frozen={k:r for k,r in all_frozen.items() if r.get('season')==season and k in present}
  latest=max(completed+[r['week'] for r in frozen.values()],default=min(weeks))
+ from site_week import active_week
+ current=active_week(rows)
+ if current and current[0]==season:latest=current[1]
  try:selected=int(week) if week else latest
  except (ValueError,TypeError):selected=latest
  if selected not in weeks:selected=latest

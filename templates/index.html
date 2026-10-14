@@ -1,3 +1,4 @@
+{% from '_save_watchlist.html' import save_item with context %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -227,7 +228,7 @@
     {% endif %}
     {% if summary is not none and combinations is none %}
     <section class="results">
-        <h2>Results</h2>
+        <h2>Results</h2>{{ save_item('trend',manual_search_url,'Manual Trend Finder search') }}
         {% if combination_conditions %}<p class="active-filters">Filters used: {{ combination_conditions|display_trend_filters }}</p>{% endif %}
         {% if filter_chips %}<div class="active-filter-chips">{% for chip in filter_chips %}<button type="button" class="filter-chip" data-remove-fields='{{ chip.fields|tojson }}' aria-label="Remove {{ chip.label }}">{{ chip.label }} <span aria-hidden="true">×</span></button>{% endfor %}</div>{% else %}<p class="active-filters">All Games</p>{% endif %}
         {% if results_freshness %}<p class="active-filters" style="font-size:14px;">Results recorded through {{ results_freshness.season }} Week {{ results_freshness.week }} • {{ results_freshness.date }}</p>{% if results_freshness.missing_refs or results_freshness.missing_spreads or results_freshness.missing_totals %}<p class="active-filters" style="font-size:13px;">Missing season data: {{ results_freshness.missing_refs }} referee names • {{ results_freshness.missing_spreads }} spreads • {{ results_freshness.missing_totals }} betting totals</p>{% endif %}{% endif %}

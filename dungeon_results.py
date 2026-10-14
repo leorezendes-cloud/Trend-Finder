@@ -15,9 +15,9 @@ def weekly_window(now=None):
     now = now or datetime.now(ZoneInfo('America/New_York'))
     if now.tzinfo is None: raise ValueError('Timezone-aware time required')
     now = now.astimezone(ZoneInfo('America/New_York'))
-    start = now.date() - timedelta(days=(now.weekday()-3)%7)
-    if now.weekday()==2 and now.hour>=12: start += timedelta(days=7)
-    return start, start+timedelta(days=7)
+    from site_week import week_window
+    start,end=week_window(now)
+    return start.date(),end.date()
 
 
 def primetime_records(games, only_primetime=True):

@@ -26,7 +26,9 @@ def timestamp(value):
 def period_key(frequency, now):
     local=now.astimezone(ZoneInfo('America/New_York'))
     if frequency=='monthly':return local.strftime('%Y-%m')
-    year,week,_=local.isocalendar()
+    from site_week import week_window
+    start,_=week_window(now)
+    year,week,_=start.isocalendar()
     return f'{year}-W{week:02d}'
 
 
@@ -37,12 +39,16 @@ def build_draft(root, now):
     schedule=root/'nfl_games.csv'
     rows=list(csv.DictReader(read(schedule).splitlines())) if schedule.exists() else []
     if not rows:warnings.append('No saved schedule is available.')
+    from site_week import active_week
+    current=active_week(rows,now)
+    has_week=any(row.get('season') and row.get('week') for row in rows)
     future={}
     for row in rows:
         if row.get('away_score') or row.get('home_score'):continue
         try:
             kickoff=datetime.fromisoformat(row['gameday']+'T'+row['gametime']).replace(tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
         except (KeyError,ValueError):continue
+        if has_week and (int(row.get('season',0)),int(row.get('week',0)))!=current:continue
         if not all(row.get(key) for key in ('game_id','away_team','home_team')):continue
         if now<kickoff<=now+timedelta(days=7):future[row['game_id']]=(row,kickoff)
     predictions=[];published_lines={}

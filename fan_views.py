@@ -40,10 +40,15 @@ def parse_scores(payload):
 @bp.get('/scores.json')
 def scores():
     # Separate from homepage rendering: a slow feed never delays the main menu.
+    from site_week import active_week
+    current=active_week(read_csv(ROOT/'nfl_games.csv'))
     with _score_lock:
+        if _score_cache.get('week')!=current:
+            _score_cache.update(expires=0,games=[],updated=None,week=current)
         if time.monotonic() >= _score_cache['expires']:
             try:
-                req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
+                query=f'?dates={current[0]}&seasontype=2&week={current[1]}' if current else ''
+                req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'+query,
                               headers={'User-Agent': 'TrendFindah/1.0'})
                 with urlopen(req, timeout=5) as response:
                     payload = json.loads(response.read(2_000_000))

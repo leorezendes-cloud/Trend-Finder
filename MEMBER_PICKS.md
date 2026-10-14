@@ -39,3 +39,7 @@ python -m unittest test_member_picks test_membership test_newsletter test_hostin
 ```
 
 Tests use temporary schedules and member databases. They cover private drafts, common immutable lines, per-member choices, invalid selections, CSRF/access control, kickoff boundaries, idempotent final grading, pushes/ties, pending scores, postponements, voids and rebuilding draft weeks without modifying source data.
+
+## Site week and shortcuts
+
+See [WEEKLY_POLICY.md](WEEKLY_POLICY.md). The default sheet and submission window switch Wednesday at 8 a.m. Eastern. Publishing a future sheet does not open it early. Members can reach picks from the homepage, Upcoming Matchups, market and team comparison pages; game-specific links narrow the current sheet.

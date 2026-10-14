@@ -105,6 +105,16 @@ class MembershipTests(unittest.TestCase):
         self.assertIn('Signed up in the last 7 days: 1', result.output)
         self.assertNotIn('person@example.com', result.output)
 
+    def test_manual_search_can_be_saved_and_reopened(self):
+        self.register()
+        target='/trend-finder?run=analyze&season=2026&location=Away'
+        response=self.client.post('/members/watchlist/save',data={'kind':'trend','target':target,'title':'My manual search','csrf_token':self.token('/members/preferences')})
+        self.assertEqual(response.status_code,302)
+        html=self.client.get('/members/preferences').text
+        self.assertIn('/trend-finder?',html)
+        self.assertIn('run=analyze',html)
+        self.assertIn('My manual search',html)
+
     def test_watchlist_deduplication_csrf_and_member_isolation(self):
         self.register()
         path='/members/watchlist/save'

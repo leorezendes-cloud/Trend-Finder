@@ -224,7 +224,11 @@ def export_csv(cards):
 def sunday_scout_page():
     from flask import request
     from scout4.blend import view as blend_view
-    blends=blend_view()
+    all_blends=blend_view()
+    from site_week import active_week
+    current=active_week(read_csv(HISTORY))
+    blends=[r for r in all_blends if (r.get('season'),r.get('week'))==current]
+    archived_blends=[r for r in all_blends if r not in blends]
 
     try:
         cards = scout_report()
@@ -249,6 +253,8 @@ def sunday_scout_page():
             content_type="text/csv; charset=utf-8",
             headers={"Content-Disposition": "attachment; filename=the_plug_forecasts.csv"},
         )
-    return render_template("sunday_scout.html", cards=cards, blends=blends)
+    from daily_forecasts import daily_view
+    daily=daily_view(PROJECT)
+    return render_template("sunday_scout.html", cards=cards, blends=blends, daily=daily,archived_blends=archived_blends)
 
 

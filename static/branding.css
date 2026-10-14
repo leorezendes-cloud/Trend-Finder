@@ -29,3 +29,7 @@ html body .stats-note :is(h2, h3, p) { color: #172234; -webkit-text-stroke: 0; }
 html body.scout4 main, html body.scout4 h2, html body.scout4 footer p,
 html body.scout4 .stats-note, html body.scout4 .stats-note :is(h2,h3,p) { color: #f1f5f9; -webkit-text-stroke: 0; }
 html body.scout4 main a:not(.site-brand):not(.site-profile), .scout-page .scout-card h2 a { color: #fbbf24; -webkit-text-stroke: 0; }
+
+html body .member-pick-link, html body .archive-link, html body .archive-link:visited { color: #fbbf24; -webkit-text-stroke: 0; }
+
+.site-week-label { text-align: center; color: #fbbf24; font: 14px Arial,sans-serif; margin: 8px 0 20px; }

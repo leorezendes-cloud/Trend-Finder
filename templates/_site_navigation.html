@@ -35,7 +35,7 @@
 </nav>
 {% elif plug_section %}
 <nav class="section-navigation" aria-label="The Plug navigation">
-    <a href="{{ url_for('plug_page') }}">Matchup Analysis</a>
+    <a href="{{ url_for('plug_page') }}">Matchup Analysis</a><a href="{{ url_for('market_page') }}">Spreads &amp; Totals</a>
     <a href="{{ url_for('scout4.teams_page') }}">Team Stats</a>
     <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
     <a href="{{ url_for('scout4.ratings_page') }}">Team Ratings</a>
@@ -53,3 +53,5 @@
 </details>
 </div>
 </div>
+
+{% if current_site_week %}<p class="site-week-label">{{ current_site_week[0] }} · NFL Week {{ current_site_week[1] }} · Changes Wednesday, 8 a.m. ET</p>{% endif %}

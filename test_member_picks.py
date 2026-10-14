@@ -13,7 +13,7 @@ class MemberPicksTests(unittest.TestCase):
 
     def setUp(self):
         test_newsletter.NewsletterTests.setUp(self)
-        self.now=datetime(2030,10,15,12,tzinfo=timezone.utc)
+        self.now=datetime(2030,10,16,12,tzinfo=timezone.utc)
         clock_patch=patch('member_picks.now_utc',return_value=self.now);self.clock=clock_patch.start();self.addCleanup(clock_patch.stop)
         self.root=Path(self.temp.name);self.app.config['PICKS_SOURCE_ROOT']=str(self.root)
         self.rows=[dict(game_id='2030_06_A_B',season='2030',week='6',game_type='REG',gameday='2030-10-17',gametime='20:15',away_team='A',home_team='B',away_score='',home_score='',result='',spread_line='3',total_line='40')]

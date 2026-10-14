@@ -116,7 +116,10 @@ def my_picks():
     if g.member is None:return redirect(url_for('membership.login'))
     sync_results()
     weeks=db().execute('SELECT * FROM pick_weeks WHERE published_at IS NOT NULL ORDER BY season DESC,week DESC').fetchall()
-    selected=request.args.get('week_id',type=int) or (weeks[0]['id'] if weeks else None)
+    from site_week import active_week
+    current=active_week(list(schedule().values()),now_utc())
+    default=next((week['id'] for week in weeks if (week['season'],week['week'])==current),None)
+    selected=request.args.get('week_id',type=int) or default
     games=db().execute('''SELECT g.*,p.su,p.ats,p.ou,p.su_result,p.ats_result,p.ou_result
         FROM pick_games g JOIN pick_weeks w ON w.id=g.week_id
         LEFT JOIN member_picks p ON p.game_id=g.id AND p.member_id=?
@@ -125,7 +128,12 @@ def my_picks():
     for market in ('su','ats','ou'):
         results=db().execute(f'SELECT {market}_result result,COUNT(*) n FROM member_picks WHERE member_id=? AND {market} IS NOT NULL GROUP BY {market}_result',(g.member['id'],)).fetchall()
         records[market]={row['result']:row['n'] for row in results}
-    return render_template('member_picks.html',weeks=weeks,selected=selected,games=games,records=records)
+    team=request.args.get('team','');opponent=request.args.get('opponent','');target=request.args.get('game_id','')
+    if target:games=[game for game in games if game['game_id']==target]
+    elif team:games=[game for game in games if team in (game['away'],game['home']) and (not opponent or opponent in (game['away'],game['home']))]
+    active_selected=next((week for week in weeks if week['id']==selected),None)
+    week_open=bool(active_selected and (active_selected['season'],active_selected['week'])==current)
+    return render_template('member_picks.html',weeks=weeks,selected=selected,games=games,records=records,current=current,week_open=week_open)
 
 
 @bp.post('/games/<int:game_id>')
@@ -133,8 +141,10 @@ def save_pick(game_id):
     if g.member is None:return redirect(url_for('membership.login'))
     sync_results();connection=db();connection.execute('BEGIN IMMEDIATE')
     try:
-        game=connection.execute('SELECT g.*,w.published_at FROM pick_games g JOIN pick_weeks w ON w.id=g.week_id WHERE g.id=?',(game_id,)).fetchone()
+        game=connection.execute('SELECT g.*,w.published_at,w.season,w.week FROM pick_games g JOIN pick_weeks w ON w.id=g.week_id WHERE g.id=?',(game_id,)).fetchone()
         if game is None or not game['published_at']:abort(404)
+        from site_week import active_week
+        if active_week(list(schedule().values()),now_utc())!=(game['season'],game['week']):abort(409,description='This week is not open for picks. Weeks change Wednesday at 8 a.m. Eastern.')
         if game['locked'] or game['void_reason'] or now_utc()>=datetime.fromisoformat(game['lock_at']):abort(409,description='Picks are locked for this game.')
         su=request.form.get('su','');ats=request.form.get('ats','');ou=request.form.get('ou','')
         if su not in ('',game['away'],game['home']) or ats not in ('',game['away'],game['home']) or ou not in ('','Over','Under'):abort(400)

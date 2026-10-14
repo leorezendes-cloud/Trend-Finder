@@ -32,7 +32,10 @@ def view_data():
     cache_years = sorted(int(p.parent.name) for p in (ROOT/'data'/'scout4').glob('*/latest.json'))
     try:
         season = int(request.args.get('season', max(cache_years) if cache_years else max(years)))
-        before_week = int(request.args.get('before_week', 19))
+        from site_week import active_week
+        current=active_week(schedule)
+        default=min(current[1]+1,19) if current and season==current[0] else 19
+        before_week = int(request.args.get('before_week', default))
     except ValueError:
         abort(400, description='Season and week must be numbers.')
     if season not in years or not 1 <= before_week <= 19:

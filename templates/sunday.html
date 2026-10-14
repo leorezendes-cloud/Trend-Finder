@@ -20,9 +20,9 @@
         
         {% include '_site_navigation.html' %}
         {% include '_home_sections.html' %}
-        <h2 class="home-matchups-title">Upcoming Matchups</h2>
+        <h2 class="home-matchups-title">Upcoming Matchups</h2><p><a class="member-pick-link" href="{{ url_for('member_picks.my_picks') }}">Make your member picks →</a> · <a class="member-pick-link" href="{{ url_for('market_page') }}">Upcoming spreads &amp; totals →</a></p>
         
-        <p>{% if archive %}<strong>Archived October 11, 2026 snapshot.</strong> <a href="{{ url_for('sunday_page',window=selected_window) }}">View current matchups</a>{% else %}<strong>Scheduled games in the next seven days.</strong> Historical trends use saved lines, not live odds. <a href="{{ url_for('sunday_page',window=selected_window,view='archive') }}">View October 11 archive</a>{% endif %}</p>
+        <p>{% if archive %}<strong>Archived October 11, 2026 snapshot.</strong> <a href="{{ url_for('sunday_page',window=selected_window) }}">View current matchups</a>{% else %}<strong>Scheduled games in the next seven days.</strong> Historical trends use saved lines, not live odds. <a class="archive-link" href="{{ url_for('sunday_page',window=selected_window,view='archive') }}">View October 11 archive</a>{% endif %}</p>
         {% if pending %}<p>{{ pending|length }} scheduled games have no eligible underdog trend line yet.</p>{% endif %}
         <section class="sunday-window-selector">
             <a class="snapshot-link" href="{{ url_for('sunday_page', window=selected_window,download=1,view="archive" if archive else "current") }}">
@@ -176,7 +176,7 @@
                     
                     {% if not archive %}<p>{{ game.gameday }} · {{ game.gametime_et }} ET{% if game.neutral %} · Neutral venue{% endif %}</p>
                     <details class="saved-line-details"><summary>Saved line details{% if game.line_stale %} · over 24 hours old{% endif %}</summary><p>{{ game.line_source }}{% if game.line_time %} · Captured {{ game.line_time|eastern_time }}{% endif %}. Historical trends use this saved line, not live odds.</p></details>{% endif %}
-                    {% if game.game_id %}<p><a class="matchup-comparison-link" href="{{ url_for('fans.matchup',game_id=game.game_id) }}">Compare teams, player leaders &amp; prediction →</a></p>{% endif %}
+                    {% if game.game_id %}<p><a class="member-pick-link" href="{{ url_for('member_picks.my_picks',game_id=game.game_id) }}">Pick this game →</a></p><p><a class="matchup-comparison-link" href="{{ url_for('fans.matchup',game_id=game.game_id) }}">Compare teams, player leaders &amp; prediction →</a></p>{% endif %}
                     <h4>Exploratory Matching Ranges</h4>
 
                     {% if game.top_trends %}

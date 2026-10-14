@@ -91,6 +91,7 @@ def plug_page():
 @app.route("/trend-finder", methods=["GET", "POST"])
 def trend_finder():
 
+    form_data=request.form if request.method=='POST' else request.args
     filter_options = get_csv_filter_options()
     csv_filters = {}
     current_qbs = get_current_qb_options()
@@ -117,21 +118,21 @@ def trend_finder():
 
    
 
-    if request.method == 'POST':
+    if request.method == 'POST' or request.args.get('run')=='analyze':
         try:
-            combination_conditions = json.loads(request.form.get('combination_conditions', '[]'))
+            combination_conditions = json.loads(form_data.get('combination_conditions', '[]'))
             if not isinstance(combination_conditions, list) or len(combination_conditions) > 3 or any(not isinstance(label, str) or ': ' not in label or len(label) > 200 for label in combination_conditions):
                 raise ValueError
         except (ValueError, TypeError):
             abort(400, description='Invalid combination conditions.')
         for field in CSV_FILTER_FIELDS:
-            value = request.form.get(field, '').strip()
+            value = form_data.get(field, '').strip()
             if value:
                 csv_filters[field] = value
                 if value not in filter_options[field]:
                     error = f'Choose a CSV value for {field.replace("_", " ")}. '
-        dog_qb_name = request.form.get('dog_qb_name', '').strip()
-        historical_dog_qb_name = request.form.get('historical_dog_qb_name', '').strip()
+        dog_qb_name = form_data.get('dog_qb_name', '').strip()
+        historical_dog_qb_name = form_data.get('historical_dog_qb_name', '').strip()
         if dog_qb_name and dog_qb_name not in current_qbs:
             error = 'Choose a current-season underdog QB from the dropdown.'
         if historical_dog_qb_name and historical_dog_qb_name not in filter_options['dog_qb_name']:
@@ -140,19 +141,19 @@ def trend_finder():
             error = 'Choose one underdog QB: use either the current or historical dropdown.'
         if dog_qb_name or historical_dog_qb_name:
             csv_filters['dog_qb_name'] = historical_dog_qb_name or dog_qb_name
-        season = request.form.get('season', '')
-        season_mode = request.form.get('season_mode', 'single')
-        single_season_input = request.form.get('season', '')
-        start_season_input = request.form.get('start_season', '')
-        end_season_input = request.form.get('end_season', '')
+        season = form_data.get('season', '')
+        season_mode = form_data.get('season_mode', 'single')
+        single_season_input = form_data.get('season', '')
+        start_season_input = form_data.get('start_season', '')
+        end_season_input = form_data.get('end_season', '')
 
-        location = request.form.get('location', '')
-        primetime = request.form.get('primetime', '')
+        location = form_data.get('location', '')
+        primetime = form_data.get('primetime', '')
         
-        spread_mode = request.form.get("spread_mode", "none")
-        min_spread_input = request.form.get('min_spread', '')
-        max_spread_input = request.form.get('max_spread', '')
-        exact_spread_input = request.form.get('exact_spread', '')
+        spread_mode = form_data.get("spread_mode", "none")
+        min_spread_input = form_data.get('min_spread', '')
+        max_spread_input = form_data.get('max_spread', '')
+        exact_spread_input = form_data.get('exact_spread', '')
        
         
 
@@ -212,7 +213,7 @@ def trend_finder():
             location = None
         if error is None:
             stats = run_analysis(combination_conditions=combination_conditions, season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
-            if request.form.get("action") == "combinations":
+            if form_data.get("action") == "combinations":
                 combinations = scan_grouped_combinations(season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
                 combinations = [trend for trend in combinations if trend["ats_rate"] >= 55.0 and trend["sample"] >= combination_min_games(season)]
                 combination_count = combinations[0].get('retained_count', len(combinations)) if combinations else 0
@@ -345,6 +346,7 @@ def trend_finder():
     for key,value in csv_filters.items():filter_chips.append(dict(label=f"{'QB' if key=='qb_name' else 'Underdog QB' if key=='dog_qb_name' else key.replace('_',' ').title()}: {value}",fields=['dog_qb_name','historical_dog_qb_name'] if key=='dog_qb_name' else [key]))
     return render_template(
         "index.html",
+        manual_search_url=url_for('trend_finder',run='analyze',**{k:v for k,v in form_data.items() if v and k not in ('run','action','csrf_token')}),
         filter_chips=filter_chips,qb_summaries=qb_summaries(matchup_groups),results_freshness=results_freshness(),
         filter_options=filter_options,
         csv_filters=csv_filters,
@@ -974,6 +976,19 @@ def conspiracy_dungeon_page():
                       archive_week=archive_week, archive_stage=archive_stage,
                       anomaly_category=request.args.get("category", "world"), anomaly_year=anomaly_year)
     return render_template("conspiracy_dungeon.html", view=view)
+
+
+
+@app.get('/market')
+def market_page():
+    from market_views import market_games
+    return render_template('market.html',games=market_games(Path(__file__).resolve().parent))
+
+@app.context_processor
+def site_week_context():
+    from site_week import active_week
+    from market_views import read
+    return {'current_site_week':active_week(read(Path(__file__).resolve().parent/'nfl_games.csv'))}
 
 if __name__ == '__main__':
     app.run(port=5001)

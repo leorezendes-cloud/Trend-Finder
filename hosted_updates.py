@@ -92,6 +92,9 @@ def update_once(root):
             shutil.copy2(SOURCE/name, path)
         os.environ['TREND_FINDAH_AUTO_MODEL_CONFIG'] = str(SOURCE/'automatic_model.json')
         attempt('predictions', lambda: predictions(root))
+        if stages['predictions']=='ok':
+            from daily_forecasts import update_daily
+            attempt('daily forecast review',lambda:update_daily(root))
     else:
         stages['predictions'] = 'skipped: upstream update failed'
     def grade():
