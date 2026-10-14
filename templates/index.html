@@ -240,7 +240,7 @@
                 <span class="stat-value">{{ summary.dogs }}</span>
             </div>
             <div class="stat">
-                <span class="stat-label">Staight Up Wins</span>
+                <span class="stat-label">Straight Up Wins</span>
                 <span class="stat-value">{{ summary.wins }}</span>
             </div>
             <div class="stat">
@@ -253,11 +253,11 @@
             </div>
             <div class="stat">
                 <span class="stat-label">Straight Up Win Rate</span>
-                <span class="stat-value">{{ "%.2f"|format(summary.win_rate) }}%</span>
+                <span class="stat-value">{{ "%.2f%%"|format(summary.win_rate) if summary.win_rate is not none else "N/A" }}</span>
             </div>
             <div class="stat">
                 <span class="stat-label">Dog Cover Rate</span>
-                <span class="stat-value">{{ "%.2f"|format(summary.ats_rate) }}%</span>
+                <span class="stat-value">{{ "%.2f%%"|format(summary.ats_rate) if summary.ats_rate is not none else "N/A" }}</span>
             </div>
             <div class="stat">
                 <span class="stat-label">Pick' Ems</span>
@@ -269,7 +269,7 @@
             </div>
             <div class="stat">
                 <span class="stat-label">ATS Edge</span>
-                <span class="stat-value">{{ "%+.2f"|format(summary.ats_edge) }}%</span>
+                <span class="stat-value">{{ "%+.2f%%"|format(summary.ats_edge) if summary.ats_edge is not none else "N/A" }}</span>
             </div>
             <div class="stat">
                 <span class="stat-label">95% ATS Range</span>

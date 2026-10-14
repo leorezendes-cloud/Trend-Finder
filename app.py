@@ -240,9 +240,9 @@ def trend_finder():
                 + all_games['away']['pushes']
             )
 
-            win_rate = 0
-            ats_rate = 0
-            ats_edge = 0
+            win_rate = None
+            ats_rate = None
+            ats_edge = None
             breakeven_rate = 52.38
 
             if total_dogs > 0:
@@ -328,7 +328,7 @@ def trend_finder():
     elif start_season is not None and end_season is not None:filter_chips.append(dict(label=f'{start_season}–{end_season}',fields=['start_season','end_season']))
     if location:filter_chips.append(dict(label=f'{location} Dogs',fields=['location']))
     if is_primetime is not None:filter_chips.append(dict(label='Primetime' if is_primetime else 'Non-Primetime',fields=['primetime']))
-    if any(v is not None for v in (min_spread,max_spread,exact_spread)):filter_chips.append(dict(label='Spread filter',fields=['spread_mode','min_spread','max_spread','exact_spread']))
+    if any(v is not None for v in (min_spread,max_spread,exact_spread)):filter_chips.append(dict(label=(f'Exact spread: +{exact_spread:g}' if exact_spread is not None else f'Spread: {min_spread:g}–{max_spread:g}' if min_spread is not None and max_spread is not None else f'Spread: +{min_spread:g} or more' if min_spread is not None else f'Spread: up to +{max_spread:g}'),fields=['spread_mode','min_spread','max_spread','exact_spread']))
     for key,value in csv_filters.items():filter_chips.append(dict(label=f"{'QB' if key=='qb_name' else 'Underdog QB' if key=='dog_qb_name' else key.replace('_',' ').title()}: {value}",fields=['dog_qb_name','historical_dog_qb_name'] if key=='dog_qb_name' else [key]))
     return render_template(
         "index.html",

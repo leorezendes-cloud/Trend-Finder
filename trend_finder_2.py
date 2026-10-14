@@ -1,4 +1,5 @@
 from pregame_lines import effective_rows
+from name_aliases import canonical_name, FIELDS as NAME_FIELDS
 #!/usr/bin/env python3
 import math
 from copy import deepcopy
@@ -85,9 +86,11 @@ def matches_csv_filters(game, filters):
         if expected is None:
             continue
         if field == 'qb_name':
-            if expected not in (game.get('away_qb_name'),game.get('home_qb_name')):return False
+            if canonical_name(expected) not in (canonical_name(game.get('away_qb_name')),canonical_name(game.get('home_qb_name'))):return False
             continue
         actual = coast_filter_value(game, field) if field in ('home_coast','away_coast','dog_coast') else underdog_qb_name(game) if field == 'dog_qb_name' else game.get(field, '')
+        if field in NAME_FIELDS or field == 'dog_qb_name':
+            actual, expected = canonical_name(actual), canonical_name(expected)
         if actual == '':
             return False
         if field in NUMERIC_FILTER_FIELDS:
