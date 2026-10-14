@@ -15,8 +15,9 @@
     <a href="{{ url_for('plug_page') }}" {% if plug_section %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png') }}" alt=""><span>The Plug</span></a>
     <a href="{{ url_for('conspiracy_dungeon_page') }}" {% if request.endpoint == 'conspiracy_dungeon_page' %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png') }}" alt=""><span>Conspiracy Dungeon</span></a>
     <a href="{{ url_for('membership.feedback_page',page=request.path) }}">Beta Feedback</a>
-    {% if g.is_owner %}<a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a><a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>{% endif %}
+    {% if g.is_owner %}<a href="{{ url_for('member_picks.admin') }}">Manage Weekly Picks</a><a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a><a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>{% endif %}
     {% if g.member %}
+    <a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>
     <a href="{{ url_for('membership.preferences') }}" {% if request.blueprint == 'membership' %}aria-current="page"{% endif %}>My Profile</a>
     <form class="member-logout" method="post" action="{{ url_for('membership.logout') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button>

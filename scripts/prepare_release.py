@@ -53,7 +53,7 @@ def release_files():
         for path in ROOT.glob(pattern):
             add(path)
     for name in ('gunicorn.conf.py', 'requirements.txt', '.env.example',
-                 'HOSTING.md', 'MEMBERSHIP.md', 'NEWSLETTER.md', '.gitignore', 'render.yaml', 'automatic_model.json'):
+                 'HOSTING.md', 'MEMBERSHIP.md', 'NEWSLETTER.md', 'MEMBER_PICKS.md', '.gitignore', 'render.yaml', 'automatic_model.json'):
         add(ROOT / name)
     cache = ROOT / 'data/scout4'
     # Preserve all available saved statistics seasons and their pointed-to files.
@@ -78,7 +78,7 @@ def release_files():
         if paths:
             add(paths[-1])
     # Ship meaningful tests, but never account databases, secrets, logs or raw downloads.
-    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py'):
+    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py', 'test_member_picks.py'):
         add(ROOT / name)
     return sorted(selected)
 

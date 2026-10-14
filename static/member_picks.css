@@ -1,0 +1,14 @@
+.picks-page { max-width: 1100px; margin: auto; font: 16px/1.6 Arial,sans-serif; }
+.picks-page a { color: #fbbf24; }
+.picks-page h2 { font-size: 24px; }
+.picks-records { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 24px 0; }
+.picks-records section, .pick-game { background: #162235; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.picks-records strong { font-size: 32px; }
+.picks-page form { max-width: none; }
+.picks-page select, .picks-page input:not([type=hidden]) { box-sizing: border-box; width: 100%; padding: 10px; margin: 8px 0 18px; font: 16px Arial,sans-serif; color: #111827; background: white; -webkit-text-stroke: 0; }
+.picks-page fieldset { border: 1px solid #475569; border-radius: 8px; margin: 18px 0; }
+.pick-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.pick-options label { -webkit-text-stroke: 0; font: 700 16px Arial,sans-serif; }
+.picks-page button { margin-top: 12px; }
+.picks-page legend { color: #fbbf24; font-weight: bold; }
+@media(max-width:650px) { .picks-records,.pick-options { grid-template-columns: 1fr; } }
