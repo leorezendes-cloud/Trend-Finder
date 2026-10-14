@@ -816,8 +816,8 @@
     "sha256": "1edff0f8f42ceab38fd034eb0b7dfeb6a17ffd763134913d967532cd3f7cfae1"
   },
   "seo.py": {
-    "bytes": 7258,
-    "sha256": "1d9504f759334ec0b10bac291c0a375107eb796ef9b516969afa7a020c659bc8"
+    "bytes": 7276,
+    "sha256": "f9a41d53d3b26d412ad82d048b432c1a0c08594a2a85f614c667d2fbd8ae834a"
   },
   "site_views.py": {
     "bytes": 1962,
@@ -1136,8 +1136,8 @@
     "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
-    "bytes": 27945,
-    "sha256": "462ffb29f6d67b7c326594388ae40dca9153f7c353932c6b14b685b02dd45f96"
+    "bytes": 27939,
+    "sha256": "dc82e495bc27cda531894e1fd1a5d5cec3db43f47cdb82ee2b45d3c82f2dcf07"
   },
   "templates/market.html": {
     "bytes": 1259,

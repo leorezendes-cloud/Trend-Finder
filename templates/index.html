@@ -14,7 +14,7 @@
     <div class="section-logo-title"><img src="{{ url_for('static', filename='Images/Branding/trend-findah-nav.png') }}" alt="Trendfindah 3000" width="953" height="179"></div>
     {% include '_site_navigation.html' %}
 
-    <p class="section-intro">Trendfindah 3000 helps you discover NFL trends with historical ATS records and custom filters. <a href="{{ url_for('trends_page') }}">Discover Trends</a> highlights patterns and streaks.</p>
+    <p class="section-intro">Trendfindah 3000 is your NFL trend finder for historical ATS records and custom filters. <a href="{{ url_for('trends_page') }}">Discover Trends</a> highlights patterns and streaks.</p>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
         <h1 class="search-panel-title">Trendfindah 3000</h1>
         {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}

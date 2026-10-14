@@ -6,7 +6,7 @@ from flask import current_app,has_request_context,request,Response
 
 PAGES={
  'home':('/', 'Discover NFL Trends & Predictions | Gravy Train', 'Discover NFL trends with Trendfindah 3000, get The Plug’s locked predictions, and investigate betting patterns and conspiracy theories in the Conspiracy Dungeon.'),
- 'trend_finder':('/trend-finder','Trendfindah 3000 | Discover NFL Trends | Gravy Train','Discover NFL trends with Trendfindah 3000. Research historical ATS patterns by season, spread, team, coach, quarterback, and primetime, and save your searches.'),
+ 'trend_finder':('/trend-finder','Trendfindah 3000 | NFL Trend Finder | Gravy Train','Discover NFL trends with Trendfindah 3000, an NFL trend finder. Research historical ATS patterns by season, spread, team, coach, quarterback, and primetime, and save your searches.'),
  'trends_page':('/trends','Discover NFL Trends, ATS Patterns & Streaks | Gravy Train','Discover NFL trends and ATS streaks with Trendfindah 3000: compare historical records, sample sizes, recent performance, and upcoming matchups.'),
  'sunday_page':('/sunday','Upcoming NFL Matchups & Spreads | Gravy Train','Review this week’s NFL matchups, saved spreads, kickoff times, and historical underdog trends. Compare teams and make free member picks.'),
  'market_page':('/market','Upcoming NFL Spreads & Totals | Gravy Train','See the latest verified saved NFL spreads and over/under totals for upcoming games, with quote timestamps and links to team comparisons.'),
