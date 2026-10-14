@@ -27,6 +27,47 @@ class TrendEvidenceTests(unittest.TestCase):
                 self.assertEqual(group['evidence']['periods'][0]['sample'], len(games))
                 self.assertEqual(sum(row['sample'] for row in group['evidence']['seasons']), len(games))
 
+    def test_standard_analysis_verifies_grouped_conditions(self):
+        conditions = ['Stadium: Mercedes-Benz Stadium', 'Month: 10']
+        games = finder.find_matching_trend_games(conditions, season=(2020, 2026))
+        self.assertTrue(games)
+        record = finder.summarize_evidence_games(games)
+        stats = finder.run_analysis(combination_conditions=conditions, season=(2020, 2026))
+        verified = finder.evaluate_trend(stats)
+        for field in ('sample', 'ats_wins', 'ats_losses', 'ats_pushes', 'ats_rate'):
+            self.assertEqual(record[field], verified[field])
+        from home_results import matching_game_groups
+        listed = matching_game_groups(combination_conditions=conditions, season=(2020, 2026))
+        self.assertEqual({game['game_id'] for group in listed for game in group['games']},
+                         {game['game_id'] for game in games})
+        response = app.test_client().post('/trend-finder', data={
+            'combination_conditions': json.dumps(conditions), 'season_mode':'range',
+            'start_season':'2020', 'end_season':'2026', 'action':'analyze'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Verifying:', response.get_data(as_text=True))
+        self.assertIn('Mercedes-Benz Stadium', response.get_data(as_text=True))
+
+    def test_stadium_subsets_are_one_family_and_keep_exact_records(self):
+        anchor = ('Stadium', 'Example Stadium')
+        features = [('Home team', 'A'), ('Month', '10'), ('Underdog QB', 'Example QB')]
+        memberships = {anchor:frozenset(range(20))}
+        def evaluate(ids):
+            n = len(ids)
+            return dict(ats_rate=60.0, ats_wins=3*n//5, ats_losses=n-3*n//5,
+                        ats_pushes=0, sample=n, ci_low=40.0, coming_soon=False)
+        trends = []
+        for index, feature in enumerate(features):
+            ids = frozenset(range(index, index+10))
+            memberships[feature] = ids
+            trends.append(dict(evaluate(ids), _features=(anchor, feature), _ids=ids,
+                               filters=[f'{key}: {value}' for key,value in (anchor, feature)]))
+        groups = finder.group_related_combinations(trends, memberships, evaluate)
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0]['family_filters'], ['Stadium: Example Stadium'])
+        self.assertEqual(len(groups[0]['related']), 3)
+        for variant in groups[0]['related']:
+            self.assertEqual(variant['sample'], len(variant['_ids']))
+
     def test_matching_games_obey_manual_scope_and_season(self):
         games = finder.find_matching_trend_games(['Underdog QB: Josh Allen'],
                                                  season=(2023, 2026), location='Away', min_spread=1.5)

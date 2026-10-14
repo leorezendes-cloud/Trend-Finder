@@ -9,13 +9,13 @@
                 {% endif %}
                 {% if trend.related %}
                 <h3>How conditions compare with the baseline</h3>
-                <p>Showing up to 8 of {{ trend.related_count }} related subsets, including weaker results. Each row applies its listed conditions to the baseline: {{ trend.baseline.filters | display_trend_baseline }} | Underdog ATS: {{ '%.2f'|format(trend.baseline.ats_rate) }}%, under the same manual filters and seasons. Differences are percentage points relative to this baseline, not extra gains on top of the main card.</p>
+                <p>Showing {{ trend.related_count }} related subsets, including weaker results. Each row applies its listed conditions to the baseline: {{ trend.baseline.filters | display_trend_baseline }} | Underdog ATS: {{ '%.2f'|format(trend.baseline.ats_rate) }}%, under the same manual filters and seasons. Differences are percentage points relative to this baseline, not extra gains on top of the main card.</p>
                 {% for related in trend.related %}
                 <div class="combination-impact">
                     <strong>With {{ related.added_filters | display_trend_filters }}</strong>
                     {% if related.filters == trend.filters %}<span class="combination-scope">This is the trend shown on the main card.</span>{% endif %}
                     {% if related.coming_soon %}<span class="combination-soon">🏈 Coming up within 7 days</span>{% endif %}
-                    <p>Underdog ATS: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} percentage points vs. baseline | {{ related.sample }} games</p>
+                    <p>Underdog ATS: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} percentage points vs. baseline | {{ related.sample }} games{% if related.games_url %} | <a href="{{ related.games_url }}">Verify games →</a>{% endif %}</p>
                 </div>
                 {% endfor %}
                 {% endif %}

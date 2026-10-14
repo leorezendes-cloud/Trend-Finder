@@ -16,6 +16,7 @@
     <p class="section-intro">Build your own research with filters and combinations, or <a href="{{ url_for('trends_page') }}">Discover Trends</a> to explore current patterns and streaks.</p>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
         <h1 class="search-panel-title">Trend Findah 3000</h1>
+        {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}
         <div class="form-grid">
             <div class="filter-mode-row">
             <div class="field">
@@ -329,13 +330,13 @@
                 <span class="combination-header">
                 <span class="combination-filters">
                     {% if trend.coming_soon %}<span class="combination-soon">🏈 Coming up within 7 days</span>{% endif %}
-                    {{ trend.filters | display_trend_filters }}
+                    {{ (trend.family_filters or trend.filters) | display_trend_filters }}
                     {% if active_filters %}<span class="combination-scope">{{ active_filters | display_trend_filters }}</span>{% endif %}
                 </span>
                 <span class="combination-metrics">
                     <span class="combination-record-line">
-                        <span class="combination-record">Underdog ATS: {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }}</span>
-                        <span class="combination-win-rate">{{ '%.2f'|format(trend.ats_rate) }}% ATS</span>
+                        <span class="combination-record">{% if trend.family_filters and trend.family_filters != trend.filters %}Featured subset · {% endif %}Underdog ATS: {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }}</span>
+                        <span class="combination-win-rate">{% if trend.family_rate_low is defined and trend.family_rate_low != trend.family_rate_high %}{{ '%.2f'|format(trend.family_rate_low) }}–{{ '%.2f'|format(trend.family_rate_high) }}% ATS across filters{% else %}{{ '%.2f'|format(trend.ats_rate) }}% ATS{% endif %}</span>
                     </span>
                     <small class="combination-sample">{{ trend.sample }} underdogs · {{ trend.dog_no_push }} ATS decisions · {{ trend.sample - trend.dog_no_push }} pushes</small>
                 </span>
@@ -349,15 +350,17 @@
                 <p><strong>Upcoming matches</strong></p>
                 {% for game in trend.upcoming_games[:1] %}<p>{{ game.matchup }} | {{ game.kickoff }} | Underdog: {{ game.dog_team }}</p>{% endfor %}
                 {% endif %}
+                {% if trend.family_filters %}<p>Featured record: {{ trend.filters|display_trend_filters }} | {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }} | {{ '%.2f'|format(trend.ats_rate) }}% ATS. The range shows the baseline and compared subsets; it is not a prediction interval.</p>{% endif %}
                 <p class="combination-description">{{ trend.description }}</p>
                 {% if trend.related %}
                 <p><strong>Filter comparison preview</strong></p>
-                {% for related in trend.related[:2] %}
-                <p>With {{ related.added_filters | display_trend_filters }}: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} points vs. baseline{% if related.filters == trend.filters %} (this card){% endif %}</p>
+                {% for related in trend.related[:3] %}
+                <p>With {{ related.added_filters | display_trend_filters }}: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} points vs. baseline{% if related.filters == trend.filters %} (featured record){% endif %}{% if related.games_url %} | <a href="{{ related.games_url }}">Verify games →</a>{% endif %}</p>
                 {% endfor %}
                 {% endif %}
+                {% if trend.related|length > 3 %}<details><summary>All {{ trend.related_count }} filter comparisons</summary>{% for related in trend.related[3:] %}<p>{{ related.filters|display_trend_filters }} | {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}%{% if related.games_url %} | <a href="{{ related.games_url }}">Verify games →</a>{% endif %}</p>{% endfor %}</details>{% endif %}
                 {% if trend.overlapping_patterns %}<details><summary>{{ trend.overlapping_patterns|length }} similar patterns grouped here</summary><p>These patterns share at least 80% of the combined historical game sample with this card.</p>{% for similar in trend.overlapping_patterns %}<p>{{ similar.filters|display_trend_filters }} | ATS: {{ similar.ats_wins }}–{{ similar.ats_losses }}–{{ similar.ats_pushes }} | {{ '%.2f'|format(similar.ats_rate) }}% | {{ similar.sample }} games</p>{% endfor %}</details>{% endif %}
-                <p><a class="evidence-link" href="{{ trend.games_url }}" target="_blank" rel="noopener">Full trend details →</a></p>
+                <p><a class="evidence-link" href="{{ trend.games_url }}">Full trend details →</a></p>
 
             </div>
         </details>

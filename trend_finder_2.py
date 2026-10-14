@@ -403,9 +403,18 @@ def Check_Games(
                     
     return stats
 
+def matches_combination_conditions(game, conditions):
+    analysis = analyze_game(game)
+    return not analysis['is_pickem'] and set(conditions) <= {
+        f'{field}: {value}' for field, value in grouped_game_features(game, analysis)}
+
+
 def run_analysis(**filters):
+    conditions = filters.pop('combination_conditions', None)
     with open(game_file, 'r') as game_check:
         reader = effective_rows(csv.DictReader(game_check), game_file)
+        if conditions:
+            reader = [game for game in reader if all(game.get(field, '') != '' for field in ('home_score', 'away_score', 'result', 'spread_line')) and matches_combination_conditions(game, conditions)]
         return Check_Games(reader, **filters)
 
 def load_finished_games(season='2026', game_type='REG'):
@@ -1455,7 +1464,7 @@ def prioritize_upcoming_combinations(trends, contexts):
 def group_related_combinations(trends, memberships, evaluate, evaluated=None):
     """Group by a recurring identity and compare subsets with its full baseline."""
     groups = {}
-    priority = {'Underdog QB': 0, 'Home team': 1, 'Away team': 1, 'Dog location': 2}
+    priority = {'Stadium': 0, 'Underdog QB': 1, 'Home team': 2, 'Away team': 2, 'Dog location': 3}
     cache = {}
     for trend in trends:
         features = trend['_features']
@@ -1506,7 +1515,10 @@ def group_related_combinations(trends, memberships, evaluate, evaluated=None):
         displayed_samples[leader_ids] = leader
         leader['baseline'] = baseline
         variants.sort(key=lambda trend: (trend['coming_soon'], abs(trend['ats_difference']), trend['sample']), reverse=True)
-        leader['related'] = variants[:8]
+        leader['related'] = variants
+        leader['family_filters'] = baseline['filters']
+        rates = [baseline['ats_rate']] + [variant['ats_rate'] for variant in variants]
+        leader['family_rate_low'], leader['family_rate_high'] = min(rates), max(rates)
         leader['related_count'] = len(variants)
         leader['baseline_is_main'] = leader['filters'] == baseline['filters']
         result.append(leader)

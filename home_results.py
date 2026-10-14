@@ -3,9 +3,10 @@ from pregame_lines import effective_rows
 import csv
 from pathlib import Path
 from collections import defaultdict
-from trend_finder_2 import game_file, Check_Games, analyze_game
+from trend_finder_2 import game_file, Check_Games, analyze_game, matches_combination_conditions
 
 def matching_game_groups(**selection):
+    conditions = selection.pop("combination_conditions", None)
     grouped=defaultdict(list)
     selected_qbs={selection.get(key) for key in ('dog_qb_name','away_qb_name','home_qb_name','qb_name') if selection.get(key)}
     # Use the standard analyzer itself so this list includes exactly its games,
@@ -13,6 +14,7 @@ def matching_game_groups(**selection):
     with open(game_file,newline='') as f:
         for row in effective_rows(csv.DictReader(f),game_file):
             if Check_Games([row], **selection)['all_games']['games']==0: continue
+            if conditions and not matches_combination_conditions(row, conditions):continue
             analysis=analyze_game(row)
             qb_results=[]
             for side in ('away','home'):

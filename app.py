@@ -98,6 +98,7 @@ def trend_finder():
     historical_dog_qb_name = ''
     combinations = None
     combination_count = 0
+    combination_conditions = []
     summary = None
     matchup_groups = []
     error = None
@@ -117,6 +118,12 @@ def trend_finder():
    
 
     if request.method == 'POST':
+        try:
+            combination_conditions = json.loads(request.form.get('combination_conditions', '[]'))
+            if not isinstance(combination_conditions, list) or len(combination_conditions) > 3 or any(not isinstance(label, str) or ': ' not in label or len(label) > 200 for label in combination_conditions):
+                raise ValueError
+        except (ValueError, TypeError):
+            abort(400, description='Invalid combination conditions.')
         for field in CSV_FILTER_FIELDS:
             value = request.form.get(field, '').strip()
             if value:
@@ -204,7 +211,7 @@ def trend_finder():
         if location == '':
             location = None
         if error is None:
-            stats = run_analysis(season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
+            stats = run_analysis(combination_conditions=combination_conditions, season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
             if request.form.get("action") == "combinations":
                 combinations = scan_grouped_combinations(season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
                 combinations = [trend for trend in combinations if trend["ats_rate"] >= 55.0 and trend["sample"] >= combination_min_games(season)]
@@ -282,7 +289,7 @@ def trend_finder():
     if summary is not None and combinations is None:
         from home_results import matching_game_groups
         matchup_groups = matching_game_groups(
-            season=season, location=location, is_primetime=is_primetime,
+            combination_conditions=combination_conditions, season=season, location=location, is_primetime=is_primetime,
             min_spread=min_spread, max_spread=max_spread,
             exact_spread=exact_spread, **csv_filters)
     if season_mode == "single" and season:
@@ -317,6 +324,10 @@ def trend_finder():
                 selection=json.dumps(dict(season=season, location=location, is_primetime=is_primetime,
                                           min_spread=min_spread, max_spread=max_spread,
                                           exact_spread=exact_spread, **csv_filters)))
+            for related in trend.get('related', []):
+                related['games_url'] = url_for('combination_details', conditions=json.dumps(related['filters']),
+                    selection=json.dumps(dict(season=season, location=location, is_primetime=is_primetime,
+                        min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)))
             trend['description'] = describe_combination(
                 trend, season=season, location=location, is_primetime=is_primetime,
                 min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread,
@@ -339,6 +350,7 @@ def trend_finder():
         current_qbs=current_qbs,
         dog_qb_name=dog_qb_name,
         historical_dog_qb_name=historical_dog_qb_name,
+        combination_conditions=combination_conditions,
         combinations=combinations,
         data_status=trend_data_status() if combinations is not None else None,
         combination_count=combination_count,
@@ -425,8 +437,22 @@ def trend_games():
         detail['description'] = f'{len(games)} games match these conditions, but all were pushes; there is no ATS cover rate.'
     else:
         detail['description'] = describe_combination(detail, season=season, **selection)
+    for related in detail.get('related', []):
+        related['games_url'] = url_for('combination_details', conditions=json.dumps(related['filters']),
+            selection=json.dumps(dict(season=season, **selection)))
     scope_labels = [f'{key.replace("_", " ").title()}: {value}' for key, value in selection.items() if value is not None]
-    return render_template('trend_games.html', conditions=conditions, scope_labels=scope_labels,
+    verification_fields = {key: value for key, value in selection.items() if value is not None}
+    if 'is_primetime' in verification_fields:
+        verification_fields['primetime'] = 'yes' if verification_fields.pop('is_primetime') else 'no'
+    if 'dog_qb_name' in verification_fields:
+        verification_fields['historical_dog_qb_name'] = verification_fields.pop('dog_qb_name')
+    verification_fields['spread_mode'] = 'exact' if selection.get('exact_spread') is not None else 'range' if selection.get('min_spread') is not None and selection.get('max_spread') is not None else 'min' if selection.get('min_spread') is not None else 'max' if selection.get('max_spread') is not None else 'none'
+    verification_fields['season_mode'] = 'range' if isinstance(season, tuple) else 'single'
+    if isinstance(season, tuple):
+        verification_fields.update(start_season=season[0], end_season=season[1])
+    elif season is not None:
+        verification_fields['season'] = season
+    return render_template('trend_games.html', verification_fields=verification_fields, conditions=conditions, scope_labels=scope_labels,
                            season=season, trend=detail, games=games[(page-1)*25:page*25], evidence=evidence,
                            data_status=status, page=page, page_count=page_count,
                            previous_url=page_url(page-1) if page > 1 else None,
