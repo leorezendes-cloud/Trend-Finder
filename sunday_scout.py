@@ -253,8 +253,6 @@ def sunday_scout_page():
             content_type="text/csv; charset=utf-8",
             headers={"Content-Disposition": "attachment; filename=the_plug_forecasts.csv"},
         )
-    from daily_forecasts import daily_view
-    daily=daily_view(PROJECT)
-    return render_template("sunday_scout.html", cards=cards, blends=blends, daily=daily,archived_blends=archived_blends)
+    return render_template("sunday_scout.html", cards=cards, blends=blends,archived_blends=archived_blends)
 
 

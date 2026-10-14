@@ -92,7 +92,9 @@ def teams_page():
                                                              ('Rushing yards / game', 'rushing_yards'),
                                                              ('Passing EPA / game', 'passing_epa'),
                                                              ('Rushing EPA / game', 'rushing_epa'))]})
-    return render_template('scout4_teams.html', view=v, cards=cards, team=team, opponent=opponent, matchup=matchup)
+    from member_picks import comparison_picks
+    inline_picks=comparison_picks(team=team,opponent=opponent) if matchup else []
+    return render_template('scout4_teams.html', inline_picks=inline_picks, view=v, cards=cards, team=team, opponent=opponent, matchup=matchup)
 
 
 OFFENSE_POSITIONS = {'QB', 'RB', 'FB', 'WR', 'TE'}

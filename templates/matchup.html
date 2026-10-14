@@ -4,7 +4,7 @@
 {% block heading %}{{ game.away_team }} @ {{ game.home_team }}{% endblock %}
 {% block filter_form %}{% endblock %}
 {% block data_notes %}<p class="stats-note">{{ game.gameday }} · {{ game.gametime }} ET · Week {{ week }}. Comparison uses completed regular-season games before Week {{ week }}.{% if manifest %} Stats retrieved {{ manifest.retrieved_at|eastern_time }}.{% endif %} Missing statistics stay —.</p>{% endblock %}
-{% block content %}<p><a class="member-pick-link" href="{{ url_for('member_picks.my_picks',game_id=game.game_id) }}">Make picks for this matchup →</a></p>
+{% block content %}{% include '_inline_picks.html' %}
 {% if game.away_score != '' and game.home_score != '' %}<p class="stats-note">Saved final score: {{ game.away_team }} {{ game.away_score }} · {{ game.home_team }} {{ game.home_score }}</p>{% endif %}
 <section class="stats-card matchup-panel"><h2>Prediction</h2>
 {% if forecast %}{% set prediction = forecast.components['Blend'] %}<p><strong>{{ prediction.pick or 'No ATS pick' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p><p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p><p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% else %}<p>No saved prediction for this matchup yet.</p>{% endif %}

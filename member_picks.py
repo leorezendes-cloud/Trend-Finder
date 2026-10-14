@@ -5,7 +5,8 @@ from datetime import datetime,timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 import secrets
-from flask import Blueprint,abort,current_app,g,redirect,render_template,request,session,url_for
+from urllib.parse import urlsplit
+from flask import Blueprint,abort,current_app,g,redirect,render_template,request,session,url_for,flash,jsonify
 from membership import db
 
 bp=Blueprint('member_picks',__name__,url_prefix='/picks')
@@ -67,7 +68,7 @@ def init_picks(app):
 
     @app.after_request
     def protect_private_picks(response):
-        if request.blueprint=='member_picks':response.headers['Cache-Control']='no-store'
+        if request.blueprint=='member_picks' or g.get('member') and request.endpoint in ('fans.matchup','scout4.teams_page'):response.headers['Cache-Control']='no-store'
         return response
 
 
@@ -117,6 +118,66 @@ def sync_results():
                 db().execute('UPDATE member_picks SET su_result=?,ats_result=?,ou_result=? WHERE member_id=? AND game_id=?',(*outcomes,pick['member_id'],game['id']))
 
 
+def comparison_picks(game_id=None,team=None,opponent=None):
+    """Read or open a saved shared sheet; never captures market data."""
+    if g.get('member') is None:return []
+    from weekly_pick_lines import publish_saved_snapshot
+    from site_week import active_week
+    publish_saved_snapshot(db(),Path(current_app.config['PICKS_SOURCE_ROOT']),now_utc())
+    sync_results()
+    current=active_week(list(schedule().values()),now_utc())
+    if current is None:return []
+    games=db().execute('''SELECT g.*,p.su,p.ats,p.ou,p.su_result,p.ats_result,p.ou_result
+        FROM pick_games g JOIN pick_weeks w ON w.id=g.week_id
+        LEFT JOIN member_picks p ON p.game_id=g.id AND p.member_id=?
+        WHERE w.published_at IS NOT NULL AND w.season=? AND w.week=? ORDER BY g.kickoff_at''',
+        (g.member['id'],*current)).fetchall()
+    if game_id:return [game for game in games if game['game_id']==game_id]
+    return [game for game in games if team in (game['away'],game['home']) and opponent in (game['away'],game['home'])]
+
+
+def write_choices(connection,game,choices):
+    connection.execute('''INSERT INTO member_picks(member_id,game_id,su,ats,ou,updated_at) VALUES(?,?,?,?,?,?)
+        ON CONFLICT(member_id,game_id) DO UPDATE SET su=excluded.su,ats=excluded.ats,ou=excluded.ou,updated_at=excluded.updated_at''',
+        (g.member['id'],game['id'],*(value or None for value in choices),now_utc().isoformat()))
+
+
+@bp.post('/save')
+def save_all_picks():
+    if g.member is None:
+        if request.accept_mimetypes.best=='application/json':return jsonify(error='Sign in again to save your picks.'),401
+        return redirect(url_for('membership.login'))
+    ids=request.form.getlist('game_ids')
+    if not ids or len(ids)>32 or len(ids)!=len(set(ids)) or any(not value.isdecimal() for value in ids):abort(400)
+    target=request.form.get('return_to','')
+    parts=urlsplit(target)
+    if parts.scheme or parts.netloc or parts.fragment or parts.path not in ('/picks/','/scout4/teams') and not parts.path.startswith('/matchup/'):
+        target=url_for('member_picks.my_picks')
+    sync_results();connection=db();connection.execute('BEGIN IMMEDIATE');saved=locked=0
+    try:
+        from site_week import active_week
+        current=active_week(list(schedule().values()),now_utc())
+        for ident in ids:
+            game=connection.execute('SELECT g.*,w.published_at,w.season,w.week FROM pick_games g JOIN pick_weeks w ON w.id=g.week_id WHERE g.id=?',(int(ident),)).fetchone()
+            if game is None or not game['published_at']:abort(404)
+            if current!=(game['season'],game['week']):abort(409,description='This NFL week is closed for picks.')
+            choices=[]
+            for key,allowed in [('su',(game['away'],game['home'])),('ats',(game['away'],game['home'])),('ou',('Over','Under'))]:
+                values=request.form.getlist(f'{key}_{ident}')
+                if len(values)>1 or values and values[0] not in allowed:abort(400,description='Choose one option per category.')
+                choices.append(values[0] if values else '')
+            if game['locked'] or game['void_reason'] or now_utc()>=datetime.fromisoformat(game['lock_at']):
+                locked+=1;continue
+            write_choices(connection,game,choices);saved+=1
+        connection.commit()
+    except Exception:
+        connection.rollback();raise
+    message='Picks saved. You can finish any blank selections before kickoff.' if saved else 'These games are locked; your saved picks are unchanged.'
+    if saved and locked:message+=' Picks for games that have locked were kept unchanged.'
+    if request.accept_mimetypes.best=='application/json':return jsonify(message=message,saved=saved,locked=locked)
+    flash(message,'picks');return redirect(target)
+
+
 @bp.get('/')
 def my_picks():
     if g.member is None:return redirect(url_for('membership.login'))
@@ -154,9 +215,7 @@ def save_pick(game_id):
         if game['locked'] or game['void_reason'] or now_utc()>=datetime.fromisoformat(game['lock_at']):abort(409,description='Picks are locked for this game.')
         su=request.form.get('su','');ats=request.form.get('ats','');ou=request.form.get('ou','')
         if su not in ('',game['away'],game['home']) or ats not in ('',game['away'],game['home']) or ou not in ('','Over','Under'):abort(400)
-        connection.execute('''INSERT INTO member_picks(member_id,game_id,su,ats,ou,updated_at) VALUES(?,?,?,?,?,?)
-            ON CONFLICT(member_id,game_id) DO UPDATE SET su=excluded.su,ats=excluded.ats,ou=excluded.ou,updated_at=excluded.updated_at''',
-            (g.member['id'],game_id,su or None,ats or None,ou or None,now_utc().isoformat()))
+        write_choices(connection,game,(su,ats,ou))
         connection.commit()
     except Exception:
         connection.rollback();raise

@@ -62,7 +62,7 @@ class MemberPicksTests(unittest.TestCase):
         client=self.member();self.assertEqual(self.pick(client,game_id).status_code,302)
         other=self.member(3)
         self.assertEqual(self.pick(other,game_id,su='B',ats='B',ou='Under').status_code,302)
-        self.assertIn('A +3 / B -3',client.get('/picks/').text)
+        self.assertIn('A +3 · B -3',client.get('/picks/').text)
         data={'csrf_token':self.token('/members/preferences'),f'spread_{game_id}':10,f'total_{game_id}':50,'action':'publish'}
         self.assertEqual(self.client.post(path,data=data).status_code,405)
         with self.app.app_context():

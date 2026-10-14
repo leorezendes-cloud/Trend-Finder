@@ -344,9 +344,11 @@ def trend_finder():
     if is_primetime is not None:filter_chips.append(dict(label='Primetime' if is_primetime else 'Non-Primetime',fields=['primetime']))
     if any(v is not None for v in (min_spread,max_spread,exact_spread)):filter_chips.append(dict(label=(f'Exact spread: +{exact_spread:g}' if exact_spread is not None else f'Spread: {min_spread:g}–{max_spread:g}' if min_spread is not None and max_spread is not None else f'Spread: +{min_spread:g} or more' if min_spread is not None else f'Spread: up to +{max_spread:g}'),fields=['spread_mode','min_spread','max_spread','exact_spread']))
     for key,value in csv_filters.items():filter_chips.append(dict(label=f"{'QB' if key=='qb_name' else 'Underdog QB' if key=='dog_qb_name' else key.replace('_',' ').title()}: {value}",fields=['dog_qb_name','historical_dog_qb_name'] if key=='dog_qb_name' else [key]))
+    from saved_trends import manual_trend_title
+    manual_search_url=url_for('trend_finder',run='analyze',**{k:v for k,v in form_data.items() if v and k not in ('run','action','csrf_token')})
     return render_template(
         "index.html",
-        manual_search_url=url_for('trend_finder',run='analyze',**{k:v for k,v in form_data.items() if v and k not in ('run','action','csrf_token')}),
+        manual_search_url=manual_search_url,manual_search_title=manual_trend_title(manual_search_url),
         filter_chips=filter_chips,qb_summaries=qb_summaries(matchup_groups),results_freshness=results_freshness(),
         filter_options=filter_options,
         csv_filters=csv_filters,

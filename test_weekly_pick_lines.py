@@ -32,7 +32,7 @@ class AutomaticLinesTests(unittest.TestCase):
         self.assertEqual(report['state'],'ready')
         response=self.member().get('/picks/')
         self.assertEqual(response.status_code,200)
-        self.assertIn('A +2.5 / B -2.5',response.text)
+        self.assertIn('A +2.5 · B -2.5',response.text)
         self.assertIn('44.5',response.text)
         self.assertIn('Wednesday 8 a.m. ET snapshot',response.text)
         with self.app.app_context():

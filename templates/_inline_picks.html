@@ -1,0 +1,15 @@
+{% from '_pick_cards.html' import pick_card with context %}
+<section class="inline-member-picks">
+<h2>Your picks</h2>
+{% if g.member %}
+{% if inline_picks %}
+<p>Choose one per category, or leave blanks to finish before kickoff.</p>
+{% for message in get_flashed_messages(category_filter=['picks']) %}<p role="status">{{ message }}</p>{% endfor %}
+<form class="member-picks-form" method="post" action="{{ url_for('member_picks.save_all_picks') }}" data-pick-form>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="{{ request.full_path.rstrip('?') }}">
+<div class="picks-grid">{% for pick in inline_picks %}{{ pick_card(pick) }}{% endfor %}</div>
+{% if inline_picks|selectattr('locked','equalto',0)|rejectattr('void_reason')|list %}<div class="pick-save-bar"><button type="submit">Save picks</button><p class="pick-save-status" role="status" aria-live="polite"></p></div>{% endif %}
+</form>
+{% else %}<p>No shared pick sheet is available for this matchup in the current week.</p>{% endif %}
+{% else %}<p><a href="{{ url_for('membership.login') }}">Sign in</a> to make your picks here.</p>{% endif %}
+</section>

@@ -3,7 +3,7 @@
 <title>{% block title %}{% endblock %} | Gravy Train</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='scout4.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
-</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='member_picks.css') }}"><script src="{{ url_for('static',filename='member_picks.js') }}" defer></script></head>
 <body class="scout4"><main>
 <header><p class="eyebrow">THE PLUG · GRAVY TRAIN</p><h1>{% block heading %}{% endblock %}</h1>
 {% include '_site_navigation.html' %}

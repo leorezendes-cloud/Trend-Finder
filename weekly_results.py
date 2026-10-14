@@ -1,5 +1,7 @@
 """Full-week results from canonical games; saved predictions retain their lines."""
 import csv,math,json
+from datetime import datetime,timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from ats_money_analysis import load_games
 
@@ -49,6 +51,9 @@ def build_results(root,week=None):
   dog_margin=margin if dog==g['away_team'] else -margin if margin is not None else None
   matchup=f"{g['away_team']} @ {g['home_team']}"
   item=dict(g,matchup=matchup,underdog=dog or ('Pick’em' if spread==0 else 'Unavailable'),spread=abs(spread) if spread is not None else None,ats_result=grade(dog_margin+abs(spread)) if final and dog else 'Pick’em' if spread==0 else 'Unavailable' if spread is None else 'Pending',su_result='Win' if dog_margin is not None and dog_margin>0 else 'Loss' if dog_margin is not None and dog_margin<0 else 'Tie' if dog_margin==0 else 'Pending',game_status='Final' if final else 'Scheduled',live_score=f"{g['away_team']} {g['away_score']} – {g['home_team']} {g['home_score']}" if final else '—',scout_pick='No saved pick',scout_result='—',scout_cushion='—')
+  try:started=datetime.fromisoformat(g['gameday']+'T'+g.get('gametime','13:00')).replace(tzinfo=ZoneInfo('America/New_York'))<=datetime.now(timezone.utc)
+  except ValueError:started=True
+  item['pending_note']='Awaiting verified final score' if started else 'Not played yet'
   rank=ranks.get(matchup,{})
   for key in ['rank_3y','rank_5y','rank_10y','rank_all']:item[key]=rank.get(key,'—')
   item['has_rankings']=bool(rank)
@@ -79,4 +84,4 @@ def build_results(root,week=None):
   games.append(item)
  tally=dict(covers=sum(g['ats_result']=='Cover' for g in games),losses=sum(g['ats_result']=='Loss' for g in games),pushes=sum(g['ats_result']=='Push' for g in games),correct=sum(g['scout_result']=='Correct' for g in games),wrong=sum(g['scout_result']=='Wrong' for g in games),pick_pushes=sum(g['scout_result']=='Push' for g in games),finals=sum(g['game_status']=='Final' for g in games),games=len(games))
  tally.update(total_correct=sum(g['total_result']=='Correct' for g in games),total_wrong=sum(g['total_result']=='Wrong' for g in games),total_pushes=sum(g['total_result']=='Push' for g in games))
- return dict(model_label=model_label,model_note=model_note,has_blend=has_blend,games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])

@@ -18,6 +18,7 @@ class NewsletterTests(unittest.TestCase):
             self.app.add_url_rule('/', 'home',lambda:'public')
             for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page','fans.fantasy']:
                 self.app.add_url_rule('/'+endpoint,endpoint,lambda:'public')
+            self.app.add_url_rule('/matchup/<game_id>','fans.matchup',lambda game_id:'public')
             init_membership(self.app)
         self.app.config.update(NEWSLETTER_AUTO_DRAFT_ENABLED=False,TESTING=True,RESEND_API_KEY='fake-test-key',NEWSLETTER_ADDRESS='Test address only',NEWSLETTER_ENABLED=False)
         with self.app.app_context():

@@ -113,7 +113,7 @@ class MembershipTests(unittest.TestCase):
         html=self.client.get('/members/preferences').text
         self.assertIn('/trend-finder?',html)
         self.assertIn('run=analyze',html)
-        self.assertIn('My manual search',html)
+        self.assertIn('Away dogs | Season 2026',html)
 
     def test_watchlist_deduplication_csrf_and_member_isolation(self):
         self.register()

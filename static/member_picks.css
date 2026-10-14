@@ -12,3 +12,30 @@
 .picks-page button { margin-top: 12px; }
 .picks-page legend { color: #fbbf24; font-weight: bold; }
 @media(max-width:650px) { .picks-records,.pick-options { grid-template-columns: 1fr; } }
+
+/* Compact checklist cards share the records' three-column layout. */
+.picks-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.picks-grid .pick-compact { margin: 0; padding: 16px; }
+.pick-compact h2 { margin: 0 0 6px; font: bold 20px Arial,sans-serif; }
+.pick-compact p { margin: 6px 0; font: 14px/1.5 Arial,sans-serif; -webkit-text-stroke: 0; }
+.pick-compact .pick-deadline { color: #cbd5e1; font-size: 12px; }
+.pick-compact .pick-lines { color: #fbbf24; font-weight: 700; }
+.pick-compact fieldset.pick-checklist { padding: 7px 8px; margin: 8px 0; min-width: 0; border: 1px solid #475569; border-radius: 8px; }
+.pick-checklist legend { color: #f1f5f9; font: bold 13px Arial,sans-serif; -webkit-text-stroke: 0; }
+.pick-check-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.pick-check-options label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: #f1f5f9; font: 14px/1.5 Arial,sans-serif; -webkit-text-stroke: 0; }
+.pick-check-options input[type=checkbox] { appearance: auto; width: 17px; height: 17px; padding: 0; margin: 0; accent-color: #fbbf24; flex-shrink: 0; }
+.pick-check-options label:has(input:checked) { color: #fbbf24; }
+.pick-checklist:disabled label { cursor: default; }
+.pick-source { color: #cbd5e1; font: 12px/1.5 Arial,sans-serif; margin-top: 10px; -webkit-text-stroke: 0; }
+.pick-source p { font-size: 12px; }
+.picks-page .member-picks-form, .inline-member-picks .member-picks-form { display: block; max-width: none; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.pick-save-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+.pick-save-status { color: #f1f5f9; font: 14px/1.5 Arial,sans-serif; -webkit-text-stroke: 0; }
+.inline-member-picks { margin: 20px 0; }
+.inline-member-picks .picks-grid { grid-template-columns: minmax(0,360px); }
+.inline-member-picks .pick-game { color: #f1f5f9; }
+.inline-member-picks .pick-game a { color: #fbbf24; }
+.inline-member-picks .pick-save-bar button { padding: 10px 20px; border: 1px solid #d5aa35; border-radius: 8px; background: #172234; color: #fbbf24; cursor: pointer; font: bold 16px Arial,sans-serif; }
+@media(max-width:900px) { .picks-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:650px) { .picks-grid { grid-template-columns: 1fr; } }

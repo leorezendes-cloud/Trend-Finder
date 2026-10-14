@@ -127,7 +127,9 @@ def matchup(game_id):
         candidate = json.loads(path.read_text())
         if candidate.get('game_id') == game_id:
             forecast = candidate
-    return render_template('matchup.html', game=game, teams=teams, season=season, week=week,
+    from member_picks import comparison_picks
+    inline_picks=comparison_picks(game_id=game_id)
+    return render_template('matchup.html', inline_picks=inline_picks, game=game, teams=teams, season=season, week=week,
                            manifest=manifest, forecast=forecast)
 
 

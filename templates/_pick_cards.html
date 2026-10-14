@@ -1,0 +1,16 @@
+{% macro pick_card(game,editable=true) %}
+<article class="pick-game pick-compact">
+<h2><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.away }} at {{ game.home }}</a></h2>
+<p class="pick-deadline">{{ game.lock_at|pick_time }} · {{ 'Locked' if game.locked or not editable else 'Open' }}</p>
+<p class="pick-lines">{{ game.away }} {{ '%+g'|format(game.away_spread) }} · {{ game.home }} {{ '%+g'|format(-game.away_spread) }}<br>Total {{ '%g'|format(game.total) }}</p>
+{% if editable and not game.locked and not game.void_reason %}<input type="hidden" name="game_ids" value="{{ game.id }}">{% endif %}
+{% for key,label in [('su','SU winner'),('ats','ATS winner'),('ou','Over / Under')] %}
+<fieldset class="pick-checklist" {% if not editable or game.locked or game.void_reason %}disabled{% endif %}><legend>{{ label }}</legend><div class="pick-check-options">
+{% for value in ([game.away,game.home] if key!='ou' else ['Over','Under']) %}<label for="{{ key }}-{{ game.id }}-{{ loop.index }}"><input type="checkbox" id="{{ key }}-{{ game.id }}-{{ loop.index }}" name="{{ key }}_{{ game.id }}" value="{{ value }}" {% if game[key]==value %}checked{% endif %}><span>{{ value }}{% if key=='ats' %} {{ '%+g'|format(game.away_spread if value==game.away else -game.away_spread) }}{% endif %}</span></label>{% endfor %}
+</div>{% if game[key] and game[key~'_result']!='Pending' %}<small>{{ game[key~'_result'] }}</small>{% endif %}</fieldset>
+{% endfor %}
+{% if game.away_final is not none %}<p>Final: {{ game.away }} {{ game.away_final }} – {{ game.home }} {{ game.home_final }}</p>{% endif %}
+{% if game.void_reason %}<p>Void: {{ game.void_reason }}</p>{% endif %}
+<details class="pick-source"><summary>Line details</summary><p>{{ game.line_source }}</p></details>
+</article>
+{% endmacro %}

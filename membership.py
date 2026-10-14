@@ -282,7 +282,11 @@ def preferences():
                 db().execute('UPDATE members SET newsletter_opt_in=?,newsletter_frequency=?,consent_updated_at=CURRENT_TIMESTAMP WHERE id=?', (int(opt_in == 'yes'), frequency, g.member['id']))
             g.member = db().execute('SELECT * FROM members WHERE id=?', (g.member['id'],)).fetchone()
             saved = True
-    return render_template('membership.html', mode='preferences', error=error, saved=saved, watchlist=db().execute('SELECT * FROM watchlist WHERE member_id=? ORDER BY created_at DESC,id DESC', (g.member['id'],)).fetchall()), 400 if error else 200
+    watchlist=[dict(row) for row in db().execute('SELECT * FROM watchlist WHERE member_id=? ORDER BY created_at DESC,id DESC',(g.member['id'],)).fetchall()]
+    from saved_trends import manual_trend_title
+    for item in watchlist:
+        if item['kind']=='trend' and urlsplit(item['target']).path=='/trend-finder':item['title']=manual_trend_title(item['target'])
+    return render_template('membership.html',mode='preferences',error=error,saved=saved,watchlist=watchlist),400 if error else 200
 
 
 def allow_attempt(action, email):
@@ -430,6 +434,9 @@ def save_watchlist():
             abort(400)
         try:
             target = parts.path + '?' + urlencode(sorted(parse_qsl(parts.query, max_num_fields=100)))
+            if parts.path=='/trend-finder':
+                from saved_trends import manual_trend_title
+                title=manual_trend_title(target)
         except ValueError:
             abort(400)
     else:

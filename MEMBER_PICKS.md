@@ -41,3 +41,9 @@ Tests use temporary schedules and member databases. They cover private drafts, c
 ## Site week and shortcuts
 
 See [WEEKLY_POLICY.md](WEEKLY_POLICY.md). The default sheet and submission window switch Wednesday at 8 a.m. Eastern. Automatic publication opens only the active week. Members can reach picks from the homepage, Upcoming Matchups, market and team comparison pages; game-specific links narrow the current sheet.
+
+## Compact checklist and partial saves
+
+My Picks displays a three-column card grid with one Save picks button. Check one choice per category; clicking a checked option again clears it. Blank categories can be saved and completed later. Saved choices reappear on subsequent visits. Each game keeps its kickoff deadline; if a game locks during editing, its existing picks stay unchanged while other open games save. Invalid choices reject the entire submission.
+
+Matchup details and selected team-versus-opponent comparisons include the same controls inline. Saving keeps the member on that page, and changes use the same private records as My Picks. Clicking a My Picks matchup opens its comparison page. All save requests require CSRF protection and use the signed-in member ID. Signed-in comparison pages are marked no-store because they include private selections.
