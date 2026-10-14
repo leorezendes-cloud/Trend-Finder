@@ -356,6 +356,7 @@
                 <p>With {{ related.added_filters | display_trend_filters }}: {{ related.ats_wins }}–{{ related.ats_losses }}–{{ related.ats_pushes }} | {{ '%.2f'|format(related.ats_rate) }}% | {{ '%+.2f'|format(related.ats_difference) }} points vs. baseline{% if related.filters == trend.filters %} (this card){% endif %}</p>
                 {% endfor %}
                 {% endif %}
+                {% if trend.overlapping_patterns %}<details><summary>{{ trend.overlapping_patterns|length }} similar patterns grouped here</summary><p>These patterns share at least 80% of the combined historical game sample with this card.</p>{% for similar in trend.overlapping_patterns %}<p>{{ similar.filters|display_trend_filters }} | ATS: {{ similar.ats_wins }}–{{ similar.ats_losses }}–{{ similar.ats_pushes }} | {{ '%.2f'|format(similar.ats_rate) }}% | {{ similar.sample }} games</p>{% endfor %}</details>{% endif %}
                 <p><a class="evidence-link" href="{{ trend.games_url }}" target="_blank" rel="noopener">Full trend details →</a></p>
 
             </div>

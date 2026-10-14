@@ -20,14 +20,15 @@
             <p class="discovery-note">Historical underdog patterns matched to scheduled games and saved market lines. These percentages describe past results.</p>
             <div class="trend-card-grid">
                 {% for game in upcoming_previews %}
-                <a class="trend-card compact-card trend-link" href="{{ url_for('trend_details', location=game.trend.location, prime='yes' if game.trend.primetime else 'no', spread=game.trend.spread) }}">
+                <div class="trend-card compact-card trend-link">
                     <span class="combination-soon">🏈 Upcoming matchup</span>
                     <strong class="compact-title">{{ game.matchup }}</strong>
                     <p>{{ game.kickoff }} | Underdog: {{ game.dog_team }} +{{ '%g'|format(game.dog_spread) }}</p>
                     <p class="positive">Historical underdog ATS: {{ '%.2f'|format(game.trend.historical_ats_rate) }}%</p>
                     <small>{{ game.trend.location }} dogs | {{ 'Primetime' if game.trend.primetime else 'Non-Primetime' }} | {{ game.trend.spread }} | {{ game.trend.historical_sample }} historical games</small>
-                    <p>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}</p><p>View trend details →</p>
-                </a>
+                    <details class="saved-line-details"><summary>Saved line details</summary><p>{{ game.line_source }}{% if game.line_time %} · {{ game.line_time|eastern_time }}{% endif %}</p></details>
+                    <p><a class="matchup-comparison-link" href="{{ url_for('trend_details', location=game.trend.location, prime='yes' if game.trend.primetime else 'no', spread=game.trend.spread) }}">View trend details →</a></p>
+                </div>
                 {% else %}<p>No upcoming previews qualify. A game needs a saved spread and at least 30 matching historical games.</p>{% endfor %}
             </div>
         </section>

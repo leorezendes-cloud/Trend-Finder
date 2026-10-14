@@ -1510,6 +1510,22 @@ def group_related_combinations(trends, memberships, evaluate, evaluated=None):
     return result
 
 
+def collapse_overlapping_combinations(groups, threshold=0.8):
+    """Keep the first ranked card when historical samples overlap by 80% or more."""
+    distinct = []
+    for group in groups:
+        ids = group['_ids']
+        match = next((kept for kept in distinct
+                      if len(ids & kept['_ids']) / len(ids | kept['_ids']) >= threshold), None)
+        if match is None:
+            group['overlapping_patterns'] = []
+            distinct.append(group)
+        else:
+            match['overlapping_patterns'].append({key:group[key] for key in
+                ('filters','ats_rate','ats_wins','ats_losses','ats_pushes','sample')})
+    return distinct
+
+
 def selected_finished_games(rows, season, scope):
     """One selection rule for discovery, evidence, and the matching-games page."""
     csv_scope = {key: value for key, value in scope.items() if key in CSV_FILTER_FIELDS or key == 'dog_qb_name'}
@@ -1678,6 +1694,7 @@ def scan_grouped_combinations(season=None, max_depth=3, beam_width=150, limit=10
     retained = found[:limit]
     groups = group_related_combinations(retained, memberships, evaluate, evaluated)
     prioritize_upcoming_combinations(groups, contexts)
+    groups = collapse_overlapping_combinations(groups)
     current_season = max(int(game['season']) for game in rows)
     for group in groups:
         group['retained_count'] = len(retained)

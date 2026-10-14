@@ -32,6 +32,18 @@ class CsvFilterTests(unittest.TestCase):
                 self.assertEqual(finder.Check_Games(self.games, **{field: value}),
                                  finder.Check_Games(subset))
 
+    def test_near_identical_samples_are_grouped_without_changing_records(self):
+        def group(ids,label,rate):
+            return {'_ids':frozenset(ids),'filters':[label],'ats_rate':rate,
+                    'ats_wins':7,'ats_losses':3,'ats_pushes':0,'sample':10}
+        first=group(range(10),'Underdog QB: Example',70)
+        similar=group(list(range(9))+[10],'Away team: BUF',65)
+        separate=group(range(20,30),'Away team: SEA',60)
+        collapsed=finder.collapse_overlapping_combinations([first,similar,separate])
+        self.assertEqual(len(collapsed),2)
+        self.assertEqual(collapsed[0]['ats_rate'],70)
+        self.assertEqual(collapsed[0]['overlapping_patterns'][0]['ats_rate'],65)
+
     def test_combination_scan_keeps_scope(self):
         scope = {'home_team': self.row['home_team'], 'roof': self.row['roof']}
         trends = finder.scan_basic_trends(season=self.row['season'], **scope)
