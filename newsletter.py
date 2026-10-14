@@ -3,6 +3,8 @@ import json
 import os
 import secrets
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
@@ -18,6 +20,7 @@ SECTIONS = [('predictions', 'Prediction highlights'), ('matchups', 'Upcoming mat
 
 def init_newsletter(app):
     app.config.update(
+        NEWSLETTER_AUTO_DRAFT_ENABLED=True,
         NEWSLETTER_ENABLED=os.environ.get('TREND_FINDAH_NEWSLETTER_ENABLED') == 'true',
         NEWSLETTER_FROM=os.environ.get('TREND_FINDAH_NEWSLETTER_FROM',
             'Trendfindah <noreply@mail.trendfindah.com>'),
@@ -40,6 +43,19 @@ def init_newsletter(app):
                 attempted_at INTEGER, claimed_at INTEGER,
                 PRIMARY KEY(issue_id,member_id),
                 CHECK(state IN ('pending','sending','accepted','failed','unknown','skipped')))''')
+
+    with app.app_context():
+        with db():
+            db().execute("CREATE TABLE IF NOT EXISTS newsletter_generated (frequency TEXT NOT NULL, period TEXT NOT NULL, issue_id INTEGER NOT NULL UNIQUE, metadata TEXT NOT NULL, PRIMARY KEY(frequency,period))")
+
+    @app.cli.command('newsletter-generate')
+    @click.option('--frequency', type=click.Choice(['weekly','monthly']), default='weekly')
+    def generate_command(frequency):
+        owner = db().execute('SELECT member_id FROM site_owners ORDER BY member_id LIMIT 1').fetchone()
+        if not owner:
+            raise click.ClickException('Configure a site-owner account first.')
+        issue_id = generate_draft(owner['member_id'], frequency)
+        click.echo(f'Draft #{issue_id} ready for review at /newsletter/issues/{issue_id}. No email sent.')
 
     @app.before_request
     def protect_newsletter_forms():
@@ -123,6 +139,10 @@ def manage(issue_id=None):
     editing = get_issue(issue_id) if issue_id is not None else None
     if editing is not None and editing['status'] != 'draft':
         abort(409, description='Approved or canceled issues cannot be edited.')
+    if editing is None and request.method == 'GET' and current_app.config['NEWSLETTER_AUTO_DRAFT_ENABLED']:
+        generate_draft(g.member['id'], 'weekly')
+        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency='monthly' LIMIT 1").fetchone():
+            generate_draft(g.member['id'], 'monthly')
     defaults = dict(json.loads(editing['sections']), subject=editing['subject'], frequency=editing['frequency']) if editing is not None else {}
     error = None
     if request.method == 'POST':
@@ -154,7 +174,8 @@ def issue_page(issue_id):
     require_owner()
     issue = get_issue(issue_id)
     counts = {row['state']:row['n'] for row in db().execute('SELECT state,COUNT(*) n FROM newsletter_deliveries WHERE issue_id=? GROUP BY state', (issue_id,))}
-    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=SECTIONS,counts=counts)
+    metadata = db().execute('SELECT metadata FROM newsletter_generated WHERE issue_id=?',(issue_id,)).fetchone()
+    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=SECTIONS,counts=counts,generated=json.loads(metadata['metadata']) if metadata else None)
 
 
 @bp.get('/issues/<int:issue_id>/preview')
@@ -260,3 +281,41 @@ def send_issue(issue_id):
         # Sequential sending stays within the provider's default request budget.
         time.sleep(.6)
     return accepted,skipped,failed
+
+
+def generate_draft(owner_id, frequency='weekly', now=None, root=None):
+    from newsletter_draft import period_key, build_draft
+    if frequency not in ('weekly','monthly'):
+        raise ValueError('Invalid newsletter frequency')
+    now=now or datetime.now(timezone.utc)
+    period=period_key(frequency,now)
+    existing=db().execute('SELECT issue_id,metadata FROM newsletter_generated WHERE frequency=? AND period=?',(frequency,period)).fetchone()
+    if existing:
+        issue=get_issue(existing['issue_id']);previous=json.loads(existing['metadata'])
+        if issue['status']!='draft' or json.loads(issue['sections'])!=previous.get('original_sections') or issue['subject']!=previous.get('original_subject'):
+            return existing['issue_id']
+        sections,metadata=build_draft(root or Path(current_app.root_path),now)
+        metadata.update(original_sections=sections,original_subject=issue['subject'])
+        connection=db();connection.execute('BEGIN IMMEDIATE')
+        try:
+            current=get_issue(existing['issue_id'])
+            if current['status']=='draft' and current['sections']==issue['sections'] and current['subject']==issue['subject']:
+                connection.execute('UPDATE newsletter_issues SET sections=? WHERE id=?',(json.dumps(sections),current['id']))
+                connection.execute('UPDATE newsletter_generated SET metadata=? WHERE issue_id=?',(json.dumps(metadata),current['id']))
+            connection.commit()
+        except Exception:
+            connection.rollback();raise
+        return existing['issue_id']
+    sections,metadata=build_draft(root or Path(current_app.root_path),now)
+    metadata.update(original_sections=sections,original_subject=f'Trendfindah: Prediction highlights · {period}')
+    connection=db();connection.execute('BEGIN IMMEDIATE')
+    try:
+        existing=connection.execute('SELECT issue_id FROM newsletter_generated WHERE frequency=? AND period=?',(frequency,period)).fetchone()
+        if existing:
+            connection.rollback();return existing['issue_id']
+        issue_id=connection.execute('INSERT INTO newsletter_issues(subject,frequency,sections,owner_id) VALUES(?,?,?,?)',
+            (f'Trendfindah: Prediction highlights · {period}',frequency,json.dumps(sections),owner_id)).lastrowid
+        connection.execute('INSERT INTO newsletter_generated VALUES(?,?,?,?)',(frequency,period,issue_id,json.dumps(metadata)))
+        connection.commit();return issue_id
+    except Exception:
+        connection.rollback();raise

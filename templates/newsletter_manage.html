@@ -6,11 +6,14 @@
 <p>Opted in: {{ counts.get('weekly',0) }} weekly · {{ counts.get('monthly',0) }} monthly</p>
 {% if not config.NEWSLETTER_ENABLED %}<p>Live sending is disabled. You can create, preview, and approve drafts here.</p>{% endif %}
 {% if not config.NEWSLETTER_ADDRESS %}<p>Add your business mailing address before sending.</p>{% endif %}
+{% if not editing %}<h2>Drafts ready for review</h2><p>A weekly draft is prepared automatically when you open this page. Monthly drafts are prepared when you have monthly subscribers. Your edits are never overwritten. Open an issue below to preview and edit it.</p>{% for issue in issues %}<article><a href="{{ url_for('newsletter.issue_page',issue_id=issue.id) }}">{{ issue.subject }}</a><p>{{ issue.frequency|capitalize }} · {{ issue.status|capitalize }} · {{ issue.created_at }}</p></article>{% else %}<p>No issues yet.</p>{% endfor %}{% endif %}
 {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if not editing %}<details><summary>Create a manual draft instead</summary>{% endif %}
 <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <label for="subject">Subject</label><input id="subject" name="subject" required minlength="5" maxlength="150" value="{{ request.form.get('subject',defaults.get('subject','Trendfindah: This week’s prediction highlights')) }}">
 <label for="frequency">Audience</label><select id="frequency" name="frequency">{% for value in ['weekly','monthly'] %}<option value="{{ value }}" {% if request.form.get('frequency',defaults.get('frequency','weekly'))==value %}selected{% endif %}>{{ value|capitalize }} subscribers</option>{% endfor %}</select>
 {% for key,heading in headings %}<label for="{{ key }}">{{ heading }}{{ ' (required)' if key=='predictions' else ' (optional)' }}</label><textarea id="{{ key }}" name="{{ key }}" maxlength="6000" {% if key=='predictions' %}required minlength="20"{% endif %}>{{ request.form.get(key,defaults.get(key,'')) }}</textarea>{% endfor %}
 <p>Use published predictions and saved evidence. This editor never runs models or refreshes data. Write plain text; HTML is escaped.</p><button>{{ 'Save draft' if editing else 'Create draft' }}</button></form>
-<h2>Recent issues</h2>{% for issue in issues %}<article><a href="{{ url_for('newsletter.issue_page',issue_id=issue.id) }}">{{ issue.subject }}</a><p>{{ issue.frequency|capitalize }} · {{ issue.status|capitalize }} · {{ issue.created_at }}</p></article>{% else %}<p>No issues yet.</p>{% endfor %}
+{% if not editing %}</details>{% endif %}
+
 </main></body></html>

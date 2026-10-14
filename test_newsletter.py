@@ -19,7 +19,7 @@ class NewsletterTests(unittest.TestCase):
             for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page','fans.fantasy']:
                 self.app.add_url_rule('/'+endpoint,endpoint,lambda:'public')
             init_membership(self.app)
-        self.app.config.update(TESTING=True,RESEND_API_KEY='fake-test-key',NEWSLETTER_ADDRESS='Test address only',NEWSLETTER_ENABLED=False)
+        self.app.config.update(NEWSLETTER_AUTO_DRAFT_ENABLED=False,TESTING=True,RESEND_API_KEY='fake-test-key',NEWSLETTER_ADDRESS='Test address only',NEWSLETTER_ENABLED=False)
         with self.app.app_context():
             with db():
                 for email,opt,frequency in [('owner@example.com',1,'weekly'),('weekly@example.com',1,'weekly'),('monthly@example.com',1,'monthly'),('out@example.com',0,'weekly')]:

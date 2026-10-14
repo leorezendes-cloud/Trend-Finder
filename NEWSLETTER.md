@@ -55,3 +55,26 @@ python -m unittest test_newsletter test_membership test_membership_backups test_
 Tests use temporary member databases and mocked Resend requests. They cover owner permissions, CSRF, editing/locking, preview escaping and section order, audience/frequency selection, unsubscribe, opt-out on retry, frozen audiences, duplicate prevention, retry payload/key stability, stale-retry refusal, disabled delivery, and the actual CLI path. No member email or real provider request is used.
 
 Provider references: https://resend.com/docs/api-reference/emails/send-email and https://resend.com/docs/dashboard/emails/idempotency-keys
+
+
+## Automatic drafts
+
+The owner newsletter page now automatically prepares a draft from saved evidence when it is opened: one weekly draft per Eastern-time ISO week, plus one monthly draft per calendar month when monthly subscribers exist. Drafts appear before the optional manual editor. This requires no separate cron service or additional paid worker. It is lazy generation on review-page visits, not a scheduled midnight job. No email or notification is sent by generation.
+
+Predictions use the saved public Blend forecasts shown in The Plug, with their original scoring margins, ATS edges, quote timestamps, and saved totals where available. Completed/started games, future-sealed forecasts, team/kickoff mismatches, and incomplete records are excluded. The supporting matchup section uses the saved schedule and gives validated public forecast lines precedence over schedule lines, labeling the source. Relevant historical location/time groups are summarized from completed schedule rows with at least 30 ATS decisions; those are descriptive history, not model predictions. Missing predictions and old quotes are labeled for review rather than invented.
+
+Each generated draft records its generation time, source hashes and review warnings. Reopening the review page returns the same issue for that period, preserving all manual edits and approvals. Unedited, unapproved automatic drafts refresh from the latest saved evidence when you reopen the owner page. Once you edit the subject/content or approve an issue, automatic refresh stops and preserves your version. Review quote times before approval. Prediction publication remains controlled by the existing research process; this module never runs a collector, fits a model, refreshes data, or changes an existing forecast.
+
+To prepare the same idempotent draft explicitly from the host Shell, without sending:
+
+```sh
+python -m flask --app wsgi newsletter-generate --frequency weekly
+```
+
+Use `--frequency monthly` for monthly issues. The command uses an existing site-owner account. It can also be run by a scheduler that shares this web service's persistent membership database if scheduled generation is wanted later; no external scheduler has been installed. Approval and the separate explicit delivery command remain required. `TREND_FINDAH_NEWSLETTER_ENABLED=false` does not prevent drafting or review.
+
+Generator verification:
+
+```sh
+python -m unittest test_newsletter_draft test_newsletter test_membership test_hosting -v
+```
