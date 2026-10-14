@@ -53,7 +53,8 @@ def scores():
                                     updated=datetime.now(timezone.utc).isoformat(), stale=False)
             except (OSError, ValueError, TypeError, AttributeError):
                 _score_cache['stale'] = True
-            _score_cache['expires'] = time.monotonic() + 60
+            interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
+            _score_cache['expires'] = time.monotonic() + interval
         schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
         games = []
         for game in _score_cache['games']:
@@ -70,8 +71,9 @@ def scores():
                 row['market'] = betting_result(saved)
             games.append(row)
         result = jsonify(games=games, updated=_score_cache['updated'],
-                         stale=_score_cache.get('stale', False), source='ESPN')
-        result.headers['Cache-Control'] = 'public, max-age=30'
+                         stale=_score_cache.get('stale', False), source='ESPN',
+                         refresh_seconds=15 if any(game['state']=='in' for game in games) else 60)
+        result.headers['Cache-Control'] = 'no-store'
         return result
 
 

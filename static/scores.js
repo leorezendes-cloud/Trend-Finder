@@ -3,11 +3,17 @@
   if (!panel) return;
   const list = panel.querySelector('.score-grid');
   const note = panel.querySelector('.score-update');
+  let refreshSeconds = 60;
+  let timer;
+  let inFlight = false;
   async function refresh() {
+    if (inFlight) return;
+    inFlight = true;
     try {
-      const response = await fetch(panel.dataset.url, {signal: AbortSignal.timeout(10000)});
+      const response = await fetch(panel.dataset.url, {cache: 'no-store', signal: AbortSignal.timeout(10000)});
       if (!response.ok) throw new Error('Unavailable');
       const data = await response.json();
+      refreshSeconds = data.refresh_seconds === 15 ? 15 : 60;
       list.replaceChildren();
       for (const game of data.games) {
         const card = document.createElement(game.url ? 'a' : 'div');
@@ -33,12 +39,18 @@
         card.append(teams, status, results);
         list.append(card);
       }
-      note.textContent = data.updated ? `${data.stale ? 'Updates delayed · last received' : 'ESPN · updated'} ${new Date(data.updated).toLocaleTimeString()} · checks every minute · ATS/totals use saved lines` : 'Scores temporarily unavailable. Try again shortly.';
+      note.textContent = data.updated ? `${data.stale ? 'Updates delayed · last received' : 'ESPN · updated'} ${new Date(data.updated).toLocaleTimeString()} · checks every ${refreshSeconds === 15 ? "15 seconds" : "minute"} · ATS/totals use saved lines` : 'Scores temporarily unavailable. Try again shortly.';
       if (!data.games.length && data.updated && !data.stale) note.textContent = 'No games listed by the score feed right now.';
     } catch (_) {
       note.textContent = 'Score updates unavailable. Any displayed scores may be outdated.';
+    } finally {
+      inFlight = false;
+      clearTimeout(timer);
+      timer = setTimeout(() => { if (!document.hidden) refresh(); }, refreshSeconds * 1000);
     }
   }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { clearTimeout(timer); refresh(); }
+  });
   refresh();
-  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
 })();

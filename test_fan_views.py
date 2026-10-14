@@ -32,6 +32,13 @@ class FanViewsTests(unittest.TestCase):
                 self.assertTrue(client.get('/scores.json').json['stale'])
                 self.assertIsNotNone(client.get('/scores.json').json['updated'])
 
+    def test_live_games_use_fifteen_second_cache_without_browser_cache(self):
+        with patch.dict(_score_cache, {'expires':9999999,'games':[{'state':'in','date':'2026-10-18T20:00Z','away':'BUF','home':'LV','away_score':'7','home_score':'3','status':'Q1'}], 'updated':'2026-10-18T20:05:00Z'}, clear=True):
+            with patch('fan_views.time.monotonic',return_value=0):
+                response=app.test_client().get('/scores.json')
+                self.assertEqual(response.json['refresh_seconds'],15)
+                self.assertEqual(response.headers['Cache-Control'],'no-store')
+
     def test_matchup_stats_stop_before_game_week_and_link_to_players(self):
         response = app.test_client().get('/matchup/2026_06_BUF_LV')
         self.assertEqual(response.status_code, 200)

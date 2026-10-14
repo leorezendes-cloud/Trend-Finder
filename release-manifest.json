@@ -1160,12 +1160,12 @@
     "sha256": "0e62b0761483495d1f8a1f1497e9ffaa18a49fac52ee449436a56e8f4fb2e75d"
   },
   "fan_views.py": {
-    "bytes": 11486,
-    "sha256": "a0a8556f3e0fd8bd213fd1399cfe0783a5a9ea800158f3a970b70fb4594cc3f7"
+    "bytes": 11677,
+    "sha256": "76fced10dbe592b5717034713e2b025b34a67efc5452fae6b606bacf4580d435"
   },
   "static/scores.js": {
-    "bytes": 2635,
-    "sha256": "5b366ce2347ce6c21a548549172afb865221968187952ea4c3045cd49e4da686"
+    "bytes": 3089,
+    "sha256": "e1882320f2500762fd00ddca73ae67f24aa35632cb6abd3d52871d685375b782"
   },
   "templates/matchup.html": {
     "bytes": 3820,
@@ -1176,8 +1176,8 @@
     "sha256": "e99d5230858d004c21e642438705a02baf378d859d26df00504725f11d63933e"
   },
   "test_fan_views.py": {
-    "bytes": 7377,
-    "sha256": "f8bae43c937c9033794db6baeb9c065fd7771930276d9841ae93ad36c65d32ad"
+    "bytes": 7966,
+    "sha256": "9bd94708e9b7f88c8ad3619a3c68b1e7cd5034f3cb45621e1c32cfa7ea32a988"
   },
   "test_coast_filters.py": {
     "bytes": 1556,
