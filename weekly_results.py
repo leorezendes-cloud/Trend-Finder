@@ -84,7 +84,7 @@ def build_results(root,week=None):
     item['scout_pick']=f'{team} {line:+g}';item['scout_cushion']=f"{abs(float(s['form_cover_cushion'])):+.1f}"
     result=grade((margin if team==g['away_team'] else -margin)+line) if final else 'Pending'
     item['scout_result']={'Cover':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending'}[result]
-   else:item['scout_pick']='No call';item['scout_result']='No call'
+   else:item['scout_pick']='No pick recorded';item['scout_result']='Not graded'
   item.update(total_pick='No saved total',total_result='—',model_name=model_label)
   if record:
    from scout4.blend import grade_components
@@ -92,12 +92,12 @@ def build_results(root,week=None):
    try:
     results=grade_components(record,g);component=record['components']['Blend'];team=component['pick']
     line=record['quote']['line'] if team==g['away_team'] else -record['quote']['line']
-    item['scout_pick']=f'{team} {line:+g}' if team else 'No call'
-    item['scout_result']={'Win':'Correct','Loss':'Wrong','No Call':'No call'}.get(results['Blend'],results['Blend'])
+    item['scout_pick']=f'{team} {line:+g}' if team else 'No pick recorded'
+    item['scout_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(results['Blend'],results['Blend'])
     item['scout_cushion']=f"{abs(component['ats_edge']):.1f}"
     if record.get('totals'):
-     total=record['totals'];item['total_pick']=f"{total['prediction']['lean']} {total['quote']['line']:g}"
-     tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'No call'}.get(tr,tr)
+     total=record['totals'];item['total_pick']='No pick recorded' if total['prediction']['lean']=='No Call' else f"{total['prediction']['lean']} {total['quote']['line']:g}"
+     tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(tr,tr)
    except ValueError:
     item['scout_pick']='Review needed';item['scout_result']='Review needed';item['total_result']='Review needed'
   games.append(item)

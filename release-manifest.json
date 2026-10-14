@@ -28,8 +28,8 @@
     "sha256": "7fd7a1046f79d9cf1849267fab11149a25cc914bb0ab02cdeda15a1084a3bb6a"
   },
   "WEEKLY_POLICY.md": {
-    "bytes": 3618,
-    "sha256": "749857fa5a47505f810d9dc8d315d3de514dfd83e506e7e5be88e1cda44e7a7a"
+    "bytes": 4197,
+    "sha256": "c8e41057c4cc21d6b95b60e20282ff477e63e486071a90190a923d937ab22c69"
   },
   "anomaly_analysis.py": {
     "bytes": 8461,
@@ -56,8 +56,8 @@
     "sha256": "c11069a00a34d21a4e16a9a4fe9a07e0c39c7c6caf731273ac43eb3955062b72"
   },
   "automatic_model.json": {
-    "bytes": 10844,
-    "sha256": "59367d9453a20f1c3d3c2db8c18de5d9966c917cf3bf959fdaf4e34a6763b306"
+    "bytes": 10875,
+    "sha256": "23fd14b03349a97fcbf6c32bff1d6ba289cd03746698a612d66ed164b85e49af"
   },
   "backtest_summary.csv": {
     "bytes": 684,
@@ -648,8 +648,8 @@
     "sha256": "0f89ab2dcdd9086fab90c4eb3438070e96440708a56a904c535e9019d66f409f"
   },
   "scout4/blend.py": {
-    "bytes": 9587,
-    "sha256": "9b69eab10ba494db06ccff217ed99780cbcbdbab8bf7632f65b3d2947c736f33"
+    "bytes": 10255,
+    "sha256": "d79a9f66c5319fa07c18dfda700139245536eb6a463d39da1018bd6df54bc0c7"
   },
   "scout4/blend_results.py": {
     "bytes": 2770,
@@ -808,8 +808,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4592,
-    "sha256": "ae320d3a3d584c2a3766743035bd7f5b5d043a93e8965ee2d37602bc5e9432a4"
+    "bytes": 4620,
+    "sha256": "a9fecafee3110567d97ff26a578cf574d9135d0f12a51365221dcc26e64c1175"
   },
   "site_views.py": {
     "bytes": 1962,
@@ -1052,8 +1052,8 @@
     "sha256": "9aad9c60746a87f27ce8fe89babae747a05a6d07835290ba9ee9741b328e5bef"
   },
   "sunday_scout.py": {
-    "bytes": 11064,
-    "sha256": "0a595ff23eac6943766efcdf4b6fe187deb6233518d7ae825e675f0f08d8f1fe"
+    "bytes": 10956,
+    "sha256": "8ed3597214d31ef9c3a7245d6edd0257a27b95241e51f91d5e7e574a4240460c"
   },
   "sunday_scout_pregame_2026-10-11.csv": {
     "bytes": 1927,
@@ -1132,8 +1132,8 @@
     "sha256": "2df0ea58eb50ead0fcc50135fc4f2adab1b15b67780e3c55040689d5e8ef7bac"
   },
   "templates/matchup.html": {
-    "bytes": 3962,
-    "sha256": "51ab2573bd48a37188ec26a3d28f35ebfe939d81cbaac62c4067d33ca289e3ea"
+    "bytes": 3967,
+    "sha256": "a65f22a33f55e319a59a39879c8e709a1aa2d158837e2e1db6b99ee3729c274a"
   },
   "templates/member_picks.html": {
     "bytes": 2404,
@@ -1180,8 +1180,8 @@
     "sha256": "7cb6b2f52a24f7c3593da9292d0da81edd5deb08c239058389734db02d3e51a8"
   },
   "templates/prediction_results.html": {
-    "bytes": 2392,
-    "sha256": "34e56ce6839ae38fe609fd44e3433d942579f3cfeca22fc206e1253601fbe89c"
+    "bytes": 2503,
+    "sha256": "44d4c61bcbd0ae5d436e20d438150894164aaca207559c90e1d2a22117d18c69"
   },
   "templates/scout4_base.html": {
     "bytes": 3395,
@@ -1216,8 +1216,8 @@
     "sha256": "3ae0b3eba6d639d44b138f6065d82d4c30990b8a8e3b0a1499b93d3ada3d4f45"
   },
   "templates/sunday_scout.html": {
-    "bytes": 10346,
-    "sha256": "9e584683f46afdcb25d58735a4f96487cda5a4a6abf71eb27d58b44485135733"
+    "bytes": 10577,
+    "sha256": "5a4c179b22bac1b1c2aeee968eabd0fc7d46f61c7b601c5b8dfd7a3a3763064c"
   },
   "templates/trend_details.html": {
     "bytes": 4068,
@@ -1287,6 +1287,10 @@
     "bytes": 6543,
     "sha256": "148df30e0e283d2188bd013f225f4b42f94a6a4b3905904648c201efaa974961"
   },
+  "test_plug_always_pick.py": {
+    "bytes": 4134,
+    "sha256": "da187845c9190dcf925b14fbd739cfa63dc0b141458b4c5589d3afb0b77434a9"
+  },
   "test_site_refresh.py": {
     "bytes": 3476,
     "sha256": "c659a6af9ad81d9d3ca14436a86c0e05377b19a88f342c7407ce4a513b7a274d"
@@ -1352,8 +1356,8 @@
     "sha256": "4471e502caea1b1f05dc6e9fe2d3e79402d93132244cc2e34fb8f8f3f3c69b5f"
   },
   "weekly_results.py": {
-    "bytes": 8157,
-    "sha256": "adf97b4a626ac96a4782a31f84754432f7e262d84e59d9c2e564b152947a706e"
+    "bytes": 8250,
+    "sha256": "c0e4275f565c1b7eabd47174471a18c5eb7e2b272ce7575500917472aefdd854"
   },
   "world_event_notes.csv": {
     "bytes": 274,

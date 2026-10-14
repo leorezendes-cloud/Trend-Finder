@@ -144,12 +144,10 @@ def scout_report():
             model_fav = round((favorite_form["pf"] + dog_form["pa"]) / 2, 1)
             margin = round(model_dog - model_fav, 1)
             cover_cushion = round(margin + spread, 1)
-            if cover_cushion >= 3:
+            if cover_cushion >= 0:
                 lean = "Form leans underdog"
-            elif cover_cushion <= -3:
-                lean = "Form leans favorite"
             else:
-                lean = "Form sees a close spread"
+                lean = "Form leans favorite"
 
         if len(available) == len(WINDOWS):
             rank_range = max(available) - min(available)
@@ -162,9 +160,9 @@ def scout_report():
         if rank_range is not None and rank_range >= 4:
             highlight = "Historical ranking changes across eras"
         elif len(available) == len(WINDOWS) and max(available) <= 4 and cover_cushion is not None:
-            if cover_cushion >= 3:
+            if cover_cushion >= 0:
                 highlight = "Recent form and historical rankings both favor the underdog"
-            elif cover_cushion <= -3:
+            else:
                 highlight = "Current form conflicts with strong historical ranking"
 
         cards.append({

@@ -1,6 +1,6 @@
 {
-  "version": "scout4-plug-margin-blend-2-automatic-updates",
-  "created_at": "2026-10-13T15:17:41.587064+00:00",
+  "version": "scout4-plug-margin-blend-3-always-pick",
+  "created_at": "2026-10-14T18:46:57.413384+00:00",
   "weights": {
     "scout_scoring": 0.5,
     "plug_points_only": 0.5
@@ -308,11 +308,12 @@
   "score_model_file_sha256": "0da67d8b982e514ce3355cca5f3a134c6d94a5732b7b9c11721cdad44b1b309f",
   "totals_model_file_sha256": "f6cb333805e1686ea7bc7d0bc869e0e8e201c0195a51f4da74a271225ba60781",
   "code_sha256": {
-    "scout4/blend.py": "9b69eab10ba494db06ccff217ed99780cbcbdbab8bf7632f65b3d2947c736f33",
+    "scout4/blend.py": "d79a9f66c5319fa07c18dfda700139245536eb6a463d39da1018bd6df54bc0c7",
     "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
     "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4",
     "scout4/stats.py": "4c748b37e8b17028e7806476068305e280709c65a399607c56ceda8c60375a69",
     "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6"
   },
-  "policy": "First eligible capture per game; identical cutoff, inputs and quote for all components. Totals use Scout only. Automatic refresh uses the same frozen coefficients; original game forecasts are never replaced."
+  "policy": "First eligible pregame pick stays locked. Blend ATS chooses the underdog on an exact edge tie (home on pick\u2019em); totals choose Under on an exact model tie. Missing valid inputs remain pending. No retroactive changes.",
+  "always_pick": true
 }

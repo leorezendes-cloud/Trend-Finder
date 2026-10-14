@@ -23,6 +23,19 @@ def combine(scout_margin,plug_margin,line):
     return {'away_margin':margin,'ats_edge':edge,'side':None if abs(edge)<1e-9 else 'away' if edge>0 else 'home'}
 
 
+def plug_ats_pick(decision,game,line,always_pick=False):
+    side=decision['side']
+    if side is None and always_pick:side='away' if line>0 else 'home'
+    return game[side+'_team'] if side else None
+
+
+def plug_total_pick(prediction,always_pick=False):
+    result=dict(prediction)
+    if always_pick and result.get('lean')=='No Call':
+        result.update(lean='Under',tie_break='Exact model tie: Under')
+    return result
+
+
 def plug_prediction(schedule,game):
     """Preserve Plug PF/PA rounding and points-only formula on earlier weeks."""
     output={};history={}
@@ -91,12 +104,13 @@ def run(root=ROOT,now=None):
             components={}
             for name,margin in [('Scout scoring',scout['margin_first']),('The Plug',plug['away_margin']),('Blend',combined['away_margin'])]:
                 decision=combine(margin,margin,q['line'])
-                components[name]={'away_margin':margin,'ats_edge':decision['ats_edge'],'pick':None if decision['side'] is None else g[decision['side']+'_team']}
+                components[name]={'away_margin':margin,'ats_edge':decision['ats_edge'],'pick':plug_ats_pick(decision,g,q['line'],config.get('always_pick',False) and name=='Blend')}
+                if name=='Blend' and config.get('always_pick') and decision['side'] is None:components[name]['tie_break']='Exact model tie: underdog, or home at pick’em'
             tq=quote(quotes,g,'Total',now);total=None
             if tq:
                 teams,league=profiles(schedule,feed,year,week);values=features(teams,league,g['away_team'],g['home_team'],g.get('location')=='Neutral',tq['line'])
                 if values:total=predict(config['totals_candidate']['model'],values,tq['line'])
-                if total is not None:total={'quote':tq,'prediction':total,'features':values,'model':'Scout totals only; not blended'}
+                if total is not None:total={'quote':tq,'prediction':plug_total_pick(total,config.get('always_pick',False)),'features':values,'model':'Scout totals only; not blended'}
             record={'game_id':g['game_id'],'away_team':g['away_team'],'home_team':g['home_team'],'season':year,'week':week,
                     'kickoff_utc':ko.isoformat(),'decision_cutoff_utc':now.isoformat(),'version':config['version'],
                     'configuration_sha256':model_hash,'weights':config['weights'],'quote':q,'components':components,
