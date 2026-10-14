@@ -97,3 +97,6 @@ html body .matchup-panel { padding: 18px; box-sizing: border-box; }
 html body .matchup-panel > h2 { margin: 0 0 16px; }
 html body .matchup-panel > p { margin: 12px 0; }
 html body .matchup-panel > a { display: inline-block; margin: 8px 0 4px; }
+
+html body main > .matchup-panel { margin-bottom: 24px; }
+html body .stats-grid:has(> .matchup-panel) { gap: 24px; }
