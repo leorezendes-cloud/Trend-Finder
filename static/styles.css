@@ -1072,3 +1072,17 @@ h2 {
 .qb-search-summary p { font:14px Arial,sans-serif; }
 
 [data-game-anomaly][hidden] { display: none !important; }
+
+/* Keep trend verification as a compact gold link, without a form panel. */
+.combination-card a, .combination-card a:visited { color: #fbbf24; }
+.combination-card .trend-verification-form {
+    display: block; width: auto; max-width: none; margin: 12px 0;
+    padding: 0; background: transparent; border: 0; border-radius: 0;
+    box-shadow: none; text-align: left;
+}
+.combination-card .trend-verification-link {
+    display: inline; width: auto; margin: 0; padding: 0; background: transparent;
+    border: 0; border-radius: 0; box-shadow: none; color: #fbbf24;
+    font: inherit; text-decoration: underline; cursor: pointer;
+}
+.combination-card .trend-verification-link:hover { color: #fde68a; background: transparent; }

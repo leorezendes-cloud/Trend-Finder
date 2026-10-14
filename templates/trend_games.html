@@ -20,10 +20,10 @@
         <p>{% if season is none %}All seasons{% elif season is number %}Season {{ season }}{% else %}Seasons {{ season[0] }}–{{ season[1] }}{% endif %}{% if scope_labels %} | {{ scope_labels | display_trend_filters }}{% endif %}</p>
         <p>These are completed games matching every condition and manual filter. The ATS result belongs to the underdog; the score is shown away team first. Pushes are excluded from the cover rate.</p>
         <p class="combination-description">{{ trend.description }}</p>
-        <form method="post" action="{{ url_for('trend_finder') }}">
+        <form class="trend-verification-form" method="post" action="{{ url_for('trend_finder') }}">
             <input type="hidden" name="combination_conditions" value="{{ conditions|tojson|forceescape }}">
             {% for key,value in verification_fields.items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
-            <button type="submit" name="action" value="analyze">Verify this record in Trend Finder</button>
+            <button class="trend-verification-link" type="submit" name="action" value="analyze">Verify record in Trend Finder →</button>
         </form>
         {% if trend.ats_rate is defined %}<p class="combination-win-rate">Underdog ATS: {{ trend.ats_wins }}–{{ trend.ats_losses }}–{{ trend.ats_pushes }} | {{ '%.2f'|format(trend.ats_rate) }}%</p>{% endif %}
                 {% if trend.baseline %}

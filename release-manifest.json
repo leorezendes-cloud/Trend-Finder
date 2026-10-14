@@ -964,8 +964,8 @@
     "sha256": "3a5f7b7269709f7251d12f91c58f1b4f5cba32f5d40e31e2022442e51d9f3fa7"
   },
   "static/styles.css": {
-    "bytes": 20363,
-    "sha256": "7a652c983d9f8b3516a2f2cf061b2392865a9a1318eb4d58f92c022894f5b7c1"
+    "bytes": 21086,
+    "sha256": "f1f50a60c066f61851dcabc020dd70573e5a7e6d44b4f6f831b460a3c63bb097"
   },
   "static/weekly_results.css": {
     "bytes": 2674,
@@ -1064,8 +1064,8 @@
     "sha256": "d79724aacb86663c64feeb0397365689a80ed894f004b65b0ff1fe8f56049e76"
   },
   "templates/index.html": {
-    "bytes": 28219,
-    "sha256": "d3160b702d415cea801160f7e5dce92cb421d563073b9941a9b5f953528b886d"
+    "bytes": 27555,
+    "sha256": "6813b6341ed422f69a446bdaa403834255b8656200895c6c005cb6bdaa701654"
   },
   "templates/matchup.html": {
     "bytes": 3928,
@@ -1128,8 +1128,8 @@
     "sha256": "f24ecfe822d964eeee43d5c56d777c64de8e4a4c3f8a23624f908a6d99d30205"
   },
   "templates/trend_games.html": {
-    "bytes": 4650,
-    "sha256": "4613c06bb334e529dac044796383483bec6335cf42706e02a17fac6ab9fd2f89"
+    "bytes": 4713,
+    "sha256": "d5cdff1fa6ac76f1a1fbc305c5339ad45131992dce4a144de50736d576f6764d"
   },
   "templates/trends.html": {
     "bytes": 19490,
