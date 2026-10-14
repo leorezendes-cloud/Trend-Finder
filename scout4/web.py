@@ -1,4 +1,5 @@
 """Scout 4.0 read-only statistics pages."""
+from pregame_lines import effective_rows
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -26,7 +27,7 @@ def sources(season):
 
 
 def view_data():
-    schedule = read_csv(ROOT / 'nfl_games.csv')
+    schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
     years = sorted({int(r['season']) for r in schedule}, reverse=True)
     cache_years = sorted(int(p.parent.name) for p in (ROOT/'data'/'scout4').glob('*/latest.json'))
     try:

@@ -82,3 +82,13 @@ html body .landing-welcome h1 { font-size: clamp(32px, 5vw, 56px); margin: 0 0 3
 .score-card { display: flex; flex-direction: column; gap: 8px; background: #1f2937; border: 1px solid #64748b; border-radius: 10px; padding: 16px; color: white; text-decoration: none; font: 15px/1.4 Arial,sans-serif; -webkit-text-stroke: 0; }
 .score-card span, .score-update { color: #cbd5e1; font: 13px/1.5 Arial,sans-serif; -webkit-text-stroke: 0; }
 a.score-card:hover, .fan-shortcuts a:hover { border-color: #fbbf24; }
+
+html body .matchup-comparison-link { color: #fbbf24; -webkit-text-stroke: 0; }
+html body .matchup-comparison { padding: 16px; box-sizing: border-box; }
+.score-card { gap: 3px; }
+.score-card > span { font-size: 11px; line-height: 12px; }
+.score-card > strong { font-size: 14px; line-height: 18px; }
+html body .matchup-comparison table { width: 100%; table-layout: fixed; }
+html body .matchup-comparison :is(th,td) { white-space: normal; overflow-wrap: anywhere; }
+html body .matchup-comparison th:first-child { width: 40%; }
+html body .matchup-comparison td small { display: block; font-size: 10px; margin-top: 3px; }

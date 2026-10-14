@@ -90,6 +90,9 @@ def team_records(schedule, feed, season, before_week):
             for metric in ('passing_yards', 'rushing_yards', 'passing_epa', 'rushing_epa'):
                 row[metric + '_allowed'] = number(opp.get(metric))
             row['net_points'] = row['points_for'] - row['points_against']
+            market = betting_result(game)
+            row['ats'] = market['home_ats'] if side == 'home' else {'W':'L','L':'W','P':'P',None:None}[market['home_ats']]
+            row['ou'] = market['ou']
             output.append(row)
     return sorted(output, key=lambda r: (r['date'], r['week'], r['game_id'], r['team']))
 
@@ -147,7 +150,7 @@ def summarize_team(selected, all_venues):
     summary = {m: mean_metric(selected, m) for m in metrics}
     for metric in metrics:
         summary[metric]['smoothed'] = smooth(summary[metric], mean_metric(all_venues, metric))
-    return {'games': len(selected), 'wins': sum(r['net_points'] > 0 for r in selected),
+    return {'markets': market_record(selected), 'games': len(selected), 'wins': sum(r['net_points'] > 0 for r in selected),
             'losses': sum(r['net_points'] < 0 for r in selected),
             'ties': sum(r['net_points'] == 0 for r in selected), 'metrics': summary,
             'baseline_games': len(all_venues)}
@@ -211,3 +214,39 @@ def recent_form(rows):
             'streak': f'{count} straight ' + ({'W':'win','L':'loss','T':'tie'}[outcomes[-1]] if count == 1 else {'W':'wins','L':'losses','T':'ties'}[outcomes[-1]]) if outcomes else 'No completed games',
             'recent_points': mean_metric(ordered[-3:], 'points_for')['value'],
             'season_points': mean_metric(ordered, 'points_for')['value']}
+
+
+def betting_result(game, home_score=None, away_score=None):
+    """Grade saved CSV lines; positive spread_line means the home team is favored."""
+    home = number(game.get('home_score')) if home_score is None else number(home_score)
+    away = number(game.get('away_score')) if away_score is None else number(away_score)
+    spread, total = number(game.get('spread_line')), number(game.get('total_line'))
+    ats = ou = None
+    if home is not None and away is not None:
+        if spread is not None:
+            margin = home - away - spread
+            ats = 'W' if margin > 0 else 'L' if margin < 0 else 'P'
+        if total is not None:
+            margin = home + away - total
+            ou = 'O' if margin > 0 else 'U' if margin < 0 else 'P'
+    return {'spread': spread, 'total': total, 'home_ats': ats, 'ou': ou}
+
+
+def market_record(rows):
+    ats = [r.get('ats') for r in rows]
+    ou = [r.get('ou') for r in rows]
+    def streak(values, labels):
+        if not values or values[-1] is None:
+            return 'Latest game ungraded'
+        count = 0
+        for value in reversed(values):
+            if value != values[-1]:
+                break
+            count += 1
+        return f'{count} straight {labels[values[-1]]}'
+    ordered = sorted(rows, key=lambda r: (r['date'], r['week'], r['game_id']))
+    return {'ats_w': ats.count('W'), 'ats_l': ats.count('L'), 'ats_p': ats.count('P'),
+            'over': ou.count('O'), 'under': ou.count('U'), 'total_push': ou.count('P'),
+            'ats_known': sum(x is not None for x in ats), 'ou_known': sum(x is not None for x in ou),
+            'ats_streak': streak([r.get('ats') for r in ordered], {'W':'ATS covers','L':'ATS losses','P':'ATS pushes'}),
+            'ou_streak': streak([r.get('ou') for r in ordered], {'O':'overs','U':'unders','P':'total pushes'})}

@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from app import app
 from fan_views import parse_scores, _score_cache, leaders
-from scout4.stats import recent_form
+from scout4.stats import recent_form, betting_result, team_records, summarize_team
 
 
 class FanViewsTests(unittest.TestCase):
@@ -47,6 +47,24 @@ class FanViewsTests(unittest.TestCase):
         form = recent_form(rows[::-1])
         self.assertEqual(form['streak'], '5 straight wins')
         self.assertEqual([r['week'] for r in form['games']], [7,6,5,4,3])
+
+    def test_market_grades_pushes_missing_lines_and_team_perspective(self):
+        game = {'home_score':'24','away_score':'21','spread_line':'3','total_line':'45'}
+        self.assertEqual(betting_result(game)['home_ats'], 'P')
+        self.assertEqual(betting_result(game)['ou'], 'P')
+        game.update(spread_line='2.5', total_line='44.5')
+        self.assertEqual(betting_result(game)['home_ats'], 'W')
+        self.assertEqual(betting_result(game)['ou'], 'O')
+        game.update(game_id='2026_01_BUF_LV',home_team='LV',away_team='BUF',season='2026',week='1',game_type='REG',gameday='2026-09-13')
+        rows = team_records([game], [], 2026, 2)
+        home = next(row for row in rows if row['team']=='LV')
+        away = next(row for row in rows if row['team']=='BUF')
+        self.assertEqual(home['ats'], 'W')
+        self.assertEqual(away['ats'], 'L')
+        self.assertEqual(summarize_team([home], [home])['markets']['over'], 1)
+        game.update(spread_line='', total_line='')
+        self.assertIsNone(betting_result(game)['home_ats'])
+        self.assertIsNone(betting_result(game)['ou'])
 
     def test_ppr_formula_and_missing_stat_exclusion(self):
         row = {'player_id':'test', 'team':'BUF', 'name':'Test player','position':'RB',

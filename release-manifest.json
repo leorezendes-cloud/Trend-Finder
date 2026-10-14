@@ -616,8 +616,8 @@
     "sha256": "0d44d0f583f6154684b65910475db2876c76e146bdd33b00b01c418ae80e49e7"
   },
   "scout4/stats.py": {
-    "bytes": 9770,
-    "sha256": "b751caeeca7894c19cfe6c774f193baf1abe03cfe45ee58bd8b8198b9d0f4dee"
+    "bytes": 11839,
+    "sha256": "4c748b37e8b17028e7806476068305e280709c65a399607c56ceda8c60375a69"
   },
   "scout4/totals.py": {
     "bytes": 8289,
@@ -628,8 +628,8 @@
     "sha256": "811eabe38a0c084e2332535c58eb8ee7a5d694c7bdea515031d7fc5970a50610"
   },
   "scout4/web.py": {
-    "bytes": 14181,
-    "sha256": "cc86cf6c8e7c14f7f51e0d844309a2273ec39ae51fe0fa731cff3cceb2f0d71f"
+    "bytes": 14262,
+    "sha256": "8b5b035c9e581b600004a2fd9d20f550da265e4f96272839b09295080168f605"
   },
   "scout_kickoff_2026_10_12_model_comparison.csv": {
     "bytes": 272,
@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 7614,
-    "sha256": "b15114442c0bbd02b28b64ff0f785cf2df0e37a9a05ea399b1b1e490edd21efc"
+    "bytes": 8232,
+    "sha256": "058ebabb267234277b03ae3fd81fb564f608b237afa83dbab67cca31bd2e93af"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1048,12 +1048,12 @@
     "sha256": "847336147c27d56d38df5a95ee7d400ff743939591140c089dda2a5559a5450e"
   },
   "templates/scout4_teams.html": {
-    "bytes": 4904,
-    "sha256": "17d90a2d730b391e898e0cf07b6d43b40a2e8341f599dca63404505147a415cb"
+    "bytes": 5445,
+    "sha256": "738e0b9ceba203fc713776f6a69780c304544a0a378450bed6040921f5c80e06"
   },
   "templates/sunday.html": {
-    "bytes": 8303,
-    "sha256": "a7f3314f074118b2f9d8c9f1c6cbb9cace9fbbcbe1b7a89931d269cc31e3a82f"
+    "bytes": 8335,
+    "sha256": "cf0df5724f6d11cd16a56b8bdfff3ea2524458d316c5e06a15f5926da570dd8a"
   },
   "templates/sunday_results.html": {
     "bytes": 6459,
@@ -1160,23 +1160,23 @@
     "sha256": "cb323e2b5cc2895e021f721d096b41028a9591294422567184e010b5b10f838c"
   },
   "fan_views.py": {
-    "bytes": 7085,
-    "sha256": "c3ec4d613e47e4754e9f3acd27ccaa60766e4435d4211a67a827723cc6baa4b0"
+    "bytes": 7652,
+    "sha256": "ddd1a1ce1cbfece01b10a3dccde4ace708742601d70f66742eb7166d7512d788"
   },
   "static/scores.js": {
-    "bytes": 1729,
-    "sha256": "5aeb6ddf783e9db101c9f06eea3173b333be7292e41e89ee419e4323a4362d18"
+    "bytes": 2635,
+    "sha256": "5b366ce2347ce6c21a548549172afb865221968187952ea4c3045cd49e4da686"
   },
   "templates/matchup.html": {
-    "bytes": 3275,
-    "sha256": "08b060a76c55fc8952910fab4c3be9de6af5b949faf9d5ca11ad2937b62ad414"
+    "bytes": 3778,
+    "sha256": "1520202ee6f8b327c8866c386447f308a58b8c745e9d43ac286f9d5d5bb8fd85"
   },
   "templates/fantasy.html": {
     "bytes": 2142,
     "sha256": "316fd29da4d900ee6558a8b4e5b86c694fe15d5f8575cef39a07bd5bf7ae6f01"
   },
   "test_fan_views.py": {
-    "bytes": 3585,
-    "sha256": "9abf086ee5451b5d0c119c43ddea31655231545f49b87bf4df0c1fe77f854c84"
+    "bytes": 4740,
+    "sha256": "421ec9c8462101a2eab62a442437603fb8c8842592db669630d6e944d167c039"
   }
 }

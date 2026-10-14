@@ -8,8 +8,9 @@ from threading import Lock
 from urllib.request import Request, urlopen
 from flask import Blueprint, abort, jsonify, render_template, url_for
 from scout4.web import sources, view_data
-from scout4.stats import read_csv, team_records, player_records, summarize_team, summarize_player, team_code
+from scout4.stats import read_csv, team_records, player_records, summarize_team, summarize_player, team_code, betting_result
 from pathlib import Path
+from pregame_lines import effective_rows
 
 ROOT = Path(__file__).resolve().parent
 bp = Blueprint('fans', __name__)
@@ -53,13 +54,20 @@ def scores():
             except (OSError, ValueError, TypeError, AttributeError):
                 _score_cache['stale'] = True
             _score_cache['expires'] = time.monotonic() + 60
-        schedule = read_csv(ROOT / 'nfl_games.csv')
+        schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
         games = []
         for game in _score_cache['games']:
             row = dict(game)
             matches = [g for g in schedule if team_code(g['away_team']) == row['away']
                        and team_code(g['home_team']) == row['home'] and g['gameday'] == datetime.fromisoformat(row['date'].replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York')).date().isoformat()]
             row['url'] = url_for('fans.matchup', game_id=matches[0]['game_id']) if len(matches) == 1 else None
+            row['market'] = None
+            if len(matches) == 1:
+                saved = dict(matches[0])
+                # Live scores are graded only once the provider marks the game final.
+                saved.update(home_score=row['home_score'] if row['state']=='post' else '',
+                             away_score=row['away_score'] if row['state']=='post' else '')
+                row['market'] = betting_result(saved)
             games.append(row)
         result = jsonify(games=games, updated=_score_cache['updated'],
                          stale=_score_cache.get('stale', False), source='ESPN')
@@ -69,7 +77,7 @@ def scores():
 
 def fan_context(game):
     season, week = int(game['season']), int(game['week'])
-    schedule = read_csv(ROOT / 'nfl_games.csv')
+    schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
     teams, players, manifest = sources(season)
     records = team_records(schedule, teams, season, week)
     people = player_records(schedule, players, season, week)
