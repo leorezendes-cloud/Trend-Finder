@@ -964,8 +964,8 @@
     "sha256": "3a5f7b7269709f7251d12f91c58f1b4f5cba32f5d40e31e2022442e51d9f3fa7"
   },
   "static/styles.css": {
-    "bytes": 21199,
-    "sha256": "90f41e50acedc8ef3e785387a7b436598d0db361dad22750b6859aafcbeb2da2"
+    "bytes": 21355,
+    "sha256": "97fa163074337d1f01bed25cdc48aa33f260793c8ceb5644bd8d21b1930c2910"
   },
   "static/weekly_results.css": {
     "bytes": 2674,
@@ -1064,8 +1064,8 @@
     "sha256": "d79724aacb86663c64feeb0397365689a80ed894f004b65b0ff1fe8f56049e76"
   },
   "templates/index.html": {
-    "bytes": 27700,
-    "sha256": "3b9a885c1ebefdcf47aaa2dce5027284e4b133727ce0a73360ad49cc5c606cf9"
+    "bytes": 27731,
+    "sha256": "8f523f390c9d2b564921093ce68cf1e3449fd42e9b14b1f0cd57fc14e83ebc0d"
   },
   "templates/matchup.html": {
     "bytes": 3928,

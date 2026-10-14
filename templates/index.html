@@ -16,7 +16,7 @@
     <p class="section-intro">Build your own research with filters and combinations, or <a href="{{ url_for('trends_page') }}">Discover Trends</a> to explore current patterns and streaks.</p>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
         <h1 class="search-panel-title">Trend Findah 3000</h1>
-        {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}
+        {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}
         <div class="form-grid">
             <div class="filter-mode-row">
             <div class="field">

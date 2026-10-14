@@ -1090,3 +1090,6 @@ h2 {
 .combination-details a, .combination-impact a {
     font-weight: 400; -webkit-text-stroke: 0; color: #fbbf24;
 }
+
+.home-filter-form .clear-combination-link,
+.home-filter-form .clear-combination-link:visited { color: #fbbf24; font-weight: 400; -webkit-text-stroke: 0; }
