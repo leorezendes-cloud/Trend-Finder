@@ -17,3 +17,7 @@ URLs use the validated `PUBLIC_ORIGIN` configuration, never incoming Host header
 5. Check Page indexing for errors and Performance for actual search impressions/clicks as Google processes the site.
 
 Verification needs the owner's Google account and domain access; it is not performed by deploying these files. Metadata and sitemap submission help discovery and presentation, but neither guarantees indexing nor a particular ranking. No advertising or tracking scripts are introduced.
+
+## Distinctive search phrases
+
+Homepage and trend pages emphasize “discover NFL trends” and “Trendfindah 3000”. Dungeon metadata includes “NFL conspiracies”, “conspiracy theories”, and the Conspiracy Dungeon name, alongside its actual betting-pattern research features. These are descriptive titles/snippets, not a meta-keywords tag or claims that anomalies prove misconduct. The visible page format and wording remain unchanged.

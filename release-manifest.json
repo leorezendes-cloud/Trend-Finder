@@ -28,8 +28,8 @@
     "sha256": "7fd7a1046f79d9cf1849267fab11149a25cc914bb0ab02cdeda15a1084a3bb6a"
   },
   "SEO.md": {
-    "bytes": 2340,
-    "sha256": "88f2b059e084d55f824ce4b8c3df11a6f1ac8d4abcd51c2364141b7560ece1f5"
+    "bytes": 2787,
+    "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4197,
@@ -816,8 +816,8 @@
     "sha256": "1edff0f8f42ceab38fd034eb0b7dfeb6a17ffd763134913d967532cd3f7cfae1"
   },
   "seo.py": {
-    "bytes": 7183,
-    "sha256": "2c5c8df28ae78a46ae4110168ed816c3abc9f933b57b3e97d721436bd30fa082"
+    "bytes": 7258,
+    "sha256": "1d9504f759334ec0b10bac291c0a375107eb796ef9b516969afa7a020c659bc8"
   },
   "site_views.py": {
     "bytes": 1962,

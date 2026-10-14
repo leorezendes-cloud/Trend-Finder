@@ -5,9 +5,9 @@ from xml.etree import ElementTree as ET
 from flask import current_app,has_request_context,request,Response
 
 PAGES={
- 'home':('/', 'NFL Predictions, ATS Trends & Matchups | Gravy Train', 'Explore NFL predictions, historical ATS trends, team comparisons, upcoming matchups, and free member picks with Gravy Train and Trend Findah.'),
- 'trend_finder':('/trend-finder','NFL ATS Trend Finder | Trend Findah | Gravy Train','Research historical NFL underdog trends by season, spread, team, coach, quarterback, venue, and primetime. Save your searches with a free account.'),
- 'trends_page':('/trends','Discover NFL ATS Trends & Streaks | Gravy Train','Explore NFL against-the-spread trends, recent performance, and streaks with historical sample sizes and upcoming matchup comparisons.'),
+ 'home':('/', 'Discover NFL Trends & Predictions | Gravy Train', 'Discover NFL trends with Trendfindah 3000, get The Plug’s locked predictions, and investigate betting patterns and conspiracy theories in the Conspiracy Dungeon.'),
+ 'trend_finder':('/trend-finder','Trendfindah 3000 | Discover NFL Trends | Gravy Train','Discover NFL trends with Trendfindah 3000. Research historical ATS patterns by season, spread, team, coach, quarterback, and primetime, and save your searches.'),
+ 'trends_page':('/trends','Discover NFL Trends, ATS Patterns & Streaks | Gravy Train','Discover NFL trends and ATS streaks with Trendfindah 3000: compare historical records, sample sizes, recent performance, and upcoming matchups.'),
  'sunday_page':('/sunday','Upcoming NFL Matchups & Spreads | Gravy Train','Review this week’s NFL matchups, saved spreads, kickoff times, and historical underdog trends. Compare teams and make free member picks.'),
  'market_page':('/market','Upcoming NFL Spreads & Totals | Gravy Train','See the latest verified saved NFL spreads and over/under totals for upcoming games, with quote timestamps and links to team comparisons.'),
  'plug_page':('/the-plug','NFL ATS & Over/Under Picks | The Plug | Gravy Train','See The Plug’s locked NFL ATS and over/under predictions, projected scores, original lines, and recorded results, powered by Scout 4.0.'),
@@ -17,7 +17,7 @@ PAGES={
  'scout4.ratings_page':('/scout4/ratings','NFL Team Ratings | Scout 4.0 | Gravy Train','Explore NFL team ratings and matchup research powered by Scout 4.0, with saved data and transparent model information.'),
  'fans.fantasy':('/fantasy','NFL Fantasy Football PPR Stats | Gravy Train','Explore NFL fantasy football PPR statistics and player performance using saved season data.'),
  'fans.prediction_results':('/predictions/results','NFL Prediction Results & Pick Records | Gravy Train','Track The Plug’s NFL ATS and over/under results. Picks are saved before kickoff and graded against their original lines and verified final scores.'),
- 'conspiracy_dungeon_page':('/conspiracy-dungeon','NFL Public Money & Betting Anomalies | Gravy Train','Explore NFL public betting splits, saved line movement, referee assignments, and descriptive anomalies in the Conspiracy Dungeon.'),
+ 'conspiracy_dungeon_page':('/conspiracy-dungeon','NFL Conspiracies & Betting Patterns | Conspiracy Dungeon','Explore NFL conspiracy theories through public betting splits, line movement, referee trends, and unusual game results in the Conspiracy Dungeon.'),
 }
 ALIASES={'sunday_scout.sunday_scout_page':'plug_page'}
 TEAMS={'ARI':'Arizona Cardinals','ATL':'Atlanta Falcons','BAL':'Baltimore Ravens','BUF':'Buffalo Bills','CAR':'Carolina Panthers','CHI':'Chicago Bears','CIN':'Cincinnati Bengals','CLE':'Cleveland Browns','DAL':'Dallas Cowboys','DEN':'Denver Broncos','DET':'Detroit Lions','GB':'Green Bay Packers','HOU':'Houston Texans','IND':'Indianapolis Colts','JAX':'Jacksonville Jaguars','KC':'Kansas City Chiefs','LA':'Los Angeles Rams','LAC':'Los Angeles Chargers','LV':'Las Vegas Raiders','MIA':'Miami Dolphins','MIN':'Minnesota Vikings','NE':'New England Patriots','NO':'New Orleans Saints','NYG':'New York Giants','NYJ':'New York Jets','PHI':'Philadelphia Eagles','PIT':'Pittsburgh Steelers','SEA':'Seattle Seahawks','SF':'San Francisco 49ers','TB':'Tampa Bay Buccaneers','TEN':'Tennessee Titans','WAS':'Washington Commanders'}
