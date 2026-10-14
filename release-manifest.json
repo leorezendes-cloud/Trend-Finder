@@ -920,8 +920,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 9058,
-    "sha256": "acbe2f1f2fce0b28a4b460fa4341b7e329af2c05e7691681441820c8655fb302"
+    "bytes": 9122,
+    "sha256": "0e640060e7564f9573905596f303017ca3b46c1db57440f13d7a5fd318376fbe"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1184,7 +1184,7 @@
     "sha256": "de9a31e0a0d0e9e49afeadef9374cb2eb3dd72900b807d5dc2d055b253743649"
   },
   "templates/prediction_results.html": {
-    "bytes": 2354,
-    "sha256": "611d84957bb51ea33595c69b1ca275a3b8c84284ef4f9ea952dce9048308dc0c"
+    "bytes": 2392,
+    "sha256": "34e56ce6839ae38fe609fd44e3433d942579f3cfeca22fc206e1253601fbe89c"
   }
 }
