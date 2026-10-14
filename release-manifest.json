@@ -1076,8 +1076,8 @@
     "sha256": "495cc73e62c19628334ed6f5d86e1eeca18e171131fa4e42cc5dfc750291252b"
   },
   "templates/_home_sections.html": {
-    "bytes": 1227,
-    "sha256": "633047f7e6607b6b8e5597f0a2a9a8d1d64ef742533c3c1ad1be0ba58340d374"
+    "bytes": 1231,
+    "sha256": "c217a0106fac96273aef944f5ad6b9f41a58853b48a3c003206d0e3d00f493b5"
   },
   "templates/_inline_picks.html": {
     "bytes": 1170,
@@ -1096,8 +1096,8 @@
     "sha256": "0be974261e53fe988f1e21ee7bcc634dfc0ca485ab2c998aa0c6108830a489fb"
   },
   "templates/_site_navigation.html": {
-    "bytes": 4751,
-    "sha256": "2001c45cf32c129682506a706c81c5de29b1e46222f5c19be5517112484b50a3"
+    "bytes": 4754,
+    "sha256": "85b496274de7cf9a24aee2ee4545e04fe636de493cb6d24071951af6e7ef5e02"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2791,
@@ -1132,12 +1132,12 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/home.html": {
-    "bytes": 4700,
-    "sha256": "db38902595e951f6a591a2fc1de246d1ee5a3f5cba3a629b2c357c9a3505d236"
+    "bytes": 4695,
+    "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
-    "bytes": 27919,
-    "sha256": "f593d872eb3976684a2ccb7bf952005bb18a520a1bf3507da452adab59ce6864"
+    "bytes": 27945,
+    "sha256": "462ffb29f6d67b7c326594388ae40dca9153f7c353932c6b14b685b02dd45f96"
   },
   "templates/market.html": {
     "bytes": 1259,
@@ -1312,8 +1312,8 @@
     "sha256": "c659a6af9ad81d9d3ca14436a86c0e05377b19a88f342c7407ce4a513b7a274d"
   },
   "test_site_sections.py": {
-    "bytes": 5652,
-    "sha256": "cf539da0ace630209193d4a8740a85188f02b25cc01da4f6890ca4c7c12a45f9"
+    "bytes": 5649,
+    "sha256": "ca5a198d363d22412090c893b60cbe8e330bce133473756c1ee924b99b77c7a5"
   },
   "test_trend_cache.py": {
     "bytes": 1361,

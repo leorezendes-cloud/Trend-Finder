@@ -52,7 +52,7 @@ class SiteSectionsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.text
         self.assertIn('Find your next angle.', html)
-        self.assertIn('Find a sneaky trend with the Trend Findah 3000.', html)
+        self.assertIn('Discover NFL trends with custom ATS filters.', html)
         self.assertIn('Picks going left?? Get right with the plug.', html)
         self.assertIn('Find the fix in the Conspiracy Dungeon.', html)
         self.assertIn('Sign in', html)
