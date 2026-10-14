@@ -1,5 +1,6 @@
 """Opt-in updates on Render's persistent disk; never run on page requests."""
 import json
+from membership_backups import backup_database
 import os
 import shutil
 import subprocess
@@ -74,6 +75,9 @@ def update_once(root):
         except Exception as error:
             stages[name] = 'failed: ' + type(error).__name__
             print(f'Automatic update {name} failed: {type(error).__name__}', flush=True)
+    attempt('account backup', lambda: backup_database(
+        os.environ.get('TREND_FINDAH_DATABASE', '/var/data/members.sqlite3'),
+        Path(os.environ.get('TREND_FINDAH_DATABASE', '/var/data/members.sqlite3')).resolve().parent/'account-backups'))
     finals.BACKUPS = root / 'backups'
     attempt('finals', lambda: finals.main(['--apply','--season',str(season),'--file',str(root/'nfl_games.csv')]))
     attempt('stats', lambda: collect(season, root/'data/scout4'))

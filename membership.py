@@ -145,6 +145,23 @@ def init_membership(app):
         click.echo('Local test only; expires in 15 minutes:')
         click.echo('http://localhost:5002/members/reset-password/' + token)
 
+    @app.cli.command('membership-backup-status')
+    def backup_status():
+        """Report backup health without printing account details."""
+        import json
+        folder = Path(current_app.config['MEMBERSHIP_DATABASE']).resolve().parent/'account-backups'
+        status_path = folder/'status.json'
+        if not status_path.exists():
+            click.echo('No automatic account backup has completed yet.')
+            return
+        status = json.loads(status_path.read_text())
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        stamp = datetime.fromisoformat(status['completed_at']).astimezone(ZoneInfo('America/New_York'))
+        click.echo('Latest backup: ' + stamp.strftime('%b %d, %I:%M %p %Z'))
+        click.echo('Restore verified: ' + ('yes' if status['restore_verified'] else 'no'))
+        click.echo('Stored in: ' + str(folder))
+
     @app.cli.command('backup-membership-db')
     @click.argument('destination', type=click.Path())
     def backup(destination):

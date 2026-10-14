@@ -58,3 +58,9 @@ Before public release, configure the Resend key, verify the sending domain, appl
 ## Signup totals
 
 In the Render service's Shell, run `python -m flask --app wsgi membership-count`. It reports total members, signups in the last seven days, and newsletter opt-ins without printing member emails. This operator command is not a public endpoint. Running it locally counts only the local database, not hosted accounts.
+
+## Automatic account backups
+
+With hosted automatic updates enabled, the account database is backed up every six hours into `/var/data/account-backups`. The SQLite backup API produces a consistent copy while users are active. Every snapshot is integrity checked and restored into a temporary database; full rows and counts are compared before it becomes a retained backup. The directory is private (0700) and snapshots are private (0600). The newest 112 snapshots are retained, approximately 28 days at the six-hour schedule. In Render Shell, run `python -m flask --app wsgi membership-backup-status` to check the latest verification. These backups share the service disk: they do not protect against loss of the entire disk. Arrange a separate private storage destination before treating disaster recovery as complete. No automatic upload of member data occurs.
+
+For recovery, verify a selected copy in isolation with `membership_backups.verify_restore`, then stop the web service before an operator replaces the account database. Keep the current database separately. Do not restore over a running service, and do not use an entire disk rollback for routine account recovery because it would also roll back stats and sealed predictions.

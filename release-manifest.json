@@ -12,8 +12,8 @@
     "sha256": "c6acc060dd2805f269324508f0a2cb223b2f734c542585fa5a8591365934aa8d"
   },
   "MEMBERSHIP.md": {
-    "bytes": 5415,
-    "sha256": "621c332cd8a985ca744ba14a2c44c7e991769cd7883f2e1374c8f855c5a26f69"
+    "bytes": 6655,
+    "sha256": "b6bf655ece8c12e9eddd43006ac6d4c84ad609fc4b2c58ed1f28d894a5341a8b"
   },
   "anomaly_analysis.py": {
     "bytes": 8461,
@@ -532,8 +532,8 @@
     "sha256": "9c870b95c93d5c3dbc647ed484eb7e5521e393550c63ebea94e2fa53decbe113"
   },
   "membership.py": {
-    "bytes": 17953,
-    "sha256": "ce8514ee8b6e4d09d5ed82d10f1c35a66fa1af7ebe5f94d507768a37b1fbaf15"
+    "bytes": 18838,
+    "sha256": "76ba5db08b278254dd203e28469f5c2574a05ba03c56eb879167ab9581262f35"
   },
   "nfl_games.csv": {
     "bytes": 2190111,
@@ -1148,8 +1148,8 @@
     "sha256": "c4345153153c3b0a98b60ee4c56d38ce015ad6007bff436fb0cc228875140a83"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4301,
-    "sha256": "0a41c20aac0e4c53555b5fe39f128ccb304ae55551e57ab8e624a013c9ff254f"
+    "bytes": 4331,
+    "sha256": "4570a441ef3e0e95f497391adc459a7f347175118591b6148c454f8e8e5f2e62"
   },
   "test_trend_cache.py": {
     "bytes": 1361,
@@ -1188,8 +1188,8 @@
     "sha256": "34e56ce6839ae38fe609fd44e3433d942579f3cfeca22fc206e1253601fbe89c"
   },
   "hosted_updates.py": {
-    "bytes": 5871,
-    "sha256": "ac231c5a7f315c5d978ce50510cb08a2ddf2e5b100e9b2f715d6363128c80f12"
+    "bytes": 6171,
+    "sha256": "174498bd759262464b304ee308b3c865a5870a3e5bf4829994b786959eb4522a"
   },
   "automatic_model.json": {
     "bytes": 10844,
@@ -1202,5 +1202,13 @@
   "test_hosted_updates.py": {
     "bytes": 2353,
     "sha256": "b2254b076961da15066c2168c6cb452ea98473dd729174e55952915c349b2c85"
+  },
+  "membership_backups.py": {
+    "bytes": 3733,
+    "sha256": "4688776f2c81a90eded8943bbda21feb4c38744d1c99416cbb3d41a15b8c7da0"
+  },
+  "test_membership_backups.py": {
+    "bytes": 2538,
+    "sha256": "1b625fecfb5b1913ad616cc8e8e001b16f5bc0ae399950e51648cb60988b4613"
   }
 }
