@@ -30,7 +30,7 @@ def migrate():
     """Transactional, versioned schema initialization; safe to repeat."""
     connection = db()
     version = connection.execute('PRAGMA user_version').fetchone()[0]
-    if version > 3:
+    if version > 4:
         raise RuntimeError('Membership database is newer than this application')
     if version == 0:
         with connection:
@@ -54,6 +54,12 @@ def migrate():
         with connection:
             connection.execute('CREATE TABLE IF NOT EXISTS watchlist (id INTEGER PRIMARY KEY, member_id INTEGER NOT NULL REFERENCES members(id), kind TEXT NOT NULL CHECK(kind IN ("team","trend")), target TEXT NOT NULL, title TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(member_id,kind,target))')
             connection.execute('PRAGMA user_version = 3')
+        version = 3
+    if version == 3:
+        with connection:
+            connection.execute('CREATE TABLE IF NOT EXISTS site_owners (member_id INTEGER PRIMARY KEY REFERENCES members(id))')
+            connection.execute('CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, member_id INTEGER REFERENCES members(id), category TEXT NOT NULL, page TEXT NOT NULL, message TEXT NOT NULL, status TEXT NOT NULL DEFAULT "open", created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)')
+            connection.execute('PRAGMA user_version = 4')
 
 
 def csrf_token():
@@ -102,6 +108,7 @@ def init_membership(app):
         if g.member is not None and session.get('member_version', 0) != g.member['session_version']:
             session.clear()
             g.member = None
+        g.is_owner = bool(g.member and db().execute('SELECT 1 FROM site_owners WHERE member_id=?', (g.member['id'],)).fetchone())
         # Protect membership mutations without changing Scout or legacy analysis requests.
         if request.blueprint == 'membership' and request.method == 'POST':
             token = request.form.get('csrf_token', '')
@@ -111,7 +118,7 @@ def init_membership(app):
 
     @app.after_request
     def protect_recovery_response(response):
-        if request.endpoint in ('membership.forgot_password', 'membership.reset_password'):
+        if request.endpoint in ('membership.forgot_password', 'membership.reset_password', 'membership.feedback_review'):
             response.headers['Cache-Control'] = 'no-store'
             response.headers['Referrer-Policy'] = 'no-referrer'
         return response
@@ -121,6 +128,17 @@ def init_membership(app):
         connection = g.pop('member_db', None)
         if connection is not None:
             connection.close()
+
+    @app.cli.command('membership-owner')
+    @click.argument('email')
+    def membership_owner(email):
+        """Grant owner review access from the private service Shell only."""
+        member = db().execute('SELECT id FROM members WHERE email=?', (email.strip().lower(),)).fetchone()
+        if member is None:
+            raise click.ClickException('Register your account first; no account matched.')
+        with db():
+            db().execute('INSERT OR IGNORE INTO site_owners(member_id) VALUES(?)', (member['id'],))
+        click.echo('Owner feedback access enabled for that registered account.')
 
     @app.cli.command('membership-count')
     def membership_count():
@@ -135,7 +153,7 @@ def init_membership(app):
     @app.cli.command('init-membership-db')
     def initialize():
         migrate()
-        click.echo('Membership database initialized (schema version 3).')
+        click.echo('Membership database initialized (schema version 4).')
 
     @app.cli.command('membership-reset-link')
     @click.argument('email')
@@ -429,3 +447,64 @@ def remove_watchlist(item_id):
     with db():
         db().execute('DELETE FROM watchlist WHERE id=? AND member_id=?', (item_id,g.member['id']))
     return redirect(url_for('membership.preferences') + '#my-watchlist')
+
+
+@bp.route('/feedback', methods=['GET','POST'])
+def feedback_page():
+    page = request.form.get('page', '/') if request.method=='POST' else request.args.get('page','/')
+    try:
+        parts = urlsplit(page)
+    except ValueError:
+        page = '/'
+        parts = urlsplit(page)
+    if parts.scheme or parts.netloc or not parts.path.startswith('/') or len(page)>200:
+        page = '/'
+    else:
+        page = parts.path
+    if page.startswith('/members/reset-password/'):
+        page = '/members/reset-password'
+    error = None
+    if request.method=='POST':
+        if not allow_attempt('feedback', str(g.member['id']) if g.member else csrf_token()):
+            return render_template('feedback.html',page=page,error='Too many reports. Please try again in 15 minutes.'),429
+        category = request.form.get('category','')
+        message = request.form.get('message','').strip()
+        if category not in ('Problem','Suggestion','Other') or not 10<=len(message)<=2000:
+            error = 'Choose a feedback type and enter 10–2,000 characters.'
+        else:
+            with db():
+                db().execute('INSERT INTO feedback(member_id,category,page,message) VALUES(?,?,?,?)',
+                    (g.member['id'] if g.member else None,category,page,message))
+            return redirect(url_for('membership.feedback_page',sent=1))
+    return render_template('feedback.html',page=page,error=error),400 if error else 200
+
+
+@bp.get('/feedback/review')
+def feedback_review():
+    if not g.is_owner:
+        abort(403)
+    status = request.args.get('status','open')
+    if status not in ('open','resolved'):
+        abort(400)
+    try:
+        page = int(request.args.get('page','1'))
+    except ValueError:
+        abort(400)
+    count = db().execute('SELECT COUNT(*) FROM feedback WHERE status=?',(status,)).fetchone()[0]
+    pages = max(1,(count+49)//50)
+    if not 1<=page<=pages:
+        abort(400)
+    reports = db().execute('SELECT * FROM feedback WHERE status=? ORDER BY id DESC LIMIT 50 OFFSET ?', (status,(page-1)*50)).fetchall()
+    return render_template('feedback_review.html',reports=reports,status=status,page=page,pages=pages)
+
+
+@bp.post('/feedback/<int:report_id>/status')
+def feedback_status(report_id):
+    if not g.is_owner:
+        abort(403)
+    status = request.form.get('status')
+    if status not in ('open','resolved'):
+        abort(400)
+    with db():
+        db().execute('UPDATE feedback SET status=? WHERE id=?',(status,report_id))
+    return redirect(url_for('membership.feedback_review'))

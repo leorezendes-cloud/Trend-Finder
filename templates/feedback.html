@@ -1,0 +1,8 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Beta Feedback | Gravy Train</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">{% include '_branding_head.html' %}</head><body>
+{% include '_site_navigation.html' %}<main class="membership"><h1>Beta Feedback</h1><p>Tell us what went wrong, what you expected, or what you’d like to see. Reports are private and visible to the site owner. Don’t include passwords or other sensitive information.</p>
+{% if request.args.get('sent')=='1' %}<p class="member-message" role="status">Thanks—your feedback has been saved.</p>{% endif %}
+{% if error %}<p class="member-message" role="alert">{{ error }}</p>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label for="category">Feedback type</label><select id="category" name="category">{% for type in ['Problem','Suggestion','Other'] %}<option {% if request.form.get('category')==type %}selected{% endif %}>{{ type }}</option>{% endfor %}</select>
+<label for="page">Page</label><input id="page" name="page" value="{{ page }}" maxlength="200">
+<label for="message">Your feedback</label><textarea id="message" name="message" required minlength="10" maxlength="2000" rows="6">{{ request.form.get('message','') }}</textarea><button type="submit">Send feedback</button></form><p><a href="{{ url_for('home') }}">Back to main menu</a></p></main></body></html>

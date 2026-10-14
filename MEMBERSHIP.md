@@ -12,7 +12,7 @@ Use the project's existing Python environment and Flask dependencies. Membership
 - `TREND_FINDAH_ENV=production`: Requires the explicit secret and enables secure cookies; serve over HTTPS.
 - `TREND_FINDAH_DATABASE`: Optional absolute SQLite file path. Defaults to `instance/members.sqlite3`. Its parent directory must exist and be writable. Keep this file on durable storage and back it up; exclude accounts and keys from source control.
 
-Schema version 3 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
+Schema version 4 initializes automatically at startup. Re-running `python -m flask --app app init-membership-db` is safe and preserves members. Future versions must add a sequential migration in `membership.migrate`; newer database versions are rejected.
 
 Start locally using `python app.py` (port 5001), then visit `/members/register`. Membership does not run collectors or refresh research data. Password recovery sends through Resend when RESEND_API_KEY is configured. Email verification and newsletters remain inactive.
 
@@ -68,3 +68,7 @@ For recovery, verify a selected copy in isolation with `membership_backups.verif
 ## My Watchlist
 
 Profiles contain a private team/trend watchlist, up to 100 saved items per member. Save teams on their statistics or matchup pages; save trends on their detail pages. Duplicate saves do not create duplicate items. Membership CSRF protection and authenticated owner checks protect save/remove actions. Saved team links show current statistics; saved trend URLs retain their original filters and recalculate results against available data. Schema version 3 adds the watchlist without altering existing accounts. Verified account backups include watchlist rows and continue supporting older version-2 snapshots.
+
+## Beta feedback
+
+The navigation menu links to a public CSRF-protected feedback form. Reports include category, page path (query strings and password-reset tokens removed), message, optional authenticated member ID, and time. No email is sent. Reports are retained privately in the account database and included in verified backups. Owner review requires an explicit operator grant: in Render Shell run `python -m flask --app wsgi membership-owner YOUR_REGISTERED_EMAIL`. This grants access only to an existing account; registration itself never grants privileges. The account then sees Review Feedback in the menu and profile. Owners can mark reports resolved or reopen them. Review responses are not cached; other accounts and guests receive 403. Feedback submissions have validation and database-backed rate limits. Schema version 4 adds feedback and owner roles without replacing accounts or watchlists.

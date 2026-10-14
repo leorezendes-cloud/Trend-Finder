@@ -139,6 +139,39 @@ class MembershipTests(unittest.TestCase):
             'csrf_token':self.token('/members/preferences')}).status_code,302)
         self.assertIn('October underdogs',self.client.get('/members/preferences').text)
 
+    def test_feedback_is_private_owner_only_and_status_changes_are_protected(self):
+        path='/members/feedback'
+        token=self.token(path)
+        reply=self.client.post(path,data={'csrf_token':token,'category':'Problem',
+            'page':'/sunday?private=omit','message':'The comparison table needs more space.'})
+        self.assertEqual(reply.status_code,302)
+        with self.app.app_context():
+            row=db().execute('SELECT * FROM feedback').fetchone()
+            self.assertEqual(row['page'],'/sunday')
+            report_id=row['id']
+        self.assertEqual(self.client.get('/members/feedback/review').status_code,403)
+        self.register()
+        self.assertEqual(self.client.get('/members/feedback/review').status_code,403)
+        grant=self.app.test_cli_runner().invoke(args=['membership-owner','person@example.com'])
+        self.assertEqual(grant.exit_code,0)
+        review=self.client.get('/members/feedback/review')
+        self.assertEqual(review.status_code,200)
+        self.assertIn('comparison table needs more space',review.text)
+        self.assertEqual(review.headers['Cache-Control'],'no-store')
+        self.assertEqual(self.client.post(f'/members/feedback/{report_id}/status',data={'status':'resolved'}).status_code,400)
+        self.client.post(f'/members/feedback/{report_id}/status',data={'status':'resolved','csrf_token':self.token('/members/feedback/review')})
+        with self.app.app_context():self.assertEqual(db().execute('SELECT status FROM feedback').fetchone()[0],'resolved')
+        self.assertEqual(self.app.test_client().get('/members/feedback/review').status_code,403)
+
+    def test_feedback_validates_and_removes_reset_tokens(self):
+        path='/members/feedback'
+        self.assertEqual(self.client.post(path,data={'category':'Problem','message':'short'}).status_code,400)
+        self.assertEqual(self.client.post(path,data={'csrf_token':self.token(path),'category':'Problem','message':'short'}).status_code,400)
+        self.client.post(path,data={'csrf_token':self.token(path),'category':'Other',
+            'page':'/members/reset-password/secret-token','message':'The recovery form is hard to read.'})
+        with self.app.app_context():
+            self.assertEqual(db().execute('SELECT page FROM feedback').fetchone()[0],'/members/reset-password')
+
     def test_preferences_persistence_opt_out_and_migration(self):
         self.register(newsletter_opt_in='yes')
         self.assertEqual(self.row()['newsletter_opt_in'], 1)
@@ -280,7 +313,7 @@ class MembershipTests(unittest.TestCase):
             self.assertEqual(row['email'], 'legacy@example.com')
             self.assertEqual(row['password_hash'], 'existing-hash')
             self.assertEqual(row['session_version'], 0)
-            self.assertEqual(db().execute('PRAGMA user_version').fetchone()[0], 3)
+            self.assertEqual(db().execute('PRAGMA user_version').fetchone()[0], 4)
 
     def test_backup_and_local_reset_cli(self):
         self.register()
@@ -295,7 +328,7 @@ class MembershipTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         with closing(sqlite3.connect(destination)) as connection:
             self.assertEqual(connection.execute('SELECT email FROM members').fetchone()[0], 'person@example.com')
-            self.assertEqual(connection.execute('PRAGMA user_version').fetchone()[0], 3)
+            self.assertEqual(connection.execute('PRAGMA user_version').fetchone()[0], 4)
         self.assertNotEqual(runner.invoke(args=['backup-membership-db',destination]).exit_code, 0)
 
     def test_public_access_and_secure_settings(self):

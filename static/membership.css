@@ -7,3 +7,7 @@
 .membership input:focus-visible, .membership button:focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
 
 .member-check[hidden] { display: none; }
+.membership textarea { width: 100%; box-sizing: border-box; padding: 12px; margin: 8px 0 18px; font: 16px/1.5 Arial,sans-serif; border-radius: 6px; }
+.feedback-report { background: #1f2937; padding: 18px; margin: 24px 0; border-radius: 10px; overflow-wrap: anywhere; }
+.feedback-report p { font: 14px/1.6 Arial,sans-serif; color: white; -webkit-text-stroke: 0; }
+.feedback-message { white-space: pre-wrap; }

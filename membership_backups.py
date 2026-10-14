@@ -16,9 +16,10 @@ TABLES = ('members', 'password_resets', 'auth_limits')
 def checked_database(connection):
     if connection.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
         raise ValueError('Database integrity check failed')
-    if connection.execute('PRAGMA user_version').fetchone()[0] not in (2,3):
+    if connection.execute('PRAGMA user_version').fetchone()[0] not in (2,3,4):
         raise ValueError('Unsupported account schema')
-    tables = TABLES + (('watchlist',) if connection.execute('PRAGMA user_version').fetchone()[0] == 3 else ())
+    version = connection.execute('PRAGMA user_version').fetchone()[0]
+    tables = TABLES + (('watchlist',) if version >= 3 else ()) + (('site_owners','feedback') if version >= 4 else ())
     return {table: connection.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0] for table in tables}
 
 
