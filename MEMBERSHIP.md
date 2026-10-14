@@ -54,3 +54,7 @@ python -m flask --app app backup-membership-db /absolute/path/to/new-backup.sqli
 The command uses SQLite's backup API, restricts the new file to its owner, and refuses to overwrite existing files. Store backups separately from the host's main disk and arrange a retention schedule during hosting setup. Backups contain private account data; don't commit or upload them to public repositories. To restore, stop the membership app, preserve the existing database, copy the backup to the configured database path, then restart. No scheduled backup job is installed.
 
 Before public release, configure the Resend key, verify the sending domain, apply the host's trusted-proxy settings, and test real delivery. Newsletter email remains disabled.
+
+## Signup totals
+
+In the Render service's Shell, run `python -m flask --app wsgi membership-count`. It reports total members, signups in the last seven days, and newsletter opt-ins without printing member emails. This operator command is not a public endpoint. Running it locally counts only the local database, not hosted accounts.

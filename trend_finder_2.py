@@ -17,13 +17,49 @@ CSV_FILTER_FIELDS = (
     'home_score', 'away_score', 'result', 'game_id', 'overtime',
     'away_rest', 'home_rest', 'spread_line', 'total_line', 'roof', 'surface',
     'temp', 'wind', 'away_qb_name', 'home_qb_name', 'away_coach',
-    'home_coach', 'referee', 'stadium', 'qb_name',
+    'home_coach', 'referee', 'stadium', 'qb_name', 'home_coast', 'away_coast', 'dog_coast',
 )
 NUMERIC_FILTER_FIELDS = {
     'week', 'home_score', 'away_score', 'result', 'overtime',
     'away_rest', 'home_rest', 'spread_line', 'total_line', 'temp', 'wind',
 }
 
+
+
+COAST_OPTIONS = ('East Coast', 'West Coast', 'Other states')
+EAST_COAST_TEAMS = {'ATL', 'BAL', 'BUF', 'CAR', 'JAX', 'JAC', 'MIA', 'NE', 'NYG', 'NYJ', 'TB', 'WAS', 'WSH'}
+WEST_COAST_TEAMS = {'SF', 'SEA', 'LAC', 'SD', 'OAK'}
+KNOWN_TEAMS = EAST_COAST_TEAMS | WEST_COAST_TEAMS | {'ARI','AZ','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','KC','LA','LAR','LV','MIN','NO','PHI','PIT','STL','TEN'}
+
+
+def team_coast(team, season):
+    # Home-state geography, not kickoff time zone or the venue of this game.
+    if team not in KNOWN_TEAMS:
+        return None
+    if team in EAST_COAST_TEAMS:
+        return 'East Coast'
+    if team in WEST_COAST_TEAMS:
+        return 'West Coast'
+    year = int(season)
+    if team in ('LA', 'LAR') and year >= 2016:
+        return 'West Coast'
+    if team == 'LV' and year < 2020:
+        return 'West Coast'
+    return 'Other states'
+
+
+def coast_filter_value(game, field):
+    if field == 'dog_coast':
+        try:
+            spread = float(game.get('spread_line', ''))
+        except (ValueError, TypeError):
+            return None
+        if spread == 0:
+            return None
+        team = game.get('home_team') if spread < 0 else game.get('away_team')
+    else:
+        team = game.get('home_team' if field == 'home_coast' else 'away_team')
+    return team_coast(team, game.get('season', 0))
 
 
 def underdog_qb_name(game):
@@ -51,7 +87,7 @@ def matches_csv_filters(game, filters):
         if field == 'qb_name':
             if expected not in (game.get('away_qb_name'),game.get('home_qb_name')):return False
             continue
-        actual = underdog_qb_name(game) if field == 'dog_qb_name' else game.get(field, '')
+        actual = coast_filter_value(game, field) if field in ('home_coast','away_coast','dog_coast') else underdog_qb_name(game) if field == 'dog_qb_name' else game.get(field, '')
         if actual == '':
             return False
         if field in NUMERIC_FILTER_FIELDS:
@@ -75,6 +111,8 @@ def get_csv_filter_options():
         options[field] = sorted(values, key=key)
     options['dog_qb_name'] = sorted({game[field] for game in games for field in ('home_qb_name', 'away_qb_name') if game.get(field)})
     options['qb_name'] = options['dog_qb_name']
+    for field in ('home_coast', 'away_coast', 'dog_coast'):
+        options[field] = list(COAST_OPTIONS)
     return options
 
 
@@ -213,6 +251,9 @@ def Check_Games(
     stadium=None,
     dog_qb_name=None,
     qb_name=None,
+    home_coast=None,
+    away_coast=None,
+    dog_coast=None,
     ):
     parameters = locals().copy()
     csv_filters = {field: parameters[field] for field in CSV_FILTER_FIELDS}
@@ -1225,6 +1266,10 @@ def describe_combination(trend, season=None, **scope):
             return f'the underdog plays {"at home" if value == "Home" else "away"}'
         if field == 'Primetime':
             return 'it is a primetime game' if value == 'Yes' else 'it is a non-primetime game'
+        if field in ('Home coast', 'Away coast', 'Underdog coast'):
+            side = {'Home coast':'home team', 'Away coast':'away team', 'Underdog coast':'underdog'}[field]
+            region = {'East Coast':'an Atlantic-coast state', 'West Coast':'a Pacific-coast state', 'Other states':'another state'}[value]
+            return f'the {side} is based in {region}'
         if field in ('Home team', 'Away team'):
             return f'{value} is the {field.lower()}'
         if field in ('Home team rest', 'Away team rest'):
@@ -1283,6 +1328,8 @@ def grouped_game_features(game, analysis):
         'Primetime': ('Yes' if analysis['is_primetime'] else 'No')
                      if analysis['is_primetime'] is not None else None,
     }
+    for field, label in (('home_coast','Home coast'), ('away_coast','Away coast'), ('dog_coast','Underdog coast')):
+        features[label] = coast_filter_value(game, field)
     labels = {
         'home_team': 'Home team', 'away_team': 'Away team',
         'home_rest': 'Home team rest', 'away_rest': 'Away team rest',

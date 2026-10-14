@@ -179,7 +179,8 @@
         </div>
         <details id="more-filters"{% if csv_filters.get("qb_name") or historical_dog_qb_name %} open{% endif %}>
             <summary class="csv-filters-heading">More filters</summary>
-            <p class="search-text">Combine any filters below. Each matches an exact CSV value; All includes missing values. Scores, result, and overtime describe completed games.</p>
+            <p class="search-text">Combine any filters below. Each matches an exact value; All includes missing values. Scores, result, and overtime describe completed games.</p>
+            <p class="search-text">Coast filters use franchise home states: Atlantic states = East Coast, Pacific states = West Coast; all others = Other states. These describe the team, not the game venue. Historical relocations are accounted for.</p>
             <div class="field">
             <label for="qb_name">Any recorded QB (either team):</label>
             <input id="qb_name" name="qb_name" type="search" list="qb-name-options"
@@ -201,7 +202,7 @@
                 </div>
                 {% for field, values in filter_options.items() if field not in ('dog_qb_name', 'game_type', 'qb_name') %}
                 <div class="field">
-                    <label for="csv-{{ field }}">{{ field.replace('_', ' ').title() }}</label>
+                    <label for="csv-{{ field }}">{{ 'Underdog Coast' if field == 'dog_coast' else field.replace('_', ' ').title() }}</label>
                     <select id="csv-{{ field }}" name="{{ field }}">
                         <option value="">All</option>
                         {% for value in values %}

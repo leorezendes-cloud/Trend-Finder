@@ -92,3 +92,8 @@ html body .matchup-comparison table { width: 100%; table-layout: fixed; }
 html body .matchup-comparison :is(th,td) { white-space: normal; overflow-wrap: anywhere; }
 html body .matchup-comparison th:first-child { width: 40%; }
 html body .matchup-comparison td small { display: block; font-size: 10px; margin-top: 3px; }
+
+html body .matchup-panel { padding: 18px; box-sizing: border-box; }
+html body .matchup-panel > h2 { margin: 0 0 16px; }
+html body .matchup-panel > p { margin: 12px 0; }
+html body .matchup-panel > a { display: inline-block; margin: 8px 0 4px; }

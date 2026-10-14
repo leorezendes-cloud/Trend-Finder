@@ -13,11 +13,13 @@ class CsvFilterTests(unittest.TestCase):
         with open(finder.game_file, newline='') as source:
             cls.games = list(csv.DictReader(source))
         cls.row = next(game for game in cls.games if all(
-            game.get(field, '') for field in finder.CSV_FILTER_FIELDS if field != 'qb_name'
+            game.get(field, '') for field in finder.CSV_FILTER_FIELDS if field not in ('qb_name','home_coast','away_coast','dog_coast')
         ))
 
     def test_every_csv_parameter_filters_games(self):
         for field in finder.CSV_FILTER_FIELDS:
+            if field in ('home_coast','away_coast','dog_coast'):
+                continue  # Derived geography is covered in test_coast_filters.
             with self.subTest(field=field):
                 value = self.row['home_qb_name'] if field=='qb_name' else self.row[field]
                 if field=='qb_name':

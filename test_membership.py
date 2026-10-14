@@ -95,6 +95,14 @@ class MembershipTests(unittest.TestCase):
         self.assertEqual(good.location, '/')
         self.assertIn('Signed in', self.client.get('/members/preferences').text)
 
+    def test_operator_signup_count_does_not_print_addresses(self):
+        self.register()
+        result = self.app.test_cli_runner().invoke(args=['membership-count'])
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn('Total members: 1', result.output)
+        self.assertIn('Signed up in the last 7 days: 1', result.output)
+        self.assertNotIn('person@example.com', result.output)
+
     def test_preferences_persistence_opt_out_and_migration(self):
         self.register(newsletter_opt_in='yes')
         self.assertEqual(self.row()['newsletter_opt_in'], 1)

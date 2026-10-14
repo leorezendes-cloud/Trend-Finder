@@ -117,6 +117,16 @@ def init_membership(app):
         if connection is not None:
             connection.close()
 
+    @app.cli.command('membership-count')
+    def membership_count():
+        """Show signup totals to a service operator without exposing member details."""
+        total = db().execute('SELECT COUNT(*) FROM members').fetchone()[0]
+        recent = db().execute("SELECT COUNT(*) FROM members WHERE created_at >= datetime('now','-7 days')").fetchone()[0]
+        opted_in = db().execute('SELECT COUNT(*) FROM members WHERE newsletter_opt_in=1').fetchone()[0]
+        click.echo(f'Total members: {total}')
+        click.echo(f'Signed up in the last 7 days: {recent}')
+        click.echo(f'Newsletter opt-ins: {opted_in}')
+
     @app.cli.command('init-membership-db')
     def initialize():
         migrate()
