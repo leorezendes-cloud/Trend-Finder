@@ -49,23 +49,24 @@
     <a href="{{ url_for('fans.prediction_results') }}">Prediction Results</a>
     <a href="{{ url_for('sunday_results_page') }}">Matchup Results</a>
     <a href="{{ url_for('sunday_scout.sunday_scout_page', download=1) }}">⬇️ Save The Plug's Snapshot</a>
+    <a href="{{ url_for('methodology_page') }}">How picks work</a>
   </nav>
 
 {% if config.get('SCOUT4_BLEND_ENABLED') %}
   <section class="scout-intro">
-    <p><strong>One blended ATS pick per game, plus Scout's over/under pick.</strong> Experimental forecasts, saved before kickoff. Each pick and its saved line stay locked through grading. Newer market lines do not change these picks.</p>
+    <p><strong>Plug’s Pick and Plug Total for each game.</strong> Experimental forecasts, saved before kickoff. Each pick and its saved line stay locked through grading. Newer market lines do not change these picks.</p>
     <details><summary>About these picks</summary><p>ATS uses 50% Scout 4.0 scoring margin + 50% The Plug points-only margin. These are not calibrated cover probabilities. No injury/weather adjustment is applied.</p><p>Component forecasts are saved separately locally against the same quoted line. Totals use Scout's separate model. Existing standalone ATS probability forecasts remain a separate experiment.</p><p>First eligible forecast stays locked; source times and original lines are preserved for grading.</p></details>
   </section>
   <div class="scout-grid">
   {% for r in blends %}{% set b=r.components['Blend'] %}
     <article class="scout-card">
       <div class="scout-muted">{{ r.kickoff_utc|eastern_time }}</div><h2><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></h2>
-      <div class="scout-section-label">Locked ATS pick</div>
+      <div class="scout-section-label">Plug’s Pick · locked</div>
       <div class="scout-proj"><p><strong>{{ b.pick or 'No pick recorded' }}</strong>{% if b.pick %} {{ '%+g'|format(r.quote.line if b.pick==r.away_team else -r.quote.line) }}{% endif %}</p><p>Projected winner: {% if b.away_margin>0 %}{{ r.away_team }}{% elif b.away_margin<0 %}{{ r.home_team }}{% else %}Even{% endif %}{% if b.away_margin!=0 %} by {{ '%.1f'|format(b.away_margin|abs) }} points{% endif %}. · Spread edge: {{ '%.1f'|format(b.ats_edge|abs) }} points.</p>{% if b.tie_break %}<small>{{ b.tie_break }}</small>{% endif %}<p>Result: {{ 'Not graded' if r.results['Blend']=='No Call' else r.results['Blend'] }}</p></div>
-      {% if r.totals %}<div class="scout-divider"></div><div class="scout-section-label">Scout over / under pick</div><p><strong>{{ 'No pick recorded' if r.totals.prediction.lean=='No Call' else r.totals.prediction.lean }} {{ r.totals.quote.line }}</strong> · Estimated total: {{ '%.1f'|format(r.totals.prediction.total) }} points.</p>{% else %}<p>Totals pending: no eligible quote or estimate at capture.</p>{% endif %}
+      {% if r.totals %}<div class="scout-divider"></div><div class="scout-section-label">Plug Total · locked</div><p><strong>{{ 'No pick recorded' if r.totals.prediction.lean=='No Call' else r.totals.prediction.lean }} {{ r.totals.quote.line }}</strong> · Estimated total: {{ '%.1f'|format(r.totals.prediction.total) }} points.</p>{% else %}<p>Totals pending: no eligible quote or estimate at capture.</p>{% endif %}
       <p class="scout-muted">{{ r.quote.sportsbook }} · Quote observed: {{ r.quote.captured_at_utc|eastern_time }}<br>Forecast sealed: {{ r.sealed_at_utc|eastern_time }}</p>
     </article>
-  {% else %}<article class="scout-card"><p>No blended picks are available yet.</p></article>{% endfor %}
+  {% else %}<article class="scout-card"><p>No Plug picks are available yet.</p></article>{% endfor %}
   </div>
 {% endif %}
   <details class="scout-intro"><summary>Archived locked forecasts ({{ archived_blends|length }})</summary>{% for old in archived_blends %}<p>{{ old.away_team }} at {{ old.home_team }} · {{ old.kickoff_utc|eastern_time }} · {{ old.components['Blend'].pick or 'No pick recorded' }} · {{ 'Not graded' if old.results['Blend']=='No Call' else old.results['Blend'] }}</p>{% endfor %}</details>

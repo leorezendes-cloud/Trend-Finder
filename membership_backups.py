@@ -20,6 +20,9 @@ def checked_database(connection):
         raise ValueError('Unsupported account schema')
     version = connection.execute('PRAGMA user_version').fetchone()[0]
     tables = TABLES + (('watchlist',) if version >= 3 else ()) + (('site_owners','feedback') if version >= 4 else ())
+    optional=('pick_weeks','pick_games','member_picks','newsletter_issues','newsletter_deliveries','newsletter_generated')
+    present={row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    tables+=tuple(table for table in optional if table in present)
     return {table: connection.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0] for table in tables}
 
 

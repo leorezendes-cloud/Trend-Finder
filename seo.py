@@ -5,6 +5,7 @@ from xml.etree import ElementTree as ET
 from flask import current_app,has_request_context,request,Response
 
 PAGES={
+ 'methodology_page':('/about','About & Methodology | NFL Research | Gravy Train','Learn how Gravy Train researches NFL trends, creates locked Plug picks, captures shared member lines, and grades ATS and over/under records.'),
  'home':('/', 'Discover NFL Trends & Predictions | Gravy Train', 'Discover NFL trends with Trendfindah 3000, get The Plug’s locked predictions, and investigate betting patterns and conspiracy theories in the Conspiracy Dungeon.'),
  'trend_finder':('/trend-finder','Trendfindah 3000 | NFL Trend Finder | Gravy Train','Discover NFL trends with Trendfindah 3000, an NFL trend finder. Research historical ATS patterns by season, spread, team, coach, quarterback, and primetime, and save your searches.'),
  'trends_page':('/trends','Discover NFL Trends, ATS Patterns & Streaks | Gravy Train','Discover NFL trends and ATS streaks with Trendfindah 3000: compare historical records, sample sizes, recent performance, and upcoming matchups.'),

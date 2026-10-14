@@ -5,10 +5,12 @@
 <p class="pick-week-note">Weeks change Wednesday at 8 a.m. Eastern. Shared lines stay fixed all week. Click a matchup for its team comparison.</p>
 {% if not week_open and weeks %}<p>This is a previous week or the active week’s snapshot is not ready. Picks are closed here.</p>{% endif %}
 {% for message in get_flashed_messages(category_filter=['picks']) %}<p class="pick-save-status" role="status">{{ message }}</p>{% endfor %}
+<details class="mobile-picks-menu" open><summary><span data-pick-menu-label>Weekly picks</span><small data-pick-menu-status role="status" aria-live="polite"></small></summary>
 <form class="member-picks-form" method="post" action="{{ url_for('member_picks.save_all_picks') }}" data-pick-form>
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="{{ request.full_path.rstrip('?') }}">
 <div class="picks-grid">{% for game in games %}{{ pick_card(game,week_open) }}{% endfor %}</div>
 {% if week_open and games|selectattr('locked','equalto',0)|rejectattr('void_reason')|list %}<div class="pick-save-bar"><button type="submit">Save picks</button><p class="pick-save-status" role="status" aria-live="polite">You can save an incomplete week and finish later.</p></div>{% endif %}
 </form>
+</details>
 <p>SU means straight-up winner; ATS means the winner against the shared spread. A tied spread or total is a push. Results are graded after verified final scores are saved.</p>
 {% endblock %}

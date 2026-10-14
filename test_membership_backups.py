@@ -21,10 +21,17 @@ class MembershipBackupTests(unittest.TestCase):
                     db().execute("INSERT INTO members(email,password_hash,newsletter_opt_in) VALUES('test@example.com','test-hash',1)")
                     db().execute("INSERT INTO watchlist(member_id,kind,target,title) VALUES(1,'team','/scout4/teams?team=BUF','BUF')")
                     db().execute("INSERT INTO feedback(category,page,message) VALUES('Problem','/sunday','Example beta feedback')")
+                with db():
+                    db().execute("INSERT INTO pick_weeks(season,week,owner_id,published_at) VALUES(2030,6,1,'2030-10-16T12:00:00+00:00')")
+                    db().execute("INSERT INTO pick_games(week_id,game_id,away,home,kickoff_at,lock_at,away_spread,total,line_source) VALUES(1,'g','A','B','2030-10-20T17:00:00+00:00','2030-10-20T17:00:00+00:00',3,44,'test quote')")
+                    db().execute("INSERT INTO member_picks(member_id,game_id,su,ats,ou,updated_at) VALUES(1,1,'A','B','Under','2030-10-16T12:00:00+00:00')")
                 # Keep the live connection open to exercise SQLite's consistent backup API.
                 backup_database(database,folder,keep=2)
             snapshots=list(folder.glob('accounts-*.sqlite3'))
             self.assertEqual(verify_restore(snapshots[0])['members'],1)
+            self.assertEqual(verify_restore(snapshots[0])['member_picks'],1)
+            self.assertEqual(verify_restore(snapshots[0])['pick_games'],1)
+            self.assertIn('newsletter_issues',verify_restore(snapshots[0]))
             self.assertEqual(verify_restore(snapshots[0])['watchlist'],1)
             self.assertEqual(verify_restore(snapshots[0])['feedback'],1)
             self.assertEqual(snapshots[0].stat().st_mode & 0o777,0o600)

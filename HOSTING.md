@@ -78,3 +78,5 @@ Set `TREND_FINDAH_AUTO_UPDATE=1` on the existing Render web service after deploy
 ## Automatic member pick lines
 
 The same `TREND_FINDAH_AUTO_UPDATE=1` setting also enables a separate Wednesday 8 a.m. Eastern market capture and automatic shared-line publication. The timer checks every 30 seconds; capture completion takes a few minutes. Weekly snapshots persist separately under `/var/data/site-data/data/member_lines/`. Missing verified quotes leave publication pending. View `/picks/admin` to review frozen lines without entering them. See WEEKLY_POLICY.md for the one-time 2026 Week 6 snapshot and catch-up rules.
+
+Owner **Manage Weekly Picks → Site health** shows whether a recent backup has passed restore verification and whether automatic data updates are healthy. Restore checks include member pick and newsletter tables when present. This panel reports saved status only; it does not run jobs on visits. Production health still needs to be checked after deployment on the actual Render disk.

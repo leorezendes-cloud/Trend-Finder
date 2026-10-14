@@ -226,7 +226,9 @@ def save_pick(game_id):
 def admin():
     owner()
     sheets=db().execute('SELECT * FROM pick_weeks ORDER BY season DESC,week DESC').fetchall()
-    return render_template('pick_week_admin.html',sheets=sheets)
+    from site_health import owner_health
+    health=owner_health(Path(current_app.config['PICKS_SOURCE_ROOT']),current_app.config['MEMBERSHIP_DATABASE'])
+    return render_template('pick_week_admin.html',sheets=sheets,health=health)
 
 
 @bp.get('/admin/weeks/<int:week_id>')

@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 8543,
-    "sha256": "af8e9eda5ab94eebd9fcf3f0eeee98745715b4c94eba12b3edb20afaef9b54b4"
+    "bytes": 8929,
+    "sha256": "f32bdeebaa43d28e548c48720cf14e28fa779aafcb9a712f6872116861ac0afa"
   },
   "LAUNCH_CHECKLIST.md": {
     "bytes": 2110,
@@ -20,8 +20,8 @@
     "sha256": "8cd14f10b2991a13cdcfefa95dbebca3d1d709e84ef610e35d531b5a6a2ee5ae"
   },
   "MEMBER_PICKS.md": {
-    "bytes": 5250,
-    "sha256": "d20ad1457f6d6007b1a5c861103578d1f42dc35147d3bafe3a1c67df75872d9d"
+    "bytes": 5726,
+    "sha256": "78eddf77e80eb36a737a3db14f5731bd6caa6573a2c259590869b760649a99c5"
   },
   "NEWSLETTER.md": {
     "bytes": 8053,
@@ -48,8 +48,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 39251,
-    "sha256": "2811422e6f2d0d84c740e582211d64865cd1210e98aa6e0a7f6c9a19d4ea8ada"
+    "bytes": 39381,
+    "sha256": "4371413b68e5183f1fe2ef2327506d46796dc267701b44d8a413833f4fbbf3cf"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -576,16 +576,16 @@
     "sha256": "9ea8fea5124d50aa088288ffb634ed28ff871721775a73d930c2d0da78e1183b"
   },
   "member_picks.py": {
-    "bytes": 14684,
-    "sha256": "f6232bd8d3463c215d8c6ca82683ab14103dc89a8d84621b1b90f2fd60f54b16"
+    "bytes": 14852,
+    "sha256": "b193559c18815bd033f8cbb42ae700e3ce8359ef15fe79ab1098285f63968729"
   },
   "membership.py": {
     "bytes": 26011,
     "sha256": "aa0400c2eecdf714704858f071d776ec901f8791392c6ddd661aa8bd571be8f5"
   },
   "membership_backups.py": {
-    "bytes": 3933,
-    "sha256": "144e9e94cc3ab6a7759790dbbafcad08d2bb92b84da483881278341e48f854b0"
+    "bytes": 4227,
+    "sha256": "0cefb00659e6a28040640dd642d78567752fb4c1ae3dd62a16caf1c9a0733733"
   },
   "name_aliases.py": {
     "bytes": 555,
@@ -812,12 +812,16 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4645,
-    "sha256": "1edff0f8f42ceab38fd034eb0b7dfeb6a17ffd763134913d967532cd3f7cfae1"
+    "bytes": 4696,
+    "sha256": "1becd319e6cd440cae3e80cb98f89fb1b45247ef7360081a9aaf8f5aa4bc67f1"
   },
   "seo.py": {
-    "bytes": 7276,
-    "sha256": "f9a41d53d3b26d412ad82d048b432c1a0c08594a2a85f614c667d2fbd8ae834a"
+    "bytes": 7502,
+    "sha256": "35ef53b9defd8ccb7d1d6f31389079177742fd68b8613ad4a841e95aa910e9b9"
+  },
+  "site_health.py": {
+    "bytes": 1448,
+    "sha256": "881a52f6bda65707158574dcd2a37dfbaa2ed1830c7628edf368d018c8e330bf"
   },
   "site_views.py": {
     "bytes": 1962,
@@ -992,12 +996,12 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/member_picks.css": {
-    "bytes": 3741,
-    "sha256": "5f7957413eabd42f31c84ea6b88fe0dfca8e8b16e9ea39ea737db7c5f7767bc3"
+    "bytes": 4348,
+    "sha256": "9a9f4d17b3cf411ec920b09ca022311b22cfef33b5f8265569a1e7fa8a6822a6"
   },
   "static/member_picks.js": {
-    "bytes": 1377,
-    "sha256": "c0fd39f5feb4e2e0c341d1417ee0605f0099271f5cfde9a7be2a4b1ebd04ecfe"
+    "bytes": 3095,
+    "sha256": "715e3e8226013bbd86bd83400ada7578caeed75e50ccf40066730b641a9a7446"
   },
   "static/membership.css": {
     "bytes": 1191,
@@ -1080,12 +1084,12 @@
     "sha256": "c217a0106fac96273aef944f5ad6b9f41a58853b48a3c003206d0e3d00f493b5"
   },
   "templates/_inline_picks.html": {
-    "bytes": 1170,
-    "sha256": "8b934726d6d045961d6309b7138636197436ed23fc026eb1ed5802fc83dc3485"
+    "bytes": 1363,
+    "sha256": "29764c255750ae9fd1c36b8a96908002254c7c6f2d8d1a0d2fad9e820c1a1c5a"
   },
   "templates/_pick_cards.html": {
-    "bytes": 1800,
-    "sha256": "b8658e54f60af02ff9e484d2243f053dc7d14775fa166d5a3465d0f062aa6f38"
+    "bytes": 1823,
+    "sha256": "6fb7e6ac9626f7f703a7bb857dd0a9b0790d20a63ed6c722afec862afdf6c5bb"
   },
   "templates/_save_watchlist.html": {
     "bytes": 640,
@@ -1096,8 +1100,8 @@
     "sha256": "0be974261e53fe988f1e21ee7bcc634dfc0ca485ab2c998aa0c6108830a489fb"
   },
   "templates/_site_navigation.html": {
-    "bytes": 4754,
-    "sha256": "85b496274de7cf9a24aee2ee4545e04fe636de493cb6d24071951af6e7ef5e02"
+    "bytes": 4883,
+    "sha256": "e1690514c304932f3e59aebafffe1a93a53469bf2eba5887e09b7a129a32528e"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2791,
@@ -1140,20 +1144,24 @@
     "sha256": "dc82e495bc27cda531894e1fd1a5d5cec3db43f47cdb82ee2b45d3c82f2dcf07"
   },
   "templates/market.html": {
-    "bytes": 1259,
-    "sha256": "2df0ea58eb50ead0fcc50135fc4f2adab1b15b67780e3c55040689d5e8ef7bac"
+    "bytes": 1272,
+    "sha256": "43a0fb94ff4d2eadbc9370d4f47e7a0f86ab1ff07c9cbaa576f4035a6ecbd78e"
   },
   "templates/matchup.html": {
     "bytes": 3967,
     "sha256": "a65f22a33f55e319a59a39879c8e709a1aa2d158837e2e1db6b99ee3729c274a"
   },
   "templates/member_picks.html": {
-    "bytes": 2404,
-    "sha256": "efecd15efb184faf5d5ead12c64548b18154533e80ebf02de03631672e810875"
+    "bytes": 2591,
+    "sha256": "20d70cb656bf416df87919c399915ef1e72cc9c8ba607697c9ab38bdc03c6152"
   },
   "templates/membership.html": {
     "bytes": 5283,
     "sha256": "3fbf91573d97113c13d8b651f6f35ba02c61e68ca59cd33077d7e8f1b1568e86"
+  },
+  "templates/methodology.html": {
+    "bytes": 3800,
+    "sha256": "ea7dfe0551c170cc625778b0e96a1f36642c7cc71e4e92423700ed72da02bec2"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
@@ -1180,8 +1188,8 @@
     "sha256": "976543733bfef5189c011b83428ffa7f883ce0bf1d2de3d8f3f143bf0a227257"
   },
   "templates/pick_week_admin.html": {
-    "bytes": 809,
-    "sha256": "1f5d5e28831772403d9f1c24d9e7fe7c7b5b71087c2117a50e2d7d8cdffbf50d"
+    "bytes": 1026,
+    "sha256": "61d20327771564359721d3aba910e20b493b91615b3c434a4cdd82d5df0e8a97"
   },
   "templates/pick_week_review.html": {
     "bytes": 1292,
@@ -1228,8 +1236,8 @@
     "sha256": "ff7422ac0651218df786826fde8e37bbe021037d1ef21556e79c3558903a7510"
   },
   "templates/sunday_scout.html": {
-    "bytes": 10639,
-    "sha256": "973b6952a2fff096fc5555bd0d33c833b420bac9638b4516d79329f1e76a54f6"
+    "bytes": 10691,
+    "sha256": "c57f0293c6f596ae6a1b6b4347214cd218be84165382eaf4a592c2b98f4aab2f"
   },
   "templates/trend_details.html": {
     "bytes": 4130,
@@ -1280,8 +1288,12 @@
     "sha256": "f2b27fee67002ef8cf033716aac42ff2172cab28b91f440e265cf6d55849aa90"
   },
   "test_membership_backups.py": {
-    "bytes": 2952,
-    "sha256": "bdd66a9cd8921a7ca36ba974d6adc871136b8c708a44e299904ef3064cacdc00"
+    "bytes": 3734,
+    "sha256": "569a2fb173425bcbd600425565d559eb0634633a6e83aae1167833e8751030dd"
+  },
+  "test_mobile_pick_menu.js": {
+    "bytes": 2132,
+    "sha256": "d80298eb07b89b6611d1bf11117b6d4fb6dd550b4389a0bb79099c98fb5b5c58"
   },
   "test_newsletter.py": {
     "bytes": 10849,
@@ -1306,6 +1318,10 @@
   "test_seo.py": {
     "bytes": 4444,
     "sha256": "1a783279ec1c00faec77ef38aba44f931f2d456236e18041883c65387a4db5ad"
+  },
+  "test_site_health.py": {
+    "bytes": 1726,
+    "sha256": "219bd326ba1e1c865ee96b9387e8c2876aacb96344b2fb1f9c08d8fb572e5bb1"
   },
   "test_site_refresh.py": {
     "bytes": 3476,
