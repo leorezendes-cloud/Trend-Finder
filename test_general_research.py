@@ -161,8 +161,8 @@ class GeneralResearchTests(unittest.TestCase):
         self.assertEqual(labels,expected)
         fragment=client.get(query+'&evidence=1&evidence_metric=Underdogs+ATS').text
         self.assertEqual(fragment.count('<tr>'),11) # Header plus ten games.
-        self.assertIn('All games involved',fragment)
-        link=unescape(re.search(r'href="([^"]+)">All games involved',fragment).group(1))
+        self.assertIn('All Games Involved',fragment)
+        link=unescape(re.search(r'href="([^"]+)">All Games Involved',fragment).group(1))
         params=parse_qs(urlsplit(link).query)
         self.assertEqual(params['research_role'],['underdog'])
         self.assertEqual(params['primetime'],['yes'])

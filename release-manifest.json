@@ -1109,7 +1109,7 @@
   },
   "templates/_general_games.html": {
     "bytes": 1993,
-    "sha256": "466ca5a67516cb2754e469987325766d1ef12ee419356e5d71af773f79213f24"
+    "sha256": "d09a6d6e2f725358934cb65dadd22aaafd32801b1649b4518ade42c628979ba6"
   },
   "templates/_home_sections.html": {
     "bytes": 1231,
@@ -1169,7 +1169,7 @@
   },
   "templates/general_trend_games.html": {
     "bytes": 770,
-    "sha256": "dbe6f28270e6cd597810d92cda021c0120862b308cf678ae0dba0df8542b1104"
+    "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
     "bytes": 10101,
@@ -1313,7 +1313,7 @@
   },
   "test_general_research.py": {
     "bytes": 13100,
-    "sha256": "fb62e0d991c4eb959498fb516551badea747184b44a4479ea3f3039a221a3814"
+    "sha256": "81514b6723603e8155ee864842a1fc85a90c4f866c203fa26de90089f131653a"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,
