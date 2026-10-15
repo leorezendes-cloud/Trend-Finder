@@ -1,5 +1,5 @@
-.general-research a:not(.nav-link):not(.button):not(.clear-button),
-.general-research a:not(.nav-link):not(.button):not(.clear-button):visited { color:#fbbf24; }
+.general-research a:not(.nav-link):not(.button):not(.clear-button):not(.filter-chip),
+.general-research a:not(.nav-link):not(.button):not(.clear-button):not(.filter-chip):visited { color:#fbbf24; }
 .general-research [hidden] { display:none !important; }
 .general-research .table-scroll { width:100%;overflow-x:auto; }
 .general-research .research-results table { width:100%;border-collapse:collapse;text-align:left; }
