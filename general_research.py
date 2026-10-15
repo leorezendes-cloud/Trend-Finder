@@ -145,10 +145,28 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, curren
                 if best:evaluated[key]=best
         candidates.sort(key=lambda v:(v[0],v[1],v[2]),reverse=True)
         beam=[(key,ids) for _,_,key,ids in candidates[:40]]
-    unique={}
-    for trend in sorted(evaluated.values(),key=lambda v:(len(v['conditions']),tuple(v['conditions'].items()))):
-        unique.setdefault((trend['label'],trend['membership']),trend)
-    return sorted(unique.values(),key=lambda v:(v['recent_games']>=minimum,v['score'],v['recent_games'],v['sample']),reverse=True)[:limit]
+    return group_overlapping_trends(evaluated.values(),minimum=minimum,limit=limit)
+
+
+def group_overlapping_trends(trends, *, minimum=10, limit=30, threshold=.8):
+    """Group the same outcome on near-identical game sets, without adding records."""
+    ranked=sorted(trends,key=lambda v:(v['recent_games']>=minimum,v['score'],v['recent_games'],v['sample'],-len(v['conditions'])),reverse=True)
+    groups=[]
+    for trend in ranked:
+        ids=set(trend['membership'])
+        candidates=[]
+        for group in groups:
+            if group['label']!=trend['label']:continue
+            leader=set(group['membership']);union=ids|leader
+            overlap=len(ids&leader)/len(union) if union else 0
+            if overlap>=threshold:candidates.append((overlap,group))
+        if candidates:
+            # Compare to the representative, preventing chains of increasingly different samples.
+            group=max(candidates,key=lambda item:item[0])[1]
+            group['related'].append(dict(trend))
+        else:
+            groups.append(dict(trend,related=[]))
+    return groups[:limit]
 
 
 def render_general(form, games_page=False):
@@ -203,10 +221,11 @@ def render_general(form, games_page=False):
     pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
     selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions','game_id','evidence','evidence_metric')}
     selection.update(research_view='general',run='analyze')
-    for trend in combinations or []:
-        params={**selection,**trend['conditions']}
-        trend['url']=url_for('trend_finder',**params,_anchor='matching-games')
-        trend['evidence_url']=url_for('trend_finder',**params,evidence='1',evidence_metric=trend['label'])
+    for group in combinations or []:
+        for trend in [group]+group.get('related',[]):
+            params={**selection,**trend['conditions']}
+            trend['url']=url_for('trend_finder',**params,_anchor='matching-games')
+            trend['evidence_url']=url_for('trend_finder',**params,evidence='1',evidence_metric=trend['label'])
     filter_chips=[]
     chip_scope={**selection,'action':'combinations' if combinations is not None else 'analyze'}
     def chip(label,fields):

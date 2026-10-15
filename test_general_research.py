@@ -226,4 +226,22 @@ class GeneralResearchTests(unittest.TestCase):
         discovery=client.get('/trend-finder?research_view=general&run=analyze&season=2005&action=combinations').text
         self.assertIn('No combinations meet',discovery)
 
+    def test_overlap_groups_coach_qb_variants_without_combining_records(self):
+        from general_research import group_overlapping_trends
+        def trend(name,ids,label='Under',score=.7):
+            return {'conditions':{'home_coach' if name=='Andy Reid' else 'home_qb_name':name},'label':label,'membership':tuple(ids),'recent_games':12,'score':score,'sample':len(ids),'wins':30,'losses':10,'pushes':1,'rate':75.0}
+        lead=trend('Andy Reid',range(42),score=.71)
+        qb=trend('Patrick Mahomes',range(41))
+        other=trend('Other QB',range(100,142))
+        different=trend('Different outcome',range(42),label='Favorites ATS')
+        groups=group_overlapping_trends([lead,qb,other,different])
+        self.assertEqual(len(groups),3)
+        chief=next(g for g in groups if g['conditions']==lead['conditions'])
+        self.assertEqual(chief['sample'],42)
+        self.assertEqual(chief['wins'],30)
+        self.assertEqual(len(chief['related']),1)
+        self.assertEqual(chief['related'][0]['sample'],41)
+        self.assertEqual(chief['related'][0]['conditions'],qb['conditions'])
+        self.assertEqual(len(group_overlapping_trends([lead,qb,other],limit=2)),2)
+
 if __name__=='__main__':unittest.main()

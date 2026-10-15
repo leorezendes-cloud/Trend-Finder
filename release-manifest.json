@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 4808,
-    "sha256": "a4479e059e0b74517a7b40642808ebb4482454ba802d06d05d358f00583369a7"
+    "bytes": 5415,
+    "sha256": "0daca845f91cd51ca5b35373b830790e9023cbb23b41568d2febd294fc421ec0"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
@@ -548,8 +548,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 16664,
-    "sha256": "b821b17c730b49b4af237a858ef8b55a787009ef022d855aaab265210d50ebe6"
+    "bytes": 17484,
+    "sha256": "3815869d418f9aea7a758eccf8571194b3654668ed86c6b296b764bf67d826d4"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -1012,8 +1012,8 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 2606,
-    "sha256": "9504bf57b6c9181017abfa139bba06b526e44b20a3631c0c5a8694a8000a3dec"
+    "bytes": 2941,
+    "sha256": "c6c827c0e1ca68638994d023c763b972207241552bddaf36ff4e63f1ceebd2a3"
   },
   "static/general_research.js": {
     "bytes": 1571,
@@ -1103,6 +1103,10 @@
     "bytes": 1563,
     "sha256": "083388d640006a315e5cc48eb595df79161ccb9261d5e80e7b97da58275ecda0"
   },
+  "templates/_general_combination.html": {
+    "bytes": 962,
+    "sha256": "2dea103cd01add6370d1d8c2b418d4437ef886c2ff4b199451536ebd6d99aeb7"
+  },
   "templates/_general_filter_chips.html": {
     "bytes": 328,
     "sha256": "5be3efa6bf7f4caee88548c9675d63e83130d07faad12ef61ac8730cca6fde46"
@@ -1172,8 +1176,8 @@
     "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
-    "bytes": 10386,
-    "sha256": "620f4be9f5908614fd142cc09854495bae970ac0a4df7155a355912e7eb119fc"
+    "bytes": 10473,
+    "sha256": "e244008943cb524f8ec183ba00d9fe9bdf4fa3ccffafc3c6d3bac50b6c04214b"
   },
   "templates/home.html": {
     "bytes": 4695,
@@ -1312,8 +1316,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 14897,
-    "sha256": "b8b35033838262c66d3216f17ef232bfbce358df06fc23dc43fec2b816751a66"
+    "bytes": 16082,
+    "sha256": "f5c8e9f788a4c724fddd93736c2801b345446feb9116cacbd920dc702406f5e3"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,

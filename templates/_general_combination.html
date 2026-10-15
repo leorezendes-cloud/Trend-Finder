@@ -1,0 +1,8 @@
+{% from '_save_watchlist.html' import save_item with context %}
+{% macro conditions(trend) %}{% for field,value in trend.conditions.items() %}{{ field.replace('_',' ').title().replace('Qb','QB') }}: {{ value }}{% if not loop.last %} · {% endif %}{% endfor %}{% endmacro %}
+{% macro evidence(trend) %}
+<p>{{ trend.sample }} matchups · {{ trend.recent_games }} in the latest two seasons</p>
+<details class="combination-evidence" data-evidence-url="{{ trend.evidence_url }}"><summary>Verify games →</summary><div class="evidence-content" aria-live="polite"></div></details>
+{{ save_item('trend',trend.url,trend.label ~ ' · ' ~ (trend.conditions|display_trend_filters)) }}
+{% endmacro %}
+{% macro metrics(trend) %}<span class="combination-metrics"><span class="combination-record">{{ trend.label }}: {{ trend.wins }}–{{ trend.losses }}–{{ trend.pushes }}</span><span class="combination-win-rate">{{ '%.2f'|format(trend.rate) }}%</span></span>{% endmacro %}
