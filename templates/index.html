@@ -202,12 +202,12 @@
                     </select>
                     <small class="qb-filter-note">All CSV seasons, including former QBs. Use either QB dropdown.</small>
                 </div>
-                {% for field, values in filter_options.items() if field not in ('dog_qb_name', 'game_type', 'qb_name') %}
+                {% for field, values in filter_options.items() if field not in ('dog_qb_name', 'game_type', 'qb_name', 'game_id') %}
                 <div class="field">
                     <label for="csv-{{ field }}">{{ 'Underdog Coast' if field == 'dog_coast' else field.replace('_', ' ').title() }}</label>
                     <select id="csv-{{ field }}" name="{{ field }}">
                         <option value="">All</option>
-                        {% for value in values %}
+                        {% for value in values if field not in ('temp','wind','gametime') or value in ('1 p.m. ET window','4 p.m. ET window','Freezing (below 32°F)','Cool (32 to below 60°F)','Mild (60 to below 80°F)','Hot (80°F+)','Light wind (under 10 mph)','Breezy (10 to below 20 mph)','Windy (20+ mph)') %}
                         <option value="{{ value }}" {% if csv_filters.get(field) == value %}selected{% endif %}>{{ value }}</option>
                         {% endfor %}
                     </select>

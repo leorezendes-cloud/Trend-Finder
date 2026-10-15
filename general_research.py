@@ -5,6 +5,7 @@ from flask import abort, render_template, request, url_for
 from trend_finder_2 import CSV_FILTER_FIELDS, matches_csv_filters, get_csv_filter_options, game_file
 from pregame_lines import effective_rows
 from saved_trends import manual_trend_title
+from trend_filter_groups import GROUP_OPTIONS, matches_group
 
 ROLES = {'all':'Any role', 'home':'Home', 'away':'Away', 'favorite':'Favorite', 'underdog':'Underdog'}
 
@@ -72,9 +73,62 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
     return {'games':len(matches),'records':([records['selected']] if team else [])+[v for k,v in records.items() if k!='selected'],'totals':totals,'pickems':pickems,'missing_lines':missing_lines,'matches':matches}
 
 
+def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
+    """Bounded three-feature discovery; evaluate both team sides and totals."""
+    memberships={}
+    for i,g in enumerate(rows):
+        features=[]
+        for field in ('game_type','home_team','away_team','roof','surface',
+                      'home_coach','away_coach','home_qb_name','away_qb_name','referee'):
+            if g.get(field):features.append((field,g[field]))
+        for field in ('gametime','temp','wind'):
+            features.extend((field,value) for value in GROUP_OPTIONS[field] if matches_group(g,field,value))
+        for feature in features:memberships.setdefault(feature,set()).add(i)
+    features=sorted(f for f,ids in memberships.items() if len(ids)>=minimum)
+    evaluated={};beam=[((),set(range(len(rows))))]
+    for depth in range(1,4):
+        candidates=[]
+        for conditions,ids in beam:
+            for feature in features:
+                if conditions and feature<=conditions[-1]:continue
+                if any(f[0]==feature[0] for f in conditions):continue
+                subset=ids & memberships[feature]
+                if len(subset)<minimum:continue
+                key=conditions+(feature,)
+                report=research_games([rows[i] for i in sorted(subset)],team=team,role=role)
+                records=report['records'][:1] if team else report['records']
+                if not team and role!='all':
+                    label={'home':'Home teams','away':'Away teams','favorite':'Favorites','underdog':'Underdogs'}[role]
+                    records=[record for record in records if record['label']==label]
+                metrics=[(v['label']+' ATS',v['covers'],v['ats_losses'],v['pushes']) for v in records]
+                totals=report['totals']
+                metrics += [('Over',totals['over'],totals['under'],totals['push']),('Under',totals['under'],totals['over'],totals['push'])]
+                best=None
+                for label,wins,losses,pushes in metrics:
+                    n=wins+losses
+                    if n<minimum or wins/n<.55:continue
+                    # Wilson lower bound avoids ranking tiny perfect samples first.
+                    rate=wins/n;z=1.96
+                    lower=(rate+z*z/(2*n)-z*((rate*(1-rate)+z*z/(4*n))/n)**.5)/(1+z*z/n)
+                    candidate={'conditions':dict(key),'label':label,'wins':wins,'losses':losses,'pushes':pushes,
+                               'rate':100*rate,'sample':len(subset),'score':lower,'membership':tuple(sorted(subset))}
+                    if best is None or lower>best['score']:best=candidate
+                score=best['score'] if best else 0
+                candidates.append((score,len(subset),key,subset))
+                if best:evaluated[key]=best
+        candidates.sort(key=lambda v:(v[0],v[1],v[2]),reverse=True)
+        beam=[(key,ids) for _,_,key,ids in candidates[:40]]
+    unique={}
+    for trend in sorted(evaluated.values(),key=lambda v:(len(v['conditions']),tuple(v['conditions'].items()))):
+        unique.setdefault((trend['label'],trend['membership']),trend)
+    return sorted(unique.values(),key=lambda v:(v['score'],v['sample']),reverse=True)[:limit]
+
+
 def render_general(form):
     with open(game_file,newline='') as source:rows=list(effective_rows(csv.DictReader(source),game_file))
-    options=get_csv_filter_options();years=sorted({int(g['season']) for g in rows},reverse=True)
+    options=get_csv_filter_options()
+    for field in ('gametime','temp','wind'):options[field]=list(GROUP_OPTIONS[field])
+    years=sorted({int(g['season']) for g in rows},reverse=True)
     teams=sorted({g[key] for g in rows for key in ('away_team','home_team') if g.get(key)})
     role=form.get('research_role','all');team=form.get('research_team','');prime=form.get('primetime','')
     if role not in ROLES or team and team not in teams or prime not in ('','yes','no'):abort(400,description='Choose a valid team, role and time filter.')
@@ -91,7 +145,7 @@ def render_general(form):
             season=(low,high)
     except (ValueError,TypeError):abort(400,description='Choose a valid season or season range.')
     primary=('game_type','gametime','temp','wind','roof','qb_name')
-    allowed=[f for f in CSV_FILTER_FIELDS if f not in ('dog_coast',)]
+    allowed=[f for f in CSV_FILTER_FIELDS if f not in ('dog_coast','game_id')]
     for field in allowed:
         value=form.get(field,'').strip()
         if value:
@@ -99,15 +153,21 @@ def render_general(form):
             filters[field]=value
     analyze=request.method=='POST' or form.get('run')=='analyze'
     report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime) if analyze else None
+    combinations=None
+    if analyze and form.get('action')=='combinations':
+        combinations=find_combinations(report['matches'],team=team,role=role)
     try:page=max(1,int(form.get('page',1)))
     except ValueError:abort(400,description='Invalid results page.')
     pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
-    selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions')}
+    selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions','game_id')}
     selection.update(research_view='general',run='analyze')
+    for trend in combinations or []:
+        params={**selection,**trend['conditions']}
+        trend['url']=url_for('trend_finder',**params)
     target=url_for('trend_finder',**selection)
     page_url=lambda number:url_for('trend_finder',**selection,page=number)
     return render_template('general_trends.html',options=options,years=years,teams=teams,roles=ROLES,form=form,
-        primary=primary,advanced=[f for f in allowed if f not in primary],report=report,
+        combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),
         manual_search_url=target,manual_search_title=manual_trend_title(target))

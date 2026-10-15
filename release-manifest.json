@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 1490,
-    "sha256": "cfe60e643b6a8df116dfb331957f9f32d8b9316186f3d94d7f241563c9b7b154"
+    "bytes": 2111,
+    "sha256": "4ad0370d7a47ed1d20d31244afa8e0dddcb40deb9267781aa98e2e3ae09aac54"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
@@ -548,8 +548,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 7175,
-    "sha256": "ae3b77869c488420c3613f42f29f50ea0a2e6242e1bc5afdd5b054addebff7ff"
+    "bytes": 10860,
+    "sha256": "8675a060d373ce7292d1e0b65c4dcd25392b2211cc6ff7df1848667388cc0cf8"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -1012,8 +1012,8 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 1167,
-    "sha256": "45767d8115f3ceb897c3770a18edfb981fe7ea2012bbd8e4ff44ca005f04b658"
+    "bytes": 1102,
+    "sha256": "db8d419d7cd2718c418aec5bb5cdc53d251446362413b61a6b2cba6761a16065"
   },
   "static/general_research.js": {
     "bytes": 400,
@@ -1160,16 +1160,16 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/general_trends.html": {
-    "bytes": 8764,
-    "sha256": "b186b7bdc101b1672f9522c0d0eb86c92b5571b855e7efa05bff489c67b34baa"
+    "bytes": 9331,
+    "sha256": "e3e818070d406bd841fdd79e7b33cac8f10a80fafdbe1b244f6ec5ee3146f89d"
   },
   "templates/home.html": {
     "bytes": 4695,
     "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
-    "bytes": 28130,
-    "sha256": "236d56f5b9ccae12e741e45beab080b7654cd3ea88a3f5f18e2f9a68817221c5"
+    "bytes": 28406,
+    "sha256": "0980e1bb7c62c7bc2213c9acb26ac64e55533a44decf1e59304ee0649eb56a53"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1300,8 +1300,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 5429,
-    "sha256": "a5402bb07a4b0fca64aefec0ac069fb6fa4e39ef820777523bdb1ffaace18bd4"
+    "bytes": 7733,
+    "sha256": "650301cb2a84c1cb249deff755d1678c3413139ec8be5084458370599e021960"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,

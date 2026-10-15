@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from general_research import research_games
+from general_research import research_games, find_combinations
 from trend_filter_groups import matches_group
 from saved_trends import manual_trend_title
 from app import app
@@ -72,5 +72,44 @@ class GeneralResearchTests(unittest.TestCase):
         html=app.test_client().get('/trend-finder').text
         for text in ('General NFL research','Primetime Dogs preset','1 p.m. ET window','4 p.m. ET window','Playoffs (all rounds)','Recorded temperature','Recorded wind'):
             self.assertIn(text,html)
+
+    def test_simple_presets_and_original_actions_and_cards(self):
+        from html.parser import HTMLParser
+        class Choices(HTMLParser):
+            def __init__(self):super().__init__();self.field=None;self.choices={}
+            def handle_starttag(self,tag,attrs):
+                attrs=dict(attrs)
+                if tag=='select':self.field=attrs.get('name');self.choices[self.field]=[]
+                if tag=='option' and self.field:self.choices[self.field].append(attrs.get('value'))
+            def handle_endtag(self,tag):
+                if tag=='select':self.field=None
+        client=app.test_client();html=client.get('/trend-finder').text
+        parser=Choices();parser.feed(html)
+        self.assertEqual(len(parser.choices['wind']),4)
+        self.assertEqual(len(parser.choices['temp']),5)
+        self.assertEqual(len(parser.choices['gametime']),3)
+        self.assertNotIn('game_id',parser.choices)
+        self.assertIn('name="action" value="combinations"',html)
+        self.assertIn('class="clear-button"',html)
+        self.assertNotIn('Kickoff windows include',html)
+        html=client.get('/trend-finder?research_view=general&run=analyze&season=2025&research_team=BUF').text
+        self.assertIn('class="results-grid"',html);self.assertIn('class="stat',html)
+        self.assertIn('BUF — Any role',html)
+
+    def test_general_combinations_include_favorites_and_respect_scope(self):
+        rows=[game(str(i),temp='25',wind='22') for i in range(12)]
+        trends=find_combinations(rows,role='favorite')
+        self.assertTrue(trends)
+        self.assertTrue(any(t['label']=='Favorites ATS' for t in trends))
+        self.assertFalse(any('Underdog' in t['label'] for t in trends))
+        for trend in trends:
+            self.assertEqual(trend['wins'],12);self.assertEqual(trend['losses'],0)
+            verified=research_games(rows,filters=trend['conditions'])
+            self.assertEqual(verified['games'],trend['sample'])
+            self.assertNotIn('game_id',trend['conditions'])
+            self.assertNotIn('away_score',trend['conditions'])
+            from trend_finder_2 import CSV_FILTER_FIELDS
+            self.assertTrue(set(trend['conditions']).issubset(CSV_FILTER_FIELDS))
+        self.assertEqual(find_combinations(rows[:9]),[])
 
 if __name__=='__main__':unittest.main()
