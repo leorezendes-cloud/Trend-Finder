@@ -1012,8 +1012,8 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 2479,
-    "sha256": "8d257fc4dfe078586f002f6f79b0f4913cd49a6d8b8e7ca23b52c12404b058fa"
+    "bytes": 2606,
+    "sha256": "9504bf57b6c9181017abfa139bba06b526e44b20a3631c0c5a8694a8000a3dec"
   },
   "static/general_research.js": {
     "bytes": 1571,
@@ -1172,8 +1172,8 @@
     "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
-    "bytes": 10101,
-    "sha256": "7926c0aa9019f27a11eda1d0bf4462ad10beba8bd0433f20ff7289376dc2d696"
+    "bytes": 10105,
+    "sha256": "5703337a1c7833435c1a992ffcf1539a947de7410694af38da18d99bd49115bb"
   },
   "templates/home.html": {
     "bytes": 4695,

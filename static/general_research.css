@@ -27,3 +27,5 @@
 .general-research .all-research-games table { width:100%;border-collapse:collapse;text-align:left; }
 .general-research .all-research-games th,.general-research .all-research-games td { padding:10px 8px;border-bottom:1px solid #64748b; }
 @media(max-width:650px) { .general-research .all-research-games { padding:16px; } }
+
+.general-research .research-games { background:#1f2937;border:1px solid #374151;border-radius:10px;padding:16px;color:#fff; }
