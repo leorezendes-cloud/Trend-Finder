@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 5415,
-    "sha256": "0daca845f91cd51ca5b35373b830790e9023cbb23b41568d2febd294fc421ec0"
+    "bytes": 6071,
+    "sha256": "efa7201d32e82621a822b03667f53b4fa1aafd7a7518039cfcc57aa9b08891c2"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
@@ -52,8 +52,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 40721,
-    "sha256": "8d891d5f9104c1066ce3ceeb99bb4fe0eed4cc346635bb38620482a63a5d6caf"
+    "bytes": 40831,
+    "sha256": "fe779a7dfee11548717059526dbaa19f0cf6610a956b94438e4bef0c5da3cba2"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -539,6 +539,10 @@
     "bytes": 8773,
     "sha256": "31e0f5c48b915fc18d7c6d224ef7e5184e1211394d7146d8400d1fdcb8243f8f"
   },
+  "emerging_alerts.py": {
+    "bytes": 2210,
+    "sha256": "9f9658e3d3777045bfff2401900f211176a3b714b033728fc881362e060b86de"
+  },
   "fan_views.py": {
     "bytes": 12120,
     "sha256": "c1ce10fdf5cce39235718366e9295fe6d3dacd05a92f8ca7c58dc558caded3eb"
@@ -828,8 +832,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4800,
-    "sha256": "e86e47d08c26cd73c87a5482254e0496fd33c550ccc0caab1ad1c4335dccd98a"
+    "bytes": 4827,
+    "sha256": "93c60a5ae8cd3428ea67b6b8e019cb1c050f3bb9ad25cd84f44172fd6e8fc863"
   },
   "seo.py": {
     "bytes": 7604,
@@ -1036,8 +1040,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 10217,
-    "sha256": "96fd9949f58d38441545837bbfdf454958cd0230c8ebc0e6059e3f3954680fe7"
+    "bytes": 10862,
+    "sha256": "1f6962e9cc5b15cfc7338fe31a9ac9609c282126059c43da6eb15087676db21c"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1180,8 +1184,8 @@
     "sha256": "e244008943cb524f8ec183ba00d9fe9bdf4fa3ccffafc3c6d3bac50b6c04214b"
   },
   "templates/home.html": {
-    "bytes": 4695,
-    "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
+    "bytes": 6038,
+    "sha256": "3abb9cf8e0b38d6ac04dad8f9265a00e82a02956afc06d245d98290fb8939792"
   },
   "templates/index.html": {
     "bytes": 28456,
@@ -1310,6 +1314,10 @@
   "test_dog_qb_filters.py": {
     "bytes": 6022,
     "sha256": "c4345153153c3b0a98b60ee4c56d38ce015ad6007bff436fb0cc228875140a83"
+  },
+  "test_emerging_alerts.py": {
+    "bytes": 2294,
+    "sha256": "acbad958811b4d0e73263592e6e36dd99de26e929fa1327c22ec5fc8d37a7a08"
   },
   "test_fan_views.py": {
     "bytes": 8652,

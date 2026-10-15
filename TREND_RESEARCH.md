@@ -35,3 +35,7 @@ General automatic QB, coach, team and referee categories must appear in the newe
 ## Overlapping combinations
 
 General discovery groups same-outcome patterns when their matching-game sets have at least 80% Jaccard overlap (intersection divided by union). Grouping happens before the 30-card display limit. The strongest ranked pattern represents each card, and coach, QB, roof, surface and other similar variations remain nested with their individual records, save controls and ten-game evidence previews. Records are never summed. Every variation is compared with its representative to avoid transitive chains of increasingly different samples. Different outcome labels remain separate.
+
+## Home-page emerging alert
+
+A red-outlined Gravy Train card appears above the account/watchlist button when regular-season home primetime underdogs are undefeated straight up over 3–14 completed games in the upcoming matchup’s season. The card requires an unstarted, non-neutral, matching regular-season game within seven days with a finite saved spread. It says On tonight only on the game’s Eastern calendar date. The record is calculated from completed games that started before the current clock; future filled scores do not count. It updates or hides when its qualification changes, never promises an outcome, and does not modify predictions.
