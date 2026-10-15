@@ -29,7 +29,11 @@ def sources(season):
 def view_data():
     schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
     years = sorted({int(r['season']) for r in schedule}, reverse=True)
-    cache_years = sorted(int(p.parent.name) for p in (ROOT/'data'/'scout4').glob('*/latest.json'))
+    # Shared caches such as daily/latest.json are not season directories.
+    cache_years = sorted(int(p.parent.name)
+                         for p in (ROOT/'data'/'scout4').glob('*/latest.json')
+                         if len(p.parent.name) == 4 and p.parent.name.isascii()
+                         and p.parent.name.isdecimal())
     try:
         season = int(request.args.get('season', max(cache_years) if cache_years else max(years)))
         from site_week import active_week
