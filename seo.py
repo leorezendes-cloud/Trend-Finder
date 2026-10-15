@@ -9,7 +9,7 @@ PAGES={
  'home':('/', 'Discover NFL Trends & Predictions | Gravy Train', 'Discover NFL trends with Trendfindah 3000, get The Plug’s locked predictions, and investigate betting patterns and conspiracy theories in the Conspiracy Dungeon.'),
  'trend_finder':('/trend-finder','Trendfindah 3000 | NFL Trend Finder | Gravy Train','Discover NFL trends with Trendfindah 3000, an NFL trend finder. Research historical ATS patterns by season, spread, team, coach, quarterback, and primetime, and save your searches.'),
  'trends_page':('/trends','Discover NFL Trends, ATS Patterns & Streaks | Gravy Train','Discover NFL trends and ATS streaks with Trendfindah 3000: compare historical records, sample sizes, recent performance, and upcoming matchups.'),
- 'sunday_page':('/sunday','Upcoming NFL Matchups & Spreads | Gravy Train','Review this week’s NFL matchups, saved spreads, kickoff times, and historical underdog trends. Compare teams and make free member picks.'),
+ 'sunday_page':('/sunday','Upcoming NFL Matchups & Spreads | Gravy Train','Review this week’s NFL matchups, saved spreads, kickoff times, and historical underdog trends. Compare teams, challenge The Plug, and see how you do this week.'),
  'market_page':('/market','Upcoming NFL Spreads & Totals | Gravy Train','See the latest verified saved NFL spreads and over/under totals for upcoming games, with quote timestamps and links to team comparisons.'),
  'plug_page':('/the-plug','NFL ATS & Over/Under Picks | The Plug | Gravy Train','See The Plug’s locked NFL ATS and over/under predictions, projected scores, original lines, and recorded results, powered by Scout 4.0.'),
  'sunday_results_page':('/sunday-results','Weekly NFL Scores & ATS Pick Results | Gravy Train','Review weekly NFL final scores, teams’ ATS records as underdogs, matchup outcomes, and The Plug’s locked ATS and over/under pick results.'),
@@ -38,7 +38,7 @@ def metadata():
         match=re.fullmatch(r'(\d{4})_(\d{2})_([A-Z]+)_([A-Z]+)',game_id)
         if match:
             year,week,away,home=match.groups();away=TEAMS.get(away,away);home=TEAMS.get(home,home)
-            page=(request.path,f'{away} vs {home} | NFL Week {int(week)}, {year} | Gravy Train',f'Compare {away} and {home} for {year} NFL Week {int(week)}: team statistics, saved ATS and total predictions, and free member picks.')
+            page=(request.path,f'{away} vs {home} | NFL Week {int(week)}, {year} | Gravy Train',f'Compare {away} and {home} for {year} NFL Week {int(week)}: team statistics, saved ATS and total predictions, and a chance to see how you do this week.')
     public=bool(page) and not request.args and request.method in ('GET','HEAD')
     path,title,description=page or ('',None,'Explore your Gravy Train account, NFL research, member picks, and saved matchup information.')
     return {'title':title,'description':description,'canonical':origin()+path if page else None,

@@ -816,8 +816,8 @@
     "sha256": "1becd319e6cd440cae3e80cb98f89fb1b45247ef7360081a9aaf8f5aa4bc67f1"
   },
   "seo.py": {
-    "bytes": 7502,
-    "sha256": "35ef53b9defd8ccb7d1d6f31389079177742fd68b8613ad4a841e95aa910e9b9"
+    "bytes": 7544,
+    "sha256": "453d4b35089f25bb79f9daded096c9890f7d200cff25470f9a0ca9a453606b1e"
   },
   "site_health.py": {
     "bytes": 1448,
@@ -1136,32 +1136,32 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/home.html": {
-    "bytes": 4695,
-    "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
+    "bytes": 4697,
+    "sha256": "31bbb5f7198b010ccbf05f127a9b118441cb3a8c7231de3e83150d1890c7a511"
   },
   "templates/index.html": {
     "bytes": 27939,
     "sha256": "dc82e495bc27cda531894e1fd1a5d5cec3db43f47cdb82ee2b45d3c82f2dcf07"
   },
   "templates/market.html": {
-    "bytes": 1272,
-    "sha256": "43a0fb94ff4d2eadbc9370d4f47e7a0f86ab1ff07c9cbaa576f4035a6ecbd78e"
+    "bytes": 1268,
+    "sha256": "f97eb7f9130ca47deb1fa0db7480c47b65d9a30ca29cd98a01ba0a06073aea4d"
   },
   "templates/matchup.html": {
     "bytes": 3967,
     "sha256": "a65f22a33f55e319a59a39879c8e709a1aa2d158837e2e1db6b99ee3729c274a"
   },
   "templates/member_picks.html": {
-    "bytes": 2591,
-    "sha256": "20d70cb656bf416df87919c399915ef1e72cc9c8ba607697c9ab38bdc03c6152"
+    "bytes": 2634,
+    "sha256": "7d0dcc613569dbce4bf12f7aff57c6df41d2a11cb4873b065f144dd9a5004195"
   },
   "templates/membership.html": {
     "bytes": 5283,
     "sha256": "3fbf91573d97113c13d8b651f6f35ba02c61e68ca59cd33077d7e8f1b1568e86"
   },
   "templates/methodology.html": {
-    "bytes": 3800,
-    "sha256": "ea7dfe0551c170cc625778b0e96a1f36642c7cc71e4e92423700ed72da02bec2"
+    "bytes": 3820,
+    "sha256": "c8ac4f6c686e6e435ed85082cbf94370b7682ce2f6e376ae70865545e20d181c"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
@@ -1228,8 +1228,8 @@
     "sha256": "eee0c74d995792ca7b927b7f2d7da31eb9631dc71442af3e9163cd9816bd48e3"
   },
   "templates/sunday.html": {
-    "bytes": 8914,
-    "sha256": "ba163050e22ba0467cf02ca3d68daaceefcab0c916255a7cdb318499e4273c4e"
+    "bytes": 8916,
+    "sha256": "256ebbf6ee2421e7389a8038175f89610f855aa9b1e48af64bff47f56a13abd5"
   },
   "templates/sunday_results.html": {
     "bytes": 7404,
