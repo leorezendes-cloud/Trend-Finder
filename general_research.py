@@ -189,10 +189,10 @@ def render_general(form):
         trend['url']=url_for('trend_finder',**params,_anchor='matching-games')
         trend['evidence_url']=url_for('trend_finder',**params,evidence='1',evidence_metric=trend['label'])
     target=url_for('trend_finder',**selection)
-    page_url=lambda number:url_for('trend_finder',**selection,page=number,evidence='1' if form.get('evidence')=='1' else None,evidence_metric=form.get('evidence_metric') if form.get('evidence')=='1' else None,_anchor=None if form.get('evidence')=='1' else 'matching-games')
+    page_url=lambda number:url_for('trend_finder',**selection,page=number,evidence='1' if form.get('evidence')=='1' else None,evidence_metric=form.get('evidence_metric') or None,_anchor=None if form.get('evidence')=='1' else 'matching-games')
     if form.get('evidence')=='1':
         if report is None:abort(400)
-        return render_template('_general_games.html',games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''))
+        return render_template('_general_games.html',games=report['matches'][:10],total=report['games'],page=1,pages=1,page_url=page_url,evidence_metric=form.get('evidence_metric',''),preview=True,all_games_url=url_for('trend_finder',**selection,evidence_metric=form.get('evidence_metric') or None,_anchor='matching-games'))
     return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
         spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,

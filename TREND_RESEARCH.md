@@ -23,3 +23,5 @@ Team role (favorite/underdog) and Home/Away are independent: Underdog + Home + P
 Spread presets use absolute spread size: pick’em, above zero through 3, above 3 through 7, above 7 through 10, and above 10 points. Missing spreads do not match a selected band. Legacy exact-spread URLs still retain their filter.
 
 Each record and percentage is displayed in its own stat card. Verify games expands within the original combination card and loads a paginated evidence fragment with the same scope and conditions. ATS combinations show the appropriate side’s Cover/Loss/Push for each game. Evidence pagination stays inside that card, preserving the combination list and filters. Saved combination searches open their matching-games section directly.
+
+Result cards begin with Games, Pick’ems, Over and Under, followed by four-card rows for Home team, Away team, Favorites and Dogs: ATS, cover %, straight up and SU %. Named-team cards follow these rows when a team is selected. Inline Verify games previews the newest ten matches only. All games involved opens the complete paginated matching-games view in a new tab, preserving the combination list in the original tab.

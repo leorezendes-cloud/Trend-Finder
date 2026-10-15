@@ -144,7 +144,31 @@ class GeneralResearchTests(unittest.TestCase):
         self.assertEqual(client.get(query.replace('research_location=home','research_location=nowhere')).status_code,400)
         self.assertEqual(client.get(query.replace('spread_size=short','spread_size=bad')).status_code,400)
         cards=client.get(query).text
-        for label in ('Underdogs ATS record','Underdogs ATS cover %','Underdogs SU record','Underdogs SU win %'):
+        for label in ('Dogs ATS','Dogs cover %','Dogs straight up','Dogs SU %'):
             self.assertIn(label,cards)
+
+    def test_card_order_and_ten_game_preview(self):
+        import re
+        from urllib.parse import urlsplit,parse_qs
+        from html import unescape
+        client=app.test_client()
+        query='/trend-finder?research_view=general&run=analyze&season=2025&research_role=underdog&primetime=yes'
+        html=client.get(query).text
+        labels=re.findall(r'<span class="stat-label">(.*?)</span>',html)
+        expected=['Games','Pick’ems','Over','Under']
+        for team in ('Home team','Away team','Favorites','Dogs'):
+            expected.extend(team+' '+metric for metric in ('ATS','cover %','straight up','SU %'))
+        self.assertEqual(labels,expected)
+        fragment=client.get(query+'&evidence=1&evidence_metric=Underdogs+ATS').text
+        self.assertEqual(fragment.count('<tr>'),11) # Header plus ten games.
+        self.assertIn('All games involved',fragment)
+        link=unescape(re.search(r'href="([^"]+)" target="_blank"',fragment).group(1))
+        params=parse_qs(urlsplit(link).query)
+        self.assertEqual(params['research_role'],['underdog'])
+        self.assertEqual(params['primetime'],['yes'])
+        self.assertNotIn('evidence',params)
+        self.assertEqual(urlsplit(link).fragment,'matching-games')
+        full=client.get(link).text
+        self.assertGreater(full.count('<tr>'),11)
 
 if __name__=='__main__':unittest.main()
