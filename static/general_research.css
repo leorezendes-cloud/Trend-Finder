@@ -17,3 +17,8 @@
 .general-research .evidence-content { overflow-x:auto; }
 .general-research .evidence-content table { width:100%;border-collapse:collapse; }
 .general-research .evidence-content th,.general-research .evidence-content td { padding:8px;border-bottom:1px solid #64748b; }
+
+.general-research .active-filter-chips { display:flex;flex-wrap:wrap;gap:8px;margin:16px 0; }
+.general-research .active-filter-chips .filter-chip,
+.general-research .active-filter-chips .filter-chip:visited { display:inline-block;padding:6px 10px;font:bold 14px Arial,sans-serif;background:#fff;color:#000;border-radius:18px;text-decoration:none;-webkit-text-stroke:0; }
+.general-research .filter-chip:hover { background:#fbbf24; }

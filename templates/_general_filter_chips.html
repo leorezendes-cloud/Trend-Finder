@@ -1,0 +1,1 @@
+{% if filter_chips %}<div class="active-filter-chips" aria-label="Active filters">{% for chip in filter_chips %}<a class="filter-chip" href="{{ chip.url }}" aria-label="Remove {{ chip.label }}">{{ chip.label }} <span aria-hidden="true">×</span></a>{% endfor %}</div>{% else %}<p class="active-filters">All Games</p>{% endif %}

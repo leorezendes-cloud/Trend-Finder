@@ -171,4 +171,23 @@ class GeneralResearchTests(unittest.TestCase):
         full=client.get(link).text
         self.assertGreater(full.count('<tr>'),11)
 
+    def test_active_tags_remove_one_filter_and_keep_combination_mode(self):
+        import re
+        from html import unescape
+        from urllib.parse import urlsplit,parse_qs
+        query='/trend-finder?research_view=general&run=analyze&season=2025&research_role=underdog&research_location=home&primetime=yes&spread_size=short&wind=Windy+%2820%2B+mph%29'
+        client=app.test_client()
+        for suffix in ('','&action=combinations'):
+            html=client.get(query+suffix).text
+            for label in ('Season 2025','Role: Underdog','Location: Home','Primetime','Spread: Up to 3 points','Wind: Windy'):
+                self.assertIn('Remove '+label,html)
+            match=re.search(r'href="([^"]+)" aria-label="Remove Location: Home"',html)
+            link=unescape(match.group(1));params=parse_qs(urlsplit(link).query)
+            self.assertNotIn('research_location',params)
+            self.assertEqual(params['research_role'],['underdog'])
+            self.assertEqual(params['primetime'],['yes'])
+            self.assertEqual(params['action'],['combinations' if suffix else 'analyze'])
+            self.assertEqual(client.get(link).status_code,200)
+            self.assertEqual(urlsplit(link).fragment,'research-results')
+
 if __name__=='__main__':unittest.main()

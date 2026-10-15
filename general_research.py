@@ -188,13 +188,32 @@ def render_general(form):
         params={**selection,**trend['conditions']}
         trend['url']=url_for('trend_finder',**params,_anchor='matching-games')
         trend['evidence_url']=url_for('trend_finder',**params,evidence='1',evidence_metric=trend['label'])
+    filter_chips=[]
+    chip_scope={**selection,'action':'combinations' if combinations is not None else 'analyze'}
+    def chip(label,fields):
+        remaining={key:value for key,value in chip_scope.items() if key not in fields}
+        filter_chips.append({'label':label,'url':url_for('trend_finder',**remaining,_anchor='research-results')})
+    if mode=='range' and season:
+        chip(f'Seasons {season[0]}–{season[1]}',('season_mode','season','start_season','end_season'))
+    elif season is not None:
+        chip(f'Season {season}',('season',))
+    if team:chip('Team: '+team,('research_team',))
+    if role!='all':chip('Role: '+ROLES[role],('research_role',))
+    if location:chip('Location: '+location.title(),('research_location',))
+    if prime:chip('Primetime' if prime=='yes' else 'Non-primetime',('primetime',))
+    if spread_size:chip('Spread: '+SPREADS[spread_size],('spread_size',))
+    labels={'game_type':'Season stage','gametime':'Kickoff','temp':'Temperature','wind':'Wind','qb_name':'QB'}
+    stages={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl'}
+    for field,value in filters.items():
+        display=stages.get(value,value) if field=='game_type' else value
+        chip(labels.get(field,field.replace('_',' ').title().replace('Qb','QB'))+': '+display,(field,))
     target=url_for('trend_finder',**selection)
     page_url=lambda number:url_for('trend_finder',**selection,page=number,evidence='1' if form.get('evidence')=='1' else None,evidence_metric=form.get('evidence_metric') or None,_anchor=None if form.get('evidence')=='1' else 'matching-games')
     if form.get('evidence')=='1':
         if report is None:abort(400)
         return render_template('_general_games.html',games=report['matches'][:10],total=report['games'],page=1,pages=1,page_url=page_url,evidence_metric=form.get('evidence_metric',''),preview=True,all_games_url=url_for('trend_finder',**selection,evidence_metric=form.get('evidence_metric') or None,_anchor='matching-games'))
     return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
-        spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
+        filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),
         manual_search_url=target,manual_search_title=manual_trend_title(target))

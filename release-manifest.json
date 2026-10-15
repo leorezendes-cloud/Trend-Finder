@@ -548,8 +548,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 13428,
-    "sha256": "62c26dbf0db638abc9cc49c34404d98d2812b3705149d4d567f23eeff19ea6be"
+    "bytes": 14817,
+    "sha256": "7009292c6006ddd4c0115223f4af09d6a1c622d0d81355d5343fe32cfd13054e"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -1012,8 +1012,8 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 1478,
-    "sha256": "89743659d6f8dc401316425bcba54798aab64be79b6a6a82001574e9d1d5c8ac"
+    "bytes": 1911,
+    "sha256": "64e35b9151357c7867876e0b6aeb6a2459598524f4bd5ab73543930df69a0cfa"
   },
   "static/general_research.js": {
     "bytes": 1571,
@@ -1103,6 +1103,10 @@
     "bytes": 1541,
     "sha256": "495cc73e62c19628334ed6f5d86e1eeca18e171131fa4e42cc5dfc750291252b"
   },
+  "templates/_general_filter_chips.html": {
+    "bytes": 328,
+    "sha256": "5be3efa6bf7f4caee88548c9675d63e83130d07faad12ef61ac8730cca6fde46"
+  },
   "templates/_general_games.html": {
     "bytes": 2024,
     "sha256": "818eebc86b8512cf5366d18b41a52d7f7526c7c72971d6ea3d90d30676a92964"
@@ -1164,8 +1168,8 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/general_trends.html": {
-    "bytes": 9973,
-    "sha256": "921eb4acd654b1c551c64e7cc51132c53423215c818a876f75b7333e2e7e91d1"
+    "bytes": 10101,
+    "sha256": "7926c0aa9019f27a11eda1d0bf4462ad10beba8bd0433f20ff7289376dc2d696"
   },
   "templates/home.html": {
     "bytes": 4695,
@@ -1304,8 +1308,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 11473,
-    "sha256": "96bb398e5774d156732b7d28cf1a3280c8c1bb47d23877f8dd96f6086fc93b51"
+    "bytes": 12718,
+    "sha256": "4dae679c5b5cbf1526cf78b0ed4624d7e7119ee4bd16afdf9474b0ab9b138209"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,
