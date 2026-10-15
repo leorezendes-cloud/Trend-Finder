@@ -48,8 +48,12 @@ def build_results(root,week=None):
  scouts=read_csv(root/'sunday_scout_pregame_2026-10-11.csv') if season==2026 and selected==5 else []
  picks={(s['away'],s['home']):s for s in scouts}
  has_blend=any(r['week']==selected for r in frozen.values())
- model_label='Blended ATS' if has_blend else 'Original Plug ATS' if scouts else 'Saved ATS picks'
- model_note='Scout 4.0 scoring + The Plug points-only · fixed 50/50 blend · version 1' if has_blend else 'Original points-only Plug snapshot · October 11, 2026' if scouts else 'No saved model forecasts for this week.'
+ selected_records=[r for r in frozen.values() if r['week']==selected]
+ points_only=[r.get('weights')=={'scout_scoring':0.0,'plug_points_only':1.0} for r in selected_records]
+ all_points=bool(points_only) and all(points_only)
+ mixed=any(points_only) and not all_points
+ model_label='Original Plug ATS' if all_points else 'Saved ATS picks' if mixed else 'Blended ATS' if has_blend else 'Original Plug ATS' if scouts else 'Saved ATS picks'
+ model_note='Original points-for/points-allowed formula · locked predictions' if all_points else 'Multiple locked model versions · each pick retains its saved formula' if mixed else 'Scout 4.0 scoring + The Plug points-only · fixed 50/50 blend' if has_blend else 'Original points-only Plug snapshot · October 11, 2026' if scouts else 'No saved model forecasts for this week.'
  dog_records=underdog_records(rows,season,selected)
  games=[]
  for g in sorted(rows,key=lambda g:(g['gameday'],g.get('gametime',''))):

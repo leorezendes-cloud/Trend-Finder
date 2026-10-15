@@ -1,4 +1,4 @@
-"""Equal-weight scoring-margin blend with separate immutable local components.
+"""Versioned scoring margins with separate immutable research components.
 
 Scout scoring margin is distinct from the probability-only frozen ATS model.
 No descriptive historical ranking, injury or weather bonus enters this blend.
@@ -12,13 +12,18 @@ from .ratings import build_ratings,matchup
 from .totals import profiles,features,predict
 from .shadow import kickoff,quote,load_stats,statistics_gate,seal,aware
 
-CORE=('scout4/blend.py','scout4/ratings.py','scout4/totals.py','scout4/stats.py','scout4/shadow.py')
+CORE=('scout4/research_benchmarks.py','scout4/blend.py','scout4/ratings.py','scout4/totals.py','scout4/stats.py','scout4/shadow.py')
 
 
-def combine(scout_margin,plug_margin,line):
+def combine(scout_margin,plug_margin,line,weights=None):
     values=[number(v) for v in (scout_margin,plug_margin,line)]
     if any(v is None for v in values):raise ValueError('Both finite scoring margins and a shared line are required')
-    margin=(values[0]+values[1])/2
+    if weights is None:weights = {'scout_scoring':.5,'plug_points_only':.5}
+    if not isinstance(weights,dict):raise ValueError('Forecast weights must be an object')
+    scoring, points = number(weights.get('scout_scoring')), number(weights.get('plug_points_only'))
+    if scoring is None or points is None or min(scoring, points)<0 or abs(scoring+points-1)>1e-9:
+        raise ValueError('Forecast weights must be finite, nonnegative and sum to one')
+    margin=scoring*values[0]+points*values[1]
     edge=margin+values[2]
     return {'away_margin':margin,'ats_edge':edge,'side':None if abs(edge)<1e-9 else 'away' if edge>0 else 'home'}
 
@@ -100,12 +105,26 @@ def run(root=ROOT,now=None):
             scout=matchup(config['score_model'],ratings,g['away_team'],g['home_team'],'Neutral' if g.get('location')=='Neutral' else 'Away')
             plug=plug_prediction(schedule,g)
             if not scout or not plug or not scout['first_estimate']['plausible'] or not scout['second_estimate']['plausible']:raise ValueError('Missing or implausible component estimates')
-            combined=combine(scout['margin_first'],plug['away_margin'],q['line'])
+            combined=combine(scout['margin_first'],plug['away_margin'],q['line'],config['weights'])
             components={}
             for name,margin in [('Scout scoring',scout['margin_first']),('The Plug',plug['away_margin']),('Blend',combined['away_margin'])]:
                 decision=combine(margin,margin,q['line'])
                 components[name]={'away_margin':margin,'ats_edge':decision['ats_edge'],'pick':plug_ats_pick(decision,g,q['line'],config.get('always_pick',False) and name=='Blend')}
                 if name=='Blend' and config.get('always_pick') and decision['side'] is None:components[name]['tie_break']='Exact model tie: underdog, or home at pick’em'
+            benchmarks = {}
+            if config.get('research_benchmarks'):
+                from .research_benchmarks import recent_epa
+                old = combine(scout['margin_first'],plug['away_margin'],q['line'])
+                benchmarks['Previous 50/50'] = {**old, 'pick':plug_ats_pick(old,g,q['line'],True),
+                                               'version':'equal-scoring-points-1'}
+                try:epa = recent_epa(schedule,feed,g)
+                except (ValueError,TypeError,KeyError):epa = None
+                if epa is None:
+                    benchmarks['EPA Recent Form'] = {'pick':None,'status':'Insufficient prior matched EPA rows'}
+                else:
+                    direction = combine(epa['away_margin'],epa['away_margin'],q['line'])
+                    benchmarks['EPA Recent Form'] = {**epa,'ats_edge':direction['ats_edge'],
+                                                     'pick':plug_ats_pick(direction,g,q['line'],True)}
             tq=quote(quotes,g,'Total',now);total=None
             if tq:
                 teams,league=profiles(schedule,feed,year,week);values=features(teams,league,g['away_team'],g['home_team'],g.get('location')=='Neutral',tq['line'])
@@ -113,10 +132,12 @@ def run(root=ROOT,now=None):
                 if total is not None:total={'quote':tq,'prediction':plug_total_pick(total,config.get('always_pick',False)),'features':values,'model':'Scout totals only; not blended'}
             record={'game_id':g['game_id'],'away_team':g['away_team'],'home_team':g['home_team'],'season':year,'week':week,
                     'kickoff_utc':ko.isoformat(),'decision_cutoff_utc':now.isoformat(),'version':config['version'],
-                    'configuration_sha256':model_hash,'weights':config['weights'],'quote':q,'components':components,
+                    'configuration_sha256':model_hash,'weights':config['weights'],
+                    'published_formula':config.get('published_formula','Equal scoring/points blend'),
+                    'research_benchmarks':benchmarks,'quote':q,'components':components,
                     'scout_scoring':scout,'plug_points_only':plug,'totals':total,'stats_manifest':manifest,
                     'input_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in folder.iterdir()},
-                    'limitations':['Experimental equal weighting; no validated probability or confidence.',
+                    'limitations':['Experimental forecast weights; no validated probability or confidence.',
                                    'Scout scoring component is not the separate frozen ATS probability model.',
                                    'No injury, confirmed QB replacement or weather adjustments.']}
             if seal(path,record):saved+=1

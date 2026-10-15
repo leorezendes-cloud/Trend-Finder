@@ -27,7 +27,7 @@ class PlugPickPolicyTests(unittest.TestCase):
         with patch.dict('os.environ',{'TREND_FINDAH_AUTO_MODEL_CONFIG':str(root/'automatic_model.json')}):
             config,_=configuration(root)
         self.assertTrue(config['always_pick'])
-        self.assertEqual(config['version'],'scout4-plug-margin-blend-3-always-pick')
+        self.assertEqual(config['version'],'plug-points-only-4')
         for name,digest in config['code_sha256'].items():self.assertEqual(hashlib.sha256((root/name).read_bytes()).hexdigest(),digest)
 
     def test_new_capture_uses_policy_and_existing_pick_stays_locked(self):

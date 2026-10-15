@@ -1,9 +1,9 @@
 {
-  "version": "scout4-plug-margin-blend-3-always-pick",
-  "created_at": "2026-10-14T18:46:57.413384+00:00",
+  "version": "plug-points-only-4",
+  "created_at": "2026-10-15T02:30:40.266863+00:00",
   "weights": {
-    "scout_scoring": 0.5,
-    "plug_points_only": 0.5
+    "scout_scoring": 0.0,
+    "plug_points_only": 1.0
   },
   "score_model": {
     "version": "scout4-ratings-1",
@@ -308,12 +308,15 @@
   "score_model_file_sha256": "0da67d8b982e514ce3355cca5f3a134c6d94a5732b7b9c11721cdad44b1b309f",
   "totals_model_file_sha256": "f6cb333805e1686ea7bc7d0bc869e0e8e201c0195a51f4da74a271225ba60781",
   "code_sha256": {
-    "scout4/blend.py": "d79a9f66c5319fa07c18dfda700139245536eb6a463d39da1018bd6df54bc0c7",
+    "scout4/blend.py": "33b94f8da9fb5e29807c58bc0ca4f9e86382f63fe957c44a159301acf24ed4fe",
     "scout4/ratings.py": "736a598deee1d89351114043d4f992a5d86a1a44167e14d90cac756ce937e145",
     "scout4/totals.py": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4",
     "scout4/stats.py": "4c748b37e8b17028e7806476068305e280709c65a399607c56ceda8c60375a69",
-    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6"
+    "scout4/shadow.py": "b80a6e3d59b74efc2d28721b8b7ce54ec72f9f81ec62b536ff3ef12611a347b6",
+    "scout4/research_benchmarks.py": "2bae490ea8ef3d372fbd5cc5268de3e44436aff65707c3a83da7684f4e398238"
   },
-  "policy": "First eligible pregame pick stays locked. Blend ATS chooses the underdog on an exact edge tie (home on pick\u2019em); totals choose Under on an exact model tie. Missing valid inputs remain pending. No retroactive changes.",
-  "always_pick": true
+  "policy": "First eligible prediction stays locked. Future ATS forecasts use original PF/PA only. Prior 50/50 and EPA Recent Form are saved as research comparisons on the identical cutoff and spread. Totals keep the frozen Scout model.",
+  "always_pick": true,
+  "published_formula": "Original points-for/points-allowed",
+  "research_benchmarks": true
 }

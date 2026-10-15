@@ -100,9 +100,19 @@ def update_once(root):
     def grade():
         records = [json.loads(p.read_text()) for p in (root/'data/scout4/blend/predictions').glob('*.json')]
         groups, recent, excluded = prediction_performance(records, read_csv(root/'nfl_games.csv'))
+        from scout4.research_benchmarks import grade_benchmarks
+        schedule = {g['game_id']:g for g in read_csv(root/'nfl_games.csv')}
+        research = {}
+        for record in records:
+            try: outcomes = grade_benchmarks(record, schedule.get(record['game_id']))
+            except (ValueError,KeyError,TypeError): continue
+            for name, result in outcomes.items():
+                key = record.get('version','Unknown')+' / '+name
+                counts = research.setdefault(key, {})
+                counts[result] = counts.get(result, 0)+1
         target = root/'data/scout4/blend/automatic_results.json'
         temporary = target.with_suffix('.tmp')
-        temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded},indent=2))
+        temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded,'research_benchmarks':research},indent=2))
         temporary.replace(target)
     attempt('grading', grade)
     # Optional research collection is separate from the locked prediction model.
