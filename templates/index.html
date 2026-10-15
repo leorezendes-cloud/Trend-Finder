@@ -311,7 +311,7 @@
     <section class="results">
         <h2>Combinations within your filters</h2>
         {% if data_status %}<p class="evidence-data-note">CSV file last modified: {{ data_status.modified }} | Latest completed game: {{ data_status.latest_result }}</p>{% endif %}
-        <p>Showing the top {{ combinations|length }} grouped trends from {{ combination_count }} combinations (up to 100 retained), with at least {{ combination_minimum }} games and 55% ATS success.</p>
+        <p>Latest five seasons within your selected filters. Showing the top {{ combinations|length }} grouped trends from {{ combination_count }} combinations (up to 100 retained), with at least {{ combination_minimum }} games and 55% ATS success.</p>
         <details class="combination-card combination-help">
             <summary>How the grouped search works</summary>
             <div class="combination-details">

@@ -1639,6 +1639,8 @@ def scan_grouped_combinations(season=None, max_depth=3, beam_width=150, limit=10
     minimum = combination_min_games(season)
     with open(game_file, newline='') as source:
         rows = effective_rows(csv.DictReader(source), game_file)
+    latest=max((int(g['season']) for g in rows),default=0)
+    rows=[g for g in rows if latest-4<=int(g['season'])<=latest]
     current_contexts = current_feature_contexts(rows, scope)
     current_memberships = {}
     for index, context in enumerate(current_contexts):

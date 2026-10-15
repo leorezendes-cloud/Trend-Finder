@@ -98,7 +98,8 @@ class CsvFilterTests(unittest.TestCase):
         self.assertFalse(any(field in {'Home Score', 'Away Score', 'Result', 'Overtime', 'Game Id'} for field, _ in features))
 
     def test_grouped_scan_limits_and_historical_minimum(self):
-        trends = finder.scan_grouped_combinations(season=self.row['season'], limit=12, beam_width=10)
+        latest=max(int(g['season']) for g in self.games)
+        trends = finder.scan_grouped_combinations(season=(latest-4,latest), limit=12, beam_width=10)
         self.assertTrue(trends)
         self.assertLessEqual(len(trends), 12)
         for trend in trends:
@@ -311,7 +312,7 @@ class CsvFilterTests(unittest.TestCase):
         self.assertEqual(client.get('/trend-finder').status_code, 200)
         response = client.post('/trend-finder', data={
             'home_team': self.row['home_team'], 'action': 'combinations',
-            'season': self.row['season'],
+            'season': str(max(int(g['season']) for g in self.games)-1),
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Combinations within your filters', response.data)

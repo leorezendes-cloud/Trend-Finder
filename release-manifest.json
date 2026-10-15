@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 3602,
-    "sha256": "60dbfded23fc30a06bdbcf9e69eb85ac492f378f712df640ba0f6e64ff307780"
+    "bytes": 4808,
+    "sha256": "a4479e059e0b74517a7b40642808ebb4482454ba802d06d05d358f00583369a7"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
@@ -52,8 +52,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 40059,
-    "sha256": "35362be89490801c6286bc4cee2630e3e5b694e0ec45a6db8aa43726e36c8d12"
+    "bytes": 40721,
+    "sha256": "8d891d5f9104c1066ce3ceeb99bb4fe0eed4cc346635bb38620482a63a5d6caf"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -548,8 +548,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 15134,
-    "sha256": "d7fb7f948bac0b7f18601e50380d896a2ac9e86ee2804359171320e832e73c67"
+    "bytes": 16664,
+    "sha256": "b821b17c730b49b4af237a858ef8b55a787009ef022d855aaab265210d50ebe6"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -1172,16 +1172,16 @@
     "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
-    "bytes": 10105,
-    "sha256": "5703337a1c7833435c1a992ffcf1539a947de7410694af38da18d99bd49115bb"
+    "bytes": 10386,
+    "sha256": "620f4be9f5908614fd142cc09854495bae970ac0a4df7155a355912e7eb119fc"
   },
   "templates/home.html": {
     "bytes": 4695,
     "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
-    "bytes": 28406,
-    "sha256": "0980e1bb7c62c7bc2213c9acb26ac64e55533a44decf1e59304ee0649eb56a53"
+    "bytes": 28456,
+    "sha256": "93885eea0f9eef49c06e43c9f294ca881d1083c144487dae08c982e5400f90c6"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1312,8 +1312,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 13100,
-    "sha256": "81514b6723603e8155ee864842a1fc85a90c4f866c203fa26de90089f131653a"
+    "bytes": 14897,
+    "sha256": "b8b35033838262c66d3216f17ef232bfbce358df06fc23dc43fec2b816751a66"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,
@@ -1392,8 +1392,8 @@
     "sha256": "7e64ce91b9e04a01e7e43fbee1f381f8eca7edad0dcd04324d6239a6510cd866"
   },
   "test_trend_filters.py": {
-    "bytes": 19579,
-    "sha256": "9b38e04007e1bef9fea313ee4c548e3c6424e3cb5ae4ff7a21188060f88f3550"
+    "bytes": 19665,
+    "sha256": "ce1a6f5fd6c227e0b63a0de7016b32145f2e457b920d0138283e7b732a0d2e0b"
   },
   "test_week_policy.py": {
     "bytes": 5343,
@@ -1428,8 +1428,8 @@
     "sha256": "4b4537a43cfef7c7f456769683b55653791eade540edef8b803313a68126478f"
   },
   "trend_finder_2.py": {
-    "bytes": 82317,
-    "sha256": "d63a625352bd18f8d318364ec8b74e737a254d303961ad8f4cb5e3d5e496f166"
+    "bytes": 82441,
+    "sha256": "38685f62c17a85025498db9877abe690a440c54bd4995a66d9197b47fafe1a26"
   },
   "trendfindah_scout_preview_2026-10-11.csv": {
     "bytes": 1859,

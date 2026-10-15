@@ -226,6 +226,16 @@ def trend_finder():
             is_primetime = None
         if location == '':
             location = None
+        if error is None and form_data.get('action')=='combinations':
+            import csv
+            with open(game_file,newline='') as source:
+                newest=max(int(g['season']) for g in csv.DictReader(source))
+            low,high=season if isinstance(season,tuple) else (int(season),int(season)) if season is not None else (newest-4,newest)
+            season=(max(low,newest-4),min(high,newest))
+            if season[0]>season[1]:
+                error=f'Find combinations uses the latest five seasons ({newest-4}–{newest}). Choose a season in that range.'
+            else:
+                season_mode='range';start_season,end_season=season
         if error is None:
             stats = run_analysis(combination_conditions=combination_conditions, season=season, location=location, is_primetime=is_primetime, min_spread=min_spread, max_spread=max_spread, exact_spread=exact_spread, **csv_filters)
             if form_data.get("action") == "combinations":

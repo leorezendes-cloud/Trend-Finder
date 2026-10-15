@@ -91,14 +91,22 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
     return {'games':len(matches),'records':([records['selected']] if team else [])+[v for k,v in records.items() if k!='selected'],'totals':totals,'pickems':pickems,'missing_lines':missing_lines,'matches':matches}
 
 
-def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
+def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, current_rows=None):
     """Bounded three-feature discovery; evaluate both team sides and totals."""
+    context=list(current_rows) if current_rows is not None else list(rows)
+    latest=max((int(g['season']) for g in context),default=0)
+    rows=[g for g in rows if latest-4<=int(g['season'])<=latest]
+    current=[g for g in context if int(g['season'])==latest]
+    names={field:{g.get(field) for g in current if g.get(field)} for field in ('home_team','away_team','home_coach','away_coach','home_qb_name','away_qb_name','referee')}
+    # A player or coach can appear on either side of the current schedule.
+    for home,away in [('home_team','away_team'),('home_coach','away_coach'),('home_qb_name','away_qb_name')]:
+        names[home]=names[away]=names[home]|names[away]
     memberships={}
     for i,g in enumerate(rows):
         features=[]
         for field in ('game_type','home_team','away_team','roof','surface',
                       'home_coach','away_coach','home_qb_name','away_qb_name','referee'):
-            if g.get(field):features.append((field,g[field]))
+            if g.get(field) and (field not in names or g[field] in names[field]):features.append((field,g[field]))
         for field in ('gametime','temp','wind'):
             features.extend((field,value) for value in GROUP_OPTIONS[field] if matches_group(g,field,value))
         for feature in features:memberships.setdefault(feature,set()).add(i)
@@ -114,6 +122,7 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
                 if len(subset)<minimum:continue
                 key=conditions+(feature,)
                 report=research_games([rows[i] for i in sorted(subset)],team=team,role=role)
+                recent=sum(int(rows[i]['season'])>=latest-1 for i in subset)
                 records=report['records'][:1] if team else report['records']
                 if not team and role!='all':
                     label={'home':'Home teams','away':'Away teams','favorite':'Favorites','underdog':'Underdogs'}[role]
@@ -129,7 +138,7 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
                     rate=wins/n;z=1.96
                     lower=(rate+z*z/(2*n)-z*((rate*(1-rate)+z*z/(4*n))/n)**.5)/(1+z*z/n)
                     candidate={'conditions':dict(key),'label':label,'wins':wins,'losses':losses,'pushes':pushes,
-                               'rate':100*rate,'sample':len(subset),'score':lower,'membership':tuple(sorted(subset))}
+                               'rate':100*rate,'sample':len(subset),'score':lower,'membership':tuple(sorted(subset)),'recent_games':recent}
                     if best is None or lower>best['score']:best=candidate
                 score=best['score'] if best else 0
                 candidates.append((score,len(subset),key,subset))
@@ -139,7 +148,7 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
     unique={}
     for trend in sorted(evaluated.values(),key=lambda v:(len(v['conditions']),tuple(v['conditions'].items()))):
         unique.setdefault((trend['label'],trend['membership']),trend)
-    return sorted(unique.values(),key=lambda v:(v['score'],v['sample']),reverse=True)[:limit]
+    return sorted(unique.values(),key=lambda v:(v['recent_games']>=minimum,v['score'],v['recent_games'],v['sample']),reverse=True)[:limit]
 
 
 def render_general(form, games_page=False):
@@ -167,6 +176,16 @@ def render_general(form, games_page=False):
             if low not in years or high not in years or low>high:raise ValueError
             season=(low,high)
     except (ValueError,TypeError):abort(400,description='Choose a valid season or season range.')
+    discovery_window=(max(years)-4,max(years))
+    if form.get('action')=='combinations':
+        low,high=season if isinstance(season,tuple) else (season,season) if season is not None else discovery_window
+        season=(max(low,discovery_window[0]),min(high,discovery_window[1]))
+        if season[0]<=season[1]:
+            if mode=='single' and form.get('season'):
+                season=int(form['season'])
+            else:
+                mode='range';form.update(season_mode='range',start_season=str(season[0]),end_season=str(season[1]))
+                form.pop('season',None)
     primary=('game_type','gametime','temp','wind','roof','qb_name')
     allowed=[f for f in CSV_FILTER_FIELDS if f not in ('dog_coast','game_id')]
     for field in allowed:
@@ -178,7 +197,7 @@ def render_general(form, games_page=False):
     report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime,location=location,spread_size=spread_size) if analyze else None
     combinations=None
     if analyze and form.get('action')=='combinations':
-        combinations=find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role)
+        combinations=find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role,current_rows=rows)
     try:page=max(1,int(form.get('page',1)))
     except ValueError:abort(400,description='Invalid results page.')
     pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
@@ -215,7 +234,7 @@ def render_general(form, games_page=False):
     if games_page:
         return render_template('general_trend_games.html',games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''),filter_chips=filter_chips,back_url=target)
     return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
-        filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
+        discovery_window=discovery_window,filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),
         manual_search_url=target,manual_search_title=manual_trend_title(target))

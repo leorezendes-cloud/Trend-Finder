@@ -197,4 +197,33 @@ class GeneralResearchTests(unittest.TestCase):
             self.assertEqual(client.get(link).status_code,200)
             self.assertEqual(urlsplit(link).fragment,'research-results')
 
+    def test_discovery_uses_five_seasons_and_current_personnel(self):
+        rows=[game('old'+str(i),season='2021',home_qb_name='Retired QB',home_coach='Former Coach') for i in range(12)]
+        rows += [game('recent'+str(i),season='2022',home_qb_name='Retired QB',home_coach='Former Coach') for i in range(12)]
+        rows += [game('current'+str(i),season='2026',home_qb_name='Current QB',home_coach='Current Coach') for i in range(12)]
+        trends=find_combinations(rows,current_rows=rows)
+        self.assertTrue(trends)
+        self.assertEqual(max(t['sample'] for t in trends),24)
+        for trend in trends:
+            self.assertNotIn('Retired QB',trend['conditions'].values())
+            self.assertNotIn('Former Coach',trend['conditions'].values())
+        self.assertEqual(research_games(rows)['games'],36)
+        self.assertEqual(find_combinations(rows[:12],current_rows=rows),[])
+
+    def test_discovery_window_is_preserved_in_links(self):
+        import re
+        from html import unescape
+        from urllib.parse import urlsplit,parse_qs
+        client=app.test_client()
+        html=client.get('/trend-finder?research_view=general&run=analyze&action=combinations').text
+        self.assertIn('2022–2026',html)
+        for url in re.findall(r'data-evidence-url="([^"]+)"',html):
+            params=parse_qs(urlsplit(unescape(url)).query)
+            self.assertEqual(params['start_season'],['2022'])
+            self.assertEqual(params['end_season'],['2026'])
+        old=client.get('/trend-finder?research_view=general&run=analyze&season=2005').text
+        self.assertIn('Home team ATS',old)
+        discovery=client.get('/trend-finder?research_view=general&run=analyze&season=2005&action=combinations').text
+        self.assertIn('No combinations meet',discovery)
+
 if __name__=='__main__':unittest.main()
