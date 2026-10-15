@@ -117,3 +117,9 @@ html body .save-watchlist button { padding: 9px 14px; border: 1px solid #fbbf24;
 .watchlist-items a { color: #fbbf24; font: 15px/1.5 Arial,sans-serif; }
 html body .watchlist-items form { margin: 0; padding: 0; background: transparent; border: 0; }
 html body .watchlist-items button { padding: 8px 12px; font: 13px Arial,sans-serif; cursor: pointer; }
+
+/* Reserve the same logo space so short and wrapped menu labels align. */
+html body nav.site-navigation .menu-logo { flex: 0 0 58%; min-width: 0; }
+html body nav.site-navigation .menu-logo + span {
+    flex: 1; min-width: 0; text-align: left; overflow-wrap: anywhere;
+}
