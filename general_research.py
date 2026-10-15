@@ -7,6 +7,16 @@ from pregame_lines import effective_rows
 from saved_trends import manual_trend_title
 from trend_filter_groups import GROUP_OPTIONS, matches_group
 
+SPREADS = {'':'All spreads', 'pickem':'Pick’em', 'short':'Up to 3 points', 'medium':'Over 3 through 7 points', 'large':'Over 7 through 10 points', 'double':'Over 10 points'}
+
+
+def spread_matches(value, band):
+    if not band:return True
+    if value is None:return False
+    value=abs(value)
+    return {'pickem':value==0,'short':0<value<=3,'medium':3<value<=7,'large':7<value<=10,'double':value>10}[band]
+
+
 ROLES = {'all':'Any role', 'home':'Home', 'away':'Away', 'favorite':'Favorite', 'underdog':'Underdog'}
 
 
@@ -26,8 +36,9 @@ def add_record(record, margin, edge):
     record['ats_missing' if edge is None else 'covers' if edge>0 else 'ats_losses' if edge<0 else 'pushes'] += 1
 
 
-def research_games(rows, *, season=None, filters=None, team='', role='all', primetime=''):
+def research_games(rows, *, season=None, filters=None, team='', role='all', primetime='', location='', spread_size=''):
     if role not in ROLES or primetime not in ('','yes','no'):raise ValueError('Invalid research role or time')
+    if location not in ('','home','away') or spread_size not in SPREADS:raise ValueError('Invalid location or spread band')
     records={key:counter(label) for key,label in [('home','Home teams'),('away','Away teams'),('favorite','Favorites'),('underdog','Underdogs')]}
     if team:records['selected']=counter(team+' — '+ROLES[role])
     totals={'over':0,'under':0,'push':0,'missing':0};matches=[];pickems=0;missing_lines=0
@@ -50,6 +61,10 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
         if role in ('underdog','favorite'):
             subject=dog if role=='underdog' else favorite
             if subject is None or (team and subject!=selected):continue
+        subject=selected or (dog if role=='underdog' else favorite if role=='favorite' else None)
+        if location and subject and subject!=location:continue
+        if location and role in ('favorite','underdog') and subject is None:continue
+        if not spread_matches(spread,spread_size):continue
         away_margin=away-home;away_edge=None if spread is None else away_margin+spread
         add_record(records['away'],away_margin,away_edge)
         add_record(records['home'],-away_margin,None if away_edge is None else -away_edge)
@@ -64,6 +79,9 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
             difference=away+home-total_line;kind='over' if difference>0 else 'under' if difference<0 else 'push'
             totals[kind]+=1;total_result=kind.title()
         matches.append({**g,'away_score':away,'home_score':home,'spread':spread,'total':total_line,'total_result':total_result,
+                        'away_ats':('Unavailable' if away_edge is None else 'Cover' if away_edge>0 else 'Loss' if away_edge<0 else 'Push'),
+                        'home_ats':('Unavailable' if away_edge is None else 'Cover' if away_edge<0 else 'Loss' if away_edge>0 else 'Push'),
+                        'dog_side':dog,'favorite_side':favorite,'selected_side':selected,
                         'favorite':g[favorite+'_team'] if favorite else None,'underdog':g[dog+'_team'] if dog else None})
     for record in records.values():
         decisions=record['covers']+record['ats_losses'];su=record['wins']+record['losses']
@@ -125,11 +143,16 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30):
 
 
 def render_general(form):
+    form=dict(form)
+    if form.get('research_role') in ('home','away') and not form.get('research_location'):
+        form['research_location']=form['research_role'];form['research_role']='all'
     with open(game_file,newline='') as source:rows=list(effective_rows(csv.DictReader(source),game_file))
     options=get_csv_filter_options()
     for field in ('gametime','temp','wind'):options[field]=list(GROUP_OPTIONS[field])
     years=sorted({int(g['season']) for g in rows},reverse=True)
     teams=sorted({g[key] for g in rows for key in ('away_team','home_team') if g.get(key)})
+    location=form.get('research_location','');spread_size=form.get('spread_size','')
+    if location not in ('','home','away') or spread_size not in SPREADS:abort(400,description='Choose a valid location and spread range.')
     role=form.get('research_role','all');team=form.get('research_team','');prime=form.get('primetime','')
     if role not in ROLES or team and team not in teams or prime not in ('','yes','no'):abort(400,description='Choose a valid team, role and time filter.')
     mode=form.get('season_mode','single')
@@ -152,22 +175,26 @@ def render_general(form):
             if value not in options[field]:abort(400,description='Choose a listed value for '+field.replace('_',' ')+'.')
             filters[field]=value
     analyze=request.method=='POST' or form.get('run')=='analyze'
-    report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime) if analyze else None
+    report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime,location=location,spread_size=spread_size) if analyze else None
     combinations=None
     if analyze and form.get('action')=='combinations':
-        combinations=find_combinations(report['matches'],team=team,role=role)
+        combinations=find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role)
     try:page=max(1,int(form.get('page',1)))
     except ValueError:abort(400,description='Invalid results page.')
     pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
-    selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions','game_id')}
+    selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions','game_id','evidence','evidence_metric')}
     selection.update(research_view='general',run='analyze')
     for trend in combinations or []:
         params={**selection,**trend['conditions']}
-        trend['url']=url_for('trend_finder',**params)
+        trend['url']=url_for('trend_finder',**params,_anchor='matching-games')
+        trend['evidence_url']=url_for('trend_finder',**params,evidence='1',evidence_metric=trend['label'])
     target=url_for('trend_finder',**selection)
-    page_url=lambda number:url_for('trend_finder',**selection,page=number)
-    return render_template('general_trends.html',options=options,years=years,teams=teams,roles=ROLES,form=form,
-        combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary],report=report,
+    page_url=lambda number:url_for('trend_finder',**selection,page=number,evidence='1' if form.get('evidence')=='1' else None,evidence_metric=form.get('evidence_metric') if form.get('evidence')=='1' else None,_anchor=None if form.get('evidence')=='1' else 'matching-games')
+    if form.get('evidence')=='1':
+        if report is None:abort(400)
+        return render_template('_general_games.html',games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''))
+    return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
+        spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),
         manual_search_url=target,manual_search_title=manual_trend_title(target))

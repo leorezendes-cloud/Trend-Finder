@@ -12,3 +12,8 @@
 @media(max-width:650px) { .general-research .research-results { padding:16px; } }
  .general-research .form-actions .clear-button { color:black; }
 .general-research .stat .stat-value { font-size:24px; }
+
+.general-research .combination-evidence summary { color:#fbbf24;text-decoration:underline;cursor:pointer; }
+.general-research .evidence-content { overflow-x:auto; }
+.general-research .evidence-content table { width:100%;border-collapse:collapse; }
+.general-research .evidence-content th,.general-research .evidence-content td { padding:8px;border-bottom:1px solid #64748b; }

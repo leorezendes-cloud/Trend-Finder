@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 2111,
-    "sha256": "4ad0370d7a47ed1d20d31244afa8e0dddcb40deb9267781aa98e2e3ae09aac54"
+    "bytes": 3150,
+    "sha256": "0d12cd157e28c10b31eb8f4699eef32ff31a5a7e5a99ff65c39453df2dbe47ee"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
@@ -548,8 +548,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 10860,
-    "sha256": "8675a060d373ce7292d1e0b65c4dcd25392b2211cc6ff7df1848667388cc0cf8"
+    "bytes": 13344,
+    "sha256": "4bf52a05aa74f0e5ce1a071e64de88f92daa45f5a47ee4bd1b8ad02ac8405f19"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -648,8 +648,8 @@
     "sha256": "22b4beee97a6d7613d5fd117496403bdd5a7b42cd423ce9008100e37e09bef55"
   },
   "saved_trends.py": {
-    "bytes": 2735,
-    "sha256": "076ea356a1e0123a7afe64f99774fd74ca89d11d070bdcd17769ec2906a53bf4"
+    "bytes": 2999,
+    "sha256": "98963a796c4565c012c6aa74bc88c3e3b2957defac63ec170b585ef10dfa55fd"
   },
   "scheduled_ats_capture.py": {
     "bytes": 2770,
@@ -1012,12 +1012,12 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 1102,
-    "sha256": "db8d419d7cd2718c418aec5bb5cdc53d251446362413b61a6b2cba6761a16065"
+    "bytes": 1478,
+    "sha256": "89743659d6f8dc401316425bcba54798aab64be79b6a6a82001574e9d1d5c8ac"
   },
   "static/general_research.js": {
-    "bytes": 400,
-    "sha256": "0393cab7beab69eada21f7b4d852daedfba2ebd8859b00f9fe2bd65f14e5479d"
+    "bytes": 1571,
+    "sha256": "ff2e2e9a56c94316a20150d520b753cd4b80f20988cff7a604409a88327b0dfb"
   },
   "static/member_picks.css": {
     "bytes": 4348,
@@ -1103,6 +1103,10 @@
     "bytes": 1541,
     "sha256": "495cc73e62c19628334ed6f5d86e1eeca18e171131fa4e42cc5dfc750291252b"
   },
+  "templates/_general_games.html": {
+    "bytes": 1774,
+    "sha256": "fe6d56beea77251bbbd151adff2f8b7f30fead1318c870f30867b89e08f36a92"
+  },
   "templates/_home_sections.html": {
     "bytes": 1231,
     "sha256": "c217a0106fac96273aef944f5ad6b9f41a58853b48a3c003206d0e3d00f493b5"
@@ -1160,8 +1164,8 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/general_trends.html": {
-    "bytes": 9331,
-    "sha256": "e3e818070d406bd841fdd79e7b33cac8f10a80fafdbe1b244f6ec5ee3146f89d"
+    "bytes": 9142,
+    "sha256": "f733e4dec736e97b43a9acee8834c81e7fc4c85dfee292733157e0e4fae9a2b7"
   },
   "templates/home.html": {
     "bytes": 4695,
@@ -1300,8 +1304,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 7733,
-    "sha256": "650301cb2a84c1cb249deff755d1678c3413139ec8be5084458370599e021960"
+    "bytes": 10175,
+    "sha256": "f717986e2d050d4b3d6dae43f29844ca9d0cfdb46bf438844a3ecb5cce4df8af"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,

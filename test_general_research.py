@@ -112,4 +112,39 @@ class GeneralResearchTests(unittest.TestCase):
             self.assertTrue(set(trend['conditions']).issubset(CSV_FILTER_FIELDS))
         self.assertEqual(find_combinations(rows[:9]),[])
 
+    def test_location_and_spread_work_independently_of_team(self):
+        rows=[game('home_dog',spread_line='-3',gametime='20:15'),
+              game('away_dog',spread_line='3',gametime='20:15'),
+              game('day',spread_line='-3',gametime='13:00'),
+              game('large',spread_line='-10.5',gametime='20:15')]
+        report=research_games(rows,role='underdog',location='home',primetime='yes',spread_size='short')
+        self.assertEqual([g['game_id'] for g in report['matches']],['home_dog'])
+        self.assertEqual(research_games(rows,role='underdog',location='away',primetime='yes')['games'],1)
+        self.assertEqual(research_games(rows,team='BUF',location='home')['games'],0)
+        self.assertEqual(research_games(rows,spread_size='double')['games'],1)
+        from general_research import spread_matches
+        for line,band in [(0,'pickem'),(-3,'short'),(3.5,'medium'),(-7,'medium'),(7.5,'large'),(10,'large'),(10.5,'double')]:
+            self.assertTrue(spread_matches(line,band))
+        self.assertFalse(spread_matches(None,'short'))
+
+    def test_evidence_is_an_inline_fragment_preserving_scope(self):
+        client=app.test_client()
+        query='/trend-finder?research_view=general&run=analyze&season=2025&research_role=underdog&research_location=home&primetime=yes&spread_size=short'
+        response=client.get(query+'&evidence=1&evidence_metric=Underdogs+ATS')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('matching games',response.text)
+        self.assertIn('Underdogs ATS',response.text)
+        self.assertNotIn('home-filter-form',response.text)
+        self.assertNotIn('<html',response.text)
+        html=client.get(query+'&action=combinations').text
+        self.assertIn('data-evidence-url=',client.get('/trend-finder?research_view=general&run=analyze&season=2025&action=combinations').text)
+        self.assertIn('id="research_location"',html)
+        self.assertIn('id="spread_size"',html)
+        self.assertNotIn('name="spread_line"',html)
+        self.assertEqual(client.get(query.replace('research_location=home','research_location=nowhere')).status_code,400)
+        self.assertEqual(client.get(query.replace('spread_size=short','spread_size=bad')).status_code,400)
+        cards=client.get(query).text
+        for label in ('Underdogs ATS record','Underdogs ATS cover %','Underdogs SU record','Underdogs SU win %'):
+            self.assertIn(label,cards)
+
 if __name__=='__main__':unittest.main()

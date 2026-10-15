@@ -30,8 +30,10 @@ def manual_trend_title(target):
     ignored={'run','action','csrf_token','season','season_mode','start_season','end_season','location','primetime','spread_mode','min_spread','max_spread','exact_spread','combination_conditions','research_view'}
     for key,value in values.items():
         if key in ignored or not value or (key=='research_role' and value=='all'):continue
-        label={'research_team':'Team','research_role':'Role'}.get(key,key.replace('_',' ').title().replace('Qb','QB'))
+        label={'research_team':'Team','research_role':'Role','research_location':'Location','spread_size':'Spread'}.get(key,key.replace('_',' ').title().replace('Qb','QB'))
         if key=='month' and value.isdigit() and 1<=int(value)<=12:value=calendar.month_name[int(value)]
+        if key=='spread_size':
+            value={'pickem':'Pick’em','short':'Up to 3 points','medium':'Over 3 through 7 points','large':'Over 7 through 10 points','double':'Over 10 points'}.get(value,value)
         if key=='div_game':label='Division matchup';value={'0':'No','1':'Yes'}.get(value,value)
         labels.append(f'{label}: {value}')
     title=' | '.join(labels) or ('All NFL games' if values.get('research_view')=='general' else 'All underdog games')
