@@ -20,7 +20,7 @@
         
         {% include '_site_navigation.html' %}
         {% include '_home_sections.html' %}
-        <h2 class="home-matchups-title">Upcoming Matchups</h2><p><a class="member-pick-link" href="{{ url_for('member_picks.my_picks') }}">See how you do this week →</a> · <a class="member-pick-link" href="{{ url_for('market_page') }}">Upcoming spreads &amp; totals →</a></p>
+        <h2 class="home-matchups-title">Upcoming Matchups</h2><p><a class="member-pick-link" href="{{ url_for('member_picks.my_picks') }}">Make your member picks →</a> · <a class="member-pick-link" href="{{ url_for('market_page') }}">Upcoming spreads &amp; totals →</a></p>
         
         <p>{% if archive %}<strong>Archived October 11, 2026 snapshot.</strong> <a href="{{ url_for('sunday_page',window=selected_window) }}">View current matchups</a>{% else %}<strong>Scheduled games in the next seven days.</strong> Historical trends use saved lines, not live odds. <a class="archive-link" href="{{ url_for('sunday_page',window=selected_window,view='archive') }}">View October 11 archive</a>{% endif %}</p>
         {% if pending %}<p>{{ pending|length }} scheduled games have no eligible underdog trend line yet.</p>{% endif %}

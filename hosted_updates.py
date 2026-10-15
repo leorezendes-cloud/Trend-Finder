@@ -85,6 +85,9 @@ def update_once(root):
         if quotes(root) != 0:
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
+    if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1' and stages['stats']=='ok':
+        from scout4.context_model import refresh_sources
+        attempt('injury/weather collection', lambda: refresh_sources(season, root))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
         for name in CORE:
             path = root / name
@@ -102,6 +105,10 @@ def update_once(root):
         temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded},indent=2))
         temporary.replace(target)
     attempt('grading', grade)
+    # Optional research collection is separate from the locked prediction model.
+    if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1':
+        from scout4.context_model import capture as capture_context
+        attempt('injury/weather research', lambda: capture_context(root))
     status = {'started':started,'finished':datetime.now(timezone.utc).isoformat(),
               'state':'ok' if all(v=='ok' for v in stages.values()) else 'needs attention','stages':stages}
     path = root/'logs/auto_update_status.json'

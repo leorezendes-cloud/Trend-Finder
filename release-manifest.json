@@ -1,15 +1,15 @@
 {
   ".env.example": {
-    "bytes": 924,
-    "sha256": "ed53e9bcfb7d8dc2833707b3d9d9d59ab53227a661cf0e28f4f34c31488e1fb1"
+    "bytes": 1039,
+    "sha256": "4f3ce3978855475ed30f4394552010ee49b0540dfbd37a46f4fb1f22036cc517"
   },
   ".gitignore": {
     "bytes": 161,
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "HOSTING.md": {
-    "bytes": 8929,
-    "sha256": "f32bdeebaa43d28e548c48720cf14e28fa779aafcb9a712f6872116861ac0afa"
+    "bytes": 10572,
+    "sha256": "68af03c9e8d1f800321c8c53ea69f177fe2374e7a03aa4de8974959a0b1007b5"
   },
   "LAUNCH_CHECKLIST.md": {
     "bytes": 2110,
@@ -556,8 +556,8 @@
     "sha256": "7500f203903cb6d398d44520d4ec0444bd198a009cb82a56b80577793d4a0be8"
   },
   "hosted_updates.py": {
-    "bytes": 8071,
-    "sha256": "a6bae037f754020b37ab2881328229922d9ecd41d0736e2b7ee7d65562336322"
+    "bytes": 8587,
+    "sha256": "dfa66d26bc398d624d071d53c096d7f210f7849e1c1718b60ea0d2fa1cfd935a"
   },
   "manual_spread_overrides.csv": {
     "bytes": 344,
@@ -663,6 +663,10 @@
     "bytes": 2964,
     "sha256": "106a1654b081e3ec58c76523d7633fac87d15ed8de23477871d2292caac3628e"
   },
+  "scout4/context_model.py": {
+    "bytes": 9677,
+    "sha256": "358dc8952913f76a446f8bb2b5d5c2db4f7415b5b3abc5b96b25158f4ee9f22b"
+  },
   "scout4/margin_lab.py": {
     "bytes": 4765,
     "sha256": "a827d32fca6ccef6ccc93f1718d52a455eb5e16f5e66d530716684b5dd1d862c"
@@ -692,8 +696,8 @@
     "sha256": "1a58cb3e1bdfdbc93140b8f0f5437082dcceb5ab03ae2e96b83bd1dc8dfacae4"
   },
   "scout4/weather.py": {
-    "bytes": 6519,
-    "sha256": "811eabe38a0c084e2332535c58eb8ee7a5d694c7bdea515031d7fc5970a50610"
+    "bytes": 6532,
+    "sha256": "2b55bef15d4e9bde02de2e1f73493562a7da183bf37fabfd335cdd725a987c30"
   },
   "scout4/web.py": {
     "bytes": 14581,
@@ -812,8 +816,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4696,
-    "sha256": "1becd319e6cd440cae3e80cb98f89fb1b45247ef7360081a9aaf8f5aa4bc67f1"
+    "bytes": 4721,
+    "sha256": "77fd30ae3190341f3a70797c13a7ebfc9c47ae553d7e6fedf543e8662addddb9"
   },
   "seo.py": {
     "bytes": 7544,
@@ -1136,16 +1140,16 @@
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
   "templates/home.html": {
-    "bytes": 4697,
-    "sha256": "31bbb5f7198b010ccbf05f127a9b118441cb3a8c7231de3e83150d1890c7a511"
+    "bytes": 4695,
+    "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
     "bytes": 27939,
     "sha256": "dc82e495bc27cda531894e1fd1a5d5cec3db43f47cdb82ee2b45d3c82f2dcf07"
   },
   "templates/market.html": {
-    "bytes": 1268,
-    "sha256": "f97eb7f9130ca47deb1fa0db7480c47b65d9a30ca29cd98a01ba0a06073aea4d"
+    "bytes": 1272,
+    "sha256": "43a0fb94ff4d2eadbc9370d4f47e7a0f86ab1ff07c9cbaa576f4035a6ecbd78e"
   },
   "templates/matchup.html": {
     "bytes": 3967,
@@ -1160,8 +1164,8 @@
     "sha256": "3fbf91573d97113c13d8b651f6f35ba02c61e68ca59cd33077d7e8f1b1568e86"
   },
   "templates/methodology.html": {
-    "bytes": 3820,
-    "sha256": "c8ac4f6c686e6e435ed85082cbf94370b7682ce2f6e376ae70865545e20d181c"
+    "bytes": 4119,
+    "sha256": "1858f9a262d044b46aab0329f70fa2c731dcec7d47eba64697b49d1b4e2a1a25"
   },
   "templates/movement_section.html": {
     "bytes": 2750,
@@ -1228,8 +1232,8 @@
     "sha256": "eee0c74d995792ca7b927b7f2d7da31eb9631dc71442af3e9163cd9816bd48e3"
   },
   "templates/sunday.html": {
-    "bytes": 8916,
-    "sha256": "256ebbf6ee2421e7389a8038175f89610f855aa9b1e48af64bff47f56a13abd5"
+    "bytes": 8914,
+    "sha256": "ba163050e22ba0467cf02ca3d68daaceefcab0c916255a7cdb318499e4273c4e"
   },
   "templates/sunday_results.html": {
     "bytes": 7404,
@@ -1254,6 +1258,10 @@
   "test_coast_filters.py": {
     "bytes": 1556,
     "sha256": "de9a31e0a0d0e9e49afeadef9374cb2eb3dd72900b807d5dc2d055b253743649"
+  },
+  "test_context_model.py": {
+    "bytes": 4627,
+    "sha256": "194f96428a098af6167fb000ac124b8439bb5557128486bb010d52fc7c646d16"
   },
   "test_display_integrity.py": {
     "bytes": 2732,

@@ -1,5 +1,6 @@
 """Immutable live weather-forecast observations; no target-game observed weather."""
 import csv,hashlib,io,json
+from pathlib import Path
 from datetime import datetime,timedelta,timezone
 from .personnel import ROOT,timestamp
 from .shadow import kickoff
@@ -77,7 +78,7 @@ def refresh(root=ROOT,now=None):
     (folder/'evidence.json').write_text(json.dumps(result,indent=2))
     (folder/'manifest.json').write_text(json.dumps({'venues_url':VENUE_URL,'venues_sha256':hashlib.sha256(response.content).hexdigest(),
         'schedule_sha256':hashlib.sha256((root/'nfl_games.csv').read_bytes()).hexdigest(),
-        'code_sha256':hashlib.sha256((root/'scout4/weather.py').read_bytes()).hexdigest(),'responses':meta},indent=2))
+        'code_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'responses':meta},indent=2))
     return result
 
 

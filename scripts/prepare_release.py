@@ -78,7 +78,7 @@ def release_files():
         if paths:
             add(paths[-1])
     # Ship meaningful tests, but never account databases, secrets, logs or raw downloads.
-    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py', 'test_member_picks.py', 'test_week_policy.py', 'test_weekly_pick_lines.py', 'test_pick_workflow.py', 'test_weekly_matchup_layout.py', 'test_plug_always_pick.py', 'test_seo.py', 'test_site_health.py', 'test_mobile_pick_menu.js'):
+    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py', 'test_member_picks.py', 'test_week_policy.py', 'test_weekly_pick_lines.py', 'test_pick_workflow.py', 'test_weekly_matchup_layout.py', 'test_plug_always_pick.py', 'test_seo.py', 'test_site_health.py', 'test_mobile_pick_menu.js', 'test_context_model.py'):
         add(ROOT / name)
     return sorted(selected)
 
