@@ -1040,8 +1040,8 @@
     "sha256": "3be75196e0b4dda22b5673a8272778a7efa158e4ccab7411bb030293d53dc3cd"
   },
   "static/navigation.css": {
-    "bytes": 10862,
-    "sha256": "1f6962e9cc5b15cfc7338fe31a9ac9609c282126059c43da6eb15087676db21c"
+    "bytes": 10956,
+    "sha256": "9acfef9a245260175ba1af1b1de9a4fb9b1a960c9bfb6c5daa4d2b17c21e66e6"
   },
   "static/navigation.js": {
     "bytes": 589,
@@ -1184,8 +1184,8 @@
     "sha256": "e244008943cb524f8ec183ba00d9fe9bdf4fa3ccffafc3c6d3bac50b6c04214b"
   },
   "templates/home.html": {
-    "bytes": 6038,
-    "sha256": "3abb9cf8e0b38d6ac04dad8f9265a00e82a02956afc06d245d98290fb8939792"
+    "bytes": 5942,
+    "sha256": "76bdba8e59a3e2ad498edefa0840cab3bbc93395ffb1637205f50b469ad2152b"
   },
   "templates/index.html": {
     "bytes": 28456,

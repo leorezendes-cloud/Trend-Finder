@@ -38,13 +38,12 @@
             <aside class="emerging-trend-alert" aria-label="Emerging trend alert">
                 <span class="emerging-alert-badge">🔥 Emerging Trend Alert</span>
                 <strong class="early-alert">Gravy Train 🚂</strong>
-                <h2>Home Primetime Underdogs</h2>
+                <h2>Home Primetime Dogs</h2>
                 <p class="emerging-alert-record">{{ alert.record.wins }}–{{ alert.record.losses }} straight up this season</p>
                 <p>{{ alert.season }} · {{ alert.record.games }} games · {{ '%.0f'|format(alert.record.su_rate) }}% SU</p>
                 <strong>{{ 'On tonight' if alert.tonight else 'Coming up' }}: {{ alert.game.away_team }} at {{ alert.game.home_team }}</strong>
                 <p>{{ alert.kickoff }} | Underdog: {{ alert.game.home_team }} +{{ '%g'|format(alert.spread) }}</p>
                 <p><a href="{{ url_for('fans.matchup',game_id=alert.game.game_id) }}">View matchup →</a> · <a href="{{ url_for('trend_finder',research_view='general',run='analyze',season=alert.season,research_role='underdog',research_location='home',primetime='yes',game_type='REG',_anchor='research-results') }}">View trend →</a></p>
-                <small>Early-season sample; past results do not predict this game.</small>
             </aside>
             {% endif %}
             <div class="landing-account">
