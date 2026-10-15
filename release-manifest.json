@@ -31,6 +31,10 @@
     "bytes": 2787,
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
+  "TREND_RESEARCH.md": {
+    "bytes": 1490,
+    "sha256": "cfe60e643b6a8df116dfb331957f9f32d8b9316186f3d94d7f241563c9b7b154"
+  },
   "WEEKLY_POLICY.md": {
     "bytes": 4787,
     "sha256": "e6f36b2cfbdbc74191c8bc6e51b035452ee99f9811424f0b5cd3ed79175ecd62"
@@ -48,8 +52,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 39381,
-    "sha256": "4371413b68e5183f1fe2ef2327506d46796dc267701b44d8a413833f4fbbf3cf"
+    "bytes": 39746,
+    "sha256": "6dd0eab1e7c074b51ccc1e1e3825cc1327dfcd79ffbc6af6bc9b0ca409390b51"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -543,6 +547,10 @@
     "bytes": 83068,
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
+  "general_research.py": {
+    "bytes": 7175,
+    "sha256": "ae3b77869c488420c3613f42f29f50ea0a2e6242e1bc5afdd5b054addebff7ff"
+  },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
     "sha256": "66c7ebee729c17c5acb94d28cb36204a87fa9ed4bcd5db55a4c4696bfb275ce4"
@@ -640,8 +648,8 @@
     "sha256": "22b4beee97a6d7613d5fd117496403bdd5a7b42cd423ce9008100e37e09bef55"
   },
   "saved_trends.py": {
-    "bytes": 2554,
-    "sha256": "4bd19cda96c4b2d74328e1f0d8263229d159f04fb270841a75e0fd84ad0ab6bc"
+    "bytes": 2735,
+    "sha256": "076ea356a1e0123a7afe64f99774fd74ca89d11d070bdcd17769ec2906a53bf4"
   },
   "scheduled_ats_capture.py": {
     "bytes": 2770,
@@ -820,12 +828,12 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4751,
-    "sha256": "8e45063973c0ff6943b015d2c359d6805973704ee73c23bdbd1d2554f9df564e"
+    "bytes": 4800,
+    "sha256": "e86e47d08c26cd73c87a5482254e0496fd33c550ccc0caab1ad1c4335dccd98a"
   },
   "seo.py": {
-    "bytes": 7544,
-    "sha256": "453d4b35089f25bb79f9daded096c9890f7d200cff25470f9a0ca9a453606b1e"
+    "bytes": 7604,
+    "sha256": "a0f047b3e204ebacd56d0204bb9608d2dff6839435cea7e21edf9b9104f99459"
   },
   "site_health.py": {
     "bytes": 1448,
@@ -1003,6 +1011,14 @@
     "bytes": 2985,
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
+  "static/general_research.css": {
+    "bytes": 1167,
+    "sha256": "45767d8115f3ceb897c3770a18edfb981fe7ea2012bbd8e4ff44ca005f04b658"
+  },
+  "static/general_research.js": {
+    "bytes": 400,
+    "sha256": "0393cab7beab69eada21f7b4d852daedfba2ebd8859b00f9fe2bd65f14e5479d"
+  },
   "static/member_picks.css": {
     "bytes": 4348,
     "sha256": "9a9f4d17b3cf411ec920b09ca022311b22cfef33b5f8265569a1e7fa8a6822a6"
@@ -1143,13 +1159,17 @@
     "bytes": 1781,
     "sha256": "97a96c722ddf493904b82b18438b342f23dd8a27512dae334ff88a306112f71a"
   },
+  "templates/general_trends.html": {
+    "bytes": 8764,
+    "sha256": "b186b7bdc101b1672f9522c0d0eb86c92b5571b855e7efa05bff489c67b34baa"
+  },
   "templates/home.html": {
     "bytes": 4695,
     "sha256": "ce50fb0c0ec776cb103b14163feff1c0efa952ca2e3a2a8fed3edffeec0f1801"
   },
   "templates/index.html": {
-    "bytes": 27939,
-    "sha256": "dc82e495bc27cda531894e1fd1a5d5cec3db43f47cdb82ee2b45d3c82f2dcf07"
+    "bytes": 28130,
+    "sha256": "236d56f5b9ccae12e741e45beab080b7654cd3ea88a3f5f18e2f9a68817221c5"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1279,6 +1299,10 @@
     "bytes": 8652,
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
+  "test_general_research.py": {
+    "bytes": 5429,
+    "sha256": "a5402bb07a4b0fca64aefec0ac069fb6fa4e39ef820777523bdb1ffaace18bd4"
+  },
   "test_hosted_updates.py": {
     "bytes": 2653,
     "sha256": "0865401cee47e4e6f86c4aeed02cd564c70aa48dc2483e97a10b8cfd9381d382"
@@ -1387,9 +1411,13 @@
     "bytes": 107359,
     "sha256": "5a1566f710987f7eb89ce6b7df61d0085189d18331ef41d2bc093954556fe4a3"
   },
+  "trend_filter_groups.py": {
+    "bytes": 1398,
+    "sha256": "4b4537a43cfef7c7f456769683b55653791eade540edef8b803313a68126478f"
+  },
   "trend_finder_2.py": {
-    "bytes": 82177,
-    "sha256": "6723bbdc298be5379365ff0462c8b618493e3d181ab8ebeee6809aecb31981c6"
+    "bytes": 82317,
+    "sha256": "d63a625352bd18f8d318364ec8b74e737a254d303961ad8f4cb5e3d5e496f166"
   },
   "trendfindah_scout_preview_2026-10-11.csv": {
     "bytes": 1859,

@@ -16,7 +16,7 @@
 
     <p class="section-intro">Trendfindah 3000 is your NFL trend finder for historical ATS records and custom filters. <a href="{{ url_for('trends_page') }}">Discover Trends</a> highlights patterns and streaks.</p>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
-        <h1 class="search-panel-title">Trendfindah 3000</h1>
+        <input type="hidden" name="research_view" value="dogs"><h1 class="search-panel-title">Trendfindah 3000</h1><p>Underdog research · <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">General NFL research</a></p>
         {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}
         <div class="form-grid">
             <div class="filter-mode-row">
@@ -181,7 +181,7 @@
         </div>
         <details id="more-filters"{% if csv_filters.get("qb_name") or historical_dog_qb_name %} open{% endif %}>
             <summary class="csv-filters-heading">More filters</summary>
-            <p class="search-text">Combine any filters below. Each matches an exact value; All includes missing values. Scores, result, and overtime describe completed games.</p>
+            <p class="search-text">Combine any filters below. Choose an exact value or a labeled group; All includes missing values. Scores, result, and overtime describe completed games.</p>
             <p class="search-text">Coast filters use franchise home states: Atlantic states = East Coast, Pacific states = West Coast; all others = Other states. These describe the team, not the game venue. Historical relocations are accounted for.</p>
             <div class="field">
             <label for="qb_name">Any recorded QB (either team):</label>

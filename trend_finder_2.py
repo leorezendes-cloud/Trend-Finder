@@ -1,3 +1,4 @@
+from trend_filter_groups import GROUP_OPTIONS, matches_group
 from pregame_lines import effective_rows
 from name_aliases import canonical_name, FIELDS as NAME_FIELDS
 #!/usr/bin/env python3
@@ -85,6 +86,10 @@ def matches_csv_filters(game, filters):
     for field, expected in filters.items():
         if expected is None:
             continue
+        grouped = matches_group(game, field, expected)
+        if grouped is not None:
+            if not grouped:return False
+            continue
         if field == 'qb_name':
             if canonical_name(expected) not in (canonical_name(game.get('away_qb_name')),canonical_name(game.get('home_qb_name'))):return False
             continue
@@ -111,7 +116,7 @@ def get_csv_filter_options():
     for field in CSV_FILTER_FIELDS:
         values = {game[field] for game in games if game.get(field, '') != ''}
         key = float if field in NUMERIC_FILTER_FIELDS else str
-        options[field] = sorted(values, key=key)
+        options[field] = list(GROUP_OPTIONS.get(field, ())) + sorted(values, key=key)
     options['dog_qb_name'] = sorted({game[field] for game in games for field in ('home_qb_name', 'away_qb_name') if game.get(field)})
     options['qb_name'] = options['dog_qb_name']
     for field in ('home_coast', 'away_coast', 'dog_coast'):
@@ -322,9 +327,6 @@ def Check_Games(
             continue
         if game['result'] == '':
             continue
-        if game_type is not None:
-            if game['game_type'] != game_type:
-                continue
         if season is not None:
             if isinstance(season, tuple):
                 if not season[0] <= int(game['season']) <= season[1]:

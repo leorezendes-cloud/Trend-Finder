@@ -92,6 +92,12 @@ def plug_page():
 def trend_finder():
 
     form_data=request.form if request.method=='POST' else request.args
+    legacy = request.method=='POST' or request.args.get('run')=='analyze'
+    research_view=form_data.get('research_view','dogs' if legacy else 'general')
+    if research_view=='general':
+        from general_research import render_general
+        return render_general(form_data)
+    if research_view!='dogs':abort(400,description='Choose a valid research view.')
     filter_options = get_csv_filter_options()
     csv_filters = {}
     current_qbs = get_current_qb_options()

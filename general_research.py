@@ -1,0 +1,113 @@
+"""General historical NFL research: one matchup per game, explicit team contexts."""
+import csv
+import math
+from flask import abort, render_template, request, url_for
+from trend_finder_2 import CSV_FILTER_FIELDS, matches_csv_filters, get_csv_filter_options, game_file
+from pregame_lines import effective_rows
+from saved_trends import manual_trend_title
+
+ROLES = {'all':'Any role', 'home':'Home', 'away':'Away', 'favorite':'Favorite', 'underdog':'Underdog'}
+
+
+def finite(value):
+    try:value = float(value)
+    except (TypeError,ValueError):return None
+    return value if math.isfinite(value) else None
+
+
+def counter(label):
+    return {'label':label,'games':0,'wins':0,'losses':0,'ties':0,'covers':0,'ats_losses':0,'pushes':0,'ats_missing':0}
+
+
+def add_record(record, margin, edge):
+    record['games'] += 1
+    record['wins' if margin>0 else 'losses' if margin<0 else 'ties'] += 1
+    record['ats_missing' if edge is None else 'covers' if edge>0 else 'ats_losses' if edge<0 else 'pushes'] += 1
+
+
+def research_games(rows, *, season=None, filters=None, team='', role='all', primetime=''):
+    if role not in ROLES or primetime not in ('','yes','no'):raise ValueError('Invalid research role or time')
+    records={key:counter(label) for key,label in [('home','Home teams'),('away','Away teams'),('favorite','Favorites'),('underdog','Underdogs')]}
+    if team:records['selected']=counter(team+' — '+ROLES[role])
+    totals={'over':0,'under':0,'push':0,'missing':0};matches=[];pickems=0;missing_lines=0
+    for g in rows:
+        year=int(g['season'])
+        if season is not None and (not season[0]<=year<=season[1] if isinstance(season,tuple) else year!=int(season)):continue
+        if not matches_csv_filters(g,filters or {}):continue
+        away,home=finite(g.get('away_score')),finite(g.get('home_score'))
+        if away is None or home is None:continue
+        if primetime:
+            clock=g.get('gametime','')
+            if not clock:continue
+            if (clock>='19:00') != (primetime=='yes'):continue
+        spread=finite(g.get('spread_line'));total_line=finite(g.get('total_line'))
+        dog='away' if spread is not None and spread>0 else 'home' if spread is not None and spread<0 else None
+        favorite='home' if dog=='away' else 'away' if dog=='home' else None
+        selected='away' if team and g.get('away_team')==team else 'home' if team and g.get('home_team')==team else None
+        if team and selected is None:continue
+        if role in ('home','away') and team and selected!=role:continue
+        if role in ('underdog','favorite'):
+            subject=dog if role=='underdog' else favorite
+            if subject is None or (team and subject!=selected):continue
+        away_margin=away-home;away_edge=None if spread is None else away_margin+spread
+        add_record(records['away'],away_margin,away_edge)
+        add_record(records['home'],-away_margin,None if away_edge is None else -away_edge)
+        for key,side in [('favorite',favorite),('underdog',dog),('selected',selected)]:
+            if side is not None and key in records:
+                sign=1 if side=='away' else -1
+                add_record(records[key],sign*away_margin,None if away_edge is None else sign*away_edge)
+        if spread is None:missing_lines+=1
+        elif spread==0:pickems+=1
+        if total_line is None:totals['missing']+=1;total_result='Unavailable'
+        else:
+            difference=away+home-total_line;kind='over' if difference>0 else 'under' if difference<0 else 'push'
+            totals[kind]+=1;total_result=kind.title()
+        matches.append({**g,'away_score':away,'home_score':home,'spread':spread,'total':total_line,'total_result':total_result,
+                        'favorite':g[favorite+'_team'] if favorite else None,'underdog':g[dog+'_team'] if dog else None})
+    for record in records.values():
+        decisions=record['covers']+record['ats_losses'];su=record['wins']+record['losses']
+        record['ats_rate']=100*record['covers']/decisions if decisions else None
+        record['su_rate']=100*record['wins']/su if su else None
+    matches.sort(key=lambda g:(g.get('gameday',''),g.get('gametime',''),g['game_id']),reverse=True)
+    return {'games':len(matches),'records':([records['selected']] if team else [])+[v for k,v in records.items() if k!='selected'],'totals':totals,'pickems':pickems,'missing_lines':missing_lines,'matches':matches}
+
+
+def render_general(form):
+    with open(game_file,newline='') as source:rows=list(effective_rows(csv.DictReader(source),game_file))
+    options=get_csv_filter_options();years=sorted({int(g['season']) for g in rows},reverse=True)
+    teams=sorted({g[key] for g in rows for key in ('away_team','home_team') if g.get(key)})
+    role=form.get('research_role','all');team=form.get('research_team','');prime=form.get('primetime','')
+    if role not in ROLES or team and team not in teams or prime not in ('','yes','no'):abort(400,description='Choose a valid team, role and time filter.')
+    mode=form.get('season_mode','single')
+    if mode not in ('single','range'):abort(400,description='Choose a valid season mode.')
+    season=None;filters={}
+    try:
+        if mode=='single' and form.get('season'):
+            season=int(form['season'])
+            if season not in years:raise ValueError
+        elif mode=='range':
+            low=int(form.get('start_season') or min(years));high=int(form.get('end_season') or max(years))
+            if low not in years or high not in years or low>high:raise ValueError
+            season=(low,high)
+    except (ValueError,TypeError):abort(400,description='Choose a valid season or season range.')
+    primary=('game_type','gametime','temp','wind','roof','qb_name')
+    allowed=[f for f in CSV_FILTER_FIELDS if f not in ('dog_coast',)]
+    for field in allowed:
+        value=form.get(field,'').strip()
+        if value:
+            if value not in options[field]:abort(400,description='Choose a listed value for '+field.replace('_',' ')+'.')
+            filters[field]=value
+    analyze=request.method=='POST' or form.get('run')=='analyze'
+    report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime) if analyze else None
+    try:page=max(1,int(form.get('page',1)))
+    except ValueError:abort(400,description='Invalid results page.')
+    pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
+    selection={k:v for k,v in form.items() if v and k not in ('page','run','action','csrf_token','combination_conditions')}
+    selection.update(research_view='general',run='analyze')
+    target=url_for('trend_finder',**selection)
+    page_url=lambda number:url_for('trend_finder',**selection,page=number)
+    return render_template('general_trends.html',options=options,years=years,teams=teams,roles=ROLES,form=form,
+        primary=primary,advanced=[f for f in allowed if f not in primary],report=report,
+        games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
+        has_advanced=any(form.get(f) for f in allowed if f not in primary),
+        manual_search_url=target,manual_search_title=manual_trend_title(target))
