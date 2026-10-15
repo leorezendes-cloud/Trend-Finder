@@ -22,3 +22,8 @@
 .general-research .active-filter-chips .filter-chip,
 .general-research .active-filter-chips .filter-chip:visited { display:inline-block;padding:6px 10px;font:bold 14px Arial,sans-serif;background:#fff;color:#000;border-radius:18px;text-decoration:none;-webkit-text-stroke:0; }
 .general-research .filter-chip:hover { background:#fbbf24; }
+
+.general-research .all-research-games { width:calc(100% - 32px);max-width:1200px;box-sizing:border-box;margin:32px auto;padding:24px;background:#1f2937;color:#fff;border:1px solid #374151;border-radius:12px; }
+.general-research .all-research-games table { width:100%;border-collapse:collapse;text-align:left; }
+.general-research .all-research-games th,.general-research .all-research-games td { padding:10px 8px;border-bottom:1px solid #64748b; }
+@media(max-width:650px) { .general-research .all-research-games { padding:16px; } }

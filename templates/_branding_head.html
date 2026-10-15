@@ -1,7 +1,7 @@
 {% include '_seo_head.html' %}
 <meta name="format-detection" content="telephone=no">
 {% set endpoint = request.endpoint or '' %}
-{% if endpoint in ['home','trend_finder','trends_page','trend_details','trend_games','combination_details','backtest_page'] %}
+{% if endpoint in ['home','trend_finder','general_trend_games','trends_page','trend_details','trend_games','combination_details','backtest_page'] %}
 {% set background = 'Images/Branding/trend-findah-background.png' %}
 {% elif endpoint == 'plug_page' or endpoint == 'sunday_scout.sunday_scout_page' or (endpoint.startswith('scout4.') or endpoint.startswith('fans.')) %}
 {% set background = 'Images/Branding/gravy-train-branding/the-plug/the-plug-full.png' %}

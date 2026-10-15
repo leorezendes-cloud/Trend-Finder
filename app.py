@@ -88,6 +88,15 @@ def plug_page():
     return app.view_functions['sunday_scout.sunday_scout_page']()
 
 
+@app.route('/trend-finder/games')
+def general_trend_games():
+    from general_research import render_general
+    selection=request.args.to_dict()
+    selection.update(research_view='general',run='analyze',action='analyze')
+    selection.pop('evidence',None)
+    return render_general(selection,games_page=True)
+
+
 @app.route("/trend-finder", methods=["GET", "POST"])
 def trend_finder():
 

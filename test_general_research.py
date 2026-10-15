@@ -162,14 +162,21 @@ class GeneralResearchTests(unittest.TestCase):
         fragment=client.get(query+'&evidence=1&evidence_metric=Underdogs+ATS').text
         self.assertEqual(fragment.count('<tr>'),11) # Header plus ten games.
         self.assertIn('All games involved',fragment)
-        link=unescape(re.search(r'href="([^"]+)" target="_blank"',fragment).group(1))
+        link=unescape(re.search(r'href="([^"]+)">All games involved',fragment).group(1))
         params=parse_qs(urlsplit(link).query)
         self.assertEqual(params['research_role'],['underdog'])
         self.assertEqual(params['primetime'],['yes'])
         self.assertNotIn('evidence',params)
-        self.assertEqual(urlsplit(link).fragment,'matching-games')
+        self.assertEqual(urlsplit(link).path,'/trend-finder/games')
+        self.assertNotIn('target="_blank"',fragment)
         full=client.get(link).text
         self.assertGreater(full.count('<tr>'),11)
+        self.assertIn('class="all-research-games"',full)
+        self.assertNotIn('home-filter-form',full)
+        self.assertIn('Back to Trend Finder',full)
+        paged=client.get('/trend-finder/games?season=2025&page=2').text
+        self.assertIn('/trend-finder/games?',paged)
+        self.assertIn('Page 2 of 3',paged)
 
     def test_active_tags_remove_one_filter_and_keep_combination_mode(self):
         import re
