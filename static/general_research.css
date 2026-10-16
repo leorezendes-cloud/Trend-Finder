@@ -34,3 +34,9 @@
 .general-research .related-combinations > summary { cursor:pointer;color:#fbbf24; }
 .general-research .combination-variation { margin-top:12px;padding:12px;border:1px solid #64748b;border-radius:8px; }
 .general-research .combination-variation > summary { cursor:pointer; }
+
+.general-research .primetime-night-options { grid-column:1 / -1;border:1px solid #475569;border-radius:8px;padding:12px;min-width:0; }
+.general-research .primetime-night-options legend { font-size:18px; }
+.general-research .primetime-night-checks { display:flex;flex-wrap:wrap;gap:10px 18px; }
+.general-research .primetime-night-checks label { display:inline-flex;align-items:center;gap:6px;font:14px Arial,sans-serif;color:#fff;-webkit-text-stroke:0; }
+.general-research .primetime-night-checks input { width:17px;height:17px;margin:0;appearance:auto;accent-color:#fbbf24; }

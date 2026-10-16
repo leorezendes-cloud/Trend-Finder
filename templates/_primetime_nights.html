@@ -1,0 +1,1 @@
+<fieldset class="primetime-night-options"><legend>Primetime nights — choose any</legend><div class="primetime-night-checks">{% for key,label in night_options %}<label><input type="checkbox" name="primetime_nights" value="{{ key }}"{% if key in form.get('primetime_nights','').split(',') %} checked{% endif %}>{{ label }}</label>{% endfor %}</div></fieldset>

@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 6071,
-    "sha256": "efa7201d32e82621a822b03667f53b4fa1aafd7a7518039cfcc57aa9b08891c2"
+    "bytes": 6539,
+    "sha256": "b8a9fd32fc85f70c76673701db0af038a1bfa40150718d89ad29f2fb999127b2"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 6198,
@@ -552,8 +552,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 17484,
-    "sha256": "3815869d418f9aea7a758eccf8571194b3654668ed86c6b296b764bf67d826d4"
+    "bytes": 18112,
+    "sha256": "fa0e1e07bcd2061c120a0f95fc80d700f534886753055ac32d1601c3bd66dc60"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -627,6 +627,10 @@
     "bytes": 3540,
     "sha256": "7550af144e26ed9d30420ec5a53592b0251073a535857a9ddf3b5c4fd066190e"
   },
+  "primetime_nights.py": {
+    "bytes": 1186,
+    "sha256": "431d85ff7e3ee00fcbe9eee59b95ddba8a17d9582920d38ae589f92e147e89e3"
+  },
   "public_money.py": {
     "bytes": 10148,
     "sha256": "8af346dee9daf057075ce0dec5be1b9ad94ed5337d7c94222cffc220a9afd0a1"
@@ -656,8 +660,8 @@
     "sha256": "22b4beee97a6d7613d5fd117496403bdd5a7b42cd423ce9008100e37e09bef55"
   },
   "saved_trends.py": {
-    "bytes": 2999,
-    "sha256": "98963a796c4565c012c6aa74bc88c3e3b2957defac63ec170b585ef10dfa55fd"
+    "bytes": 3208,
+    "sha256": "b85d42e3d53c0817df0afd5cd7d312990e291ebe32c3ccf33f48932278cb0f36"
   },
   "scheduled_ats_capture.py": {
     "bytes": 2770,
@@ -840,8 +844,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4921,
-    "sha256": "fbc258a008f63cdb4f74298a589a0d66ae3b4d949ccd9b640b6ad3dc38c57fb6"
+    "bytes": 4949,
+    "sha256": "95c33dbc0116c33bb1b839ec2de4fb768cc595af9e279517ddd2d6a9a038a591"
   },
   "seo.py": {
     "bytes": 7604,
@@ -1024,12 +1028,12 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/general_research.css": {
-    "bytes": 2941,
-    "sha256": "c6c827c0e1ca68638994d023c763b972207241552bddaf36ff4e63f1ceebd2a3"
+    "bytes": 3518,
+    "sha256": "4e73f0170f6fd5682b5d152ad74023bdeaae683a68f5b207f578320c32c5edf1"
   },
   "static/general_research.js": {
-    "bytes": 1571,
-    "sha256": "ff2e2e9a56c94316a20150d520b753cd4b80f20988cff7a604409a88327b0dfb"
+    "bytes": 2019,
+    "sha256": "364b38eb803139659af6cd030da849c7ea289c147fe91d1abf526e65fcfdad54"
   },
   "static/member_picks.css": {
     "bytes": 5963,
@@ -1143,6 +1147,10 @@
     "bytes": 1823,
     "sha256": "6fb7e6ac9626f7f703a7bb857dd0a9b0790d20a63ed6c722afec862afdf6c5bb"
   },
+  "templates/_primetime_nights.html": {
+    "bytes": 360,
+    "sha256": "d980e03b45727d81ef7555f9f4e9b10c16acad5b2cd6518159da200f9909b076"
+  },
   "templates/_save_watchlist.html": {
     "bytes": 640,
     "sha256": "c5f90902350db36f5349e447959a464180eaadf668ef7b469c285c7058a0a1b2"
@@ -1192,8 +1200,8 @@
     "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
-    "bytes": 10473,
-    "sha256": "e244008943cb524f8ec183ba00d9fe9bdf4fa3ccffafc3c6d3bac50b6c04214b"
+    "bytes": 10512,
+    "sha256": "9c21f91b10614001ee61d401a3dab7d547a4066650a8cffcec747063674e66a4"
   },
   "templates/home.html": {
     "bytes": 5942,
@@ -1390,6 +1398,10 @@
   "test_points_publication.py": {
     "bytes": 6919,
     "sha256": "f3a1ec2bb47483b78cfbacc7bf716c5056cd7d62e2b6a5734b7fe9c0944b334c"
+  },
+  "test_primetime_nights.py": {
+    "bytes": 2661,
+    "sha256": "77852337feb00c14fe3583c8608e40c9355bee0f95e7f61e7bf003aa66d09e12"
   },
   "test_public_pick_market.py": {
     "bytes": 2411,

@@ -1,6 +1,7 @@
 """General historical NFL research: one matchup per game, explicit team contexts."""
 import csv
 import math
+from primetime_nights import normalize_nights, matches_nights, NIGHT_OPTIONS
 from flask import abort, render_template, request, url_for
 from trend_finder_2 import CSV_FILTER_FIELDS, matches_csv_filters, get_csv_filter_options, game_file
 from pregame_lines import effective_rows
@@ -36,7 +37,7 @@ def add_record(record, margin, edge):
     record['ats_missing' if edge is None else 'covers' if edge>0 else 'ats_losses' if edge<0 else 'pushes'] += 1
 
 
-def research_games(rows, *, season=None, filters=None, team='', role='all', primetime='', location='', spread_size=''):
+def research_games(rows, *, season=None, filters=None, team='', role='all', primetime='', location='', spread_size='', primetime_nights=()):
     if role not in ROLES or primetime not in ('','yes','no'):raise ValueError('Invalid research role or time')
     if location not in ('','home','away') or spread_size not in SPREADS:raise ValueError('Invalid location or spread band')
     records={key:counter(label) for key,label in [('home','Home teams'),('away','Away teams'),('favorite','Favorites'),('underdog','Underdogs')]}
@@ -46,6 +47,7 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
         year=int(g['season'])
         if season is not None and (not season[0]<=year<=season[1] if isinstance(season,tuple) else year!=int(season)):continue
         if not matches_csv_filters(g,filters or {}):continue
+        if primetime_nights and not matches_nights(g,primetime_nights):continue
         away,home=finite(g.get('away_score')),finite(g.get('home_score'))
         if away is None or home is None:continue
         if primetime:
@@ -170,7 +172,8 @@ def group_overlapping_trends(trends, *, minimum=10, limit=30, threshold=.8):
 
 
 def render_general(form, games_page=False):
-    form=dict(form)
+    try:form=normalize_nights(form)
+    except ValueError:abort(400,description='Choose valid primetime nights.')
     if form.get('research_role') in ('home','away') and not form.get('research_location'):
         form['research_location']=form['research_role'];form['research_role']='all'
     with open(game_file,newline='') as source:rows=list(effective_rows(csv.DictReader(source),game_file))
@@ -212,7 +215,7 @@ def render_general(form, games_page=False):
             if value not in options[field]:abort(400,description='Choose a listed value for '+field.replace('_',' ')+'.')
             filters[field]=value
     analyze=request.method=='POST' or form.get('run')=='analyze'
-    report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime,location=location,spread_size=spread_size) if analyze else None
+    report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime,location=location,spread_size=spread_size,primetime_nights=form.get('primetime_nights','').split(',') if form.get('primetime_nights') else ()) if analyze else None
     combinations=None
     if analyze and form.get('action')=='combinations':
         combinations=find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role,current_rows=rows)
@@ -238,7 +241,8 @@ def render_general(form, games_page=False):
     if team:chip('Team: '+team,('research_team',))
     if role!='all':chip('Role: '+ROLES[role],('research_role',))
     if location:chip('Location: '+location.title(),('research_location',))
-    if prime:chip('Primetime' if prime=='yes' else 'Non-primetime',('primetime',))
+    if prime:chip('Primetime' if prime=='yes' else 'Non-primetime',('primetime','primetime_nights') if form.get('primetime_nights') else ('primetime',))
+    if form.get('primetime_nights'):chip('Nights: '+', '.join(dict(NIGHT_OPTIONS)[key] for key in form['primetime_nights'].split(',')),('primetime_nights',))
     if spread_size:chip('Spread: '+SPREADS[spread_size],('spread_size',))
     labels={'game_type':'Season stage','gametime':'Kickoff','temp':'Temperature','wind':'Wind','qb_name':'QB'}
     stages={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl'}
@@ -253,7 +257,7 @@ def render_general(form, games_page=False):
     if games_page:
         return render_template('general_trend_games.html',games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''),filter_chips=filter_chips,back_url=target)
     return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
-        discovery_window=discovery_window,filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
+        discovery_window=discovery_window,night_options=NIGHT_OPTIONS,filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),
         manual_search_url=target,manual_search_title=manual_trend_title(target))

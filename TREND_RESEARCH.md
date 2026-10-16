@@ -39,3 +39,8 @@ General discovery groups same-outcome patterns when their matching-game sets hav
 ## Home-page emerging alert
 
 A red-outlined Gravy Train card appears above the account/watchlist button when regular-season home primetime underdogs are undefeated straight up over 3–14 completed games in the upcoming matchup’s season. The card requires an unstarted, non-neutral, matching regular-season game within seven days with a finite saved spread. It says On tonight only on the game’s Eastern calendar date. The record is calculated from completed games that started before the current clock; future filled scores do not count. It updates or hides when its qualification changes, never promises an outcome, and does not modify predictions.
+
+
+### Manual primetime night filters
+
+Select any combination of weekday night checkboxes, including Thursday, Sunday and Monday Night. Multiple nights match either selected night, so Sunday plus Monday can be analyzed together for Over/Under results. A night kickoff is 7 p.m. Eastern or later. Selecting nights enables Primetime Only; selecting All or Non-Primetime clears the checkboxes. Night selections remain in filter tags, saved trends and game evidence links.
