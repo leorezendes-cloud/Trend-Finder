@@ -34,29 +34,9 @@ def schedule():
     return {row['game_id']:row for row in rows}
 
 
-def market_for_pick(pick):
-    """Latest saved market display, independent of the frozen member-pick line."""
-    root=Path(current_app.config['PICKS_SOURCE_ROOT'])
-    if not hasattr(g,'inline_pick_markets'):
-        from market_views import market_games
-        g.inline_pick_markets={row['game_id']:row for row in market_games(root,now_utc())}
-    market=g.inline_pick_markets.get(pick['game_id'])
-    if market:return market
-    path=root/'nfl_games.csv'
-    if not path.exists():return None
-    from pregame_lines import effective_rows
-    with path.open(newline='',encoding='utf-8-sig') as source:
-        row=next((r for r in effective_rows(csv.DictReader(source),path) if r['game_id']==pick['game_id']),None)
-    if row is None:return None
-    return dict(row,spread=number(row.get('spread_line')),total=number(row.get('total_line')),
-                spread_source=row.get('line_source','Saved schedule'),total_source=row.get('total_source','Saved schedule'),
-                spread_time=None,spread_capture_display=row.get('line_capture') or '',total_time=row.get('total_capture') or None,spread_stale=False,total_stale=False)
-
-
 def init_picks(app):
     app.config.setdefault('PICKS_SOURCE_ROOT',app.root_path)
     app.register_blueprint(bp)
-    app.jinja_env.globals['market_for_pick']=market_for_pick
     app.jinja_env.filters['pick_time'] = lambda value: datetime.fromisoformat(value).astimezone(ZoneInfo('America/New_York')).strftime('%a %b %d, %I:%M %p ET')
     with app.app_context():
         with db():
