@@ -20,8 +20,8 @@
     "sha256": "8cd14f10b2991a13cdcfefa95dbebca3d1d709e84ef610e35d531b5a6a2ee5ae"
   },
   "MEMBER_PICKS.md": {
-    "bytes": 5726,
-    "sha256": "78eddf77e80eb36a737a3db14f5731bd6caa6573a2c259590869b760649a99c5"
+    "bytes": 6244,
+    "sha256": "9de556c4026daad818d6cf8a6e317160f0bdcdb3cd20a30a094f4b7859c952a0"
   },
   "NEWSLETTER.md": {
     "bytes": 8053,
@@ -588,8 +588,8 @@
     "sha256": "9ea8fea5124d50aa088288ffb634ed28ff871721775a73d930c2d0da78e1183b"
   },
   "member_picks.py": {
-    "bytes": 14937,
-    "sha256": "a8b12cdcbc4e149a6d46eae6ffed949326731bf0e9060d7c9ee95388a97a8d7d"
+    "bytes": 16136,
+    "sha256": "a84e2dcfc6995e4436a27caf3b5fa66cae78ec9bf0ec7bfb459c19fb5245ed64"
   },
   "membership.py": {
     "bytes": 26011,
@@ -1028,8 +1028,8 @@
     "sha256": "ff2e2e9a56c94316a20150d520b753cd4b80f20988cff7a604409a88327b0dfb"
   },
   "static/member_picks.css": {
-    "bytes": 4348,
-    "sha256": "9a9f4d17b3cf411ec920b09ca022311b22cfef33b5f8265569a1e7fa8a6822a6"
+    "bytes": 4663,
+    "sha256": "d4553a3c66f29519976458bffeed64741a6ea7b22ef00ebfbf57db5800172658"
   },
   "static/member_picks.js": {
     "bytes": 3095,
@@ -1127,9 +1127,13 @@
     "bytes": 1231,
     "sha256": "c217a0106fac96273aef944f5ad6b9f41a58853b48a3c003206d0e3d00f493b5"
   },
+  "templates/_inline_pick_market.html": {
+    "bytes": 1136,
+    "sha256": "9f78f18ce588fa297a34029fa955b9362571886188b3878cdeaa4e44be0574cc"
+  },
   "templates/_inline_picks.html": {
-    "bytes": 1363,
-    "sha256": "29764c255750ae9fd1c36b8a96908002254c7c6f2d8d1a0d2fad9e820c1a1c5a"
+    "bytes": 1441,
+    "sha256": "2b76de35bb5aae492082a9f3945275cff702777e6b63045bf71d29c6b97c25a2"
   },
   "templates/_pick_cards.html": {
     "bytes": 1823,
@@ -1372,8 +1376,8 @@
     "sha256": "ea95f376126e044861d8666d53aceb8d2eb766d2f3ac4eaa1bfa6f882cdae0ef"
   },
   "test_pick_workflow.py": {
-    "bytes": 6543,
-    "sha256": "148df30e0e283d2188bd013f225f4b42f94a6a4b3905904648c201efaa974961"
+    "bytes": 7675,
+    "sha256": "2a8e0d0fcb9353713daca681504d9bb5098545a1c22b4e5af5db1728887d98a9"
   },
   "test_plug_always_pick.py": {
     "bytes": 4114,

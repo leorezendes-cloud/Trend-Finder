@@ -52,3 +52,7 @@
  .mobile-picks-menu[open] > summary::before { content: '▾ '; }
  .mobile-picks-menu > summary small { display: block; color: #f1f5f9; font-weight: normal; font-size: 13px; }
 }
+
+.inline-member-picks .picks-grid { grid-template-columns:repeat(2,minmax(0,360px));align-items:start; }
+.inline-member-picks .inline-market-card { background:#1f2937;border:1px solid #475569;border-radius:8px; }
+@media(max-width:650px) { .inline-member-picks .picks-grid { grid-template-columns:minmax(0,1fr); } }

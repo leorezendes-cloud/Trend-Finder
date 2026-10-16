@@ -1,0 +1,9 @@
+<article class="pick-game pick-compact inline-market-card" aria-label="Market for {{ pick.away }} at {{ pick.home }}">
+<h2>Game Market</h2><p><strong>{{ pick.away }} at {{ pick.home }}</strong></p>
+{% if market %}
+<p class="pick-lines">Latest saved spread<br>{% if market.spread is not none %}{{ pick.away }} {{ '%+g'|format(market.spread) }} · {{ pick.home }} {{ '%+g'|format(-market.spread) }}{% else %}Unavailable{% endif %}</p>
+<p class="pick-lines">Total<br>{{ '%g'|format(market.total) if market.total is not none else 'Unavailable' }}</p>
+{% for key,label in [('spread','Spread'),('total','Total')] %}<p class="pick-deadline">{{ label }}: {{ market[key ~ '_source'] }}{% if market[key ~ '_time'] %}<br>Captured {{ market[key ~ '_time']|pick_time }}{% elif key=='spread' and market.spread_capture_display %}<br>Captured {{ market.spread_capture_display }}{% endif %}{% if market[key ~ '_stale'] %}<br>Over 24 hours old{% endif %}</p>{% endfor %}
+<p>Saved market lines can move. Your picks use the shared lines in the card beside this one.</p>
+{% else %}<p>Market lines are unavailable for this matchup.</p>{% endif %}
+</article>

@@ -77,6 +77,22 @@ class PickWorkflowTests(unittest.TestCase):
             self.assertEqual(db().execute('SELECT su FROM member_picks WHERE game_id=?',(first,)).fetchone()[0],'A')
             self.assertEqual(db().execute('SELECT su FROM member_picks WHERE game_id=?',(second,)).fetchone()[0],'C')
 
+    def test_inline_market_can_move_without_changing_member_lines(self):
+        ident,_=self.sheet();self.member()
+        from member_picks import comparison_picks
+        from flask import render_template,g
+        market=dict(game_id=self.rows[0]['game_id'],spread=-1.5,total=47.5,spread_source='Saved market quote',total_source='Saved market quote',spread_time=self.now.isoformat(),total_time=self.now.isoformat(),spread_stale=False,total_stale=False)
+        with self.app.test_request_context('/scout4/teams?team=A&opponent=B'):
+            g.member={'id':2};g.is_owner=False
+            games=comparison_picks(team='A',opponent='B')
+            original=games[0]['away_spread']
+            with patch('market_views.market_games',return_value=[market]):
+                html=render_template('_inline_picks.html',inline_picks=games)
+            self.assertIn('Game Market',html)
+            self.assertIn('A -1.5',html);self.assertIn('47.5',html)
+            self.assertIn('Shared member lines',html)
+            self.assertEqual(db().execute('SELECT away_spread FROM pick_games WHERE id=?',(ident,)).fetchone()[0],original)
+
     def test_inline_controls_and_save_return_to_comparison(self):
         ident,_=self.sheet();client=self.member()
         from member_picks import comparison_picks

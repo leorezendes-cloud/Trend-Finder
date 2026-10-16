@@ -49,3 +49,7 @@ My Picks displays a three-column card grid with one Save picks button. Check one
 Matchup details and selected team-versus-opponent comparisons include the same controls inline. Saving keeps the member on that page, and changes use the same private records as My Picks. Clicking a My Picks matchup opens its comparison page. All save requests require CSRF protection and use the signed-in member ID. Signed-in comparison pages are marked no-store because they include private selections.
 
 On mobile, successful saves collapse the checklist into one expandable menu and scroll that menu into view. Saved selections remain available when reopened. Desktop keeps the full cards visible. The client retries one network interruption or transient gateway error with the same submission; the existing database upsert makes retries safe. Failed saves remain expanded with an explanation. The original “Load failed” cause has not been established from production logs.
+
+## Comparison-page market card
+
+Inline pick controls on team and matchup comparisons are paired with a separate Game Market card. It reads the same latest saved pregame quotes as the market view, shows the spread for both teams and the total with available capture/source details, and stacks below the pick card on mobile. For a started game it falls back to the effective saved pregame lines. Missing markets are labeled unavailable. These display values never change the shared frozen member-pick lines or grading.

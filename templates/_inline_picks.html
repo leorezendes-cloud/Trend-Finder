@@ -8,7 +8,7 @@
 <details class="mobile-picks-menu" open><summary><span data-pick-menu-label>Make or edit picks</span><small data-pick-menu-status role="status" aria-live="polite"></small></summary>
 <form class="member-picks-form" method="post" action="{{ url_for('member_picks.save_all_picks') }}" data-pick-form>
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="{{ request.full_path.rstrip('?') }}">
-<div class="picks-grid">{% for pick in inline_picks %}{{ pick_card(pick) }}{% endfor %}</div>
+<div class="picks-grid">{% for pick in inline_picks %}{{ pick_card(pick) }}{% set market=market_for_pick(pick) %}{% include '_inline_pick_market.html' %}{% endfor %}</div>
 {% if inline_picks|selectattr('locked','equalto',0)|rejectattr('void_reason')|list %}<div class="pick-save-bar"><button type="submit">Save picks</button><p class="pick-save-status" role="status" aria-live="polite"></p></div>{% endif %}
 </form>
 </details>
