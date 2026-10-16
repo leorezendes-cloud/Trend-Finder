@@ -34,9 +34,18 @@ def schedule():
     return {row['game_id']:row for row in rows}
 
 
+def public_market_for_pick(pick):
+    from public_pick_market import matchup_public_market
+    cache=g.setdefault('inline_public_markets',{})
+    key=(pick['game_id'],pick['kickoff_at'])
+    if key not in cache:cache[key]=matchup_public_market(Path(current_app.config['PICKS_SOURCE_ROOT']),pick,now_utc())
+    return cache[key]
+
+
 def init_picks(app):
     app.config.setdefault('PICKS_SOURCE_ROOT',app.root_path)
     app.register_blueprint(bp)
+    app.jinja_env.globals['public_market_for_pick']=public_market_for_pick
     app.jinja_env.filters['pick_time'] = lambda value: datetime.fromisoformat(value).astimezone(ZoneInfo('America/New_York')).strftime('%a %b %d, %I:%M %p ET')
     with app.app_context():
         with db():
