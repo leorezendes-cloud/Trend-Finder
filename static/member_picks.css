@@ -66,3 +66,10 @@
 .inline-public-market .public-market-section:last-child { border-right:0; }
 @media(max-width:1000px) { .inline-member-picks .picks-grid { grid-template-columns:minmax(0,1fr); } }
 @media(max-width:650px) { .public-market-columns { grid-template-columns:minmax(0,1fr); } .inline-public-market .public-market-section { border-right:0;border-bottom:1px solid #475569; } }
+
+.mobile-public-market-panel { display:none; }
+@media(max-width:650px) {
+ .inline-member-picks .mobile-picks-menu .inline-public-market { display:none; }
+ .inline-member-picks .mobile-public-market-panel { display:grid;gap:16px;margin-top:16px; }
+ .inline-member-picks .mobile-public-market-panel .pick-compact { margin:0;padding:16px; }
+}

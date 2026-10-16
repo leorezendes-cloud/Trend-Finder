@@ -1032,8 +1032,8 @@
     "sha256": "ff2e2e9a56c94316a20150d520b753cd4b80f20988cff7a604409a88327b0dfb"
   },
   "static/member_picks.css": {
-    "bytes": 5623,
-    "sha256": "e6b7cbc48489bd0acc05dfb239a51c436e6ae014f2783649a3b3f5f8c6bd304e"
+    "bytes": 5963,
+    "sha256": "1372fc80c4593c06a54c37295883e2fa2171f2dbec1cc98f4e9152b96d7cc199"
   },
   "static/member_picks.js": {
     "bytes": 3095,
@@ -1132,8 +1132,8 @@
     "sha256": "c217a0106fac96273aef944f5ad6b9f41a58853b48a3c003206d0e3d00f493b5"
   },
   "templates/_inline_picks.html": {
-    "bytes": 1457,
-    "sha256": "119209d761d516145ecb454c5c4523e6406ef71cb371c2a5256b8b314651b1d2"
+    "bytes": 1642,
+    "sha256": "3b4f6c722448d2205e6e3ba80a1966f7950c1590fbb2d40b7cfdf0f511ae9e7f"
   },
   "templates/_inline_public_market.html": {
     "bytes": 1359,
