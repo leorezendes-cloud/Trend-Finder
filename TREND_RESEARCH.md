@@ -44,3 +44,5 @@ A red-outlined Gravy Train card appears above the account/watchlist button when 
 ### Manual primetime night filters
 
 Select any combination of weekday night checkboxes, including Thursday, Sunday and Monday Night. Multiple nights match either selected night, so Sunday plus Monday can be analyzed together for Over/Under results. A night kickoff is 7 p.m. Eastern or later. Selecting nights enables Primetime Only; selecting All or Non-Primetime clears the checkboxes. Night selections remain in filter tags, saved trends and game evidence links.
+
+Find Combinations retains qualifying ATS, Over and Under results separately for each filter combination. The bounded results list shares space across the three markets; overlapping variations remain grouped within the same outcome. Totals require at least 10 non-push decisions and 55% success; missing totals are excluded.

@@ -32,8 +32,8 @@
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
   },
   "TREND_RESEARCH.md": {
-    "bytes": 6539,
-    "sha256": "b8a9fd32fc85f70c76673701db0af038a1bfa40150718d89ad29f2fb999127b2"
+    "bytes": 6864,
+    "sha256": "e2064adb8b66e2a1817461971116d3dff765bfff26230f1088627bb49cfd06d2"
   },
   "WEEKLY_POLICY.md": {
     "bytes": 6198,
@@ -552,8 +552,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 18112,
-    "sha256": "fa0e1e07bcd2061c120a0f95fc80d700f534886753055ac32d1601c3bd66dc60"
+    "bytes": 18591,
+    "sha256": "b238ee096aa3f80956ef810528f70d62f65be1e49772e362dcb3ed4f8800db2a"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -844,8 +844,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4949,
-    "sha256": "95c33dbc0116c33bb1b839ec2de4fb768cc595af9e279517ddd2d6a9a038a591"
+    "bytes": 4979,
+    "sha256": "5fe5a6d8f5bd61a31b785865c2f0b6f6ac651b2dbd26a6a1888754a220ad29af"
   },
   "seo.py": {
     "bytes": 7604,
@@ -1322,6 +1322,10 @@
   "test_coast_filters.py": {
     "bytes": 1556,
     "sha256": "de9a31e0a0d0e9e49afeadef9374cb2eb3dd72900b807d5dc2d055b253743649"
+  },
+  "test_combination_totals.py": {
+    "bytes": 1674,
+    "sha256": "29031341bcce0807746eac918d0d6d5d161fdacfe4d9ccc9ba28b46646fc193a"
   },
   "test_context_model.py": {
     "bytes": 4627,

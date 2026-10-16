@@ -141,10 +141,10 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, curren
                     lower=(rate+z*z/(2*n)-z*((rate*(1-rate)+z*z/(4*n))/n)**.5)/(1+z*z/n)
                     candidate={'conditions':dict(key),'label':label,'wins':wins,'losses':losses,'pushes':pushes,
                                'rate':100*rate,'sample':len(subset),'score':lower,'membership':tuple(sorted(subset)),'recent_games':recent}
+                    evaluated[(key,label)]=candidate
                     if best is None or lower>best['score']:best=candidate
                 score=best['score'] if best else 0
                 candidates.append((score,len(subset),key,subset))
-                if best:evaluated[key]=best
         candidates.sort(key=lambda v:(v[0],v[1],v[2]),reverse=True)
         beam=[(key,ids) for _,_,key,ids in candidates[:40]]
     return group_overlapping_trends(evaluated.values(),minimum=minimum,limit=limit)
@@ -168,7 +168,15 @@ def group_overlapping_trends(trends, *, minimum=10, limit=30, threshold=.8):
             group['related'].append(dict(trend))
         else:
             groups.append(dict(trend,related=[]))
-    return groups[:limit]
+    # Give ATS, Over and Under discoveries space even when one market dominates.
+    families=[[g for g in groups if g['label'].endswith(' ATS')],
+              [g for g in groups if g['label']=='Over'],
+              [g for g in groups if g['label']=='Under']]
+    chosen=[]
+    while len(chosen)<limit and any(families):
+        for family in families:
+            if family and len(chosen)<limit:chosen.append(family.pop(0))
+    return [g for g in groups if any(g is item for item in chosen)]
 
 
 def render_general(form, games_page=False):
