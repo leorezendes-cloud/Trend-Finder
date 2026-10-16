@@ -1032,8 +1032,8 @@
     "sha256": "ff2e2e9a56c94316a20150d520b753cd4b80f20988cff7a604409a88327b0dfb"
   },
   "static/member_picks.css": {
-    "bytes": 4914,
-    "sha256": "80b0ecef5d8026272f358515bd7416aab38eccd709621866cae1cfe92d48703a"
+    "bytes": 5623,
+    "sha256": "e6b7cbc48489bd0acc05dfb239a51c436e6ae014f2783649a3b3f5f8c6bd304e"
   },
   "static/member_picks.js": {
     "bytes": 3095,
@@ -1136,8 +1136,8 @@
     "sha256": "119209d761d516145ecb454c5c4523e6406ef71cb371c2a5256b8b314651b1d2"
   },
   "templates/_inline_public_market.html": {
-    "bytes": 1318,
-    "sha256": "e471ba501739ec24397e36b1e2507283f7dfa6a575117fcc344452b913b32a0b"
+    "bytes": 1359,
+    "sha256": "e1c3f21b71731bd1728e1da2b8c0ce9477a661af6803455c7b05461bdd51adb9"
   },
   "templates/_pick_cards.html": {
     "bytes": 1823,
