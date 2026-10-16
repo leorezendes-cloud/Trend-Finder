@@ -1729,8 +1729,9 @@ def _trend_data_signature():
     root = game_file.resolve().parent
     paths = (game_file.resolve(), root / 'manual_spread_overrides.csv',
              root / 'public_money_snapshots.csv')
+    from score_finals import final_signature
     return tuple((str(path), path.stat().st_mtime_ns, path.stat().st_size)
-                 if path.exists() else (str(path), None, None) for path in paths)
+                 if path.exists() else (str(path), None, None) for path in paths) + (('confirmed-finals',final_signature(game_file)),)
 
 
 @lru_cache(maxsize=32)

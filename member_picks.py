@@ -27,6 +27,8 @@ def schedule():
     if not path.exists():return {}
     with path.open(newline='',encoding='utf-8-sig') as stream:
         rows=list(csv.DictReader(stream))
+    from score_finals import public_final_rows
+    rows=public_final_rows(rows,path)
     ids=[row.get('game_id') for row in rows]
     if len(ids)!=len(set(ids)):raise ValueError('Duplicate game identities in saved schedule')
     return {row['game_id']:row for row in rows}

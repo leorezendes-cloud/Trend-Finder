@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime,timezone
 from zoneinfo import ZoneInfo
 
-def effective_rows(rows,path):
+def effective_rows(rows,path,*,include_scores=True):
     rows=[corrected_row(row) for row in rows];root=Path(path).resolve().parent
     manual_path=root/'manual_spread_overrides.csv';manual={}
     if manual_path.exists():
@@ -41,4 +41,7 @@ def effective_rows(rows,path):
             g.update(total_line=f'{total:g}',total_source='DraftKings pregame capture',total_capture=capture.astimezone(ZoneInfo('America/New_York')).strftime('%b %d, %I:%M %p ET'))
         if g.get('dog_team') is not None and g.get('spread_line'):
             spread=float(g['spread_line']);g['dog_team']=g['away_team'] if spread>0 else g['home_team'] if spread<0 else '';g['dog_spread']=str(abs(spread))
+    if include_scores:
+        from score_finals import public_final_rows
+        rows=public_final_rows(rows,path)
     return rows

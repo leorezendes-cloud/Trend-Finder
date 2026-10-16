@@ -60,7 +60,7 @@ def scores():
                 _score_cache['stale'] = True
             interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
             _score_cache['expires'] = time.monotonic() + interval
-        schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv')
+        schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv',include_scores=False)
         games = []
         for game in _score_cache['games']:
             row = dict(game)
@@ -112,7 +112,7 @@ def leaders(rows, code):
 
 @bp.get('/matchup/<game_id>')
 def matchup(game_id):
-    game = next((g for g in read_csv(ROOT / 'nfl_games.csv') if g['game_id'] == game_id), None)
+    game = next((g for g in effective_rows(read_csv(ROOT / 'nfl_games.csv'),ROOT/'nfl_games.csv') if g['game_id'] == game_id), None)
     if game is None:
         abort(404)
     season, week, records, players, manifest = fan_context(game)
@@ -225,6 +225,6 @@ def prediction_performance(records, schedule):
 @bp.get('/predictions/results')
 def prediction_results():
     records = [json.loads(p.read_text()) for p in (ROOT / 'data/scout4/blend/predictions').glob('*.json')]
-    groups, recent, excluded = prediction_performance(records, read_csv(ROOT / 'nfl_games.csv'))
+    groups, recent, excluded = prediction_performance(records, effective_rows(read_csv(ROOT / 'nfl_games.csv'),ROOT/'nfl_games.csv'))
     return render_template('prediction_results.html', groups=groups, recent=recent,
                            excluded=excluded, freshness=data_freshness())
