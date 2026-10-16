@@ -15,7 +15,7 @@
      {% include '_site_navigation.html' %}
 
 <h1>🏈 Weekly Results 🚂</h1>
-{% if tally.finals<tally.games %}<p>Results appear after verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
+{% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
 {% if latest_completed_week is not none and latest_completed_week!=selected_week %}<p><a class="archive-link" href="{{ url_for('sunday_results_page',week=latest_completed_week) }}">View Week {{ latest_completed_week }} completed results →</a></p>{% endif %}
 <form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
 <div class="weekly-result-tallies"><div><span>Underdog results</span><strong>{{ tally.covers }}–{{ tally.losses }}–{{ tally.pushes }}</strong></div><div><span>Plug ATS picks</span><strong>{{ tally.correct }}–{{ tally.wrong }}–{{ tally.pick_pushes }}</strong></div><div><span>Completed games</span><strong>{{ tally.finals }} / {{ tally.games }}</strong></div></div>
@@ -23,13 +23,13 @@
 
 
 {% if has_blend %}<p class="weekly-results-note">Plug totals: {{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }} · ATS blend and totals remain separate.</p>{% endif %}
-<h2>Week {{ selected_week }} Matchups</h2><p class="weekly-results-note">ATS as Dog is the team’s {{ season }} regular-season cover–loss–push record as an underdog entering Week {{ selected_week }}. Result is its ATS outcome in this matchup. Scores are saved finals, not a live scoreboard.</p>
+<h2>Week {{ selected_week }} Matchups</h2><p class="weekly-results-note">ATS as Dog is the team’s {{ season }} regular-season cover–loss–push record as an underdog entering Week {{ selected_week }}. Result is its ATS outcome in this matchup. Scores show saved or ESPN-confirmed finals. Refresh for the latest results.</p>
 {% if games %}
 <div class="tf-desktop-results weekly-results-table-wrap">
 <table class="weekly-results-table"><thead><tr><th>Matchup</th><th>Scores</th><th>Underdog</th><th>ATS as Dog</th><th>Result</th><th>Plug's Pick</th><th>Plug Total</th><th>Plug Result</th><th>Details</th></tr></thead><tbody>
 {% for game in games %}<tr>
 <td><strong>{{ game.matchup }}</strong><br><small>{{ game.gameday }}</small></td>
-<td>{{ game.live_score }}</td>
+<td>{{ game.live_score }}{% if game.score_source %}<br><small>{{ game.score_source }}</small>{% endif %}</td>
 <td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
 <td class="dog-ats-record">{{ game.dog_ats_record }}</td>
 <td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</span></td>
@@ -52,7 +52,7 @@
 
         </div>
 
-        <p class="tf-game-score">Scores: {{ game.live_score }}</p>
+        <p class="tf-game-score">Scores: {{ game.live_score }}{% if game.score_source %}<br><small>{{ game.score_source }}</small>{% endif %}</p>
 
         <p class="tf-game-spread">
             Underdog:

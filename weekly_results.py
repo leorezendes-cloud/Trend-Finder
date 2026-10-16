@@ -25,8 +25,37 @@ def underdog_records(rows,season,before_week):
   record[result]+=1
  return records
 
-def build_results(root,week=None):
- rows=list(load_games(root/'nfl_games.csv').values())
+def confirmed_score_rows(rows,updates,now=None):
+ """Display-only ESPN finals; match both teams and the exact scheduled kickoff."""
+ now=now or datetime.now(timezone.utc)
+ indexed={}
+ for update in updates or []:
+  if update.get('state')!='post' or update.get('completed') is not True:continue
+  try:
+   kickoff=datetime.fromisoformat(update['date'].replace('Z','+00:00'))
+   away=float(update['away_score']);home=float(update['home_score'])
+   if kickoff.tzinfo is None or kickoff>now or not all(math.isfinite(n) and n>=0 and n.is_integer() for n in (away,home)):continue
+  except (KeyError,TypeError,ValueError,AttributeError):continue
+  key=(update.get('away'),update.get('home'),kickoff)
+  value=(str(int(away)),str(int(home)))
+  if key in indexed and indexed[key]!=value:indexed[key]=None
+  else:indexed.setdefault(key,value)
+ output=[]
+ for original in rows:
+  row=dict(original)
+  if row.get('away_score') not in ('',None) and row.get('home_score') not in ('',None):output.append(row);continue
+  try:
+   kickoff=datetime.fromisoformat(row['gameday']+'T'+row['gametime']).replace(tzinfo=ZoneInfo('America/New_York'))
+   final=indexed.get((row['away_team'],row['home_team'],kickoff))
+  except (KeyError,TypeError,ValueError):final=None
+  if final:
+   away,home=final
+   row.update(away_score=away,home_score=home,result=str(int(home)-int(away)),total=str(int(home)+int(away)),score_source='ESPN confirmed final')
+  output.append(row)
+ return output
+
+def build_results(root,week=None,score_updates=None):
+ rows=confirmed_score_rows(list(load_games(root/'nfl_games.csv').values()),score_updates)
  all_frozen={}
  for path in (root/'data/scout4/blend/predictions').glob('*.json'):
   record=json.loads(path.read_text());all_frozen[record['game_id']]=record

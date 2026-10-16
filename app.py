@@ -931,7 +931,9 @@ def sunday_page():
 @app.route("/sunday-results")
 def sunday_results_page():
     from weekly_results import build_results
-    view=build_results(Path(__file__).resolve().parent,request.args.get('week'))
+    from fan_views import scores
+    snapshot=scores().get_json()
+    view=build_results(Path(__file__).resolve().parent,request.args.get('week'),score_updates=snapshot.get('games',[]))
     return render_template('sunday_results.html',**view)
 
 

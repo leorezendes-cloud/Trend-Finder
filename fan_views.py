@@ -27,7 +27,7 @@ def parse_scores(payload):
             sides = {r['homeAway']: r for r in contest['competitors']}
             state = contest['status']['type']
             row = {'date': event['date'], 'status': state.get('shortDetail', state.get('description', '')),
-                   'state': state['state'], 'away': team_code(sides['away']['team']['abbreviation']),
+                   'state': state['state'], 'completed': state.get('completed') is True, 'away': team_code(sides['away']['team']['abbreviation']),
                    'home': team_code(sides['home']['team']['abbreviation']),
                    'away_score': sides['away'].get('score') if state['state'] != 'pre' else None,
                    'home_score': sides['home'].get('score') if state['state'] != 'pre' else None}

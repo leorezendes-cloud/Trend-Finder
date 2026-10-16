@@ -23,3 +23,7 @@ Starting with automatic configuration `scout4-plug-margin-blend-3-always-pick`, 
 ## Version 4 original points ATS baseline
 
 `plug-points-only-4` publishes new ATS predictions from the original points-for/points-allowed margin. Existing sealed forecasts retain their old formula and original lines; they are not regenerated on deployment. The prior 50/50 recipe and fixed net-EPA Recent Form are saved and graded separately as research benchmarks on each new forecast's same cutoff and spread. Published totals retain the frozen Scout totals model. Exact-tie selection and always-pick behavior remain unchanged. No injury/weather penalty is added to published forecasts.
+
+## Weekly page score freshness
+
+The weekly results page uses the shared cached ESPN scoreboard for provider-confirmed finals while the dual-source canonical CSV update catches up. Only completed postgame events with exact team identities and scheduled kickoff matches are eligible. Invalid or conflicting scores are rejected and existing saved finals take precedence. The overlay is read-only, clearly labeled, and all ATS/total grades continue to use the original frozen prediction lines. Refreshing the weekly page checks the shared feed cache (normally 60 seconds after games finish). The canonical update and persistent model record workflows remain unchanged.
