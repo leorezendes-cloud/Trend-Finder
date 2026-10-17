@@ -34,7 +34,8 @@
                     <span>Find the fix in the Conspiracy Dungeon.</span>
                 </a>
             </nav>
-            {% if emerging_alert %}{% set alert=emerging_alert %}
+            {% include '_active_trends.html' %}
+            {% if emerging_alert and not active_highlights %}{% set alert=emerging_alert %}
             <aside class="emerging-trend-alert" aria-label="Emerging trend alert">
                 <span class="emerging-alert-badge">🔥 Emerging Trend Alert</span>
                 <strong class="early-alert">Gravy Train 🚂</strong>

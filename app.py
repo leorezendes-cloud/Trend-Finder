@@ -80,8 +80,9 @@ def home():
         # Preserve bookmarked legacy analysis forms without changing the new home.
         return redirect(url_for('trend_finder'), code=307)
     from fan_views import data_freshness
+    from active_trends import load_highlights
     from emerging_alerts import home_dog_alert
-    return render_template("home.html", freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent))
+    return render_template("home.html", active_highlights=load_highlights(),freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent))
 
 
 @app.route("/the-plug")

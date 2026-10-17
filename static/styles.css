@@ -1093,3 +1093,30 @@ h2 {
 
 .home-filter-form .clear-combination-link,
 .home-filter-form .clear-combination-link:visited { color: #fbbf24; font-weight: 400; -webkit-text-stroke: 0; }
+
+/* Hot Right Now: compact, centered cards with native click/keyboard expansion. */
+.hot-trends #active-trends-title { text-align: center; }
+.hot-trends-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.hot-trends .hot-trend-card,
+.hot-trends .hot-trend-card[open] {
+    border: 1px solid #ef4444;
+    padding: 12px;
+    text-align: center;
+    font-size: .95rem;
+    -webkit-text-stroke: 0;
+}
+.hot-trend-summary { display: flex; flex-direction: column; align-items: center; gap: 7px; list-style: none; cursor: pointer; }
+.hot-trend-summary::-webkit-details-marker { display: none; }
+.hot-trend-summary:focus-visible { outline: 2px solid #93c5fd; outline-offset: 5px; border-radius: 4px; }
+.hot-trends .hot-trend-title { color: #4ade80; font-size: 1rem; font-weight: 600; line-height: 1.35; }
+.hot-trend-streak { font-size: .9rem; font-weight: 500; color: #fff; }
+.hot-trend-fire { font-size: 1.4rem; line-height: 1.2; }
+.hot-trend-toggle { color: #d1d5db; font-size: .75rem; font-weight: 400; }
+.hot-trend-hide, .hot-trend-card[open] .hot-trend-show { display: none; }
+.hot-trend-card[open] .hot-trend-hide { display: inline; }
+.hot-trend-details { margin-top: 12px; padding-top: 10px; border-top: 1px solid #4b5563; }
+.hot-trend-details p { margin: 8px 0; }
+.hot-trends .hot-trend-details strong { font-weight: 600; }
+.hot-trend-date { font-size: .8rem; color: #d1d5db; }
+.hot-trends .hot-trend-games,
+.hot-trends .hot-trend-games:visited { display: inline-block; margin-top: 6px; color: #93c5fd; font-size: .85rem; font-weight: 500; -webkit-text-stroke: 0; text-underline-offset: 3px; }
