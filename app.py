@@ -26,6 +26,8 @@ from sunday_scout import scout_bp
 app.register_blueprint(scout_bp)
 from scout4.web import bp as scout4_bp
 app.register_blueprint(scout4_bp)
+from expert_beta import init_app as init_expert_beta
+init_expert_beta(app)
 
 
 @lru_cache(maxsize=128)
@@ -87,6 +89,9 @@ def home():
 
 @app.route("/the-plug")
 def plug_page():
+    if app.config.get("EXPERT_BETA_ENABLED"):
+        from expert_beta import dashboard
+        return dashboard()
     return app.view_functions['sunday_scout.sunday_scout_page']()
 
 

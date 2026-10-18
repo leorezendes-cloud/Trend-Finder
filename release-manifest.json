@@ -7,6 +7,10 @@
     "bytes": 161,
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
+  "EXPERT_BETA.md": {
+    "bytes": 14752,
+    "sha256": "ee5eacef5db79c81f2c9ca35d47f151e50f9bace0ceb54e29870176117ba6771"
+  },
   "HOSTING.md": {
     "bytes": 11324,
     "sha256": "096429d84dd79d0cc56e5555e20c852317af64ef62131516000025e694ac3566"
@@ -52,8 +56,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 40831,
-    "sha256": "fe779a7dfee11548717059526dbaa19f0cf6610a956b94438e4bef0c5da3cba2"
+    "bytes": 41103,
+    "sha256": "47a4b3404b113477b0848f9c0e5aac360b74c7d2776140d24450ae5016a5c06a"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -543,6 +547,26 @@
     "bytes": 2210,
     "sha256": "9f9658e3d3777045bfff2401900f211176a3b714b033728fc881362e060b86de"
   },
+  "expert_beta.py": {
+    "bytes": 19617,
+    "sha256": "f31e65b04f991f1f2d089218569d259a8058a115d7891ad188d020863ff67ea8"
+  },
+  "expert_beta_cli.py": {
+    "bytes": 5980,
+    "sha256": "a9c4a9ea3aef1ec41752454c6c156e879b7fe43cbc64db31df289a16d96c417f"
+  },
+  "expert_credentials.py": {
+    "bytes": 1950,
+    "sha256": "e77b8c519fa17f4fb2b331a1bd2e9935881720885dfebf85222c7f430002e304"
+  },
+  "expert_provider.py": {
+    "bytes": 9320,
+    "sha256": "b95f53cd15bcff811ae0bbfe4c16ddc638df702802143b12b95b1ea05e225496"
+  },
+  "expert_refresh.py": {
+    "bytes": 2365,
+    "sha256": "d7a9063acd553e643fbfe43efe1f7616f6e4107b9339fa1065e10333757f333e"
+  },
   "fan_views.py": {
     "bytes": 12260,
     "sha256": "3fe3e35592f28288d7f8f71c0d6690adb57fc7c32eecf87274952a6d40819ad3"
@@ -844,8 +868,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 4979,
-    "sha256": "5fe5a6d8f5bd61a31b785865c2f0b6f6ac651b2dbd26a6a1888754a220ad29af"
+    "bytes": 5229,
+    "sha256": "ef120b21c5cf9b86da689685b68ee0118d5a42c51cb86f5279899ac8fc82e1fc"
   },
   "seo.py": {
     "bytes": 7604,
@@ -1027,6 +1051,10 @@
     "bytes": 2985,
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
+  "static/expert_beta.css": {
+    "bytes": 1214,
+    "sha256": "4d57023b85eb2a34ab5cc840c25d1065977cd6aa125fca6e50e5d99dea613a91"
+  },
   "static/general_research.css": {
     "bytes": 3518,
     "sha256": "4e73f0170f6fd5682b5d152ad74023bdeaae683a68f5b207f578320c32c5edf1"
@@ -1182,6 +1210,26 @@
   "templates/conspiracy_dungeon.html": {
     "bytes": 21608,
     "sha256": "99a4e86bab74f3c3fd141faeab553cd07d7f3944f65ba894cd4f1c0f40824b16"
+  },
+  "templates/expert_archive.html": {
+    "bytes": 1044,
+    "sha256": "82fc265cbd3fe6a9fb72793e375f470b907b3c86ccc67214c62824d2b7126223"
+  },
+  "templates/expert_base.html": {
+    "bytes": 1049,
+    "sha256": "26095841dc767128a43a82b3f252f32c746f8d3ce20dc8b3d8cbf350ae82d3c6"
+  },
+  "templates/expert_dashboard.html": {
+    "bytes": 1798,
+    "sha256": "32f321c0eb115d01f7d62fa9f92e37e4cd3c9c0253981e0c09966b25a54fe180"
+  },
+  "templates/expert_game.html": {
+    "bytes": 3215,
+    "sha256": "8b06a2e7f52c13f3381d6f6b895d65500b5ae832a5330d064b5c0d28f1e8a0e7"
+  },
+  "templates/expert_game_mobile.html": {
+    "bytes": 3215,
+    "sha256": "8b06a2e7f52c13f3381d6f6b895d65500b5ae832a5330d064b5c0d28f1e8a0e7"
   },
   "templates/fantasy.html": {
     "bytes": 2518,
@@ -1342,6 +1390,22 @@
   "test_emerging_alerts.py": {
     "bytes": 2294,
     "sha256": "acbad958811b4d0e73263592e6e36dd99de26e929fa1327c22ec5fc8d37a7a08"
+  },
+  "test_expert_beta.py": {
+    "bytes": 9538,
+    "sha256": "ded26a49490291a0d57ec7339586707bc067bce1f6fc9e1651c25d25bd926a06"
+  },
+  "test_expert_editorial.py": {
+    "bytes": 5006,
+    "sha256": "0e950c7e28a787f9acc3164be1d7ad02a7409280c5eb415261577d78c9b4f5ee"
+  },
+  "test_expert_gemini.py": {
+    "bytes": 3234,
+    "sha256": "7913c7c0348bb0ccb709681b0c4ef9949f1dd7580b4f926154b2c93ba8cf518a"
+  },
+  "test_expert_provider.py": {
+    "bytes": 6166,
+    "sha256": "5f6d3f850bb659a7d5e82ad5cdda4a270cbb26db5de481f80876e5dfc77bff05"
   },
   "test_fan_views.py": {
     "bytes": 8652,
