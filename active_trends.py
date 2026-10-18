@@ -23,7 +23,7 @@ def active_highlights(rows, as_of=None):
             if not games:continue
             age=(as_of-date.fromisoformat(games[0]['gameday'])).days
             if not 0<=age<=21:continue
-            recent=games[:5]
+            recent=games[:7]
             results=[g[g['dog_side']+'_ats'] for g in recent]
             wins=results.count('Cover');losses=results.count('Loss');pushes=results.count('Push')
             streak=0
@@ -31,7 +31,7 @@ def active_highlights(rows, as_of=None):
                 if game[game['dog_side']+'_ats']!='Cover':break
                 streak+=1
             # Five actual latest games, including pushes. No cherry-picked spread ranges.
-            if streak<3 and not (len(recent)==5 and wins>=4):continue
+            if streak<5 and not (len(recent)==7 and wins>=5):continue
             record=next(r for r in report['records'] if r['label']=='Underdogs')
             output.append(dict(title=('Primetime' if prime=='yes' else 'Non-primetime')+
                                (' '+location if location else '')+' underdogs',
@@ -55,7 +55,7 @@ def active_highlights(rows, as_of=None):
         for game in games:
             if game['total_result']!=outcome:break
             streak+=1
-        if streak<3:continue
+        if streak<5:continue
         recent=games[:5]
         output.append(dict(title=qb,kind='qb_total',qb_name=qb,outcome=outcome,
                            season=season,primetime='',location='',streak=streak,
