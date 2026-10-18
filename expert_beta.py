@@ -103,7 +103,7 @@ class Store:
 
     def append(self, scout, *, expert=None, kind='development', generated_at=None):
         validate_scout(scout)
-        if kind not in ('development', 'historical_reconstruction', 'prospective'):
+        if kind not in ('development', 'historical_reconstruction', 'prospective', 'production_import'):
             raise ValueError('Unknown record kind')
         generated_at = generated_at or clock().isoformat()
         if kind == 'prospective':
@@ -112,6 +112,13 @@ class Store:
                 raise ValueError('Cannot backfill prospective forecasts')
             if not 0 <= (now-instant(scout['cutoff_utc'])).total_seconds() <= 900:
                 raise ValueError('Prospective inputs expired')
+        if kind == 'production_import':
+            source = scout.get('production_source', {})
+            seal = source.get('sealed_at_utc')
+            if generated_at != seal or not instant(scout['cutoff_utc']) <= instant(seal) < instant(scout['game']['kickoff_utc']):
+                raise ValueError('Production imports must preserve their original pregame seal')
+            if not all(re.fullmatch('[a-f0-9]{64}', source.get(key,'')) for key in ('configuration_sha256','source_sha256')):
+                raise ValueError('Production imports require archived source provenance')
         if expert is not None:
             validate_expert(expert, scout)
         record = {'schema': 1, 'kind': kind, 'generated_at': generated_at,
@@ -120,12 +127,8 @@ class Store:
         folder = self.root / 'forecasts' / identity(scout)
         folder.mkdir(parents=True, exist_ok=True)
         path = folder / (digest + '.json')
-        try:
-            with path.open('xb') as stream:
-                stream.write(canonical(record))
-        except FileExistsError:
-            if path.read_bytes() != canonical(record):
-                raise ValueError('Immutable record conflict')
+        from plug_publication import immutable
+        immutable(path, canonical(record))
         return digest
 
     def records(self):
@@ -323,6 +326,8 @@ def records_or_fail():
 
 def dashboard():
     records = records_or_fail()
+    if not records and os.environ.get('TREND_FINDAH_ENV') == 'production':
+        return current_app.view_functions['sunday_scout.sunday_scout_page']()
     latest = {identity(r['scout']): r for r in records}
     games = [public_record(r) for r in latest.values() if instant(r['scout']['game']['kickoff_utc']) > clock()]
     games.sort(key=lambda r: r['scout']['game']['kickoff_utc'])
@@ -384,7 +389,9 @@ def expert_api(season, week, matchup):
 
 
 def init_app(app):
-    app.config.setdefault('EXPERT_BETA_ENABLED', os.environ.get('TREND_FINDAH_EXPERT_BETA') == '1')
-    app.config.setdefault('EXPERT_BETA_STORE', os.environ.get('TREND_FINDAH_EXPERT_STORE', str(Path(app.instance_path)/'expert_beta')))
+    hosted = os.environ.get('TREND_FINDAH_ENV') == 'production' and os.environ.get('TREND_FINDAH_AUTO_UPDATE') == '1'
+    enabled = os.environ.get('TREND_FINDAH_EXPERT_BETA', '1' if hosted else '0') == '1'
+    app.config.setdefault('EXPERT_BETA_ENABLED', enabled)
+    app.config.setdefault('EXPERT_BETA_STORE', os.environ.get('TREND_FINDAH_EXPERT_STORE', '/var/data/expert_beta' if hosted else str(Path(app.instance_path)/'expert_beta')))
     app.config.setdefault('EXPERT_PREMIUM_MEMBER_IDS', os.environ.get('TREND_FINDAH_EXPERT_MEMBERS', '').split(','))
     app.register_blueprint(bp)

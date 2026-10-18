@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "EXPERT_BETA.md": {
-    "bytes": 14752,
-    "sha256": "ee5eacef5db79c81f2c9ca35d47f151e50f9bace0ceb54e29870176117ba6771"
+    "bytes": 16799,
+    "sha256": "922c5a12e2eb23f0255501da4d2c2e23fdac6319106e02323259a1aa5373404b"
   },
   "HOSTING.md": {
     "bytes": 11324,
@@ -552,8 +552,8 @@
     "sha256": "9f9658e3d3777045bfff2401900f211176a3b714b033728fc881362e060b86de"
   },
   "expert_beta.py": {
-    "bytes": 19617,
-    "sha256": "f31e65b04f991f1f2d089218569d259a8058a115d7891ad188d020863ff67ea8"
+    "bytes": 20416,
+    "sha256": "e1a4ca96ebf59668f256a2213827878fe2f20a88028dc3529f27f6377b9d8605"
   },
   "expert_beta_cli.py": {
     "bytes": 5980,
@@ -596,8 +596,8 @@
     "sha256": "7500f203903cb6d398d44520d4ec0444bd198a009cb82a56b80577793d4a0be8"
   },
   "hosted_updates.py": {
-    "bytes": 9314,
-    "sha256": "8ada2642ef310f9acbf98660d08a5f459d6a3f4cdf354a4d6c5c17bb23959ae2"
+    "bytes": 9793,
+    "sha256": "8aad7a6c6691de587a7ebe6fab0f93051a0f3596d52f90711260ed072b044c78"
   },
   "manual_spread_overrides.csv": {
     "bytes": 344,
@@ -650,6 +650,10 @@
   "penalty_analysis.py": {
     "bytes": 3073,
     "sha256": "9d462ed610b9b60b2f9a6099f582452c7301e6e762ef0785c7d965096a725de0"
+  },
+  "plug_publication.py": {
+    "bytes": 6839,
+    "sha256": "e28e5a92b06ab4ce2755821bbae20de58f4ebfb661211590cc4cb66917dd6e9c"
   },
   "pregame_lines.py": {
     "bytes": 3540,
@@ -884,8 +888,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 5306,
-    "sha256": "b5418cfb6756d7889f5b6831758ca3d3f9a00df3b2e0d366b797c3a13ab55450"
+    "bytes": 5334,
+    "sha256": "075fc5a0053bcca00bc84d19bc411f8349482e96115295472540b5fcd3535d1a"
   },
   "seo.py": {
     "bytes": 7607,
@@ -1486,6 +1490,10 @@
   "test_plug_always_pick.py": {
     "bytes": 4114,
     "sha256": "94898af5d563b11b5401b109a8eaba7a011c1724bbe4cc301ceeefc519ac0706"
+  },
+  "test_plug_publication.py": {
+    "bytes": 7232,
+    "sha256": "be26c55f42a3c2daf17191ec609b57698d3f27ee9c02003a80176d86fdceb01b"
   },
   "test_points_publication.py": {
     "bytes": 6919,

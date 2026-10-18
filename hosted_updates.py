@@ -99,6 +99,13 @@ def update_once(root):
         attempt('predictions', lambda: predictions(root))
     else:
         stages['predictions'] = 'skipped: upstream update failed'
+    # Publication copies only sealed approved records, even if this refresh failed.
+    # It never calls experimental engines or AI, and cannot publish review drafts.
+    from plug_publication import publish
+    attempt('Plug publication', lambda: publish(root,
+        Path(os.environ.get('TREND_FINDAH_EXPERT_STORE',
+            '/var/data/expert_beta' if os.environ.get('TREND_FINDAH_ENV')=='production' else str(root/'expert_beta'))),
+        SOURCE/'automatic_model.json'))
     def grade():
         records = [json.loads(p.read_text()) for p in (root/'data/scout4/blend/predictions').glob('*.json')]
         groups, recent, excluded = prediction_performance(records, read_csv(root/'nfl_games.csv'))
