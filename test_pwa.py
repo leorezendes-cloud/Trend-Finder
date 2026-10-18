@@ -23,6 +23,20 @@ class PwaTests(unittest.TestCase):
             self.assertIn(b'data:image/png;base64,', asset.data)
             asset.close()
 
+    def test_mascot_used_for_app_and_apple_icon(self):
+        import base64
+        source=(ROOT/'static/Images/Branding_2/trend_findah_crops_and_headers/icon_tf_mascot_large.png')
+        # The independent release retains the app copy; the original art can stay local.
+        art=(ROOT/'static/pwa/apple-touch-icon.png').read_bytes()
+        if source.exists():self.assertEqual(art,source.read_bytes())
+        for size in (192,512):
+            svg=(ROOT/f'static/pwa/icon-{size}.svg').read_text()
+            self.assertIn(base64.b64encode(art).decode(),svg)
+        from app import app
+        html=app.test_client().get('/install').text
+        self.assertIn('pwa/apple-touch-icon.png',html)
+        self.assertNotIn('already on the instructions page',html)
+
     def test_worker_scope_and_version(self):
         response = self.client.get('/service-worker.js')
         self.assertEqual(response.status_code, 200)

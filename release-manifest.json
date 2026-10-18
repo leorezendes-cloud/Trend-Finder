@@ -1119,13 +1119,17 @@
     "bytes": 589,
     "sha256": "808e9f474cb6a321a945252e4e0d22981a9b09bf2bc49402881cf04340e89f7a"
   },
+  "static/pwa/apple-touch-icon.png": {
+    "bytes": 318883,
+    "sha256": "8ad0f693aa8e5d304fe5af3ab9f62ffe07414af4d669281b8c8584e491b9ca93"
+  },
   "static/pwa/icon-192.svg": {
-    "bytes": 270646,
-    "sha256": "abdfe0b83410c086af88d1dc3ea799aeb9c599ccc0018a4ca16339a05d882bb9"
+    "bytes": 425417,
+    "sha256": "5a2a72a775bd632de5721c55169beaa41dfa3fa15b1163880b9d70ea7e4d8b05"
   },
   "static/pwa/icon-512.svg": {
-    "bytes": 270646,
-    "sha256": "156c7fb65ae0083d53e36165eed4882c3099261c427fe1e7475f52174e67a37f"
+    "bytes": 425417,
+    "sha256": "61a38ebb170723f93866a5c779ccd7dd8a8ca832d2c9890b303573d26c597490"
   },
   "static/pwa/install.css": {
     "bytes": 817,
@@ -1204,8 +1208,8 @@
     "sha256": "2c9b4506cd672840633d0c628df50760cb716d9c6eaa4ef1f5832439c0267489"
   },
   "templates/_branding_head.html": {
-    "bytes": 1866,
-    "sha256": "18b67b20831a75dadaa11297b2394b696e395fd30de4eb42d9a4b8c3f8d32c3e"
+    "bytes": 1853,
+    "sha256": "d5d48fe07c21890efeedec1993bf05b2a054355961fc23a1c7d06fb574c59aa0"
   },
   "templates/_general_combination.html": {
     "bytes": 1050,
@@ -1320,8 +1324,8 @@
     "sha256": "c21cb9420e2defa467bd5bb1965525349a13a56269c9dddd76f75895b07093a1"
   },
   "templates/install.html": {
-    "bytes": 2002,
-    "sha256": "f2f60434ad9c8dfff8ace9ea9b3f8159512a2b4ef1e30b753302c0ab2aa1ab75"
+    "bytes": 1959,
+    "sha256": "d9ff401f77b67bf233f558667c8a79bfa111422ee9475dd76da9dbf019d22cd1"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1544,8 +1548,8 @@
     "sha256": "9b744ac63b55f920c37edd7e2e600203d459b06084d3803045137ad4855044f2"
   },
   "test_pwa.py": {
-    "bytes": 2377,
-    "sha256": "c6fb46a488875ee2b1b623a070936383ef187ab348f886b95deff6c8c9c14cc8"
+    "bytes": 3143,
+    "sha256": "c115f5249abdb6e560b689c8ea9193a8c525861401e130e12b5a913584e2c980"
   },
   "test_pwa_worker.js": {
     "bytes": 3721,
