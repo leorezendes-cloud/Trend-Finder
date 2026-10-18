@@ -87,8 +87,8 @@ class PublicationTests(unittest.TestCase):
             response=app.test_client().get('/the-plug')
             self.assertEqual(response.status_code,200)
             self.assertIn('HOU @ JAX',response.text)
-            self.assertIn('The Plug ATS: Pick JAX',response.text)
-            self.assertIn('The Plug total: Pick Under',response.text)
+            self.assertIn('The Plug ATS: JAX',response.text)
+            self.assertIn('The Plug total: Under',response.text)
             self.assertNotIn('expert-card-picks',response.text)
             self.assertEqual(app.test_client().get('/the-plug/2026/6/HOU-JAX').status_code,200)
 

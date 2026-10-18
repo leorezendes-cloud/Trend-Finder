@@ -4,7 +4,7 @@
 {% set display_records = display_records|default(report.records if report is not none else []) %}
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% if seo and seo.title %}{{ seo.title }}{% else %}Trendfindah 3000 | Gravy Train{% endif %}</title><link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}">{% include '_branding_head.html' %}<link rel="stylesheet" href="{{ url_for('static',filename='general_research.css') }}"><script src="{{ url_for('static',filename='general_research.js') }}" defer></script></head>
 <body class="general-research"><div class="section-logo-title"><img src="{{ url_for('static',filename='Images/Branding/trend-findah-nav.png') }}" alt="Trendfindah 3000" width="953" height="179"></div>{% include '_site_navigation.html' %}
-<p class="section-intro">Build your own research with filters and combinations, or <a href="{{ url_for('trends_page') }}">Discover Trends</a> to explore current patterns and streaks. <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset</a></p>
+<p class="section-intro"><a href="{{ url_for('trends_page') }}">Discover Trends</a> · <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset</a></p>
 {% include '_active_trends.html' %}
 {% set labels={'game_type':'Season stage','gametime':'Kickoff time (Eastern)','temp':'Recorded temperature','wind':'Recorded wind','roof':'Stadium roof','qb_name':'QB on either team'} %}
 {% set game_types={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl','PRE':'Preseason','POST':'Postseason'} %}
@@ -25,7 +25,7 @@
 <div class="form-actions"><button type="submit" name="action" value="analyze">Analyze</button><button type="submit" name="action" value="combinations">Find combinations</button><a class="clear-button" href="{{ url_for('trend_finder') }}">Clear Filters</a></div></form>
 {% if report is not none and combinations is none %}<section class="results research-results" id="research-results"><h2>Results</h2>{% include '_general_filter_chips.html' %}
 {{ save_item('trend',manual_search_url,manual_search_title) }}
-{% if qb_coverage.unverified %}<p class="stats-note" role="status">QB data check: {{ qb_coverage.unverified }} current-season team assignments await independent starter verification{% if qb_coverage.missing %}, including {{ qb_coverage.missing }} missing names{% endif %}. QB-specific trends may be incomplete. Verified corrections are linked in the game list.</p>{% endif %}
+
 <div class="results-grid">
 <div class="stat"><span class="stat-label">Games</span><span class="stat-value">{{ report.games }}</span></div>
 <div class="stat"><span class="stat-label">Pick’ems</span><span class="stat-value">{{ report.pickems }}</span></div>

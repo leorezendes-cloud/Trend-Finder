@@ -326,12 +326,9 @@ def records_or_fail():
 
 def dashboard():
     records = records_or_fail()
-    if not records and os.environ.get('TREND_FINDAH_ENV') == 'production':
-        return current_app.view_functions['sunday_scout.sunday_scout_page']()
-    latest = {identity(r['scout']): r for r in records}
-    games = [public_record(r) for r in latest.values() if instant(r['scout']['game']['kickoff_utc']) > clock()]
-    games.sort(key=lambda r: r['scout']['game']['kickoff_utc'])
-    response = current_app.make_response(render_template('expert_dashboard.html', games=games))
+    from plug_dashboard import combined_cards
+    games, earlier_games = combined_cards(records, public_record, clock())
+    response = current_app.make_response(render_template('expert_dashboard.html', games=games, earlier_games=earlier_games))
     return private_cache(response)
 
 

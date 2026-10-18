@@ -220,7 +220,9 @@ def export_csv(cards):
 
 @scout_bp.route("/sunday-scout")
 def sunday_scout_page():
-    from flask import request
+    from flask import request, current_app, redirect, url_for
+    if current_app.config.get('EXPERT_BETA_ENABLED') and request.endpoint=='sunday_scout.sunday_scout_page' and request.args.get('download')!='1':
+        return redirect(url_for('plug_page'))
     from scout4.blend import view as blend_view
     all_blends=blend_view()
     from site_week import active_week

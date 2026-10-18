@@ -13,7 +13,7 @@
 <link rel="icon" href="{{ url_for('static', filename='Images/Branding/gravy-train-branding/favicon.ico') }}" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-32.png') }}">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='pwa/apple-touch-icon.png') }}">
-<link rel="manifest" href="{{ url_for('pwa.manifest') }}">
+<link rel="manifest" href="{{ request.script_root }}/manifest.webmanifest">
 <meta name="theme-color" content="#05080e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">

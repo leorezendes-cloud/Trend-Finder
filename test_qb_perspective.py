@@ -46,12 +46,12 @@ class QBPerspectiveTests(unittest.TestCase):
 
     def test_unknown_total_breaks_streak_and_future_results_do_not_extend_it(self):
         rows=[game(str(i),season='2026',gameday=f'2026-10-{10+i:02}',
-                   home_qb_name='Test QB',total_line='40') for i in range(4)]
+                   home_qb_name='Test QB',total_line='40') for i in range(6)]
         rows[-1]['total_line']=''
         self.assertFalse(any(t.get('qb_name')=='Test QB' for t in active_highlights(rows,date(2026,10,18))))
         rows[-1]['total_line']='40';rows[-1]['gameday']='2026-10-19'
         qb=next(t for t in active_highlights(rows,date(2026,10,18)) if t.get('qb_name')=='Test QB')
-        self.assertEqual(qb['streak'],3)
+        self.assertEqual(qb['streak'],5)
 
     def test_cache_signature_tracks_verified_qb_corrections(self):
         from active_trends import qb_source_signature
@@ -65,22 +65,22 @@ class QBPerspectiveTests(unittest.TestCase):
             (root/'data/research_qbs/verified.json').write_text('{"games":{}}')
             self.assertNotEqual(before,qb_source_signature(path))
 
-    def test_qb_search_displays_own_record_and_retains_verification_notice(self):
+    def test_qb_search_displays_own_record_without_prominent_notice(self):
         rows=[game('a',home_qb_name='Josh Allen',away_qb_name='Other'),
               game('b',away_qb_name='Josh Allen',home_qb_name='Other')]
         with patch('general_research.research_rows',return_value=rows):
             response=app.test_client().get('/trend-finder?research_view=general&run=analyze&qb_name=Josh+Allen')
         self.assertEqual(response.status_code,200)
         self.assertIn('Josh Allen — All games',response.text)
-        self.assertIn('QB data check:',response.text)
+        self.assertNotIn('QB data check:',response.text)
 
     def test_total_card_links_to_same_all_season_regular_game_scope(self):
         rows=[game(str(i),season='2026',gameday=f'2026-10-{10+i:02}',
-                   home_qb_name='Test QB',total_line='40') for i in range(3)]
+                   home_qb_name='Test QB',total_line='40') for i in range(5)]
         highlights=active_highlights(rows,date(2026,10,18))
         with app.test_request_context('/'):
             html=render_template('_active_trends.html',active_highlights=highlights)
-        self.assertIn('3 consecutive overs',html)
+        self.assertIn('5 consecutive overs',html)
         self.assertIn('Game totals in Test QB starts, across seasons.',html)
         self.assertIn('qb_name=Test+QB',html)
         self.assertIn('game_type=REG',html)

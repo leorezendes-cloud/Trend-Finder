@@ -8,8 +8,8 @@
     "sha256": "7615b9ee6c64fc39abe3bf23b9ffb45536b47e28d764e5db6066e6c7061cca74"
   },
   "EXPERT_BETA.md": {
-    "bytes": 16799,
-    "sha256": "922c5a12e2eb23f0255501da4d2c2e23fdac6319106e02323259a1aa5373404b"
+    "bytes": 17662,
+    "sha256": "0447d80369213585d847fc2e16743b5dbeee2386528456d2b5fa1b24661618e4"
   },
   "HOSTING.md": {
     "bytes": 11324,
@@ -556,8 +556,8 @@
     "sha256": "9f9658e3d3777045bfff2401900f211176a3b714b033728fc881362e060b86de"
   },
   "expert_beta.py": {
-    "bytes": 20416,
-    "sha256": "e1a4ca96ebf59668f256a2213827878fe2f20a88028dc3529f27f6377b9d8605"
+    "bytes": 20181,
+    "sha256": "37957430563c8cb6d8dbbce644702cb7d1cdd87bf1b77d4c36d1eb4e500aa77b"
   },
   "expert_beta_cli.py": {
     "bytes": 5980,
@@ -655,6 +655,10 @@
     "bytes": 3073,
     "sha256": "9d462ed610b9b60b2f9a6099f582452c7301e6e762ef0785c7d965096a725de0"
   },
+  "plug_dashboard.py": {
+    "bytes": 3789,
+    "sha256": "3595802cce4fbfb6630dd8bf400599b89d50423d02dace92b51d7015f7d6a94a"
+  },
   "plug_publication.py": {
     "bytes": 6839,
     "sha256": "e28e5a92b06ab4ce2755821bbae20de58f4ebfb661211590cc4cb66917dd6e9c"
@@ -676,8 +680,8 @@
     "sha256": "a4c0b1f4171facb27f9b1f4f873ccfd6c9fd60739d61c5b0343410accfd33380"
   },
   "public_pick_market.py": {
-    "bytes": 2299,
-    "sha256": "afec393ea2b2d843b3e69c630bc553c07a31d7c4670518e16261532a0665b929"
+    "bytes": 2369,
+    "sha256": "6c9d9a2d35d8c0fa20b578669bba44e597109a202e5f6476cb6de8a1b56b2fac"
   },
   "pwa.py": {
     "bytes": 1814,
@@ -896,8 +900,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 5381,
-    "sha256": "416c6e28088bfc9871c17cfa4af6c9337c28c18b9753c3d2613d7dd24bf7b96f"
+    "bytes": 5407,
+    "sha256": "e3e094d42f9afd66d7406f41e46853740eb77f8de9809a770f4a90b39952102d"
   },
   "seo.py": {
     "bytes": 7607,
@@ -1084,8 +1088,8 @@
     "sha256": "4598a4b07beb873402e6af7ce96ff10f9679c743771b145076abaf01a1c19c5d"
   },
   "static/expert_beta.css": {
-    "bytes": 1214,
-    "sha256": "4d57023b85eb2a34ab5cc840c25d1065977cd6aa125fca6e50e5d99dea613a91"
+    "bytes": 1377,
+    "sha256": "a567671644308e50b8ca22bcab52df157cc33804436b69732d26a24c94569c0e"
   },
   "static/general_research.css": {
     "bytes": 3874,
@@ -1192,8 +1196,8 @@
     "sha256": "9aad9c60746a87f27ce8fe89babae747a05a6d07835290ba9ee9741b328e5bef"
   },
   "sunday_scout.py": {
-    "bytes": 10956,
-    "sha256": "8ed3597214d31ef9c3a7245d6edd0257a27b95241e51f91d5e7e574a4240460c"
+    "bytes": 11181,
+    "sha256": "3d85171d477947b9a8c2f2b8cc51cd7986ef9d0091d9e80257142ac7073bd43e"
   },
   "sunday_scout_pregame_2026-10-11.csv": {
     "bytes": 1927,
@@ -1208,8 +1212,8 @@
     "sha256": "2c9b4506cd672840633d0c628df50760cb716d9c6eaa4ef1f5832439c0267489"
   },
   "templates/_branding_head.html": {
-    "bytes": 1853,
-    "sha256": "d5d48fe07c21890efeedec1993bf05b2a054355961fc23a1c7d06fb574c59aa0"
+    "bytes": 1870,
+    "sha256": "ad4e3f1d13d097fa1895a8defc2848f01566a57ecf58a8c08b3dec7bdb032f7f"
   },
   "templates/_general_combination.html": {
     "bytes": 1050,
@@ -1239,6 +1243,10 @@
     "bytes": 1823,
     "sha256": "6fb7e6ac9626f7f703a7bb857dd0a9b0790d20a63ed6c722afec862afdf6c5bb"
   },
+  "templates/_plug_actions.html": {
+    "bytes": 460,
+    "sha256": "75f2ed7aabfa2cb9c154fcb10f08a175b915ac58227bcd9594dd70f72e7e45dd"
+  },
   "templates/_primetime_nights.html": {
     "bytes": 360,
     "sha256": "d980e03b45727d81ef7555f9f4e9b10c16acad5b2cd6518159da200f9909b076"
@@ -1252,8 +1260,8 @@
     "sha256": "0be974261e53fe988f1e21ee7bcc634dfc0ca485ab2c998aa0c6108830a489fb"
   },
   "templates/_site_navigation.html": {
-    "bytes": 5164,
-    "sha256": "235cb252292b502108f5c8da44c536fafd81aaccc835003bf938b79e2e164fbe"
+    "bytes": 5224,
+    "sha256": "96a7a92d028252c6d2248ce7ed9a595aea43851fc648918092737fd896339c7b"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2791,
@@ -1276,24 +1284,24 @@
     "sha256": "99a4e86bab74f3c3fd141faeab553cd07d7f3944f65ba894cd4f1c0f40824b16"
   },
   "templates/expert_archive.html": {
-    "bytes": 1044,
-    "sha256": "82fc265cbd3fe6a9fb72793e375f470b907b3c86ccc67214c62824d2b7126223"
+    "bytes": 919,
+    "sha256": "a08a526368e4b75ca6341e0b1de0244c02c9c9a3e178d4e9816a693e92c4a52b"
   },
   "templates/expert_base.html": {
-    "bytes": 1049,
-    "sha256": "26095841dc767128a43a82b3f252f32c746f8d3ce20dc8b3d8cbf350ae82d3c6"
+    "bytes": 641,
+    "sha256": "ba7a0fb1b313fc4c30d9d3b4f465d72c86a2e6d08109831f847dd829f594ee82"
   },
   "templates/expert_dashboard.html": {
-    "bytes": 1798,
-    "sha256": "32f321c0eb115d01f7d62fa9f92e37e4cd3c9c0253981e0c09966b25a54fe180"
+    "bytes": 2712,
+    "sha256": "d4c67640acb5aa605b99796fb7d74c799a95a322e9475e417464d9468251d22d"
   },
   "templates/expert_game.html": {
-    "bytes": 3215,
-    "sha256": "8b06a2e7f52c13f3381d6f6b895d65500b5ae832a5330d064b5c0d28f1e8a0e7"
+    "bytes": 3087,
+    "sha256": "9bf4b56e15831a55c097c8c7cc9048b496e913c0da0281ea05a62a921ed6974b"
   },
   "templates/expert_game_mobile.html": {
-    "bytes": 3215,
-    "sha256": "8b06a2e7f52c13f3381d6f6b895d65500b5ae832a5330d064b5c0d28f1e8a0e7"
+    "bytes": 3087,
+    "sha256": "9bf4b56e15831a55c097c8c7cc9048b496e913c0da0281ea05a62a921ed6974b"
   },
   "templates/fantasy.html": {
     "bytes": 2518,
@@ -1312,8 +1320,8 @@
     "sha256": "b12e7a792c8f5dd156fa3aa675003402cbe6c7dc5c86c26d0b0a75755ecb7edf"
   },
   "templates/general_trends.html": {
-    "bytes": 10512,
-    "sha256": "9c21f91b10614001ee61d401a3dab7d547a4066650a8cffcec747063674e66a4"
+    "bytes": 11512,
+    "sha256": "29ba98add717444f0e3ff1ade02a4abd67990562ecf19caddd9c56d35e312662"
   },
   "templates/home.html": {
     "bytes": 5942,
@@ -1384,8 +1392,8 @@
     "sha256": "24afa73e088c09a4093f3afaccf9c4108b0b304ac4629914335fdda90abf2287"
   },
   "templates/prediction_results.html": {
-    "bytes": 2731,
-    "sha256": "2b997facae843323a6972a223796e74d61ff5129abe14b308f674d7368720682"
+    "bytes": 2866,
+    "sha256": "731b27e71c3a031c6ae74e33c0d3d93f2da723520a972d7be7587f1347f16629"
   },
   "templates/scout4_base.html": {
     "bytes": 3457,
@@ -1460,12 +1468,12 @@
     "sha256": "acbad958811b4d0e73263592e6e36dd99de26e929fa1327c22ec5fc8d37a7a08"
   },
   "test_expert_beta.py": {
-    "bytes": 9538,
-    "sha256": "ded26a49490291a0d57ec7339586707bc067bce1f6fc9e1651c25d25bd926a06"
+    "bytes": 9660,
+    "sha256": "c849b50269c2cd1a7e4ecddb6ac78011fd3a2167a44a017a4fcb9edf0378a3bf"
   },
   "test_expert_editorial.py": {
-    "bytes": 5006,
-    "sha256": "0e950c7e28a787f9acc3164be1d7ad02a7409280c5eb415261577d78c9b4f5ee"
+    "bytes": 4996,
+    "sha256": "141bc4f882be973b5d97d31f6db7a84020398d8e7bf02849c016634583727b34"
   },
   "test_expert_gemini.py": {
     "bytes": 3234,
@@ -1531,9 +1539,13 @@
     "bytes": 4114,
     "sha256": "94898af5d563b11b5401b109a8eaba7a011c1724bbe4cc301ceeefc519ac0706"
   },
+  "test_plug_dashboard.py": {
+    "bytes": 3323,
+    "sha256": "ac787cee45d6a49e15c6e14a9646a57c9534cb80c1214e22d86688be861a1d67"
+  },
   "test_plug_publication.py": {
-    "bytes": 7232,
-    "sha256": "be26c55f42a3c2daf17191ec609b57698d3f27ee9c02003a80176d86fdceb01b"
+    "bytes": 7222,
+    "sha256": "a955ddfd5b905f7091619e72c828327159d6581ac18583b78f9bb1bcb130541b"
   },
   "test_points_publication.py": {
     "bytes": 6919,
@@ -1556,8 +1568,8 @@
     "sha256": "97dc70c35d8b9704fe4e01a1d2957094236b363aebe903254051dd7773071d47"
   },
   "test_qb_perspective.py": {
-    "bytes": 5109,
-    "sha256": "10073a7c5c21ab698d5a469098e905e2bfe88bdab10928f32ad00eebe6333908"
+    "bytes": 5105,
+    "sha256": "d8f7166676f3ff440fa2e4ec3bd6d8ab8bcec5650df857fbcf3b6b4eb11f4d46"
   },
   "test_qb_verification.py": {
     "bytes": 4348,

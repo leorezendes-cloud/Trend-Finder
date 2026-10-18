@@ -110,3 +110,10 @@ Render stores the archive by default at `/var/data/expert_beta`. A custom `TREND
 Imports are labeled `production_import`, keep the original seal as `generated_at`, retain the original cutoff, source bytes, SHA-256 and configuration hash, and have immutable per-game receipts. They are not relabeled as newly generated prospective forecasts. Complete files are linked atomically after fsync; an existing differing receipt or damaged archive stops publication rather than replacing history. Repeated runs recover missing receipts without duplicate forecasts. Publication failures are reported by the existing updater; prior public records remain available. `last_publication.json` contains publication counts, exclusions and the actual check time separately from original forecast timestamps.
 
 Gemini reports are never generated, imported from review folders, or approved by this publisher. The existing explicit named-review requirement and access controls still apply. Approved reports are preserved. No automatic paid API calls are configured.
+
+
+## Combined public Plug page
+
+The main page combines saved Expert-archive forecasts with existing locked public forecasts, deduplicated by game identity. Upcoming games appear first; played/underway games appear below. Distinct older locked selections remain expandable on their matchup card. No forecast is recalculated or rewritten. `/sunday-scout` opens the combined page when Beta is enabled; its snapshot-download route remains unchanged. The archive link is on The Plug’s Record page.
+
+Current market snapshots are read separately from original prediction quotes, using existing identity, timestamp and source validation. Their capture time remains visible; old prediction-quote age no longer produces a blanket statement that market lines are unavailable. Expert entitlements remain enforced in the backend, independently of membership marketing text.

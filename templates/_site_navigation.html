@@ -1,5 +1,5 @@
 {% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
-{% set plug_section = request.endpoint in ['plug_page','market_page'] or request.endpoint == 'sunday_scout.sunday_scout_page' or ((request.endpoint or '').startswith('scout4.') or (request.endpoint or '').startswith('fans.')) %}
+{% set plug_section = request.endpoint in ['plug_page','market_page'] or request.endpoint == 'sunday_scout.sunday_scout_page' or ((request.endpoint or '').startswith('scout4.') or (request.endpoint or '').startswith('fans.') or (request.endpoint or '').startswith('expert_beta.')) %}
 <div class="site-header">
 {% if g.member %}
 <a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
@@ -15,7 +15,7 @@
     <a href="{{ url_for('plug_page') }}" {% if plug_section %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png') }}" alt=""><span>The Plug</span></a>
     <a href="{{ url_for('conspiracy_dungeon_page') }}" {% if request.endpoint == 'conspiracy_dungeon_page' %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png') }}" alt=""><span>Conspiracy Dungeon</span></a>
     {% if config.get('METHODOLOGY_ENABLED') %}<a href="{{ url_for('methodology_page') }}">About &amp; Methodology</a>{% endif %}
-    <a href="{{ url_for('pwa.install') }}">Install app</a>
+    <a href="{{ request.script_root }}/install">Install app</a>
     <a href="{{ url_for('membership.feedback_page',page=request.path) }}">Beta Feedback</a>
     {% if g.is_owner %}<a href="{{ url_for('member_picks.admin') }}">Manage Weekly Picks</a><a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a><a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>{% endif %}
     {% if g.member %}
