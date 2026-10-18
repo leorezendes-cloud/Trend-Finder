@@ -88,6 +88,15 @@ class SiteSectionsTests(unittest.TestCase):
         self.assertEqual(self.client.get('/sunday-scout').status_code, 200)
         self.assertEqual(self.client.get('/sunday').status_code, 200)
 
+    def test_market_retains_plug_navigation_and_current_page(self):
+        response=self.client.get('/market')
+        self.assertEqual(response.status_code,200)
+        parser=NavigationParser();parser.feed(response.text)
+        for path in ['/the-plug','/market','/scout4/teams','/scout4/players']:
+            self.assertIn(path,parser.links['The Plug navigation'])
+        self.assertIn('<a href="/market" aria-current="page">Spreads &amp; Totals</a>',response.text)
+        self.assertIn('aria-current="page"><img class="menu-logo" src="/static/Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png"',response.text)
+
     def test_collapsed_menu_and_page_specific_backdrops(self):
         for path, art in [('/', 'trend-findah-background.png'), ('/trend-finder', 'trend-findah-background.png'), ('/the-plug', 'the-plug-full.png'), ('/conspiracy-dungeon', 'conspiracy-dungeon-full.png')]:
             html = self.client.get(path).text

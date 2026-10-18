@@ -1,13 +1,15 @@
 {% if active_highlights %}
 <section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title">
 <h2 id="active-trends-title">Hot Right Now</h2>
-<p>Current-season underdog ATS trends across all spreads. Select a trend for its record and matching games.</p>
+<p>Current-season underdog ATS trends and quarterback game-total streaks. Select a trend for its record and matching games.</p>
 <div class="trend-card-grid hot-trends-grid">
 {% for trend in active_highlights %}
 <details class="trend-card compact-card hot-trend-card">
 <summary class="hot-trend-summary">
-<span class="hot-trend-title">{{ trend.title|capitalize }}</span>
-{% if trend.streak > 0 %}
+<span class="hot-trend-title">{{ trend.title if trend.kind == "qb_total" else trend.title|capitalize }}</span>
+{% if trend.kind == 'qb_total' %}
+<span class="hot-trend-streak">{{ trend.streak }} consecutive {{ trend.outcome|lower }}s</span>
+{% elif trend.streak > 0 %}
 <span class="hot-trend-streak">{{ trend.streak }} consecutive ATS {{ 'win' if trend.streak == 1 else 'wins' }}</span>
 {% else %}
 <span class="hot-trend-streak">{{ trend.wins }} ATS wins in the last {{ trend.sample }} games</span>
@@ -16,10 +18,17 @@
 <span class="hot-trend-toggle"><span class="hot-trend-show">Show details</span><span class="hot-trend-hide">Hide details</span></span>
 </summary>
 <div class="hot-trend-details">
+{% if trend.kind == 'qb_total' %}
+<p>Game totals in {{ trend.qb_name }} starts, across seasons.</p>
+<p>{{ trend.season }} season: <strong>{{ trend.totals.over }} overs · {{ trend.totals.under }} unders · {{ trend.totals.push }} pushes</strong></p>
+<p class="hot-trend-date">Last played {{ trend.latest }}</p>
+<a class="hot-trend-games" href="{{ url_for('trend_finder',research_view='general',run='analyze',qb_name=trend.qb_name,game_type='REG',show_games='1',_anchor='matching-games') }}">See games in this trend →</a>
+{% else %}
 {% if trend.streak < 5 %}<p>Latest {{ trend.sample }} games: <strong>{{ trend.wins }}–{{ trend.losses }}–{{ trend.pushes }} ATS</strong></p>{% endif %}
 <p>{{ trend.season }} season: <strong>{{ trend.record.covers }}–{{ trend.record.ats_losses }}–{{ trend.record.pushes }} ATS</strong></p>
 <p class="hot-trend-date">Last played {{ trend.latest }} · Records include pushes.</p>
 <a class="hot-trend-games" href="{{ url_for('trend_finder',research_view='general',run='analyze',season=trend.season,research_role='underdog',research_location=trend.location,primetime=trend.primetime,game_type='REG',show_games='1',_anchor='matching-games') }}">See games in this trend →</a>
+{% endif %}
 </div>
 </details>
 {% endfor %}

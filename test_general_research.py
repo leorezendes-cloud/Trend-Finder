@@ -156,7 +156,7 @@ class GeneralResearchTests(unittest.TestCase):
         html=client.get(query).text
         labels=re.findall(r'<span class="stat-label">(.*?)</span>',html)
         expected=['Games','Pick’ems','Over','Under']
-        for team in ('Home team','Away team','Favorites','Dogs'):
+        for team in ('Dogs',):
             expected.extend(team+' '+metric for metric in ('ATS','cover %','straight up','SU %'))
         self.assertEqual(labels,expected)
         fragment=client.get(query+'&evidence=1&evidence_metric=Underdogs+ATS').text
@@ -224,7 +224,8 @@ class GeneralResearchTests(unittest.TestCase):
         old=client.get('/trend-finder?research_view=general&run=analyze&season=2005').text
         self.assertIn('Home team ATS',old)
         discovery=client.get('/trend-finder?research_view=general&run=analyze&season=2005&action=combinations').text
-        self.assertIn('No combinations meet',discovery)
+        self.assertIn('outside the 2022–2026 combination discovery window',discovery)
+        self.assertNotIn('Season (2022, 2005)',discovery)
 
     def test_overlap_groups_coach_qb_variants_without_combining_records(self):
         from general_research import group_overlapping_trends
@@ -243,5 +244,34 @@ class GeneralResearchTests(unittest.TestCase):
         self.assertEqual(chief['related'][0]['sample'],41)
         self.assertEqual(chief['related'][0]['conditions'],qb['conditions'])
         self.assertEqual(len(group_overlapping_trends([lead,qb,other],limit=2)),2)
+
+    def test_outside_discovery_window_keeps_filters_and_offers_analysis(self):
+        import re
+        from html import unescape
+        from urllib.parse import urlsplit,parse_qs
+        client=app.test_client()
+        for selection,label in [('season=2020','Season 2020'),('season_mode=range&start_season=2000&end_season=2020','Seasons 2000–2020')]:
+            with patch('general_research.find_combinations',side_effect=AssertionError('Unsupported discovery range searched')):
+                response=client.get('/trend-finder?research_view=general&run=analyze&action=combinations&research_team=BUF&'+selection)
+            self.assertEqual(response.status_code,200)
+            self.assertIn(label,response.text)
+            self.assertIn('outside the 2022–2026 combination discovery window',response.text)
+            self.assertNotIn('No combinations meet the minimum',response.text)
+            self.assertNotIn('Season (2022, 2020)',response.text)
+            target=unescape(re.search(r'<a href="([^"]+)">Analyze your selected seasons</a>',response.text).group(1))
+            params=parse_qs(urlsplit(target).query)
+            self.assertEqual(params['action'],['analyze'])
+            self.assertEqual(params['research_team'],['BUF'])
+            self.assertEqual(client.get(target).status_code,200)
+
+    def test_overlapping_discovery_range_still_searches_supported_seasons(self):
+        with patch('general_research.find_combinations',return_value=[]) as search:
+            response=app.test_client().get('/trend-finder?research_view=general&run=analyze&action=combinations&season_mode=range&start_season=2020&end_season=2024')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('Seasons 2022–2024',response.text)
+        self.assertNotIn('outside the 2022–2026',response.text)
+        rows=search.call_args.args[0]
+        self.assertTrue(rows)
+        self.assertTrue(all(2022<=int(row['season'])<=2024 for row in rows))
 
 if __name__=='__main__':unittest.main()

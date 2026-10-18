@@ -576,6 +576,7 @@ def group_early_watch(watchlist, games):
 
 @app.route("/trends")
 def trends_page():
+    from active_trends import load_highlights
     current = scan_basic_trends(season='2026')
     historical = scan_basic_trends(season=(1999, 2025))
     comparisons = compare_trends(current, historical)
@@ -698,14 +699,15 @@ def trends_page():
             trend["active_streak"] = len(streak)
 
     watchlist = group_early_watch(
-        watchlist, games
+        [trend for trend in watchlist if trend['spread'] == 'All Spreads'], games
     )
 
+    broad_comparisons = [trend for trend in comparisons if trend['spread'] == 'All Spreads']
     hot_trends = scan_hot_performance(
-        games, comparisons, window=5
+        games, broad_comparisons, window=5
     )
     hot_groups = group_hot_trends(hot_trends)
-    active_streaks = scan_active_streaks(games,comparisons, min_streak=3)
+    active_streaks = scan_active_streaks(games,broad_comparisons, min_streak=3)
     streak_groups = group_active_streaks(active_streaks)
     with open(game_file, newline='') as source:
         upcoming_rows = list(csv.DictReader(source))
@@ -720,7 +722,7 @@ def trends_page():
             source=next((r for r in upcoming_rows if f"{r['away_team']} at {r['home_team']}"==game['matchup']),{})
             upcoming_previews.append(dict(game,trend=best,line_source=source.get('public_line_source'),line_time=source.get('public_line_time')))
     return render_template(
-        'trends.html',
+        'trends.html',active_highlights=load_highlights(),
         upcoming_previews=upcoming_previews,
         comparisons=comparisons,
         watchlist=watchlist,

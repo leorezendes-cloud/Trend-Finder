@@ -5,4 +5,4 @@
 <details class="combination-evidence" data-evidence-url="{{ trend.evidence_url }}"><summary>Verify games →</summary><div class="evidence-content" aria-live="polite"></div></details>
 {{ save_item('trend',trend.url,trend.label ~ ' · ' ~ (trend.conditions|display_trend_filters)) }}
 {% endmacro %}
-{% macro metrics(trend) %}<span class="combination-metrics"><span class="combination-record">{{ trend.label }}: {{ trend.wins }}–{{ trend.losses }}–{{ trend.pushes }}</span><span class="combination-win-rate">{{ '%.2f'|format(trend.rate) }}%</span></span>{% endmacro %}
+{% macro metrics(trend) %}<span class="combination-metrics"><span class="combination-record">{{ trend.label }}: {{ trend.wins }}–{{ trend.losses }}–{{ trend.pushes }}{% if trend.streak %}<small class="current-streak">{{ trend.streak }}</small>{% endif %}</span><span class="combination-win-rate">{{ '%.2f'|format(trend.rate) }}%</span></span>{% endmacro %}

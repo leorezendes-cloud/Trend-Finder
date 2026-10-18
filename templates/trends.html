@@ -15,6 +15,7 @@
         <h1>Discover Trends</h1>
 
         {% include '_site_navigation.html' %}
+        {% include '_active_trends.html' %}
         <section class="discovery-upcoming">
             <h2>Coming up within 7 days</h2>
             <p class="discovery-note">Historical underdog patterns matched to scheduled games and saved market lines. These percentages describe past results.</p>
@@ -243,7 +244,7 @@
 
         </section>
         <details class="discovery-section">
-            <summary>Recent hot performance</summary>
+            <summary>Recent hot performance · all spreads</summary>
             <h2>🔥 Hot Performance ({{ hot_groups|length }} Groups)</h2>
             <div class="trend-card-grid">
 
@@ -297,7 +298,7 @@
                         </span>
 
                         <span class="compact-related">
-                            {{ group["related"]|length }} Related Ranges
+                            {{ group["related"]|length }} Related patterns
                         </span>
 
                     </div>
@@ -365,7 +366,7 @@
                         </span>
 
                         <span class="compact-related">
-                            {{ group["related"]|length }} Related Ranges
+                            {{ group["related"]|length }} Related patterns
                         </span>
 
                     </div>
@@ -440,7 +441,7 @@
 
                 <span class="compact-related">
                     {{ trend.current_sample }} Games |
-                    {{ trend.related|length }} Related Ranges
+                    {{ trend.related|length }} Related patterns
                 </span>
 
             </div>

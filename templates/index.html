@@ -289,10 +289,10 @@
                 <span class="stat-value">{{ summary.trend_signal }}</span>
             </div>
         </div>
-        <details class="home-matching-games" style="margin-top: 24px; color: black; -webkit-text-stroke: 0;">
-            <summary style="cursor: pointer; font-size: 20px; font-weight: bold;">View games involved ({{ summary.games }})</summary>
+        <details open class="home-matching-games" style="margin-top: 24px; color: black; -webkit-text-stroke: 0;">
+            <summary style="cursor: pointer; font-size: 20px; font-weight: bold;">Games Involved in Trend ({{ summary.games }})</summary>
             {% for group in matchup_groups %}
-            <details style="margin-top: 12px;">
+            <details{% if loop.first %} open{% endif %} style="margin-top: 12px;">
                 <summary style="cursor: pointer; font-weight: bold;">{{ group.games|length }} {% if is_primetime is sameas true %}primetime {% elif is_primetime is sameas false %}non-primetime {% endif %}games from {{ group.year }}</summary>
                 <div class="evidence-table-scroll" style="background: #1f2937; border-radius: 8px;">
                     <table class="evidence-table">

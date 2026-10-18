@@ -122,6 +122,55 @@ class PageTests(unittest.TestCase):
                     with self.subTest(path=path):
                         self.assertEqual(self.client.get(path).status_code, 200)
 
+    def test_home_away_splits_keep_cutoff_and_neutral_games_separate(self):
+        from flask import render_template
+        schedule = [game('away', 1, a=10, h=20),
+                    game('home', 2, away='B', home='A', a=14, h=30),
+                    game('neutral', 3, a=7, h=7, location='Neutral'),
+                    game('future', 4, a=99)]
+        schedule[0].update(spread_line='3', total_line='30')
+        records = team_records(schedule, [feed('away', 1, 'A', 8)], 2025, 4)
+        view = dict(season=2025, before_week=4, venue='Home', years=[2025],
+                    cache_years=[], records=records, teams=['A', 'B'],
+                    players=[], positions=[], manifest=None, diagnostics={}, coverage_week=3)
+        with patch('scout4.web.view_data', return_value=view), patch(
+                'scout4.web.render_template', wraps=render_template) as render:
+            response = self.client.get('/scout4/teams?team=A&venue=Home')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Home and away splits', response.get_data(as_text=True))
+        self.assertIn('A home and away statistics', response.get_data(as_text=True))
+        card = render.call_args.kwargs['cards'][0]
+        self.assertEqual(card['summary']['games'], 1)
+        splits = {split['venue']: split['summary'] for split in card['venue_splits']}
+        self.assertEqual(set(splits), {'Home', 'Away', 'Neutral'})
+        self.assertEqual([splits[v]['games'] for v in ('Home', 'Away', 'Neutral')], [1, 1, 1])
+        self.assertEqual(splits['Home']['wins'], 1)
+        self.assertEqual(splits['Away']['losses'], 1)
+        self.assertEqual(splits['Neutral']['ties'], 1)
+        self.assertEqual(splits['Home']['metrics']['points_for']['value'], 30)
+        self.assertEqual(splits['Away']['metrics']['points_for']['value'], 10)
+        self.assertIsNone(splits['Home']['metrics']['passing_epa']['value'])
+        self.assertEqual(splits['Away']['metrics']['passing_epa']['value'], 8)
+        self.assertEqual(splits['Away']['markets']['ats_l'], 1)
+        self.assertEqual(splits['Away']['markets']['total_push'], 1)
+        self.assertEqual(splits['Home']['markets']['ats_known'], 0)
+
+    def test_home_away_splits_render_when_one_venue_has_no_games(self):
+        from flask import render_template
+        records = team_records([game('away', 1)], [], 2025, 2)
+        view = dict(season=2025, before_week=2, venue='All', years=[2025],
+                    cache_years=[], records=records, teams=['A', 'B'],
+                    players=[], positions=[], manifest=None, diagnostics={}, coverage_week=1)
+        with patch('scout4.web.view_data', return_value=view), patch(
+                'scout4.web.render_template', wraps=render_template) as render:
+            response = self.client.get('/scout4/teams?team=A')
+        self.assertEqual(response.status_code, 200)
+        splits = render.call_args.kwargs['cards'][0]['venue_splits']
+        self.assertEqual([s['venue'] for s in splits], ['Home', 'Away'])
+        self.assertEqual(splits[0]['summary']['games'], 0)
+        self.assertIsNone(splits[0]['summary']['metrics']['points_for']['value'])
+        self.assertIn('—', response.get_data(as_text=True))
+
     def test_invalid_filters(self):
         for query in ['season=oops','before_week=0','venue=Road','team=XXX','season=9999']:
             self.assertEqual(self.client.get('/scout4/teams?'+query).status_code,400)

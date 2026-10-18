@@ -22,7 +22,7 @@ def initialize_data(source, target):
             temporary = path.with_suffix('.persistent-link')
             temporary.symlink_to(saved)
             temporary.replace(path)
-    for relative in ('data/scout4', 'data/member_lines', 'logs'):
+    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'logs'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
             continue
@@ -80,6 +80,8 @@ def update_once(root):
         Path(os.environ.get('TREND_FINDAH_DATABASE', '/var/data/members.sqlite3')).resolve().parent/'account-backups'))
     finals.BACKUPS = root / 'backups'
     attempt('finals', lambda: finals.main(['--apply','--season',str(season),'--file',str(root/'nfl_games.csv')]))
+    from qb_verification import refresh_qbs
+    attempt('QB verification', lambda: refresh_qbs(root,season))
     attempt('stats', lambda: collect(season, root/'data/scout4'))
     def capture():
         if quotes(root) != 0:

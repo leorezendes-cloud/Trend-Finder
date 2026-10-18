@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if seo and seo.title %}{{ seo.title }}{% else %}Sunday Results | Gravy Train{% endif %}</title>
+    <title>{% if seo and seo.title %}{{ seo.title }}{% else %}Weekly Game Results | Gravy Train{% endif %}</title>
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
@@ -14,7 +14,8 @@
 <body>
      {% include '_site_navigation.html' %}
 
-<h1>🏈 Weekly Results 🚂</h1>
+<h1>🏈 Weekly Game Results 🚂</h1>
+<p class="weekly-results-note">See final scores and individual matchup outcomes for the selected week, including saved Plug picks. For prediction accuracy and win–loss–push records by model, visit <a href="{{ url_for('fans.prediction_results') }}">The Plug’s Record</a>.</p>
 {% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
 {% if latest_completed_week is not none and latest_completed_week!=selected_week %}<p><a class="archive-link" href="{{ url_for('sunday_results_page',week=latest_completed_week) }}">View Week {{ latest_completed_week }} completed results →</a></p>{% endif %}
 <form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>

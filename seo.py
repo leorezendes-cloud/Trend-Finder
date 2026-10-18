@@ -12,12 +12,12 @@ PAGES={
  'sunday_page':('/sunday','Upcoming NFL Matchups & Spreads | Gravy Train','Review this week’s NFL matchups, saved spreads, kickoff times, and historical underdog trends. Compare teams, challenge The Plug, and see how you do this week.'),
  'market_page':('/market','Upcoming NFL Spreads & Totals | Gravy Train','See the latest verified saved NFL spreads and over/under totals for upcoming games, with quote timestamps and links to team comparisons.'),
  'plug_page':('/the-plug','NFL ATS & Over/Under Picks | The Plug | Gravy Train','See The Plug’s locked NFL ATS and over/under predictions, projected scores, original lines, and recorded results, powered by Scout 4.0.'),
- 'sunday_results_page':('/sunday-results','Weekly NFL Scores & ATS Pick Results | Gravy Train','Review weekly NFL final scores, teams’ ATS records as underdogs, matchup outcomes, and The Plug’s locked ATS and over/under pick results.'),
+ 'sunday_results_page':('/sunday-results','Weekly Game Results | NFL Scores | Gravy Train','Review weekly NFL final scores, teams’ ATS records as underdogs, matchup outcomes, and The Plug’s locked ATS and over/under pick results.'),
  'scout4.teams_page':('/scout4/teams','NFL Team Stats & Comparisons | Gravy Train','Compare NFL team offense and defense, ATS records, recent form, passing, rushing, and game logs using saved statistics.'),
  'scout4.players_page':('/scout4/players','NFL Player Stats & Leaders | Gravy Train','Explore NFL player statistics, passing, rushing, receiving, and defensive leaders with season and team filters.'),
  'scout4.ratings_page':('/scout4/ratings','NFL Team Ratings | Scout 4.0 | Gravy Train','Explore NFL team ratings and matchup research powered by Scout 4.0, with saved data and transparent model information.'),
  'fans.fantasy':('/fantasy','NFL Fantasy Football PPR Stats | Gravy Train','Explore NFL fantasy football PPR statistics and player performance using saved season data.'),
- 'fans.prediction_results':('/predictions/results','NFL Prediction Results & Pick Records | Gravy Train','Track The Plug’s NFL ATS and over/under results. Picks are saved before kickoff and graded against their original lines and verified final scores.'),
+ 'fans.prediction_results':('/predictions/results','The Plug’s Record | NFL Prediction Results | Gravy Train','Track The Plug’s NFL ATS and over/under results. Picks are saved before kickoff and graded against their original lines and verified final scores.'),
  'conspiracy_dungeon_page':('/conspiracy-dungeon','NFL Conspiracies & Betting Patterns | Conspiracy Dungeon','Explore NFL conspiracy theories through public betting splits, line movement, referee trends, and unusual game results in the Conspiracy Dungeon.'),
 }
 ALIASES={'sunday_scout.sunday_scout_page':'plug_page'}

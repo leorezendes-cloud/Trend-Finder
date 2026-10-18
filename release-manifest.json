@@ -43,6 +43,10 @@
     "bytes": 6198,
     "sha256": "ffc4ada9a8b5789b63484a09a8a9f04358cc4732923f729602b3ddc357f7b463"
   },
+  "active_trends.py": {
+    "bytes": 4646,
+    "sha256": "a4cc2a3eed6645e92310a9da9e6e5ac69e7d27024204eabf935080796378e332"
+  },
   "anomaly_analysis.py": {
     "bytes": 8461,
     "sha256": "39a84e69ce77c15e244aa8e92cdb6d6f8826e6cb3dd4ace6d449a89ae3b06f65"
@@ -56,8 +60,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 41103,
-    "sha256": "47a4b3404b113477b0848f9c0e5aac360b74c7d2776140d24450ae5016a5c06a"
+    "bytes": 41347,
+    "sha256": "63d8bc3555ffe64d566e1ee63089bc3ab2f03058119f6407370c1fded1a0f6d9"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -576,8 +580,8 @@
     "sha256": "7f8fe98392e98c1877be22ff9ca77e1e76cb881dbbbf306197dd6d2af0533dad"
   },
   "general_research.py": {
-    "bytes": 18591,
-    "sha256": "b238ee096aa3f80956ef810528f70d62f65be1e49772e362dcb3ed4f8800db2a"
+    "bytes": 22929,
+    "sha256": "a3064f37d28c9deb140f0417b8ea143fbfed0c8458bf74af02a56e6604ea9be1"
   },
   "graded_sunday_pregame_2026-10-11_3.csv": {
     "bytes": 1686,
@@ -592,8 +596,8 @@
     "sha256": "7500f203903cb6d398d44520d4ec0444bd198a009cb82a56b80577793d4a0be8"
   },
   "hosted_updates.py": {
-    "bytes": 9184,
-    "sha256": "25d10583799f18446dad472d7ccb24c2a766bc0b468a73a89f6f7888909e9d30"
+    "bytes": 9314,
+    "sha256": "8ada2642ef310f9acbf98660d08a5f459d6a3f4cdf354a4d6c5c17bb23959ae2"
   },
   "manual_spread_overrides.csv": {
     "bytes": 344,
@@ -667,6 +671,10 @@
     "bytes": 2299,
     "sha256": "afec393ea2b2d843b3e69c630bc553c07a31d7c4670518e16261532a0665b929"
   },
+  "qb_verification.py": {
+    "bytes": 4027,
+    "sha256": "c7b49b76e82e9d8b0126f5cf40aa2d20853db7c5418b7436e6b617935909ce58"
+  },
   "referee_assignments.csv": {
     "bytes": 3688,
     "sha256": "f8b7e573da64d6d311e4f5976e58f3bb47284a412e71b209ef4b5fa1004f6dbc"
@@ -678,6 +686,14 @@
   "requirements.txt": {
     "bytes": 63,
     "sha256": "244f83792eaef88ebc74538f7f17b31b719aeb08b922061347e6605c8b045148"
+  },
+  "research_qb_corrections.csv": {
+    "bytes": 835,
+    "sha256": "60ba3b71fbefff0cb992050fed7557f418e82611bbdea5e22682dad563fcaab5"
+  },
+  "research_qbs.py": {
+    "bytes": 2513,
+    "sha256": "1a16af3cc009de6693018f1e1bf16cf7aa1a9ab06b5e31d592863294a81fb861"
   },
   "reverse_line_analysis.py": {
     "bytes": 4093,
@@ -752,8 +768,8 @@
     "sha256": "2b55bef15d4e9bde02de2e1f73493562a7da183bf37fabfd335cdd725a987c30"
   },
   "scout4/web.py": {
-    "bytes": 14581,
-    "sha256": "93795d72e2f2f7b245308cfcbca52806752a81a8d7e0ba08597db5b30c4ea50f"
+    "bytes": 15176,
+    "sha256": "1a5c06c2ae87ee23e45cf663d6cbc9a9b1686cb26f4d225309e1fa2ea0f399b1"
   },
   "scout_kickoff_2026_10_12_model_comparison.csv": {
     "bytes": 272,
@@ -868,12 +884,12 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 5229,
-    "sha256": "ef120b21c5cf9b86da689685b68ee0118d5a42c51cb86f5279899ac8fc82e1fc"
+    "bytes": 5306,
+    "sha256": "b5418cfb6756d7889f5b6831758ca3d3f9a00df3b2e0d366b797c3a13ab55450"
   },
   "seo.py": {
-    "bytes": 7604,
-    "sha256": "a0f047b3e204ebacd56d0204bb9608d2dff6839435cea7e21edf9b9104f99459"
+    "bytes": 7607,
+    "sha256": "959bc3596743d2c3bad8d2375754a2bff779c868a35d771d03e3bb24251d6e77"
   },
   "site_health.py": {
     "bytes": 1448,
@@ -1027,6 +1043,10 @@
     "bytes": 803043,
     "sha256": "9af877b93fa668b3e0a763a66e30b7fecf3a78806325fb65edb7b6957d769e56"
   },
+  "static/Images/Branding/trend-findah-3000-nav-transparent.png": {
+    "bytes": 263994,
+    "sha256": "2b22bdde130324976485a8318da2722fa8854b48c897f7698bd9169e906b1b61"
+  },
   "static/Images/Branding/trend-findah-background.png": {
     "bytes": 1793788,
     "sha256": "f588f637d3fc3a4ebd99e1f23ce9f4f0d21a2e812bca70810312ed949bb9a1aa"
@@ -1056,8 +1076,8 @@
     "sha256": "4d57023b85eb2a34ab5cc840c25d1065977cd6aa125fca6e50e5d99dea613a91"
   },
   "static/general_research.css": {
-    "bytes": 3518,
-    "sha256": "4e73f0170f6fd5682b5d152ad74023bdeaae683a68f5b207f578320c32c5edf1"
+    "bytes": 3874,
+    "sha256": "d7a24373fb5c45b0c2cf40a2643b856b875273a742ba576841d1e6a19b950f1a"
   },
   "static/general_research.js": {
     "bytes": 2019,
@@ -1143,21 +1163,25 @@
     "bytes": 311,
     "sha256": "621b2c37a239ec32e3215c4742fdd5413ccd34dcd780ed30c1819d78ec50da33"
   },
+  "templates/_active_trends.html": {
+    "bytes": 2515,
+    "sha256": "2c9b4506cd672840633d0c628df50760cb716d9c6eaa4ef1f5832439c0267489"
+  },
   "templates/_branding_head.html": {
     "bytes": 1563,
     "sha256": "083388d640006a315e5cc48eb595df79161ccb9261d5e80e7b97da58275ecda0"
   },
   "templates/_general_combination.html": {
-    "bytes": 962,
-    "sha256": "2dea103cd01add6370d1d8c2b418d4437ef886c2ff4b199451536ebd6d99aeb7"
+    "bytes": 1050,
+    "sha256": "7cf7953c28d645ad0cbd03f2f2a8965fdfd6854eab10a1b115712ab3b330faa3"
   },
   "templates/_general_filter_chips.html": {
     "bytes": 328,
     "sha256": "5be3efa6bf7f4caee88548c9675d63e83130d07faad12ef61ac8730cca6fde46"
   },
   "templates/_general_games.html": {
-    "bytes": 1993,
-    "sha256": "d09a6d6e2f725358934cb65dadd22aaafd32801b1649b4518ade42c628979ba6"
+    "bytes": 2329,
+    "sha256": "af54c710596bfa3f4f4531e9c8d1e32e594dc08d6e2de212d52b219fd6c3823d"
   },
   "templates/_home_sections.html": {
     "bytes": 1231,
@@ -1188,8 +1212,8 @@
     "sha256": "0be974261e53fe988f1e21ee7bcc634dfc0ca485ab2c998aa0c6108830a489fb"
   },
   "templates/_site_navigation.html": {
-    "bytes": 4883,
-    "sha256": "e1690514c304932f3e59aebafffe1a93a53469bf2eba5887e09b7a129a32528e"
+    "bytes": 5105,
+    "sha256": "04a861d6ce29df0b8689f71172284ec3eea85e141f8eacb7bc8278768f08e779"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2791,
@@ -1256,8 +1280,8 @@
     "sha256": "76bdba8e59a3e2ad498edefa0840cab3bbc93395ffb1637205f50b469ad2152b"
   },
   "templates/index.html": {
-    "bytes": 28456,
-    "sha256": "93885eea0f9eef49c06e43c9f294ca881d1083c144487dae08c982e5400f90c6"
+    "bytes": 28500,
+    "sha256": "c21cb9420e2defa467bd5bb1965525349a13a56269c9dddd76f75895b07093a1"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1316,8 +1340,8 @@
     "sha256": "24afa73e088c09a4093f3afaccf9c4108b0b304ac4629914335fdda90abf2287"
   },
   "templates/prediction_results.html": {
-    "bytes": 2503,
-    "sha256": "44d4c61bcbd0ae5d436e20d438150894164aaca207559c90e1d2a22117d18c69"
+    "bytes": 2731,
+    "sha256": "2b997facae843323a6972a223796e74d61ff5129abe14b308f674d7368720682"
   },
   "templates/scout4_base.html": {
     "bytes": 3457,
@@ -1340,20 +1364,20 @@
     "sha256": "847336147c27d56d38df5a95ee7d400ff743939591140c089dda2a5559a5450e"
   },
   "templates/scout4_teams.html": {
-    "bytes": 5586,
-    "sha256": "eee0c74d995792ca7b927b7f2d7da31eb9631dc71442af3e9163cd9816bd48e3"
+    "bytes": 7828,
+    "sha256": "20cd80d4d33c940aa31db1a7f91ef7e6a6de32427608b5769711acdac0985d00"
   },
   "templates/sunday.html": {
     "bytes": 8914,
     "sha256": "ba163050e22ba0467cf02ca3d68daaceefcab0c916255a7cdb318499e4273c4e"
   },
   "templates/sunday_results.html": {
-    "bytes": 7614,
-    "sha256": "54f6c391a0b09123f943a4903fffabdc48741f5b0a2feb4b0a587075dcd13597"
+    "bytes": 7905,
+    "sha256": "ded41e8f418fe51423fa4a4bd8b370d9383de7b69b4f02de7456c58683f8ebd7"
   },
   "templates/sunday_scout.html": {
-    "bytes": 10691,
-    "sha256": "c57f0293c6f596ae6a1b6b4347214cd218be84165382eaf4a592c2b98f4aab2f"
+    "bytes": 10696,
+    "sha256": "d052eab99d8f9fa0a31531d582049eaa3e2042883cac4d17520b12a8678559b1"
   },
   "templates/trend_details.html": {
     "bytes": 4130,
@@ -1364,8 +1388,8 @@
     "sha256": "8f783e10d127f013f49245b3750999a220487e4cadfdde27a9fdafdcbea4df91"
   },
   "templates/trends.html": {
-    "bytes": 19552,
-    "sha256": "f19cecd4461ce52057c96fba3af8f3ba08e9aabbc38c9025fd553dd55293f77b"
+    "bytes": 19617,
+    "sha256": "5720c0128494e336a5350ef0bb28b9e4c9eef230cb382579341e6c547d7e5988"
   },
   "test_coast_filters.py": {
     "bytes": 1556,
@@ -1412,8 +1436,8 @@
     "sha256": "8b913d095c7f709082b7bb0cabb789e608503845e3c53660cbad33b60f1e4928"
   },
   "test_general_research.py": {
-    "bytes": 16082,
-    "sha256": "f5c8e9f788a4c724fddd93736c2801b345446feb9116cacbd920dc702406f5e3"
+    "bytes": 18112,
+    "sha256": "0b4b2e5d4869bfb5228cad07c10f8d1578507cf1254f9155b655c20216c461ca"
   },
   "test_hosted_updates.py": {
     "bytes": 2653,
@@ -1475,6 +1499,22 @@
     "bytes": 2411,
     "sha256": "9b744ac63b55f920c37edd7e2e600203d459b06084d3803045137ad4855044f2"
   },
+  "test_qb_perspective.py": {
+    "bytes": 5109,
+    "sha256": "10073a7c5c21ab698d5a469098e905e2bfe88bdab10928f32ad00eebe6333908"
+  },
+  "test_qb_verification.py": {
+    "bytes": 4348,
+    "sha256": "26b4290922cb5b784a96b4870505dd0d07d64f29bdc2cfe06f2ca722a887bb62"
+  },
+  "test_research_qbs.py": {
+    "bytes": 3996,
+    "sha256": "7a7130b0a24d3c4452fab2122fc4bba38936274855dce6ea8c7b7272a989bfbd"
+  },
+  "test_scout4.py": {
+    "bytes": 10398,
+    "sha256": "3b934cba6dc9e87ef5de016ef540c2653670ff44a6147fa2e44f33235c693e77"
+  },
   "test_seo.py": {
     "bytes": 4444,
     "sha256": "1a783279ec1c00faec77ef38aba44f931f2d456236e18041883c65387a4db5ad"
@@ -1492,8 +1532,8 @@
     "sha256": "c659a6af9ad81d9d3ca14436a86c0e05377b19a88f342c7407ce4a513b7a274d"
   },
   "test_site_sections.py": {
-    "bytes": 5649,
-    "sha256": "ca5a198d363d22412090c893b60cbe8e330bce133473756c1ee924b99b77c7a5"
+    "bytes": 6282,
+    "sha256": "e88a9010c5d1ef5f81e33d078534f78b73db083263eb3938c2548f2d9e9183e1"
   },
   "test_trend_cache.py": {
     "bytes": 1361,

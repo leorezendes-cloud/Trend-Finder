@@ -3,9 +3,10 @@ import csv
 import math
 from primetime_nights import normalize_nights, matches_nights, NIGHT_OPTIONS
 from flask import abort, render_template, request, url_for
-from trend_finder_2 import CSV_FILTER_FIELDS, matches_csv_filters, get_csv_filter_options, game_file
+from trend_finder_2 import CSV_FILTER_FIELDS, matches_csv_filters, get_csv_filter_options, game_file, canonical_name
 from pregame_lines import effective_rows
 from saved_trends import manual_trend_title
+from research_qbs import research_rows, qb_coverage
 from trend_filter_groups import GROUP_OPTIONS, matches_group
 
 SPREADS = {'':'All spreads', 'pickem':'Pick’em', 'short':'Up to 3 points', 'medium':'Over 3 through 7 points', 'large':'Over 7 through 10 points', 'double':'Over 10 points'}
@@ -28,19 +29,37 @@ def finite(value):
 
 
 def counter(label):
-    return {'label':label,'games':0,'wins':0,'losses':0,'ties':0,'covers':0,'ats_losses':0,'pushes':0,'ats_missing':0}
+    return {'label':label,'games':0,'wins':0,'losses':0,'ties':0,'covers':0,'ats_losses':0,'pushes':0,'ats_missing':0,'_history':[]}
 
 
-def add_record(record, margin, edge):
+def add_record(record, margin, edge, order=()):
+    record['_history'].append((order, None if edge is None else 'Cover' if edge>0 else 'Loss' if edge<0 else 'Push', 'Win' if margin>0 else 'Loss' if margin<0 else 'Tie'))
     record['games'] += 1
     record['wins' if margin>0 else 'losses' if margin<0 else 'ties'] += 1
     record['ats_missing' if edge is None else 'covers' if edge>0 else 'ats_losses' if edge<0 else 'pushes'] += 1
+
+
+def result_streak(results):
+    """Newest first. Pushes/ties interrupt a winning/losing streak; gaps stay unknown."""
+    if not results:return 'No completed games'
+    result=results[0]
+    if result in (None,'Unavailable'):return 'Latest result unavailable'
+    count=0
+    for value in results:
+        if value!=result:break
+        count+=1
+    words={'Cover':('cover','covers'),'Loss':('loss','losses'),'Win':('win','wins'),
+           'Push':('push','pushes'),'Tie':('tie','ties'),'Over':('over','overs'),'Under':('under','unders')}
+    noun=words[result][count!=1]
+    return f'{count} straight {noun}'
 
 
 def research_games(rows, *, season=None, filters=None, team='', role='all', primetime='', location='', spread_size='', primetime_nights=()):
     if role not in ROLES or primetime not in ('','yes','no'):raise ValueError('Invalid research role or time')
     if location not in ('','home','away') or spread_size not in SPREADS:raise ValueError('Invalid location or spread band')
     records={key:counter(label) for key,label in [('home','Home teams'),('away','Away teams'),('favorite','Favorites'),('underdog','Underdogs')]}
+    qb=(filters or {}).get('qb_name')
+    if qb:records['qb']=counter(qb+' — '+(location.title() if location else 'All games'))
     if team:records['selected']=counter(team+' — '+ROLES[role])
     totals={'over':0,'under':0,'push':0,'missing':0};matches=[];pickems=0;missing_lines=0
     for g in rows:
@@ -48,6 +67,11 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
         if season is not None and (not season[0]<=year<=season[1] if isinstance(season,tuple) else year!=int(season)):continue
         if not matches_csv_filters(g,filters or {}):continue
         if primetime_nights and not matches_nights(g,primetime_nights):continue
+        # Schedule home/away designations do not make a neutral site a road game.
+        neutral=str(g.get('location','')).lower()=='neutral' or g.get('game_type')=='SB'
+        side_filters=any((filters or {}).get(side+'_'+field)
+                         for side in ('home','away') for field in ('team','qb_name','coach'))
+        if neutral and (location or role in ('home','away') or side_filters):continue
         away,home=finite(g.get('away_score')),finite(g.get('home_score'))
         if away is None or home is None:continue
         if primetime:
@@ -63,17 +87,24 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
         if role in ('underdog','favorite'):
             subject=dog if role=='underdog' else favorite
             if subject is None or (team and subject!=selected):continue
-        subject=selected or (dog if role=='underdog' else favorite if role=='favorite' else None)
+        qb=(filters or {}).get('qb_name')
+        qb_side=next((side for side in ('away','home') if qb and canonical_name(g.get(side+'_qb_name'))==canonical_name(qb)),None)
+        if qb and qb_side is None:continue
+        if qb_side and location and qb_side!=location:continue
+        if qb_side and role in ('underdog','favorite') and qb_side!=(dog if role=='underdog' else favorite):continue
+        if qb_side and role in ('home','away') and qb_side!=role:continue
+        subject=selected or (dog if role=='underdog' else favorite if role=='favorite' else role if role in ('home','away') else qb_side or location or None)
         if location and subject and subject!=location:continue
         if location and role in ('favorite','underdog') and subject is None:continue
         if not spread_matches(spread,spread_size):continue
         away_margin=away-home;away_edge=None if spread is None else away_margin+spread
-        add_record(records['away'],away_margin,away_edge)
-        add_record(records['home'],-away_margin,None if away_edge is None else -away_edge)
-        for key,side in [('favorite',favorite),('underdog',dog),('selected',selected)]:
+        order=(g.get('gameday',''),g.get('gametime',''),g['game_id'])
+        add_record(records['away'],away_margin,away_edge,order)
+        add_record(records['home'],-away_margin,None if away_edge is None else -away_edge,order)
+        for key,side in [('favorite',favorite),('underdog',dog),('selected',selected),('qb',qb_side)]:
             if side is not None and key in records:
                 sign=1 if side=='away' else -1
-                add_record(records[key],sign*away_margin,None if away_edge is None else sign*away_edge)
+                add_record(records[key],sign*away_margin,None if away_edge is None else sign*away_edge,order)
         if spread is None:missing_lines+=1
         elif spread==0:pickems+=1
         if total_line is None:totals['missing']+=1;total_result='Unavailable'
@@ -83,14 +114,18 @@ def research_games(rows, *, season=None, filters=None, team='', role='all', prim
         matches.append({**g,'away_score':away,'home_score':home,'spread':spread,'total':total_line,'total_result':total_result,
                         'away_ats':('Unavailable' if away_edge is None else 'Cover' if away_edge>0 else 'Loss' if away_edge<0 else 'Push'),
                         'home_ats':('Unavailable' if away_edge is None else 'Cover' if away_edge<0 else 'Loss' if away_edge>0 else 'Push'),
-                        'dog_side':dog,'favorite_side':favorite,'selected_side':selected,
+                        'dog_side':dog,'favorite_side':favorite,'selected_side':selected or qb_side,'focus_side':subject,'qb_side':qb_side,
                         'favorite':g[favorite+'_team'] if favorite else None,'underdog':g[dog+'_team'] if dog else None})
     for record in records.values():
+        history=sorted(record.pop('_history'),reverse=True)
+        record['ats_streak']=result_streak([item[1] for item in history])
+        record['su_streak']=result_streak([item[2] for item in history])
         decisions=record['covers']+record['ats_losses'];su=record['wins']+record['losses']
         record['ats_rate']=100*record['covers']/decisions if decisions else None
         record['su_rate']=100*record['wins']/su if su else None
     matches.sort(key=lambda g:(g.get('gameday',''),g.get('gametime',''),g['game_id']),reverse=True)
-    return {'games':len(matches),'records':([records['selected']] if team else [])+[v for k,v in records.items() if k!='selected'],'totals':totals,'pickems':pickems,'missing_lines':missing_lines,'matches':matches}
+    total_streak=result_streak([g['total_result'] for g in matches])
+    return {'total_streak':total_streak,'games':len(matches),'records':([records['selected']] if team else [])+[v for k,v in records.items() if k!='selected'],'totals':totals,'pickems':pickems,'missing_lines':missing_lines,'matches':matches}
 
 
 def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, current_rows=None):
@@ -108,6 +143,8 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, curren
         features=[]
         for field in ('game_type','home_team','away_team','roof','surface',
                       'home_coach','away_coach','home_qb_name','away_qb_name','referee'):
+            neutral=str(g.get('location','')).lower()=='neutral' or g.get('game_type')=='SB'
+            if neutral and field.startswith(('home_','away_')):continue
             if g.get(field) and (field not in names or g[field] in names[field]):features.append((field,g[field]))
         for field in ('gametime','temp','wind'):
             features.extend((field,value) for value in GROUP_OPTIONS[field] if matches_group(g,field,value))
@@ -140,6 +177,7 @@ def find_combinations(rows, *, team='', role='all', minimum=10, limit=30, curren
                     rate=wins/n;z=1.96
                     lower=(rate+z*z/(2*n)-z*((rate*(1-rate)+z*z/(4*n))/n)**.5)/(1+z*z/n)
                     candidate={'conditions':dict(key),'label':label,'wins':wins,'losses':losses,'pushes':pushes,
+                               'streak': next((r['ats_streak'] for r in records if r['label']+' ATS'==label), report['total_streak']),
                                'rate':100*rate,'sample':len(subset),'score':lower,'membership':tuple(sorted(subset)),'recent_games':recent}
                     evaluated[(key,label)]=candidate
                     if best is None or lower>best['score']:best=candidate
@@ -184,7 +222,7 @@ def render_general(form, games_page=False):
     except ValueError:abort(400,description='Choose valid primetime nights.')
     if form.get('research_role') in ('home','away') and not form.get('research_location'):
         form['research_location']=form['research_role'];form['research_role']='all'
-    with open(game_file,newline='') as source:rows=list(effective_rows(csv.DictReader(source),game_file))
+    with open(game_file,newline='') as source:rows=research_rows(effective_rows(csv.DictReader(source),game_file),game_file)
     options=get_csv_filter_options()
     for field in ('gametime','temp','wind'):options[field]=list(GROUP_OPTIONS[field])
     years=sorted({int(g['season']) for g in rows},reverse=True)
@@ -206,10 +244,13 @@ def render_general(form, games_page=False):
             season=(low,high)
     except (ValueError,TypeError):abort(400,description='Choose a valid season or season range.')
     discovery_window=(max(years)-4,max(years))
+    outside_discovery_window=False
     if form.get('action')=='combinations':
         low,high=season if isinstance(season,tuple) else (season,season) if season is not None else discovery_window
-        season=(max(low,discovery_window[0]),min(high,discovery_window[1]))
-        if season[0]<=season[1]:
+        effective_season=(max(low,discovery_window[0]),min(high,discovery_window[1]))
+        outside_discovery_window=effective_season[0]>effective_season[1]
+        if not outside_discovery_window:
+            season=effective_season
             if mode=='single' and form.get('season'):
                 season=int(form['season'])
             else:
@@ -222,11 +263,16 @@ def render_general(form, games_page=False):
         if value:
             if value not in options[field]:abort(400,description='Choose a listed value for '+field.replace('_',' ')+'.')
             filters[field]=value
+    if not form.get('evidence_metric'):
+        form['evidence_metric']=('Underdogs ATS' if role=='underdog' else 'Favorites ATS' if role=='favorite'
+                                 else filters['qb_name']+' ATS' if filters.get('qb_name') else team+' ATS' if team else 'Home teams ATS' if location=='home'
+                                 else 'Away teams ATS' if location=='away' else 'Selected QB ATS' if filters.get('qb_name')
+                                 else 'Both teams ATS')
     analyze=request.method=='POST' or form.get('run')=='analyze'
     report=research_games(rows,season=season,filters=filters,team=team,role=role,primetime=prime,location=location,spread_size=spread_size,primetime_nights=form.get('primetime_nights','').split(',') if form.get('primetime_nights') else ()) if analyze else None
     combinations=None
     if analyze and form.get('action')=='combinations':
-        combinations=find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role,current_rows=rows)
+        combinations=[] if outside_discovery_window else find_combinations(report['matches'],team=team,role=location if not team and role=='all' and location else role,current_rows=rows)
     try:page=max(1,int(form.get('page',1)))
     except ValueError:abort(400,description='Invalid results page.')
     pages=max(1,(report['games']+99)//100) if report else 1;page=min(page,pages)
@@ -261,10 +307,19 @@ def render_general(form, games_page=False):
     page_url=lambda number:url_for('general_trend_games' if games_page else 'trend_finder',**selection,page=number,evidence='1' if form.get('evidence')=='1' else None,evidence_metric=form.get('evidence_metric') or None,_anchor=None if form.get('evidence')=='1' else 'matching-games')
     if form.get('evidence')=='1':
         if report is None:abort(400)
-        return render_template('_general_games.html',games=report['matches'][:10],total=report['games'],page=1,pages=1,page_url=page_url,evidence_metric=form.get('evidence_metric',''),preview=True,all_games_url=url_for('general_trend_games',**selection,evidence_metric=form.get('evidence_metric') or None))
+        return render_template('_general_games.html',selected_qb=filters.get('qb_name'),games=report['matches'][:10],total=report['games'],page=1,pages=1,page_url=page_url,evidence_metric=form.get('evidence_metric',''),preview=True,all_games_url=url_for('general_trend_games',**selection,evidence_metric=form.get('evidence_metric') or None))
     if games_page:
-        return render_template('general_trend_games.html',games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''),filter_chips=filter_chips,back_url=target)
-    return render_template('general_trends.html',options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
+        return render_template('general_trend_games.html',selected_qb=filters.get('qb_name'),games=report['matches'][(page-1)*100:page*100],total=report['games'],page=page,pages=pages,page_url=page_url,evidence_metric=form.get('evidence_metric',''),filter_chips=filter_chips,back_url=target)
+    display_records=report['records'] if report else []
+    if report:
+        if filters.get('qb_name'):display_records=[r for r in display_records if r['label'].startswith(filters['qb_name']+' — ')]
+        elif team:display_records=display_records[:1]
+        elif role!='all' or location:
+            wanted={'underdog':'Underdogs','favorite':'Favorites','home':'Home teams','away':'Away teams'}[role if role!='all' else location]
+            display_records=[record for record in display_records if record['label']==wanted]
+    from active_trends import load_highlights
+    return render_template('general_trends.html',selected_qb=filters.get('qb_name'),qb_coverage=qb_coverage(rows),display_records=display_records,active_highlights=load_highlights() if not analyze else [],options=options,years=years,teams=teams,roles={key:ROLES[key] for key in ('all','favorite','underdog')},form=form,
+        outside_discovery_window=outside_discovery_window,analysis_url=url_for('trend_finder',**selection,action='analyze'),
         discovery_window=discovery_window,night_options=NIGHT_OPTIONS,filter_chips=filter_chips,spreads=SPREADS,combinations=combinations,primary=primary,advanced=[f for f in allowed if f not in primary and f!='spread_line'],report=report,
         games=report['matches'][(page-1)*100:page*100] if report else [],page=page,pages=pages,page_url=page_url,
         has_advanced=any(form.get(f) for f in allowed if f not in primary),

@@ -80,7 +80,14 @@ def teams_page():
     for code in selected_teams:
         baseline = [r for r in v['records'] if r['team'] == code]
         games = filtered(baseline, v['venue'])
+        venues = ['Home', 'Away']
+        if any(row['venue'] == 'Neutral' for row in baseline):
+            venues.append('Neutral')
+        venue_splits = [{'venue': venue,
+                         'summary': summarize_team(filtered(baseline, venue), baseline)}
+                        for venue in venues]
         cards.append({'team': code, 'games': games, 'summary': summarize_team(games, baseline),
+                      'venue_splits': venue_splits,
                       'defense': defense.get(code, {}), 'form': recent_form(games)})
     matchup = []
     if team and opponent and team != opponent:
