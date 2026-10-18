@@ -66,3 +66,14 @@ class DashboardTests(ExpertBetaTests):
         self.assertIn('plug-upcoming-picks',html)
         self.assertIn('the-plug-nav.png',html)
         self.assertNotIn('Save The Plug',html)
+
+    def test_movement_context_visible_without_changing_archive(self):
+        before={p:p.read_bytes() for p in self.root.glob('forecasts/**/*.json')}
+        move=dict(team='HOU',sportsbook='Fixture',original_line=3,latest_line=-4,
+            original_observed=clock().isoformat(),latest_observed=clock().isoformat(),
+            movement=-7,original_edge=6,latest_edge=-1,unsupported=True,material=True,stale=False,closed=False)
+        with patch('plug_dashboard.compare_line',return_value=move):
+            html=self.client.get('/the-plug').text
+        self.assertIn('Original pick is no longer supported',html)
+        self.assertIn('Latest saved:',html)
+        for p,b in before.items():self.assertEqual(p.read_bytes(),b)

@@ -23,7 +23,7 @@
           const freshCards = [...documentCopy.querySelectorAll('.expert-grid > .expert-card')];
           for (const card of document.querySelectorAll('.expert-grid > .expert-card')) {
             const fresh = freshCards.find(c => c.dataset.away === card.dataset.away && c.dataset.home === card.dataset.home && c.dataset.kickoff === card.dataset.kickoff);
-            if (fresh) card.querySelector('.plug-public-market').replaceChildren(...fresh.querySelector('.plug-public-market').childNodes);
+            if (fresh) card.querySelector('.plug-market-context').replaceChildren(...fresh.querySelector('.plug-market-context').childNodes);
           }
           marketChecked = Date.now();
         }

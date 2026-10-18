@@ -1,0 +1,7 @@
+{% set move=item.line_movement %}{% if move %}<section class="plug-line-movement expert-notice">
+<strong>{{ move.team }} · {{ move.sportsbook }} line update</strong>
+<p>Original: {{ move.team }} {{ '%+g'|format(move.original_line) }} · {{ move.original_observed|eastern_time }}<br>Latest saved: {{ move.team }} {{ '%+g'|format(move.latest_line) }} · {{ move.latest_observed|eastern_time }}<br>Movement: {{ '%+g'|format(move.movement) }} points</p>
+<p>ATS edge for {{ move.team }} using the original projected score: {{ '%+.2f'|format(move.original_edge) }} → {{ '%+.2f'|format(move.latest_edge) }} points.</p>
+{% if move.stale %}<p>Latest observation is over 24 hours old; current support is unconfirmed.</p>{% elif move.closed %}<p>Pregame comparison; kickoff has passed.</p>{% endif %}
+{% if move.unsupported %}<strong>Original pick is no longer supported at this observed line{{ ' (projected ATS push)' if move.latest_edge==0 else '' }}.</strong>{% elif move.material %}<strong>Material line change. Original projection still supports {{ move.team }} at this observed spread.</strong>{% endif %}
+</section>{% endif %}

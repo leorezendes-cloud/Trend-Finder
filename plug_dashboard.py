@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import url_for
 from expert_beta import instant
 from public_pick_market import matchup_public_market
+from plug_line_movement import compare_line
 
 ROOT = Path(__file__).resolve().parent
 
@@ -15,8 +16,10 @@ def legacy_records():
 
 def combined_cards(records, render_record, now):
     items = {}
+    originals = {}
     for record in records:
         item = render_record(record)
+        originals[record['scout']['game']['game_id']] = record['scout']
         item['locked_quotes'] = record['scout'].get('quotes', {})
         item['show_scores'] = True
         items[record['scout']['game']['game_id']] = item
@@ -59,6 +62,7 @@ def combined_cards(records, render_record, now):
         future = instant(game['kickoff_utc']) > now
         item['upcoming'] = future
         item['market'] = None
+        item['line_movement'] = compare_line(originals[game['game_id']], ROOT, now, rows=market_rows) if future and game['game_id'] in originals else None
         if future:
             market = matchup_public_market(ROOT,dict(game_id=game['game_id'],away=game['away_team'],
                 home=game['home_team'],kickoff_at=game['kickoff_utc']),now,rows=market_rows)

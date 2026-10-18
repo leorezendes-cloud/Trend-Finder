@@ -300,6 +300,8 @@ def public_record(record, detail=False):
               'assessment': expert.get('summary') if expert else None}
     if detail:
         result['original_scout'] = record['scout']
+        from plug_line_movement import compare_line
+        result['line_movement'] = compare_line(record['scout'], Path(__file__).resolve().parent, clock())
         result['grading'] = results_for(record)
     return result
 
