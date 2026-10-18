@@ -136,9 +136,31 @@ def update_once(root):
     return status
 
 
+def refresh_game_day_market(root, now=None):
+    """Refresh public splits on game days without running models or AI."""
+    from scheduled_ats_capture import upcoming_games, run
+    from zoneinfo import ZoneInfo
+    now = now or datetime.now(timezone.utc)
+    today = now.astimezone(ZoneInfo('America/New_York')).date().isoformat()
+    import csv
+    with (Path(root)/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as source:
+        ids = {row['game_id'] for row in csv.DictReader(source) if row.get('gameday') == today}
+    if ids.intersection(upcoming_games(Path(root), now)):
+        if run(Path(root), now) != 0:
+            raise RuntimeError('Game-day market refresh failed')
+
+
 def start_scheduler():
     if os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         return
+    def market_loop():
+        while True:
+            try:
+                subprocess.run([sys.executable,str(SOURCE/'hosted_updates.py'),'--game-day-market'],
+                    cwd=SOURCE,timeout=180,check=True,env={**os.environ,'POLARS_MAX_THREADS':'1'})
+            except (OSError,subprocess.SubprocessError) as error:
+                print(f'Game-day market refresh failed: {type(error).__name__}',flush=True)
+            threading.Event().wait(900)
     def weekly_loop():
         # Separate timer: a long statistics update cannot delay the 8 a.m. check.
         from site_week import week_window
@@ -179,12 +201,13 @@ def start_scheduler():
                 path.write_text(json.dumps({'finished':datetime.now(timezone.utc).isoformat(),
                     'state':'needs attention','stages':{'worker':type(error).__name__}}))
             threading.Event().wait(21600)
+    threading.Thread(target=market_loop,name='game-day-market',daemon=True).start()
     threading.Thread(target=weekly_loop,name='automatic-weekly-lines',daemon=True).start()
     threading.Thread(target=loop, name='automatic-data-updates', daemon=True).start()
 
 
 if __name__ == '__main__':
-    if sys.argv[1:] != ['--once'] or os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
+    if sys.argv[1:] not in (['--once'], ['--game-day-market']) or os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         raise SystemExit('This updater is enabled only through hosted automatic updates')
     import fcntl
     root=Path('/var/data/site-data')
@@ -193,4 +216,4 @@ if __name__ == '__main__':
             fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError:
             raise SystemExit(0)
-        update_once(root)
+        (refresh_game_day_market if sys.argv[1:] == ['--game-day-market'] else update_once)(root)

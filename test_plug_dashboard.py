@@ -55,3 +55,14 @@ class DashboardTests(ExpertBetaTests):
         self.assertIn('Prediction archive',html)
         for phrase in ('not prospective validation','No independent validation','proven betting edge'):
             self.assertNotIn(phrase,html)
+
+    def test_public_money_mobile_branding_and_no_export_button(self):
+        market={'markets':[{'key':'Moneyline','label':'SU winner','source':'Fixture',
+            'captured':clock().isoformat(),'sides':[{'name':'HOU','line':None,'money':62,'bets':55}]}]}
+        with patch('plug_dashboard.matchup_public_market',return_value=market):
+            html=self.client.get('/the-plug').text
+        self.assertIn('62% money',html)
+        self.assertIn('55% picks',html)
+        self.assertIn('plug-upcoming-picks',html)
+        self.assertIn('the-plug-nav.png',html)
+        self.assertNotIn('Save The Plug',html)

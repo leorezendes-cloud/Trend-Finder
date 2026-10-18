@@ -52,16 +52,17 @@ def combined_cards(records, render_record, now):
     path=ROOT/'public_money_snapshots.csv'
     if wanted and path.exists():
         with path.open(newline='',encoding='utf-8-sig') as source:
-            market_rows=[r for r in csv.DictReader(source) if r.get('game_id') in wanted and r.get('market') in ('Spread','Total')]
+            market_rows=[r for r in csv.DictReader(source) if r.get('game_id') in wanted and r.get('market') in ('Moneyline','Spread','Total')]
 
     for item in items.values():
         game = item['scout']['game']
         future = instant(game['kickoff_utc']) > now
+        item['upcoming'] = future
         item['market'] = None
         if future:
             market = matchup_public_market(ROOT,dict(game_id=game['game_id'],away=game['away_team'],
                 home=game['home_team'],kickoff_at=game['kickoff_utc']),now,rows=market_rows)
-            item['market'] = [m for m in market['markets'] if m['key'] in ('Spread','Total') and m['sides']]
+            item['market'] = [m for m in market['markets'] if m['key'] in ('Moneyline','Spread','Total') and m['sides']]
         (upcoming if future else earlier).append(item)
     upcoming.sort(key=lambda item:item['scout']['game']['kickoff_utc'])
     earlier.sort(key=lambda item:item['scout']['game']['kickoff_utc'],reverse=True)

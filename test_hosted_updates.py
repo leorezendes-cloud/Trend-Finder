@@ -43,4 +43,18 @@ class HostedUpdatesTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):configure_persistent_data()
 
 
+    def test_game_day_capture_skips_other_days_and_never_runs_model(self):
+        from hosted_updates import refresh_game_day_market
+        from datetime import datetime,timezone
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'nfl_games.csv').write_text('game_id,gameday\ngame,2026-10-18\n')
+            with patch('scheduled_ats_capture.upcoming_games',return_value=['game']), patch('scheduled_ats_capture.run',return_value=0) as capture, patch('scout4.blend.run') as model:
+                refresh_game_day_market(root,datetime(2026,10,18,15,tzinfo=timezone.utc))
+                capture.assert_called_once()
+                refresh_game_day_market(root,datetime(2026,10,19,15,tzinfo=timezone.utc))
+                capture.assert_called_once()
+                model.assert_not_called()
+
+
 if __name__=='__main__':unittest.main()
