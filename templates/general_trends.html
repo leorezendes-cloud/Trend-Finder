@@ -1,5 +1,7 @@
 {% from '_general_combination.html' import conditions, evidence, metrics with context %}
 {% from '_save_watchlist.html' import save_item with context %}
+{% set qb_coverage = qb_coverage|default({'unverified': 0, 'missing': 0}) %}
+{% set display_records = display_records|default(report.records if report is not none else []) %}
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% if seo and seo.title %}{{ seo.title }}{% else %}Trendfindah 3000 | Gravy Train{% endif %}</title><link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}">{% include '_branding_head.html' %}<link rel="stylesheet" href="{{ url_for('static',filename='general_research.css') }}"><script src="{{ url_for('static',filename='general_research.js') }}" defer></script></head>
 <body class="general-research"><div class="section-logo-title"><img src="{{ url_for('static',filename='Images/Branding/trend-findah-nav.png') }}" alt="Trendfindah 3000" width="953" height="179"></div>{% include '_site_navigation.html' %}
 <p class="section-intro">Build your own research with filters and combinations, or <a href="{{ url_for('trends_page') }}">Discover Trends</a> to explore current patterns and streaks. <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset</a></p>
