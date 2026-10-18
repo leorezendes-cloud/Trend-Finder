@@ -2,7 +2,7 @@
     let installPrompt;
     const button = document.getElementById('install-app-button');
     const status = document.getElementById('install-app-status');
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    const standalone = Boolean(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone);
     if (standalone && status) status.textContent = 'You’re already using Trendfindah as an app.';
     if (standalone && button) button.hidden = true;
     window.addEventListener('beforeinstallprompt', event => {

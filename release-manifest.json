@@ -1132,8 +1132,8 @@
     "sha256": "9fc0a0c687a714613bb3ae982081d23148ce65169c7dce67c3980fd8a81c7e82"
   },
   "static/pwa/install.js": {
-    "bytes": 2469,
-    "sha256": "67c1c969ead0fac8cfc439ed639da1ebd66943931eae484afcc02162e08d8fc5"
+    "bytes": 2478,
+    "sha256": "0eefd8121f7e1e24acceff9370df386cf9e428f2dbb557069ef47958d3359214"
   },
   "static/pwa/offline.html": {
     "bytes": 655,
