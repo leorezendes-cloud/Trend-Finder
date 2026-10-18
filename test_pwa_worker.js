@@ -34,3 +34,26 @@ const vm = require('node:vm');
  assert.equal(saved.length, 3);
  console.log('PWA offline cache and live/account network checks passed.');
 })().catch(error => {console.error(error); process.exitCode = 1;});
+
+/* Safari help stays actionable; other pages retain the browser's native prompt. */
+(async () => {
+ function setup(hasButton=true) {
+  const listeners={}, clicks={}; let moved=false, focused=false;
+  const button={hidden:false,addEventListener:(name,fn)=>clicks[name]=fn};
+  const status={textContent:''};
+  const steps={scrollIntoView:()=>{moved=true;},focus:()=>{focused=true;}};
+  const window={matchMedia:()=>({matches:false}),addEventListener:(name,fn)=>listeners[name]=fn,isSecureContext:false};
+  vm.runInNewContext(fs.readFileSync('static/pwa/install.js','utf8'),{window,navigator:{},document:{getElementById:id=>({'install-app-button':hasButton?button:null,'install-app-status':status,'installation-steps':steps}[id])}});
+  return {listeners,clicks,button,status,moved:()=>moved&&focused};
+ }
+ const safari=setup();await safari.clicks.click();
+ assert.match(safari.status.textContent,/Share button → Add to Home Screen/);
+ assert.equal(safari.button.hidden,false);assert.equal(safari.moved(),true);
+ let prevented=false;const home=setup(false);
+ home.listeners.beforeinstallprompt({preventDefault:()=>{prevented=true;}});
+ assert.equal(prevented,false);
+ let prompted=false;const chrome=setup();
+ chrome.listeners.beforeinstallprompt({preventDefault:()=>{},prompt:async()=>{prompted=true;},userChoice:Promise.resolve({outcome:'dismissed'})});
+ await chrome.clicks.click();assert.equal(prompted,true);assert.equal(chrome.button.hidden,false);
+ console.log('Safari installation help and native prompt checks passed.');
+})();

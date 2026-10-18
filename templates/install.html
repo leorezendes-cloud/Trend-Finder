@@ -11,9 +11,11 @@
 <h1>Add Trendfindah to your phone</h1>
 <p>Open scores, trends and The Plug straight from your home screen.</p>
 <p id="install-app-status" role="status">Free to install. Internet access is needed for current data and account features.</p>
-<button id="install-app-button" type="button" hidden>Install Trendfindah</button>
-<section><h2>iPhone or iPad</h2><ol><li>Open <a href="https://trendfindah.com/install">trendfindah.com/install</a> in Safari.</li><li>Tap Share, then <strong>Add to Home Screen</strong>.</li><li>If shown, turn on <strong>Open as Web App</strong>, then tap <strong>Add</strong>.</li></ol></section>
+<button id="install-app-button" type="button" aria-controls="installation-steps">How to add to Home Screen</button>
+<div id="installation-steps" tabindex="-1">
+<section><h2>iPhone or iPad · Safari</h2><p>Use Safari’s controls to install. The links on this website cannot open the installation dialog.</p><ol><li>You’re already on the instructions page. Tap Safari’s <strong>Share</strong> button (a square with an arrow pointing up). If it is hidden, tap Safari’s <strong>More (…)</strong> menu to find Share.</li><li>Scroll through the Share menu and tap <strong>Add to Home Screen</strong>.</li><li>If shown, turn on <strong>Open as Web App</strong>, then tap <strong>Add</strong>.</li></ol></section>
 <section><h2>Android</h2><ol><li>Open Trendfindah in Chrome.</li><li>Tap <strong>Install Trendfindah</strong> above if available, or open Chrome’s menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Confirm installation and open Trendfindah from its icon.</li></ol></section>
+</div>
 <p>Your existing account works in the app. You may need to sign in again the first time.</p>
 <p><a href="{{ url_for('home') }}">Back to home →</a></p>
 </main></body></html>

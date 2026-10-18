@@ -39,6 +39,9 @@ class PwaTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         for text in ('manifest.webmanifest', 'Add to Home Screen', 'Install app', 'apple-mobile-web-app-capable'):
             self.assertIn(text, response.get_data(as_text=True))
+        self.assertIn('How to add to Home Screen',response.text)
+        self.assertNotIn('href="https://trendfindah.com/install"',response.text)
+        self.assertNotIn('type="button" hidden',response.text)
 
     def test_release_contains_install_support(self):
         from scripts.prepare_release import release_files

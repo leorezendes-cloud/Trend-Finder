@@ -1132,8 +1132,8 @@
     "sha256": "9fc0a0c687a714613bb3ae982081d23148ce65169c7dce67c3980fd8a81c7e82"
   },
   "static/pwa/install.js": {
-    "bytes": 1889,
-    "sha256": "384c1074e4ddb5e5fc3abaed80d64bb613d8745752ff72b9ad5cbb30a7b18117"
+    "bytes": 2469,
+    "sha256": "67c1c969ead0fac8cfc439ed639da1ebd66943931eae484afcc02162e08d8fc5"
   },
   "static/pwa/offline.html": {
     "bytes": 655,
@@ -1320,8 +1320,8 @@
     "sha256": "c21cb9420e2defa467bd5bb1965525349a13a56269c9dddd76f75895b07093a1"
   },
   "templates/install.html": {
-    "bytes": 1660,
-    "sha256": "f9c32044884c3330ae791e3b969ab634548997b6aa28f54dacc2e1bd11b96e24"
+    "bytes": 2002,
+    "sha256": "f2f60434ad9c8dfff8ace9ea9b3f8159512a2b4ef1e30b753302c0ab2aa1ab75"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1544,12 +1544,12 @@
     "sha256": "9b744ac63b55f920c37edd7e2e600203d459b06084d3803045137ad4855044f2"
   },
   "test_pwa.py": {
-    "bytes": 2168,
-    "sha256": "b788804935333b5fdef51f17e366f20b8400b574d19e8df16f85f1852356559e"
+    "bytes": 2377,
+    "sha256": "c6fb46a488875ee2b1b623a070936383ef187ab348f886b95deff6c8c9c14cc8"
   },
   "test_pwa_worker.js": {
-    "bytes": 2186,
-    "sha256": "4b05f86f1eec9c93ba80f73d66e4893db8fb063ac17f245dea1739b7dc77485e"
+    "bytes": 3721,
+    "sha256": "97dc70c35d8b9704fe4e01a1d2957094236b363aebe903254051dd7773071d47"
   },
   "test_qb_perspective.py": {
     "bytes": 5109,

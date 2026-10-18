@@ -4,13 +4,21 @@
     const status = document.getElementById('install-app-status');
     const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
     if (standalone && status) status.textContent = 'You’re already using Trendfindah as an app.';
+    if (standalone && button) button.hidden = true;
     window.addEventListener('beforeinstallprompt', event => {
+        if (!button || standalone) return;
         event.preventDefault();
         installPrompt = event;
-        if (button && !standalone) button.hidden = false;
+        button.textContent = 'Install Trendfindah';
+        button.hidden = false;
     });
     if (button) button.addEventListener('click', async () => {
-        if (!installPrompt) return;
+        if (!installPrompt) {
+            if (status) status.textContent = 'On iPhone or iPad, tap Safari’s Share button → Add to Home Screen → Add. On Android, use Chrome’s Install app menu.';
+            const steps = document.getElementById('installation-steps');
+            if (steps) { steps.scrollIntoView({behavior: 'smooth', block: 'start'}); steps.focus({preventScroll: true}); }
+            return;
+        }
         button.disabled = true;
         try {
             await installPrompt.prompt();
@@ -22,7 +30,8 @@
             if (status) status.textContent = 'Use the browser menu to add Trendfindah to your home screen.';
         } finally {
             installPrompt = null;
-            button.hidden = true;
+            button.textContent = 'How to add to Home Screen';
+            button.hidden = standalone;
             button.disabled = false;
         }
     });
