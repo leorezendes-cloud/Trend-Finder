@@ -31,6 +31,10 @@
     "bytes": 8053,
     "sha256": "7fd7a1046f79d9cf1849267fab11149a25cc914bb0ab02cdeda15a1084a3bb6a"
   },
+  "PWA.md": {
+    "bytes": 1738,
+    "sha256": "9045ed7a14befb0e3dd3a83ed502c00b4a5893679d2baf0228f7537faa07c15c"
+  },
   "SEO.md": {
     "bytes": 2787,
     "sha256": "ad8fe4ac938a5def7a547a2819879a40adf6bcfa5c5f72df6d26627e84c4e5e8"
@@ -60,8 +64,8 @@
     "sha256": "70de7f090d534b07d534cd0b3c169e589108af9e7877be580d9ee26b2a8e02af"
   },
   "app.py": {
-    "bytes": 41347,
-    "sha256": "63d8bc3555ffe64d566e1ee63089bc3ab2f03058119f6407370c1fded1a0f6d9"
+    "bytes": 41398,
+    "sha256": "3045005b7b7608bdfbaa465a96473b1785c7bb3c69ac1c67ba47b71836d46a31"
   },
   "ats_handle_snapshots.csv": {
     "bytes": 275168,
@@ -675,6 +679,10 @@
     "bytes": 2299,
     "sha256": "afec393ea2b2d843b3e69c630bc553c07a31d7c4670518e16261532a0665b929"
   },
+  "pwa.py": {
+    "bytes": 1814,
+    "sha256": "503b6c9fb58d7d15cf8c0a73e988325f3ba62dfd6878df921ebb0789c690ba12"
+  },
   "qb_verification.py": {
     "bytes": 4027,
     "sha256": "c7b49b76e82e9d8b0126f5cf40aa2d20853db7c5418b7436e6b617935909ce58"
@@ -888,8 +896,8 @@
     "sha256": "ea9c86672187c213c900782b06e5d72d114eda987b15e88bdad8fbea983d0bc8"
   },
   "scripts/prepare_release.py": {
-    "bytes": 5334,
-    "sha256": "075fc5a0053bcca00bc84d19bc411f8349482e96115295472540b5fcd3535d1a"
+    "bytes": 5381,
+    "sha256": "416c6e28088bfc9871c17cfa4af6c9337c28c18b9753c3d2613d7dd24bf7b96f"
   },
   "seo.py": {
     "bytes": 7607,
@@ -1111,6 +1119,30 @@
     "bytes": 589,
     "sha256": "808e9f474cb6a321a945252e4e0d22981a9b09bf2bc49402881cf04340e89f7a"
   },
+  "static/pwa/icon-192.svg": {
+    "bytes": 270646,
+    "sha256": "abdfe0b83410c086af88d1dc3ea799aeb9c599ccc0018a4ca16339a05d882bb9"
+  },
+  "static/pwa/icon-512.svg": {
+    "bytes": 270646,
+    "sha256": "156c7fb65ae0083d53e36165eed4882c3099261c427fe1e7475f52174e67a37f"
+  },
+  "static/pwa/install.css": {
+    "bytes": 817,
+    "sha256": "9fc0a0c687a714613bb3ae982081d23148ce65169c7dce67c3980fd8a81c7e82"
+  },
+  "static/pwa/install.js": {
+    "bytes": 1889,
+    "sha256": "384c1074e4ddb5e5fc3abaed80d64bb613d8745752ff72b9ad5cbb30a7b18117"
+  },
+  "static/pwa/offline.html": {
+    "bytes": 655,
+    "sha256": "de55f5d1f937e3b6c50c1a52590ea56bae19b024c64c96ed0b6fbb5a88a0141f"
+  },
+  "static/pwa/service-worker.js": {
+    "bytes": 1478,
+    "sha256": "74e0e3eb58c1c75a97744834eedc7852e60697ca38527dca05ecf22318467018"
+  },
   "static/scores.js": {
     "bytes": 3089,
     "sha256": "e1882320f2500762fd00ddca73ae67f24aa35632cb6abd3d52871d685375b782"
@@ -1172,8 +1204,8 @@
     "sha256": "2c9b4506cd672840633d0c628df50760cb716d9c6eaa4ef1f5832439c0267489"
   },
   "templates/_branding_head.html": {
-    "bytes": 1563,
-    "sha256": "083388d640006a315e5cc48eb595df79161ccb9261d5e80e7b97da58275ecda0"
+    "bytes": 1866,
+    "sha256": "18b67b20831a75dadaa11297b2394b696e395fd30de4eb42d9a4b8c3f8d32c3e"
   },
   "templates/_general_combination.html": {
     "bytes": 1050,
@@ -1216,8 +1248,8 @@
     "sha256": "0be974261e53fe988f1e21ee7bcc634dfc0ca485ab2c998aa0c6108830a489fb"
   },
   "templates/_site_navigation.html": {
-    "bytes": 5105,
-    "sha256": "04a861d6ce29df0b8689f71172284ec3eea85e141f8eacb7bc8278768f08e779"
+    "bytes": 5164,
+    "sha256": "235cb252292b502108f5c8da44c536fafd81aaccc835003bf938b79e2e164fbe"
   },
   "templates/_trend_comparisons.html": {
     "bytes": 2791,
@@ -1286,6 +1318,10 @@
   "templates/index.html": {
     "bytes": 28500,
     "sha256": "c21cb9420e2defa467bd5bb1965525349a13a56269c9dddd76f75895b07093a1"
+  },
+  "templates/install.html": {
+    "bytes": 1660,
+    "sha256": "f9c32044884c3330ae791e3b969ab634548997b6aa28f54dacc2e1bd11b96e24"
   },
   "templates/market.html": {
     "bytes": 1272,
@@ -1506,6 +1542,14 @@
   "test_public_pick_market.py": {
     "bytes": 2411,
     "sha256": "9b744ac63b55f920c37edd7e2e600203d459b06084d3803045137ad4855044f2"
+  },
+  "test_pwa.py": {
+    "bytes": 2168,
+    "sha256": "b788804935333b5fdef51f17e366f20b8400b574d19e8df16f85f1852356559e"
+  },
+  "test_pwa_worker.js": {
+    "bytes": 2186,
+    "sha256": "4b05f86f1eec9c93ba80f73d66e4893db8fb063ac17f245dea1739b7dc77485e"
   },
   "test_qb_perspective.py": {
     "bytes": 5109,

@@ -53,7 +53,7 @@ def release_files():
         for path in ROOT.glob(pattern):
             add(path)
     for name in ('gunicorn.conf.py', 'requirements.txt', '.env.example',
-                 'HOSTING.md', 'MEMBERSHIP.md', 'NEWSLETTER.md', 'MEMBER_PICKS.md', 'WEEKLY_POLICY.md', 'SEO.md', 'TREND_RESEARCH.md', '.gitignore', 'render.yaml', 'automatic_model.json'):
+                 'HOSTING.md', 'PWA.md', 'MEMBERSHIP.md', 'NEWSLETTER.md', 'MEMBER_PICKS.md', 'WEEKLY_POLICY.md', 'SEO.md', 'TREND_RESEARCH.md', '.gitignore', 'render.yaml', 'automatic_model.json'):
         add(ROOT / name)
     for name in ('expert_beta_cli.py','expert_provider.py','expert_credentials.py','expert_refresh.py','EXPERT_BETA.md'):
         add(ROOT / name)
@@ -80,7 +80,7 @@ def release_files():
         if paths:
             add(paths[-1])
     # Ship meaningful tests, but never account databases, secrets, logs or raw downloads.
-    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py', 'test_member_picks.py', 'test_week_policy.py', 'test_weekly_pick_lines.py', 'test_pick_workflow.py', 'test_weekly_matchup_layout.py', 'test_plug_always_pick.py', 'test_seo.py', 'test_site_health.py', 'test_mobile_pick_menu.js', 'test_context_model.py', 'test_points_publication.py', 'test_general_research.py', 'test_emerging_alerts.py', 'test_weekly_score_fallback.py', 'test_shared_final_scores.py', 'test_public_pick_market.py', 'test_primetime_nights.py', 'test_combination_totals.py', 'test_expert_beta.py', 'test_expert_editorial.py', 'test_expert_provider.py', 'test_expert_gemini.py', 'test_qb_perspective.py', 'test_research_qbs.py', 'test_qb_verification.py', 'test_plug_publication.py'):
+    for name in ('test_membership.py', 'test_hosting.py', 'test_page_layouts.py', 'test_trend_filters.py', 'test_site_sections.py', 'test_hosted_updates.py', 'test_membership_backups.py', 'test_newsletter.py', 'test_newsletter_draft.py', 'test_member_picks.py', 'test_week_policy.py', 'test_weekly_pick_lines.py', 'test_pick_workflow.py', 'test_weekly_matchup_layout.py', 'test_plug_always_pick.py', 'test_seo.py', 'test_site_health.py', 'test_mobile_pick_menu.js', 'test_context_model.py', 'test_points_publication.py', 'test_general_research.py', 'test_emerging_alerts.py', 'test_weekly_score_fallback.py', 'test_shared_final_scores.py', 'test_public_pick_market.py', 'test_primetime_nights.py', 'test_combination_totals.py', 'test_expert_beta.py', 'test_expert_editorial.py', 'test_expert_provider.py', 'test_expert_gemini.py', 'test_qb_perspective.py', 'test_research_qbs.py', 'test_qb_verification.py', 'test_plug_publication.py', 'test_pwa.py', 'test_pwa_worker.js'):
         add(ROOT / name)
     return sorted(selected)
 

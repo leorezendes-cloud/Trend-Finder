@@ -12,7 +12,14 @@
 {% endif %}
 <link rel="icon" href="{{ url_for('static', filename='Images/Branding/gravy-train-branding/favicon.ico') }}" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-32.png') }}">
-<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-icon-180.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='Images/Branding/trend-findah-icon.png') }}">
+<link rel="manifest" href="{{ url_for('pwa.manifest') }}">
+<meta name="theme-color" content="#05080e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trendfindah">
 <link rel="stylesheet" href="{{ url_for('static', filename='branding.css') }}">
 <style>:root { --site-art: url("{{ url_for('static', filename=background) }}"); }</style>
 <script src="{{ url_for('static', filename='navigation.js') }}" defer></script>
+
+<script src="{{ url_for('static',filename='pwa/install.js') }}" defer></script>

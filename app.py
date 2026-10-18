@@ -18,6 +18,8 @@ from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+from pwa import init_app as init_pwa
+init_pwa(app)
 from membership import init_membership
 init_membership(app)
 from fan_views import bp as fans_bp

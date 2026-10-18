@@ -1,0 +1,11 @@
+body { margin: 0; padding: 16px; font-family: Arial, sans-serif; }
+html body main.app-install { max-width: 640px; margin: 24px auto; font: 16px/1.6 Arial,sans-serif; }
+.app-install-icon { display: block; width: 96px; height: 96px; margin: 0 auto 20px; }
+.app-install h1 { font-size: 30px; line-height: 1.25; }
+.app-install h2 { font-size: 21px; margin: 0 0 12px; }
+.app-install section { margin-top: 24px; padding: 18px; border-radius: 10px; background: #1f2937; }
+.app-install ol { padding-left: 22px; margin: 0; }
+.app-install li { margin: 10px 0; }
+.app-install a { color: #fbbf24; }
+.app-install button { padding: 12px 18px; border: 1px solid #fbbf24; border-radius: 8px; background: #1f2937; color: #fbbf24; font: 700 16px Arial,sans-serif; cursor: pointer; }
+.app-install [hidden] { display: none !important; }
