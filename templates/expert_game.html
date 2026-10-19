@@ -1,4 +1,9 @@
-{% extends 'expert_base.html' %}{% block content %}{% set s=item.scout %}{% set g=s.game %}<article class="expert-report"><h2>{{ g.away_team }} at {{ g.home_team }}</h2><p>{{ g.season }} · Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><p class="expert-score">The Plug: {{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% if not item.market_current %}<p class="expert-notice">Saved market information has expired or kickoff has passed. Archived selections below are not current recommendations.</p>{% endif %}
+{% extends 'expert_base.html' %}{% block content %}{% set s=item.scout %}{% set g=s.game %}<article class="expert-report"><h2>{{ g.away_team }} at {{ g.home_team }}</h2><p>
+    <a class="matchup-comparison-link"
+       href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team)) }}">
+        View Team Comparison
+    </a>
+</p><p>{{ g.season }} · Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><p class="expert-score">The Plug: {{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% if not item.market_current %}<p class="expert-notice">Saved market information has expired or kickoff has passed. Archived selections below are not current recommendations.</p>{% endif %}
 {% set picks=s if item.market_current else item.original_scout %}<section><h3>{{ "The Plug's Picks" if item.market_current else "The Plug's Saved Picks" }}</h3>
 {% set quotes=s.quotes if item.market_current else item.original_scout.get('quotes', {}) %}
 <p>Spread: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ q.line_a if picks.spread.side==q.side_a else q.line_b if picks.spread.side==q.side_b else '' }}{% endif %}</p>

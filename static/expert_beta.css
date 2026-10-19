@@ -17,3 +17,8 @@
     margin: 10px 0;
     line-height: 1.6;
 }
+.expert-card h2 a:hover {
+    color: black;
+    text-decoration: underline;
+    -webkit-text-stroke: 1px white;
+}
