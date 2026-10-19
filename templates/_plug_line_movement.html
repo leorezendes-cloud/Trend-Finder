@@ -1,4 +1,4 @@
-{% set move=item.line_movement %}{% if move %}<section class="plug-line-movement expert-notice">
+{% set move=item.line_movement %}{% if move and move.original_line != move.latest_line %}<section class="plug-line-movement expert-notice">
 <strong>{{ move.team }} · {{ move.sportsbook }} line update</strong>
 <p>Original: {{ move.team }} {{ '%+g'|format(move.original_line) }} · {{ move.original_observed|eastern_time }}<br>Latest saved: {{ move.team }} {{ '%+g'|format(move.latest_line) }} · {{ move.latest_observed|eastern_time }}<br>Movement: {{ '%+g'|format(move.movement) }} points</p>
 <p>ATS edge for {{ move.team }} using the original projected score: {{ '%+.2f'|format(move.original_edge) }} → {{ '%+.2f'|format(move.latest_edge) }} points.</p>
