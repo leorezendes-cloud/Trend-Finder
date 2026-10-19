@@ -119,7 +119,14 @@
 </head>
 
 <body{% if request.args.get('mobile_results') == '1' %} class="mobile-results"{% endif %}>
-
+<div class="section-logo-title">
+    <img
+        src="{{ url_for('static', filename='Images/Branding/The Conspiracy Dungeon Investigation Board.png') }}"
+        alt="The Conspiracy Dungeon"
+        width="953"
+        height="179"
+    >
+</div>
 <main class="dungeon">
     {% include '_site_navigation.html' %}
    
