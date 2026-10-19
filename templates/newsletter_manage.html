@@ -1,19 +1,388 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% if seo and seo.title %}{{ seo.title }}{% else %}Newsletter | Gravy Train{% endif %}</title>
-<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">{% include '_branding_head.html' %}
-<style>.newsletter-editor{max-width:900px;margin:auto}.newsletter-editor textarea{box-sizing:border-box;width:100%;min-height:140px;padding:12px;margin-bottom:20px;font:16px/1.5 Arial,sans-serif}.newsletter-editor a{color:#fbbf24}.newsletter-editor article{padding:16px;margin:12px 0;background:#111b2b;border-radius:10px}.newsletter-editor form{max-width:none}.newsletter-editor input{box-sizing:border-box;width:100%;padding:12px;margin-bottom:18px}</style></head>
-<body>{% include '_site_navigation.html' %}<main class="newsletter-editor"><h1>Trendfindah Newsletter</h1>
-<p>Predictions lead the way, followed by upcoming matchups and notable trends.</p>
-<p>Opted in: {{ counts.get('weekly',0) }} weekly · {{ counts.get('monthly',0) }} monthly</p>
-{% if not config.NEWSLETTER_ENABLED %}<p>Live sending is disabled. You can create, preview, and approve drafts here.</p>{% endif %}
-{% if not config.NEWSLETTER_ADDRESS %}<p>Add your business mailing address before sending.</p>{% endif %}
-{% if not editing %}<h2>Drafts ready for review</h2><p>A weekly draft is prepared automatically when you open this page. Monthly drafts are prepared when you have monthly subscribers. Your edits are never overwritten. Open an issue below to preview and edit it.</p>{% for issue in issues %}<article><a href="{{ url_for('newsletter.issue_page',issue_id=issue.id) }}">{{ issue.subject }}</a><p>{{ issue.frequency|capitalize }} · {{ issue.status|capitalize }} · {{ issue.created_at }}</p></article>{% else %}<p>No issues yet.</p>{% endfor %}{% endif %}
-{% if error %}<p role="alert">{{ error }}</p>{% endif %}
-{% if not editing %}<details><summary>Create a manual draft instead</summary>{% endif %}
-<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<label for="subject">Subject</label><input id="subject" name="subject" required minlength="5" maxlength="150" value="{{ request.form.get('subject',defaults.get('subject','Trendfindah: This week’s prediction highlights')) }}">
-<label for="frequency">Audience</label><select id="frequency" name="frequency">{% for value in ['weekly','monthly'] %}<option value="{{ value }}" {% if request.form.get('frequency',defaults.get('frequency','weekly'))==value %}selected{% endif %}>{{ value|capitalize }} subscribers</option>{% endfor %}</select>
-{% for key,heading in headings %}<label for="{{ key }}">{{ heading }}{{ ' (required)' if key=='predictions' else ' (optional)' }}</label><textarea id="{{ key }}" name="{{ key }}" maxlength="6000" {% if key=='predictions' %}required minlength="20"{% endif %}>{{ request.form.get(key,defaults.get(key,'')) }}</textarea>{% endfor %}
-<p>Use published predictions and saved evidence. This editor never runs models or refreshes data. Write plain text; HTML is escaped.</p><button>{{ 'Save draft' if editing else 'Create draft' }}</button></form>
-{% if not editing %}</details>{% endif %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Newsletter Manager | TrendFindah.com</title>
 
-</main></body></html>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='membership.css') }}">
+  {% include '_branding_head.html' %}
+
+  <style>
+    .newsletter-editor {
+      max-width: 960px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .newsletter-editor h1 {
+      margin-bottom: 8px;
+    }
+
+    .newsletter-editor .muted {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .newsletter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin: 22px 0;
+    }
+
+    .newsletter-panel,
+    .newsletter-editor article {
+      background: #111b2b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .newsletter-panel h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #fbbf24;
+    }
+
+    .newsletter-issue {
+      border-top: 1px solid #334155;
+      padding: 14px 0;
+    }
+
+    .newsletter-issue:first-of-type {
+      margin-top: 14px;
+    }
+
+    .newsletter-issue strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .newsletter-issue p {
+      margin: 4px 0 10px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .newsletter-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .newsletter-editor a {
+      color: #fbbf24;
+    }
+
+    .newsletter-editor .newsletter-actions a {
+      display: inline-block;
+      border: 1px solid #9a772b;
+      border-radius: 7px;
+      padding: 7px 11px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .newsletter-editor form {
+      max-width: none;
+    }
+
+    .newsletter-editor label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: bold;
+    }
+
+    .newsletter-editor input:not([type=hidden]),
+    .newsletter-editor select,
+    .newsletter-editor textarea {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      font: 16px/1.5 Arial, sans-serif;
+    }
+
+    .newsletter-editor textarea {
+      min-height: 140px;
+      margin-bottom: 12px;
+    }
+
+    .newsletter-editor details {
+      margin: 22px 0;
+    }
+
+    .newsletter-editor summary {
+      cursor: pointer;
+      color: #fbbf24;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  {% include '_site_navigation.html' %}
+
+  <main class="newsletter-editor">
+
+    <h1>🔌 Newsletter Manager</h1>
+
+    <p class="muted">
+      Review each edition before approving it.
+      Previewing and saving never send email.
+    </p>
+
+    <p class="muted">
+      Subscribers:
+      {{ counts.get('weekly', 0) }} weekly ·
+      {{ counts.get('monthly', 0) }} monthly
+    </p>
+
+    {% if not config.NEWSLETTER_ENABLED %}
+      <p class="muted">Email sending is currently disabled.</p>
+    {% endif %}
+
+    {% if not config.NEWSLETTER_ADDRESS %}
+      <p class="muted">
+        A business mailing address is required before sending.
+      </p>
+    {% endif %}
+
+    {% if not editing %}
+
+      {% set weekly_issues = issues | selectattr('frequency', 'equalto', 'weekly') | list %}
+      {% set monthly_issues = issues | selectattr('frequency', 'equalto', 'monthly') | list %}
+
+      <div class="newsletter-grid">
+
+        <!-- WEEKLY NEWSLETTERS -->
+
+        <section class="newsletter-panel" aria-labelledby="weekly-heading">
+
+          <h2 id="weekly-heading">The Weekly Plug</h2>
+
+          <p class="muted">
+            Upcoming games, published picks, and current hot trends.
+          </p>
+
+          {% for issue in weekly_issues %}
+
+            <div class="newsletter-issue">
+
+              <strong>{{ issue.subject }}</strong>
+
+              <p>
+                Issue #{{ issue.id }} · {{ issue.status|capitalize }}
+              </p>
+
+              <div class="newsletter-actions">
+
+                <a href="{{ url_for('newsletter.preview', issue_id=issue.id) }}">
+                  Preview
+                </a>
+
+                {% if issue.status == 'draft' %}
+                  <a href="{{ url_for('newsletter.manage', issue_id=issue.id) }}">
+                    Edit
+                  </a>
+                {% endif %}
+
+                <a href="{{ url_for('newsletter.issue_page', issue_id=issue.id) }}">
+                  Details
+                </a>
+
+              </div>
+            </div>
+
+          {% else %}
+
+            <p class="muted">
+              No weekly drafts yet.
+            </p>
+
+          {% endfor %}
+
+        </section>
+
+        <!-- MONTHLY NEWSLETTERS -->
+
+        <section class="newsletter-panel" aria-labelledby="monthly-heading">
+
+          <h2 id="monthly-heading">The Monthly Plug</h2>
+
+          <p class="muted">
+            Monthly highlights and recaps.
+          </p>
+
+          {% for issue in monthly_issues %}
+
+            <div class="newsletter-issue">
+
+              <strong>{{ issue.subject }}</strong>
+
+              <p>
+                Issue #{{ issue.id }} · {{ issue.status|capitalize }}
+              </p>
+
+              <div class="newsletter-actions">
+
+                <a href="{{ url_for('newsletter.preview', issue_id=issue.id) }}">
+                  Preview
+                </a>
+
+                {% if issue.status == 'draft' %}
+                  <a href="{{ url_for('newsletter.manage', issue_id=issue.id) }}">
+                    Edit
+                  </a>
+                {% endif %}
+
+                <a href="{{ url_for('newsletter.issue_page', issue_id=issue.id) }}">
+                  Details
+                </a>
+
+              </div>
+            </div>
+
+          {% else %}
+
+            <p class="muted">
+              No monthly draft yet.
+              Automatic monthly drafts require at least one monthly subscriber.
+            </p>
+
+          {% endfor %}
+
+        </section>
+
+      </div>
+
+    {% endif %}
+
+    {% if error %}
+      <p role="alert">{{ error }}</p>
+    {% endif %}
+
+    <!-- EDITOR -->
+
+    {% if editing %}
+
+      <article>
+
+        <h2>
+          Edit {{ 'The Weekly Plug' if editing.frequency == 'weekly' else 'The Monthly Plug' }}
+        </h2>
+
+        <p class="muted">
+          Audience:
+          <strong>{{ editing.frequency|capitalize }} subscribers</strong>
+        </p>
+
+    {% else %}
+
+      <details>
+        <summary>Create a manual draft</summary>
+        <article>
+
+    {% endif %}
+
+          <form method="post">
+
+            <input
+              type="hidden"
+              name="csrf_token"
+              value="{{ csrf_token() }}"
+            >
+
+            {% if editing %}
+              <input
+                type="hidden"
+                name="frequency"
+                value="{{ editing.frequency }}"
+              >
+            {% endif %}
+
+            <label for="subject">Email subject</label>
+
+            <input
+              id="subject"
+              name="subject"
+              required
+              minlength="5"
+              maxlength="150"
+              value="{{ request.form.get('subject', defaults.get('subject', '')) }}"
+              placeholder="The Weekly Plug · October 19–25, 2026"
+            >
+
+            {% if not editing %}
+
+              <label for="frequency">Audience</label>
+
+              <select id="frequency" name="frequency">
+
+                {% for value in ['weekly', 'monthly'] %}
+
+                  <option
+                    value="{{ value }}"
+                    {% if request.form.get('frequency', defaults.get('frequency', 'weekly')) == value %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ value|capitalize }} subscribers
+                  </option>
+
+                {% endfor %}
+
+              </select>
+
+            {% endif %}
+
+            {% for key, heading in headings %}
+
+              <label for="{{ key }}">
+                {{ heading }}
+                {{ ' (required)' if key == 'predictions' else ' (optional)' }}
+              </label>
+
+              <textarea
+                id="{{ key }}"
+                name="{{ key }}"
+                maxlength="6000"
+                {% if key == 'predictions' %}
+                  required
+                  minlength="20"
+                {% endif %}
+              >{{ request.form.get(key, defaults.get(key, '')) }}</textarea>
+
+            {% endfor %}
+
+            <p class="muted">
+              Only include reviewed, published evidence.
+              The editor does not execute models or update data.
+            </p>
+
+            <button type="submit">
+              {{ 'Save draft' if editing else 'Create draft' }}
+            </button>
+
+            {% if editing %}
+              <p>
+                <a href="{{ url_for('newsletter.manage') }}">
+                  ← Back to newsletters
+                </a>
+              </p>
+            {% endif %}
+
+          </form>
+
+        </article>
+
+    {% if not editing %}
+      </details>
+    {% endif %}
+
+  </main>
+</body>
+</html>

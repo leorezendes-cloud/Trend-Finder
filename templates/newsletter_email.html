@@ -1,14 +1,137 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ issue.subject }}</title></head>
-<body style="margin:0;background:#080e18;color:#eef3fa;font-family:Arial,sans-serif">
-<table role="presentation" style="width:100%;max-width:640px;margin:auto;border-collapse:collapse"><tr><td style="padding:28px;background:#111b2b">
-<p style="color:#fbbf24;letter-spacing:2px;font-weight:bold">TRENDFINDAH · GRAVY TRAIN</p>
-<h1 style="font-size:28px;line-height:1.3">{{ issue.subject }}</h1>
-{% for key,heading in headings %}{% if sections.get(key) %}
-<h2 style="color:#fbbf24;font-size:{{ '24' if key=='predictions' else '20' }}px;margin-top:28px">{{ heading }}</h2>
-{% for paragraph in sections[key].split('\n') %}{% if paragraph %}<p style="font-size:16px;line-height:1.65">{{ paragraph }}</p>{% endif %}{% endfor %}
-{% endif %}{% endfor %}
-<p style="margin:30px 0"><a href="{{ origin }}" style="background:#fbbf24;color:#111827;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Explore Gravy Train</a></p>
-<p style="font-size:13px;line-height:1.6;color:#cbd5e1">You’re receiving this because you opted into the Trendfindah newsletter. Predictions are estimates, not guaranteed outcomes.</p>
-<p style="font-size:13px;line-height:1.6;color:#cbd5e1">{{ address }}</p>
-<p><a href="{{ unsubscribe_url }}" style="color:#fbbf24">Unsubscribe</a> · <a href="{{ origin }}/members/preferences" style="color:#fbbf24">Manage preferences</a></p>
-</td></tr></table></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ issue.subject }}</title>
+</head>
+
+<body style="margin:0;padding:0;background:#080e18;color:#eef3fa;font-family:Arial,Helvetica,sans-serif">
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+         width="100%" style="border-collapse:collapse;background:#080e18">
+    <tr>
+      <td align="center" style="padding:20px 12px">
+
+        <table role="presentation" cellpadding="0" cellspacing="0"
+               border="0" width="100%"
+               style="max-width:620px;border-collapse:collapse;background:#111b2b;border:1px solid #334155">
+
+          <tr>
+            <td style="padding:28px 24px 18px;border-bottom:2px solid #fbbf24">
+
+             <a href="https://trendfindah.com">
+                <img
+                    src="https://trendfindah.com/static/Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png"
+                    alt="TrendFindah.com"
+                    width="520"
+                    style="display:block;width:100%;max-width:520px;height:auto;border:0;">
+            </a>
+
+              <p style="margin:0 0 8px;color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:2px">
+                🔌 THE {{ 'WEEKLY' if issue.frequency == 'weekly' else 'MONTHLY' }} PLUG 🔌
+              </p>
+
+              <h1 style="margin:0;color:#f8fafc;font-size:24px;line-height:1.25">
+                {{ issue.subject.split(' · ', 1)[-1] }}
+              </h1>
+
+            </td>
+          </tr>
+
+          {% for key, heading in headings %}
+          {% if sections.get(key) %}
+
+          <tr>
+            <td style="padding:20px 24px 2px">
+
+              <h2 style="margin:0 0 12px;color:#fbbf24;font-size:19px;line-height:1.3">
+                {{ heading }}
+              </h2>
+
+              {% for block in sections[key].split('\n\n') if block|trim %}
+
+              <table role="presentation" cellpadding="0" cellspacing="0"
+                     border="0" width="100%"
+                     style="margin:0 0 10px;border-collapse:collapse;background:#182437;border:1px solid #34445c;border-radius:8px">
+                <tr>
+                  <td style="padding:12px 14px">
+
+                    {% for line in block.split('\n') if line|trim %}
+
+                      {% if line.startswith(origin ~ '/') and line|length < 2000 %}
+
+                        <p style="margin:9px 0 2px;font-size:14px">
+                          <a href="{{ line }}"
+                             style="color:#fbbf24;text-decoration:underline;font-weight:700">
+                            {{ 'Open game breakdown' if key in ('predictions','expert') else 'See trend evidence' if key == 'trends' else 'View matchup' if key == 'matchups' else 'Read more' }} →
+                          </a>
+                        </p>
+
+                      {% elif loop.first %}
+
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:700;line-height:1.4;color:#f8fafc">
+                          {{ line }}
+                        </p>
+
+                      {% else %}
+
+                        <p style="margin:4px 0;font-size:14px;line-height:1.5;color:#e2e8f0">
+                          {{ line }}
+                        </p>
+
+                      {% endif %}
+
+                    {% endfor %}
+
+                  </td>
+                </tr>
+              </table>
+
+              {% endfor %}
+
+            </td>
+          </tr>
+
+          {% endif %}
+          {% endfor %}
+
+          <tr>
+            <td style="padding:16px 24px 24px">
+              <a href="{{ origin }}"
+                 style="display:inline-block;background:#fbbf24;color:#111827;padding:11px 18px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:800">
+                Visit TrendFindah.com →
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:19px 24px 24px;border-top:1px solid #334155">
+
+              <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">
+                You're receiving this email because you subscribed to Trend Findah.
+              </p>
+
+              <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">
+                {{ address }}
+              </p>
+
+              <p style="margin:0;font-size:12px;line-height:1.6">
+                <a href="{{ unsubscribe_url }}" style="color:#fbbf24">Unsubscribe</a>
+                &nbsp;·&nbsp;
+                <a href="{{ origin }}/members/preferences" style="color:#fbbf24">
+                  Manage preferences
+                </a>
+              </p>
+
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

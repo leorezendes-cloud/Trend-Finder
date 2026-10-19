@@ -54,7 +54,7 @@
 {% for frequency in ['weekly', 'monthly'] %}<option value="{{ frequency }}" {% if g.member.newsletter_frequency == frequency %}selected{% endif %}>{{ frequency|capitalize }}</option>{% endfor %}
 </select>
 {% endif %}
-<p class="member-note">Optional. You can opt out here at any time. Weekly or monthly roundups highlight predictions, upcoming matchups, and notable trends. You can also unsubscribe directly from any newsletter. Saving preferences does not send an email.</p>
+<p class="member-note">Free newsletter: Weekly receives The Weekly Plug every week <strong>plus</strong> The Monthly Plug. Monthly receives The Monthly Plug only. You can change your preference or unsubscribe at any time. Premium picks are not part of these free emails.</p>
 {% endif %}
 <button type="submit">{{ {'register':'Create account','login':'Log in','preferences':'Save preferences'}[mode] }}</button>
 </form>

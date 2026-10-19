@@ -3,7 +3,7 @@ import json
 import os
 import secrets
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
@@ -14,8 +14,9 @@ from itsdangerous import URLSafeSerializer, BadSignature
 from membership import db
 
 bp = Blueprint('newsletter', __name__, url_prefix='/newsletter')
-SECTIONS = [('predictions', 'Prediction highlights'), ('matchups', 'Upcoming matchups'),
-            ('trends', 'Notable trends'), ('updates', 'Site updates')]
+SECTIONS = [('predictions', "The Plug's Picks"), ('trends', 'Hot Right Now'),
+            ('expert', "The Expert's Take"), ('matchups', 'Around the League'),
+            ('updates', 'Site Updates')]
 
 
 def init_newsletter(app):
@@ -23,7 +24,7 @@ def init_newsletter(app):
         NEWSLETTER_AUTO_DRAFT_ENABLED=True,
         NEWSLETTER_ENABLED=os.environ.get('TREND_FINDAH_NEWSLETTER_ENABLED') == 'true',
         NEWSLETTER_FROM=os.environ.get('TREND_FINDAH_NEWSLETTER_FROM',
-            'Trendfindah <noreply@mail.trendfindah.com>'),
+            'The Weekly Plug <noreply@mail.trendfindah.com>'),
         NEWSLETTER_ADDRESS=os.environ.get('TREND_FINDAH_NEWSLETTER_ADDRESS', '').strip(),
     )
     app.register_blueprint(bp)
@@ -84,9 +85,9 @@ def init_newsletter(app):
             raise click.ClickException('Approve the issue in the owner newsletter page first.')
         if not send:
             if issue['audience_frozen']:
-                eligible = db().execute("SELECT COUNT(*) FROM newsletter_deliveries d JOIN members m ON m.id=d.member_id WHERE d.issue_id=? AND d.state NOT IN ('accepted','skipped') AND m.newsletter_opt_in=1 AND m.newsletter_frequency=?", (issue_id,issue['frequency'])).fetchone()[0]
+                eligible = db().execute("SELECT COUNT(*) FROM newsletter_deliveries d JOIN members m ON m.id=d.member_id WHERE d.issue_id=? AND d.state NOT IN ('accepted','skipped') AND m.newsletter_opt_in=1 AND m.newsletter_frequency IN (?,?)", (issue_id,issue['frequency'],'weekly')).fetchone()[0]
             else:
-                eligible = db().execute('SELECT COUNT(*) FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency=?', (issue['frequency'],)).fetchone()[0]
+                eligible = db().execute('SELECT COUNT(*) FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency IN (?,?)', (issue['frequency'],'weekly')).fetchone()[0]
             click.echo(f'Dry run: {eligible} members currently eligible. No email sent.')
             return
         try:
@@ -116,16 +117,24 @@ def unsubscribe_url(member_id):
     return current_app.config['PUBLIC_ORIGIN'] + '/newsletter/unsubscribe/' + signer().dumps(member_id)
 
 
+def headings_for_issue(issue):
+    if issue['frequency'] == 'monthly':
+        return [('predictions', 'Month in Review'), ('trends', 'Trend Spotlight'),
+                ('expert', 'Expert Highlights'), ('matchups', 'Looking Ahead'),
+                ('updates', 'Site Updates')]
+    return SECTIONS
+
+
 def email_payload(issue, member):
     sections = json.loads(issue['sections'])
     link = unsubscribe_url(member['id'])
-    context = dict(issue=issue, sections=sections, headings=SECTIONS, unsubscribe_url=link,
+    context = dict(issue=issue, sections=sections, headings=headings_for_issue(issue), unsubscribe_url=link,
                    origin=current_app.config['PUBLIC_ORIGIN'], address=current_app.config['NEWSLETTER_ADDRESS'])
     text = issue['subject'] + '\n\n'
-    for key, heading in SECTIONS:
+    for key, heading in headings_for_issue(issue):
         if sections.get(key):
             text += heading + '\n' + sections[key] + '\n\n'
-    text += 'Visit Gravy Train: ' + context['origin'] + '\n\n' + context['address'] + '\nUnsubscribe: ' + link
+    text += 'Visit TrendFindah.com: ' + context['origin'] + '\n\n' + context['address'] + '\nUnsubscribe: ' + link
     return {'from':current_app.config['NEWSLETTER_FROM'], 'to':[member['email']],
             'subject':issue['subject'], 'text':text,
             'html':render_template('newsletter_email.html', **context),
@@ -141,13 +150,13 @@ def manage(issue_id=None):
         abort(409, description='Approved or canceled issues cannot be edited.')
     if editing is None and request.method == 'GET' and current_app.config['NEWSLETTER_AUTO_DRAFT_ENABLED']:
         generate_draft(g.member['id'], 'weekly')
-        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency='monthly' LIMIT 1").fetchone():
+        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 LIMIT 1").fetchone():
             generate_draft(g.member['id'], 'monthly')
     defaults = dict(json.loads(editing['sections']), subject=editing['subject'], frequency=editing['frequency']) if editing is not None else {}
     error = None
     if request.method == 'POST':
         subject = request.form.get('subject', '').strip()
-        frequency = request.form.get('frequency', '')
+        frequency = editing['frequency'] if editing is not None else request.form.get('frequency', '')
         sections = {key:request.form.get(key, '').strip() for key, heading in SECTIONS}
         if not 5 <= len(subject) <= 150 or '\n' in subject or '\r' in subject:
             error = 'Enter a subject between 5 and 150 characters.'
@@ -166,7 +175,7 @@ def manage(issue_id=None):
             return redirect(url_for('newsletter.issue_page', issue_id=issue_id))
     issues = db().execute('SELECT id,subject,frequency,status,created_at FROM newsletter_issues ORDER BY id DESC LIMIT 50').fetchall()
     counts = {row['newsletter_frequency']:row['n'] for row in db().execute('SELECT newsletter_frequency,COUNT(*) n FROM members WHERE newsletter_opt_in=1 GROUP BY newsletter_frequency')}
-    return render_template('newsletter_manage.html', issues=issues, counts=counts, headings=SECTIONS,error=error,defaults=defaults,editing=editing),400 if error else 200
+    return render_template('newsletter_manage.html', issues=issues, counts=counts, headings=headings_for_issue(editing) if editing is not None else SECTIONS,error=error,defaults=defaults,editing=editing),400 if error else 200
 
 
 @bp.get('/issues/<int:issue_id>')
@@ -175,7 +184,37 @@ def issue_page(issue_id):
     issue = get_issue(issue_id)
     counts = {row['state']:row['n'] for row in db().execute('SELECT state,COUNT(*) n FROM newsletter_deliveries WHERE issue_id=? GROUP BY state', (issue_id,))}
     metadata = db().execute('SELECT metadata FROM newsletter_generated WHERE issue_id=?',(issue_id,)).fetchone()
-    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=SECTIONS,counts=counts,generated=json.loads(metadata['metadata']) if metadata else None)
+    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=headings_for_issue(issue),counts=counts,generated=json.loads(metadata['metadata']) if metadata else None)
+
+
+@bp.get('/monthly/preview')
+def monthly_preview():
+    """Owner-only look at newly generated monthly content; does not save/send."""
+    require_owner()
+    from newsletter_draft import build_draft, period_key
+    now = datetime.now(timezone.utc)
+    sections, metadata = build_draft(Path(current_app.root_path), now, frequency='monthly')
+    month = datetime.strptime(period_key('monthly', now), '%Y-%m').strftime('%B %Y')
+    issue = {'subject': f'The Monthly Plug · {month}', 'frequency': 'monthly'}
+    return render_template('newsletter_email.html', issue=issue, sections=sections,
+        headings=headings_for_issue(issue), unsubscribe_url=url_for('newsletter.manage'),
+        origin=current_app.config['PUBLIC_ORIGIN'],
+        address=current_app.config['NEWSLETTER_ADDRESS'] or 'Mailing address will appear here')
+
+
+@bp.get('/premium/preview')
+def premium_preview():
+    """Owner-only full-slate preview. Never creates an email issue or recipients."""
+    require_owner()
+    from newsletter_draft import build_premium_preview, period_key
+    now = datetime.now(timezone.utc)
+    sections, metadata = build_premium_preview(Path(current_app.root_path), now)
+    issue = {'subject': "The Weekly Plug · Premium Preview",
+             'frequency': 'weekly'}
+    return render_template('newsletter_email.html', issue=issue, sections=sections,
+        headings=SECTIONS, unsubscribe_url=url_for('newsletter.manage'),
+        origin=current_app.config['PUBLIC_ORIGIN'],
+        address=current_app.config['NEWSLETTER_ADDRESS'] or 'Mailing address will appear here')
 
 
 @bp.get('/issues/<int:issue_id>/preview')
@@ -183,7 +222,7 @@ def preview(issue_id):
     require_owner()
     issue=get_issue(issue_id)
     # Preview footer links stay on the owner's preview; no live unsubscribe token.
-    return render_template('newsletter_email.html', issue=issue,sections=json.loads(issue['sections']),headings=SECTIONS,
+    return render_template('newsletter_email.html', issue=issue,sections=json.loads(issue['sections']),headings=headings_for_issue(issue),
         unsubscribe_url=url_for('newsletter.issue_page',issue_id=issue_id),origin=current_app.config['PUBLIC_ORIGIN'],
         address=current_app.config['NEWSLETTER_ADDRESS'] or 'Mailing address will appear here')
 
@@ -235,7 +274,7 @@ def send_issue(issue_id):
     connection=db();connection.execute('BEGIN IMMEDIATE')
     try:
         if not get_issue(issue_id)['audience_frozen']:
-            for member in connection.execute('SELECT id,email FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency=?',(issue['frequency'],)).fetchall():
+            for member in connection.execute('SELECT id,email FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency IN (?,?)',(issue['frequency'],'weekly')).fetchall():
                 connection.execute('INSERT INTO newsletter_deliveries(issue_id,member_id,payload,idempotency_key) VALUES(?,?,?,?)',
                     (issue_id,member['id'],json.dumps(email_payload(issue,member)),secrets.token_hex(24)))
             connection.execute('UPDATE newsletter_issues SET audience_frozen=1 WHERE id=?',(issue_id,))
@@ -257,7 +296,7 @@ def send_issue(issue_id):
         if current['attempted_at'] is not None and current['attempted_at']<=now-23*3600:
             # Resend keys expire after 24h; stop before that rather than duplicate an uncertain send.
             connection.rollback();failed+=1;continue
-        if not member or not member['newsletter_opt_in'] or member['newsletter_frequency']!=issue['frequency'] or json.loads(current['payload'])['to'] != [member['email']]:
+        if not member or not member['newsletter_opt_in'] or member['newsletter_frequency'] not in (issue['frequency'], 'weekly') or json.loads(current['payload'])['to'] != [member['email']]:
             connection.execute("UPDATE newsletter_deliveries SET state='skipped' WHERE issue_id=? AND member_id=?",(issue_id,row['member_id']))
             connection.commit();skipped+=1;continue
         connection.execute("UPDATE newsletter_deliveries SET state='sending',claimed_at=?,attempted_at=COALESCE(attempted_at,?) WHERE issue_id=? AND member_id=?",(now,now,issue_id,row['member_id']))
@@ -282,7 +321,24 @@ def send_issue(issue_id):
         time.sleep(.6)
     return accepted,skipped,failed
 
+def newsletter_subject(frequency, period):
+    if frequency == "monthly":
+        month = datetime.strptime(period, "%Y-%m")
+        return f"The Monthly Plug · {month.strftime('%B %Y')}"
 
+    year, week = period.split("-W")
+    start = datetime.fromisocalendar(int(year), int(week), 1)
+    end = start + timedelta(days=6)
+
+    if start.month == end.month:
+        dates = f"{start.strftime('%B')} {start.day}–{end.day}, {end.year}"
+    else:
+        dates = (
+            f"{start.strftime('%b')} {start.day} – "
+            f"{end.strftime('%b')} {end.day}, {end.year}"
+        )
+
+    return f"The Weekly Plug · {dates}"
 def generate_draft(owner_id, frequency='weekly', now=None, root=None):
     from newsletter_draft import period_key, build_draft
     if frequency not in ('weekly','monthly'):
@@ -294,27 +350,29 @@ def generate_draft(owner_id, frequency='weekly', now=None, root=None):
         issue=get_issue(existing['issue_id']);previous=json.loads(existing['metadata'])
         if issue['status']!='draft' or json.loads(issue['sections'])!=previous.get('original_sections') or issue['subject']!=previous.get('original_subject'):
             return existing['issue_id']
-        sections,metadata=build_draft(root or Path(current_app.root_path),now)
-        metadata.update(original_sections=sections,original_subject=issue['subject'])
+        sections,metadata=build_draft(root or Path(current_app.root_path),now,frequency=frequency)
+        refreshed_subject=newsletter_subject(frequency, period)
+        metadata.update(original_sections=sections,original_subject=refreshed_subject)
         connection=db();connection.execute('BEGIN IMMEDIATE')
         try:
             current=get_issue(existing['issue_id'])
             if current['status']=='draft' and current['sections']==issue['sections'] and current['subject']==issue['subject']:
-                connection.execute('UPDATE newsletter_issues SET sections=? WHERE id=?',(json.dumps(sections),current['id']))
+                connection.execute("UPDATE newsletter_issues SET sections=?,subject=? WHERE id=? AND status='draft'",(json.dumps(sections),refreshed_subject,current['id']))
                 connection.execute('UPDATE newsletter_generated SET metadata=? WHERE issue_id=?',(json.dumps(metadata),current['id']))
             connection.commit()
         except Exception:
             connection.rollback();raise
         return existing['issue_id']
-    sections,metadata=build_draft(root or Path(current_app.root_path),now)
-    metadata.update(original_sections=sections,original_subject=f'Trendfindah: Prediction highlights · {period}')
+    sections,metadata=build_draft(root or Path(current_app.root_path),now,frequency=frequency)
+    subject=newsletter_subject(frequency, period)
+    metadata.update(original_sections=sections,original_subject=subject)
     connection=db();connection.execute('BEGIN IMMEDIATE')
     try:
         existing=connection.execute('SELECT issue_id FROM newsletter_generated WHERE frequency=? AND period=?',(frequency,period)).fetchone()
         if existing:
             connection.rollback();return existing['issue_id']
         issue_id=connection.execute('INSERT INTO newsletter_issues(subject,frequency,sections,owner_id) VALUES(?,?,?,?)',
-            (f'Trendfindah: Prediction highlights · {period}',frequency,json.dumps(sections),owner_id)).lastrowid
+            (subject,frequency,json.dumps(sections),owner_id)).lastrowid
         connection.execute('INSERT INTO newsletter_generated VALUES(?,?,?,?)',(frequency,period,issue_id,json.dumps(metadata)))
         connection.commit();return issue_id
     except Exception:
