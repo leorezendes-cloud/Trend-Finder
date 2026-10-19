@@ -89,6 +89,13 @@ def home():
     return render_template("home.html", active_highlights=load_highlights(),freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent))
 
 
+@app.route('/hot-trends')
+def hot_trends_page():
+    from active_trends import load_highlights
+    return render_template('hot_trends.html',
+                           active_highlights=load_highlights(all_trends=True))
+
+
 @app.route("/the-plug")
 def plug_page():
     if app.config.get("EXPERT_BETA_ENABLED"):

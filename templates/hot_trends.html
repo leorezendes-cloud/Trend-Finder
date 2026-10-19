@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Hot Trends | Trend Findah 3000</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% include '_branding_head.html' %}
+</head>
+<body>
+<main class="trend-dashboard">
+{% include '_site_navigation.html' %}
+<p><a href="{{ url_for('home') }}">← Back to homepage</a></p>
+{% set all_hot_trends = true %}
+{% include '_active_trends.html' %}
+</main>
+</body>
+</html>
