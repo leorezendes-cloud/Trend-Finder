@@ -217,6 +217,20 @@ def start_scheduler():
                 path.write_text(json.dumps({'finished':datetime.now(timezone.utc).isoformat(),
                     'state':'needs attention','stages':{'worker':type(error).__name__}}))
             threading.Event().wait(21600)
+    # Lightweight Expert-only processing is independent of the full NFL data
+    # refresh. It reads sealed production forecasts and approved reviews; it
+    # cannot call Gemini unless the existing explicit opt-ins are enabled.
+    def expert_loop():
+        while True:
+            try:
+                subprocess.run([sys.executable, str(SOURCE/'expert_automation.py'), '--once'],
+                    cwd=SOURCE, timeout=480, check=True,
+                    env={**os.environ, 'POLARS_MAX_THREADS':'1'})
+            except (OSError, subprocess.SubprocessError) as error:
+                print(f'Expert-only worker failed: {type(error).__name__}', flush=True)
+            threading.Event().wait(3600)
+
+    threading.Thread(target=expert_loop,name='expert-only-updates',daemon=True).start()
     threading.Thread(target=market_loop,name='game-day-market',daemon=True).start()
     threading.Thread(target=weekly_loop,name='automatic-weekly-lines',daemon=True).start()
     threading.Thread(target=loop, name='automatic-data-updates', daemon=True).start()
