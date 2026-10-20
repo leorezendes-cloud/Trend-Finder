@@ -241,11 +241,11 @@ def register():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+    if request.method == 'GET' and g.member is not None:
+        return redirect(url_for('membership.preferences'))
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
-        if not allow_attempt('login', email):
-            return render_template('membership.html', mode='login', error='Too many attempts. Please try again in 15 minutes.'), 429
         member = db().execute('SELECT * FROM members WHERE email=?', (email[:254],)).fetchone()
         # Perform password work even for unknown accounts.
         stored = member['password_hash'] if member else current_app.config['MEMBERSHIP_DUMMY_HASH']
@@ -256,6 +256,10 @@ def login():
             session['member_version'] = member['session_version']
             session.permanent = True
             return redirect(url_for('home'))
+        # Count only failed credentials; correct passwords must never exhaust
+        # the same-account login limit. IP and email limits still protect failures.
+        if not allow_attempt('login', email):
+            return render_template('membership.html', mode='login', error='Too many attempts. Please try again in 15 minutes.'), 429
         error = 'Email or password is incorrect.'
     return render_template('membership.html', mode='login', error=error), 400 if error else 200
 

@@ -267,7 +267,11 @@ def store():
 
 def premium():
     member = getattr(g, 'member', None)
-    return bool(member and str(member['id']) in {str(x) for x in current_app.config.get('EXPERT_PREMIUM_MEMBER_IDS', [])})
+    # Site owners may review all Expert Beta reports without paid entitlements.
+    return bool(member and (
+        getattr(g, 'is_owner', False)
+        or str(member['id']) in {str(x) for x in current_app.config.get('EXPERT_PREMIUM_MEMBER_IDS', [])}
+    ))
 
 
 def accessible(record):
