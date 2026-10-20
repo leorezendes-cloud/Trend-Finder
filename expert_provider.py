@@ -74,7 +74,7 @@ class GeminiProvider:
     MODELS = ('gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite')
 
     def __init__(self, *, model=None, api_key=None, free_tier_confirmed=None):
-        self.model = model or 'gemini-3.8-flash'
+        self.model = model or 'gemini-2.5-flash'
         self.api_key = api_key or os.environ.get('GEMINI_API_KEY')
         local = {}
         if not self.api_key:

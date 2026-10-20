@@ -58,7 +58,7 @@ def save_final(root, final):
 
 
 def draft(root, version, approved=False, model=None, provider_name="openai"):
-    from expert_beta import generate_draft
+    from expert_beta import generate_draft, instant
     from expert_provider import OpenAIProvider, GeminiProvider
     if provider_name == "openai" and not approved:
         raise RuntimeError('Approval required for a paid API call')
@@ -67,6 +67,16 @@ def draft(root, version, approved=False, model=None, provider_name="openai"):
         raise ValueError('Unknown forecast version')
     if provider_name not in ("gemini", "openai"):
         raise ValueError("Unknown provider")
+    folder = Path(root)/'drafts';folder.mkdir(parents=True,exist_ok=True)
+    saved = folder/(version+'.json')
+    if provider_name == 'gemini' and saved.exists():
+        # Reuse a complete response without loading credentials or spending quota.
+        data=json.loads(saved.read_text())
+        if data.get('scout_sha256') != hashlib.sha256(canonical(rows[0]['scout'])).hexdigest():
+            raise ValueError('Saved draft references a different Scout snapshot')
+        return str(saved)
+    if provider_name == 'gemini' and clock() >= instant(rows[0]['scout']['game']['kickoff_utc']):
+        raise ValueError('Gemini draft kickoff already reached')
     provider = GeminiProvider(model=model) if provider_name == "gemini" else OpenAIProvider(approved=True, model=model)
     if provider_name == "gemini" and not provider.free_tier_confirmed:
         raise RuntimeError("Confirm Gemini Free Tier and disabled billing before generation")
@@ -76,8 +86,26 @@ def draft(root, version, approved=False, model=None, provider_name="openai"):
     # Reservation persists even after a timeout: a server may have billed the call.
     # A retry therefore requires an operator to inspect the attempt first.
     reservation = folder/(version+'.attempt.json')
-    with reservation.open('x') as stream:
-        json.dump({'version':version,'started_at':clock().isoformat(),'model':provider.model,'provider':provider_name},stream)
+    if provider_name == 'gemini':
+        # Separate lock: the scheduler already owns automation.lock. This protects
+        # direct CLI requests too, without recursively locking the queue lock.
+        import fcntl, os
+        from datetime import timedelta
+        from expert_auto_queue import recent_attempts
+        with (Path(root)/'gemini_requests.lock').open('a') as budget_lock:
+            fcntl.flock(budget_lock,fcntl.LOCK_EX)
+            now=clock();attempts=recent_attempts(root,now)
+            limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT','16'))
+            if not 1<=limit<=16:raise ValueError('Gemini daily limit must be 1..16')
+            if len(attempts)>=limit:raise RuntimeError('Persistent Gemini 24-hour quota exhausted')
+            if sum(t>now-timedelta(minutes=1) for t in attempts)>=4:
+                raise RuntimeError('Persistent Gemini minute quota exhausted')
+            with reservation.open('x') as stream:
+                json.dump({'version':version,'started_at':now.isoformat(),'model':provider.model,'provider':provider_name},stream)
+                stream.flush();os.fsync(stream.fileno())
+    else:
+        with reservation.open('x') as stream:
+            json.dump({'version':version,'started_at':clock().isoformat(),'model':provider.model,'provider':provider_name},stream)
     result = generate_draft(rows[0]['scout'],provider)
     path = folder/(version+'.json')
     with path.open('xb') as stream:

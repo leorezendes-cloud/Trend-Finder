@@ -224,7 +224,7 @@ def start_scheduler():
         while True:
             try:
                 subprocess.run([sys.executable, str(SOURCE/'expert_automation.py'), '--once'],
-                    cwd=SOURCE, timeout=480, check=True,
+                    cwd=SOURCE, timeout=900, check=True,
                     env={**os.environ, 'POLARS_MAX_THREADS':'1'})
             except (OSError, subprocess.SubprocessError) as error:
                 print(f'Expert-only worker failed: {type(error).__name__}', flush=True)

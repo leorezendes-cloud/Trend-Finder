@@ -139,6 +139,8 @@ class Store:
                 raise ValueError('Archive integrity check failed')
             record = json.loads(raw)
             validate_scout(record['scout'])
+            if record.get('expert') is not None:
+                validate_expert(record['expert'],record['scout'])
             if path.parent.relative_to(self.root/'forecasts').as_posix() != identity(record['scout']):
                 raise ValueError('Archive identity mismatch')
             record['version'] = path.stem

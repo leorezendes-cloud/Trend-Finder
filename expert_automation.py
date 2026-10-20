@@ -32,7 +32,7 @@ def execute_once(source=None, root=None, archive=None, *, publish_reports=None):
                 run_limit=int(os.environ.get('TREND_FINDAH_EXPERT_RUN_LIMIT','1')),
                 execute=True)
             status['drafts'] = draft
-            if draft['state'] == 'operator_review_required':
+            if draft['state'] == 'operator_review_required' or draft.get('attempt_requires_review',0):
                 status['state'] = 'needs_review'
         else:
             status['drafts'] = 'disabled'

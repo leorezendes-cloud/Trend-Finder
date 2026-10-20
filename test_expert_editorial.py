@@ -82,6 +82,40 @@ class ExpertEditorialTests(unittest.TestCase):
         for expected in ['sports fans','actual closing totals','Never invent or force a trend','may disagree with Scout','Works Cited','85 words']:
             self.assertIn(expected,text)
         self.assertEqual(draft['review_status'],'pending')
-        self.assertEqual(Path('templates/expert_game.html').read_text(),Path('templates/expert_game_mobile.html').read_text())
+
+
+    def test_desktop_mobile_reports_have_equivalent_core_functionality(self):
+        from html.parser import HTMLParser
+        from flask import render_template
+        from app import app
+        from expert_beta import public_record, SECTIONS, identity
+        class Links(HTMLParser):
+            def __init__(self):super().__init__();self.links=[];self.current=None
+            def handle_starttag(self,tag,attrs):
+                if tag=='a':self.current=[dict(attrs).get('href'),[]]
+            def handle_data(self,data):
+                if self.current is not None:self.current[1].append(data)
+            def handle_endtag(self,tag):
+                if tag=='a' and self.current is not None:
+                    self.links.append((self.current[0],''.join(self.current[1]).strip()));self.current=None
+        featured=next(r for r in self.store.records() if r['scout']['game']['away_team']=='HOU')
+        private=next(r for r in self.store.records() if r['scout']['game']['away_team']=='BUF')
+        for record in [featured,private]:
+            with self.subTest(game=identity(record['scout'])),app.test_request_context('/the-plug/'+identity(record['scout'])):
+                app.preprocess_request()
+                item=public_record(record,True);views=[]
+                for template in ['expert_game.html','expert_game_mobile.html']:
+                    html=render_template(template,item=item,versions=[record]);parsed=Links();parsed.feed(html)
+                    comparison=[href for href,text in parsed.links if text=='View Team Comparison']
+                    self.assertEqual(comparison,['/matchup/'+record['scout']['game']['game_id']])
+                    self.assertIn('HOU' if record is featured else 'BUF',html)
+                    self.assertIn('The Plug',html);self.assertIn('Spread:',html);self.assertIn('Total:',html)
+                    self.assertIn('Preserved Versions',html);self.assertIn('/the-plug',dict((text,href) for href,text in parsed.links).get('← Back to The Plug'))
+                    if record is featured:
+                        self.assertIn('PREMIUM_SECRET',html)
+                        for heading in SECTIONS:self.assertIn(expert_prose(heading,record['scout']['sources']),unescape(html))
+                    else:self.assertNotIn('PREMIUM_SECRET',html)
+                    views.append(comparison)
+                self.assertEqual(views[0],views[1])
 
 if __name__=='__main__':unittest.main()
