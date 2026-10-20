@@ -4,7 +4,7 @@
 {% if g.member %}
 <a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
 {% endif %}
-<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/Neon Graffiti Trend Findah Logo.png') }}" alt="Gravy Train — Home"></a>
+<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/Neon Graffiti Trend Findah Logo.png') }}" alt="Trend Findah — Home"></a>
 <div class="site-header-actions">
 <details class="site-menu" id="site-menu">
 <summary><span aria-hidden="true">☰</span> Menu</summary>
