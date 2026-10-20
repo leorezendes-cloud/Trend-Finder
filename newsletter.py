@@ -1,6 +1,7 @@
 """Owner-reviewed newsletters. Startup and page views never send email."""
 import json
 import os
+import re
 import secrets
 import time
 from datetime import datetime, timedelta, timezone
@@ -19,6 +20,40 @@ SECTIONS = [('predictions', "The Plug's Picks"), ('trends', 'Hot Right Now'),
             ('updates', 'Site Updates')]
 
 
+def plug_email_blocks(value, section, frequency):
+    """Keep new multi-line cards intact and split legacy single-line digests.
+
+    Older saved weekly drafts have one line per game/trend with no blank lines;
+    newer records contain a title, detail, and link separated with newlines.
+    """
+    value = value or ''
+    blocks = [part.strip() for part in value.split('\n\n') if part.strip()]
+    if section not in ('predictions', 'trends', 'matchups') or len(blocks) != 1:
+        return blocks
+    lines = [line.strip() for line in value.splitlines() if line.strip()]
+    if len(lines) < 2:
+        return blocks
+    result = []
+    for line in lines:
+        continuation = (line.startswith(('https://', 'http://', 'ATS:', 'Total:', 'Pick:', 'Scout:')))
+        if continuation and result:
+            result[-1] += '\n' + line
+        else:
+            result.append(line)
+    return result
+
+
+def plug_period_label(issue):
+    """Readable heading for old stored YYYY-Wxx subjects; no DB mutation."""
+    label = issue['subject'].split(' · ', 1)[-1]
+    if issue['frequency'] == 'weekly' and re.fullmatch(r'\d{4}-W\d{2}', label):
+        try:
+            return newsletter_subject('weekly', label).split(' · ', 1)[-1]
+        except ValueError:
+            pass
+    return label
+
+
 def init_newsletter(app):
     app.config.update(
         NEWSLETTER_AUTO_DRAFT_ENABLED=True,
@@ -28,6 +63,8 @@ def init_newsletter(app):
         NEWSLETTER_ADDRESS=os.environ.get('TREND_FINDAH_NEWSLETTER_ADDRESS', '').strip(),
     )
     app.register_blueprint(bp)
+    app.jinja_env.filters['plug_email_blocks'] = plug_email_blocks
+    app.jinja_env.filters['plug_period_label'] = plug_period_label
     with app.app_context():
         with db():
             db().execute('''CREATE TABLE IF NOT EXISTS newsletter_issues (
@@ -185,6 +222,27 @@ def issue_page(issue_id):
     counts = {row['state']:row['n'] for row in db().execute('SELECT state,COUNT(*) n FROM newsletter_deliveries WHERE issue_id=? GROUP BY state', (issue_id,))}
     metadata = db().execute('SELECT metadata FROM newsletter_generated WHERE issue_id=?',(issue_id,)).fetchone()
     return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=headings_for_issue(issue),counts=counts,generated=json.loads(metadata['metadata']) if metadata else None)
+
+
+@bp.get('/results/<int:year>/<int:month>')
+def monthly_results(year, month):
+    """Public read-only saved scores, pinned to the original newsletter time."""
+    from newsletter_draft import completed_month_games, ET
+    if not (1999 <= year <= 2100 and 1 <= month <= 12):
+        abort(404)
+    raw_at = request.args.get('at', '')
+    if not raw_at.isdecimal() or len(raw_at) > 12:
+        abort(400, description='A valid monthly results date is required.')
+    try:
+        at = datetime.fromtimestamp(int(raw_at), timezone.utc)
+    except (ValueError, OSError, OverflowError):
+        abort(400, description='Invalid monthly results date.')
+    if at > datetime.now(timezone.utc) or (at.astimezone(ET).year, at.astimezone(ET).month) != (year, month):
+        abort(400, description='Monthly results date is out of range.')
+    games = completed_month_games(Path(current_app.root_path), at)
+    month_name = at.astimezone(ET).strftime('%B %Y')
+    return render_template('newsletter_results.html', games=games, month_name=month_name,
+                           as_of=at.astimezone(ET), origin=current_app.config['PUBLIC_ORIGIN'])
 
 
 @bp.get('/monthly/preview')

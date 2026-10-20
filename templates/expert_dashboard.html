@@ -1,6 +1,6 @@
 {% extends 'expert_base.html' %}
 {% macro cards(items) %}<div class="expert-grid">{% for item in items %}{% set s=item.scout %}{% set g=s.game %}{% set picks=item.saved_picks %}{% set quotes=item.locked_quotes %}
-<article class="expert-card" data-away="{{ g.away_team }}" data-home="{{ g.home_team }}" data-kickoff="{{ g.kickoff_utc }}"><p class="plug-live-score" aria-live="polite"></p><p class="expert-meta">Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><h2>
+<article class="expert-card" id="game-{{ '%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team) }}" data-away="{{ g.away_team }}" data-home="{{ g.home_team }}" data-kickoff="{{ g.kickoff_utc }}"><p class="plug-live-score" aria-live="polite"></p><p class="expert-meta">Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><h2>
     <a class="matchup-comparison-link"
        href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team)) }}">
         {{ g.away_team }} @ {{ g.home_team }}

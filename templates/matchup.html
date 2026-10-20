@@ -2,20 +2,90 @@
 {% from '_save_watchlist.html' import save_item with context %}
 {% block title %}{{ game.away_team }} vs {{ game.home_team }}{% endblock %}
 {% block heading %}{{ game.away_team }} @ {{ game.home_team }}{% endblock %}
+{% block intro %}<p>{% if is_final %}Explore what happened, compare matchups, and see how much evidence supports each number.{% else %}Compare the teams, explore key matchups, and see the statistics behind each comparison.{% endif %}</p>{% endblock %}
 {% block filter_form %}{% endblock %}
-{% block data_notes %}<p class="stats-note">{{ game.gameday }} · {{ game.gametime }} ET · Week {{ week }}. Comparison uses completed regular-season games before Week {{ week }}.{% if manifest %} Stats retrieved {{ manifest.retrieved_at|eastern_time }}.{% endif %} Missing statistics stay —.</p>{% endblock %}
+{% block data_notes %}{% endblock %}
 {% block content %}{% include '_inline_picks.html' %}
-{% if game.away_score != '' and game.home_score != '' %}<p class="stats-note">Saved final score: {{ game.away_team }} {{ game.away_score }} · {{ game.home_team }} {{ game.home_score }}</p>{% endif %}
-<section class="stats-card matchup-panel"><h2>Prediction</h2>
-{% if forecast %}{% set prediction = forecast.components['Blend'] %}<p><strong>{{ prediction.pick or 'No pick recorded' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p><p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p><p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% else %}<p>No saved prediction for this matchup yet.</p>{% endif %}
-<a href="{{ url_for('plug_page') }}">See predictions and model details →</a></section>
+<style>
+.matchup-final-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
+.matchup-final-head h2{margin:0}
+.matchup-final-score{font-weight:800;font-size:1.22rem}
+.matchup-final-score small{font-size:.72rem;color:#86efac;font-weight:800;margin-left:6px}
+.matchup-boxscore{margin-top:12px;border-top:1px solid #475569}
+.matchup-boxscore>summary{cursor:pointer;color:#fbbf24;font-weight:700;padding:14px 0}
+.matchup-final-metrics{border:1px solid #475569;border-radius:10px;overflow:hidden}
+.matchup-final-column-head,.matchup-final-metric{display:grid;grid-template-columns:minmax(0,1fr) minmax(95px,1.4fr) minmax(0,1fr);gap:7px;align-items:center;text-align:center;padding:10px 9px}
+.matchup-final-column-head{background:#111827;color:#fbbf24;font-weight:700}
+.matchup-final-metric:nth-child(odd){background:#263445}
+.matchup-final-metric span{color:#cbd5e1;font-size:.87rem}
+.matchup-final-metric strong{font-size:1.1rem;font-variant-numeric:tabular-nums}
+.matchup-final-leaders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.matchup-final-team{background:#111827;border:1px solid #475569;border-radius:10px;padding:13px;min-width:0}
+.matchup-final-team h4{margin:0 0 8px;color:#fbbf24;font-size:1rem}
+.matchup-final-player{padding:8px 0;border-top:1px solid #334155;display:flex;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+.matchup-final-player small{color:#94a3b8;font-weight:700}
+.matchup-final-player strong{font-size:.96rem}
+.matchup-final-player span{font-size:.82rem;color:#cbd5e1}
+@media (min-width:768px){.matchup-prediction{width:100%;max-width:600px;margin-left:auto;margin-right:auto}}
+@media(max-width:540px){.matchup-final-head{display:block}.matchup-final-score{margin-top:6px;font-size:1.05rem}.matchup-final-column-head,.matchup-final-metric{gap:3px;padding:9px 4px}.matchup-final-metric span{font-size:.78rem}.matchup-final-metric strong{font-size:.95rem}.matchup-final-team{padding:9px}.matchup-final-leaders{gap:8px}.matchup-final-player strong{font-size:.85rem}.matchup-final-player span{font-size:.74rem}}
+</style>
+{% if is_final %}
+<section class="stats-card matchup-panel matchup-final">
+  <div class="matchup-final-head">
+    <h2>Final Game Stats</h2>
+    <div class="matchup-final-score">{{ game.away_team }} {{ game.away_score }} – {{ game.home_team }} {{ game.home_score }} <small>FINAL</small></div>
+  </div>
+  <details class="matchup-boxscore">
+    <summary>View game stats &amp; top performers</summary>
+    {% if box_score.has_details %}
+      {% if box_score.metrics %}
+      <div class="matchup-final-metrics">
+        <div class="matchup-final-column-head"><strong>{{ box_score.codes[0] }}</strong><span>Team stats</span><strong>{{ box_score.codes[1] }}</strong></div>
+        {% for metric in box_score.metrics %}
+        <div class="matchup-final-metric">
+          <strong>{{ metric['values'][0] if metric['values'][0] is not none else '—' }}</strong>
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric['values'][1] if metric['values'][1] is not none else '—' }}</strong>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if box_score.performers[0].leaders or box_score.performers[1].leaders %}
+      <h3 style="margin:18px 0 6px">Top performers</h3>
+      <div class="matchup-final-leaders">
+        {% for side in box_score.performers %}
+        <div class="matchup-final-team">
+          <h4>{{ side.team }}</h4>
+          {% for leader in side.leaders %}
+          <div class="matchup-final-player">
+            <small>{{ leader.role }}</small>
+            <strong>{{ leader.name }}</strong>
+            <span>{{ leader.stat_line }}</span>
+          </div>
+          {% else %}<p>Individual stats unavailable.</p>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% else %}
+      <p>Detailed box-score statistics haven't been imported for this game yet.</p>
+    {% endif %}
+  </details>
+</section>
+{% endif %}
+{% if not g.member or not inline_picks %}
+<section class="stats-card matchup-panel matchup-prediction"><h2>{{ 'Predicted Picks' if game.away_score not in ('', none) and game.home_score not in ('', none) else 'Prediction' }}</h2>
+{% if forecast %}{% set prediction = forecast.components['Blend'] %}<p><strong>{{ prediction.pick or 'No pick recorded' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p><p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p>{% if game.away_score in ('', none) or game.home_score in ('', none) %}<p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% endif %}{% else %}<p>No saved prediction for this matchup yet.</p>{% endif %}
+<a href="{{ url_for('plug_page') }}#game-{{ game.game_id }}">See predictions and details →</a>
+</section>
+{% endif %}
 <section class="stats-card matchup-panel matchup-comparison"><h2>Team comparison</h2><div class="table-scroll"><table><thead><tr><th>Per game</th>{% for side in teams %}<th><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} →</a></th>{% endfor %}</tr></thead><tbody>
 <tr><td>Record</td>{% for side in teams %}<td>{{ side.summary.wins }}–{{ side.summary.losses }}–{{ side.summary.ties }}</td>{% endfor %}</tr>
 <tr><td>ATS record</td>{% for side in teams %}<td>{{ side.summary.markets.ats_w }}–{{ side.summary.markets.ats_l }}–{{ side.summary.markets.ats_p }} <small>({{ side.summary.markets.ats_known }} graded)</small></td>{% endfor %}</tr>
 <tr><td>Over–Under–Push</td>{% for side in teams %}<td>{{ side.summary.markets.over }}–{{ side.summary.markets.under }}–{{ side.summary.markets.total_push }} <small>({{ side.summary.markets.ou_known }} graded)</small></td>{% endfor %}</tr>
 {% for key,label in [('points_for','Points scored'),('points_against','Points allowed'),('passing_yards','Passing yards'),('rushing_yards','Rushing yards'),('passing_yards_allowed','Passing yards allowed'),('rushing_yards_allowed','Rushing yards allowed')] %}<tr><td>{{ label }}</td>{% for side in teams %}<td>{{ side.summary.metrics[key].value|stat }} <small>({{ side.summary.metrics[key].n }} games)</small></td>{% endfor %}</tr>{% endfor %}
 </tbody></table></div></section>
-<div class="stats-grid">{% for side in teams %}<section class="stats-card matchup-panel"><h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
+<div class="stats-grid matchup-team-cards">{% for side in teams %}<section class="stats-card matchup-panel matchup-team-card"><h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
 {{ save_item('team',side.code,side.code) }}
 {% for leader in side.leaders %}<h3>{{ leader.role }}</h3><p><a href="{{ url_for('scout4.players_page',player=leader.id,team=side.code,season=season,before_week=week) }}">{{ leader.name }} →</a></p><p>{% for key in leader.fields %}{{ key|replace('_',' ')|title }}: {{ leader.summary.metrics[key].total|stat(0) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% else %}<p>No recorded player leaders before this matchup.</p>{% endfor %}</section>{% endfor %}</div>
 {% endblock %}

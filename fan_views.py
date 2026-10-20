@@ -1,5 +1,6 @@
 """Fan-facing comparisons and a read-only, cached scoreboard."""
 import json
+import math
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -88,7 +89,7 @@ def fan_context(game):
     teams, players, manifest = sources(season)
     records = team_records(schedule, teams, season, week)
     people = player_records(schedule, players, season, week)
-    return season, week, records, people, manifest
+    return season, week, records, people, manifest, teams, players
 
 
 def leaders(rows, code):
@@ -110,12 +111,112 @@ def leaders(rows, code):
     return output
 
 
+def _saved_final(game):
+    """Only a saved result makes a game final; the live scoreboard is separate."""
+    try:
+        return all(str(game[k]).strip() != '' and math.isfinite(float(game[k]))
+                   for k in ('away_score', 'home_score'))
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _recorded_number(value):
+    """Preserve missing values instead of converting them to a misleading zero."""
+    try:
+        if value is None or str(value).strip() == '':
+            return None
+        result = float(value)
+        if not math.isfinite(result):
+            return None
+        return int(result) if result.is_integer() else round(result, 1)
+    except (TypeError, ValueError):
+        return None
+
+
+def _game_stat_rows(rows, game_id):
+    """An exact saved game ID is required: never borrow stats from another week."""
+    return [row for row in (rows or [])
+            if isinstance(row, dict) and str(row.get('game_id') or row.get('gameid') or '') == game_id]
+
+
+def _final_box_score(game, team_data, player_data):
+    """Build actual-game, side-by-side statistics from cached nflverse rows.
+
+    Game rows are not pregame evidence. Scout comparisons continue to use
+    team_records/player_records strictly before the displayed matchup week.
+    """
+    game_id = game['game_id']
+    codes = (team_code(game['away_team']), team_code(game['home_team']))
+    team_rows = _game_stat_rows(team_data, game_id)
+    player_rows = _game_stat_rows(player_data, game_id)
+    by_team = {team_code(row['team']): row for row in team_rows
+               if row.get('team') and team_code(row['team']) in codes}
+
+    def team_metric(code, field):
+        return _recorded_number(by_team.get(code, {}).get(field))
+
+    metrics = []
+    for field, label in (
+        ('passing_yards', 'Passing yards'),
+        ('rushing_yards', 'Rushing yards'),
+        ('total_yards', 'Total yards'),
+        ('attempts', 'Pass attempts'),
+        ('carries', 'Rush attempts'),
+        ('sacks_suffered', 'Sacks allowed'),
+    ):
+        values = []
+        for code in codes:
+            if field == 'total_yards':
+                passing, rushing = (team_metric(code, key) for key in ('passing_yards', 'rushing_yards'))
+                value = passing + rushing if passing is not None and rushing is not None else None
+            else:
+                value = team_metric(code, field)
+            values.append(value)
+        if any(value is not None for value in values):
+            metrics.append({'label': label, 'values': values})
+
+    performers = []
+    leader_specs = (
+        ('Passing', 'passing_yards', 'passing_tds', 'attempts', 'Attempts'),
+        ('Rushing', 'rushing_yards', 'rushing_tds', 'carries', 'Carries'),
+        ('Receiving', 'receiving_yards', 'receiving_tds', 'receptions', 'Catches'),
+    )
+    for code in codes:
+        own_players = [row for row in player_rows
+                       if row.get('team') and team_code(row['team']) == code]
+        top_players = []
+        for role, yard_field, td_field, count_field, count_label in leader_specs:
+            candidates = []
+            for row in own_players:
+                name = str(row.get('player_display_name') or row.get('player_name') or '').strip()
+                yards = _recorded_number(row.get(yard_field))
+                if name and yards is not None and yards > 0:
+                    candidates.append((yards, name, row))
+            if not candidates:
+                continue
+            yards, name, winner = max(candidates, key=lambda item: (item[0], item[1]))
+            stats = [f'{yards:g} yards']
+            count = _recorded_number(winner.get(count_field))
+            if count is not None:
+                stats.append(f'{count:g} {count_label.lower()}')
+            tds = _recorded_number(winner.get(td_field))
+            if tds is not None:
+                stats.append(f'{tds:g} TD')
+            top_players.append({'role': role, 'name': name, 'stat_line': ' · '.join(stats)})
+        performers.append({'team': code, 'leaders': top_players})
+
+    return {'codes': codes, 'metrics': metrics, 'performers': performers,
+            'has_details': bool(metrics or any(p['leaders'] for p in performers))}
+
+
 @bp.get('/matchup/<game_id>')
 def matchup(game_id):
     game = next((g for g in effective_rows(read_csv(ROOT / 'nfl_games.csv'),ROOT/'nfl_games.csv') if g['game_id'] == game_id), None)
     if game is None:
         abort(404)
-    season, week, records, players, manifest = fan_context(game)
+    season, week, records, players, manifest, team_data, player_data = fan_context(game)
+    is_final = _saved_final(game)
+    box_score = _final_box_score(game, team_data, player_data) if is_final else None
     teams = []
     for side in ('away', 'home'):
         code = team_code(game[side + '_team'])
@@ -130,7 +231,7 @@ def matchup(game_id):
     from member_picks import comparison_picks
     inline_picks=comparison_picks(game_id=game_id)
     return render_template('matchup.html', inline_picks=inline_picks, game=game, teams=teams, season=season, week=week,
-                           manifest=manifest, forecast=forecast)
+                           manifest=manifest, forecast=forecast, is_final=is_final, box_score=box_score)
 
 
 @bp.get('/fantasy')

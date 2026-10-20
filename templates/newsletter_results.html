@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ month_name }} — Recorded NFL Results | TrendFindah.com</title>
+  <style>
+    body {margin:0;background:#080e18;color:#eef3fa;font:16px/1.5 Arial,Helvetica,sans-serif}
+    main {max-width:760px;margin:24px auto;padding:0 18px 36px}
+    header {text-align:center;margin-bottom:24px}
+    header img {display:block;width:min(100%,520px);height:auto;margin:auto}
+    h1 {font-size:26px;margin:14px 0 6px}
+    .eyebrow, a {color:#fbbf24}
+    .eyebrow {font-size:13px;letter-spacing:2px;font-weight:800}
+    .muted {color:#cbd5e1;font-size:14px}
+    .result {background:#182437;border:1px solid #34445c;border-radius:8px;padding:15px 16px;margin:0 0 10px}
+    .result strong {display:block;font-size:17px;margin-bottom:5px}
+    .result a {font-weight:700}
+    .back {
+    display: inline-block;
+    margin: 0 0 20px;
+    padding: 10px 10px;
+    background: #fbbf24;
+    color: #111827;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+}
+
+.back:hover {
+    background: #f59e0b;
+}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a href="{{ origin }}"><img src="{{ origin }}/static/Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png" alt="TrendFindah.com"></a>
+      <div class="eyebrow">THE MONTHLY PLUG</div>
+      <h1>{{ month_name }} — Recorded NFL Results</h1>
+      <p class="muted">
+        {{ games | length }} completed · Weeks 4–7 · Oct 1 – Oct 26
+      </p>
+    </header>
+    <a class="back" href="{{ origin }}">TrendFindah.com</a>
+    {% for gameday, game, away, home in games %}
+      <div class="result">
+        <strong>{{ gameday.strftime('%b %d') }}: {{ game.away_team }} {{ '%g' | format(away) }} – {{ game.home_team }} {{ '%g' | format(home) }}</strong>
+        <a href="{{ origin }}/matchup/{{ game.game_id | urlencode }}">Open game breakdown →</a>
+      </div>
+    {% else %}
+      <p>No saved completed games were available for this period.</p>
+    {% endfor %}
+  </main>
+</body>
+</html>

@@ -175,7 +175,12 @@ def _trends_content(origin, warnings):
                          else f"{trend['wins']} of the last {trend['sample']} {labels[trend['outcome']]}")
         query = urlencode(trend['params'])
         link = origin + '/trend-finder?' + query + '#matching-games'
-        output.append(f"{trend['title']} · {qualification}\n{link}")
+        detail = qualification
+        sample = number(trend.get('sample'))
+        wins = number(trend.get('wins'))
+        if sample is not None and wins is not None and sample > 0 and 0 <= wins <= sample:
+            detail += f" · {wins:g}/{sample:g} ({100 * wins / sample:.0f}%) in the recorded sample"
+        output.append(f"{trend['title']}\n{detail}\n{link}")
         identities.append({'title': trend['title'], 'latest_id': trend.get('latest_id')})
     return output, identities
 
@@ -220,28 +225,27 @@ def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True)
     return lines
 
 
-def _monthly_recap(root, now, origin, sources, warnings):
-    """Month-to-date verified NFL scores, not inferred Scout grading.
+def completed_month_games(root, now, sources=None):
+    """Saved, completed month-to-date scores as of an aware UTC timestamp.
 
-    A Scout performance report needs reviewed publication-time picks AND final
-    quotes/results before a win rate can be represented as real performance.
+    Reused by the email digest and its linked public archive so the count,
+    deduplication, and six-hour completion cutoff always agree.
     """
+    root = Path(root)
     schedule = root / 'nfl_games.csv'
     if not schedule.exists():
-        warnings.append('No saved NFL schedule for the monthly recap.')
-        return 'No verified results available for this month.'
-
+        return []
     raw = schedule.read_bytes()
-    sources[str(schedule.relative_to(root))] = hashlib.sha256(raw).hexdigest()
+    if sources is not None:
+        sources[str(schedule.relative_to(root))] = hashlib.sha256(raw).hexdigest()
     rows = csv.DictReader(raw.decode('utf-8-sig').splitlines())
     local = now.astimezone(ET)
-    start_date = local.date().replace(day=1)
-    completed = []
-    ids = set()
+    first = local.date().replace(day=1)
+    completed, ids = [], set()
     for row in rows:
         try:
             gameday = datetime.strptime(row['gameday'], '%Y-%m-%d').date()
-            if not start_date <= gameday <= local.date():
+            if not first <= gameday <= local.date():
                 continue
             home = number(row.get('home_score'))
             away = number(row.get('away_score'))
@@ -259,14 +263,28 @@ def _monthly_recap(root, now, origin, sources, warnings):
             completed.append((gameday, row, away, home))
         except (KeyError, ValueError, TypeError):
             continue
+    completed.sort(key=lambda item: (item[0], item[1]['game_id']), reverse=True)
+    return completed
 
+
+def _monthly_recap(root, now, origin, sources, warnings):
+    """Month-to-date recorded NFL scores, never fabricated Scout grading."""
+    root = Path(root)
+    if not (root / 'nfl_games.csv').exists():
+        warnings.append('No saved NFL schedule for the monthly recap.')
+        return 'No verified results available for this month.'
+
+    local = now.astimezone(ET)
+    completed = completed_month_games(root, now, sources)
     if not completed:
         warnings.append('No verified completed games yet this month.')
         return f"{local.strftime('%B %Y')} — no completed games in the saved results yet."
 
-    # Show the most recent eight completed games and link to recorded results.
-    completed.sort(key=lambda item: (item[0], item[1]['game_id']), reverse=True)
-    lines = [f"{local.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {local.strftime('%b %d')}."]
+    # Match the full-results link to the exact generated-at time, not a live
+    # month view that would later contradict the number printed in this email.
+    archive = (f"{origin}/newsletter/results/{local.year}/{local.month}"
+               f"?at={int(now.timestamp())}")
+    lines = [f"{local.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {local.strftime('%b %d')}.\n{archive}"]
     for gameday, row, away, home in completed[:8]:
         lines.append(f"{gameday.strftime('%b %d')}: {row['away_team']} {away:g} – {row['home_team']} {home:g}\n{origin}/matchup/{row['game_id']}")
     return '\n\n'.join(lines)

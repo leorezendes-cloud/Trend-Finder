@@ -53,7 +53,7 @@
  .mobile-picks-menu > summary small { display: block; color: #f1f5f9; font-weight: normal; font-size: 13px; }
 }
 
-.inline-member-picks .picks-grid { grid-template-columns:minmax(260px,320px) minmax(0,1fr);align-items:stretch; }
+.inline-member-picks .picks-grid { grid-template-columns:repeat(2,minmax(0,1fr));align-items:start; }
 .inline-public-market { background:#1f2937;border:1px solid #475569;border-radius:8px; }
 .inline-public-market .public-market-section { padding:8px 0;border-bottom:1px solid #475569; }
 .inline-public-market h3 { margin:0 0 6px;font:bold 15px Arial,sans-serif;color:#fbbf24; }
@@ -64,7 +64,15 @@
 .public-market-columns { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;flex:1; }
 .inline-public-market .public-market-section { min-width:0;border-bottom:0;border-right:1px solid #475569;padding:8px 10px 8px 0; }
 .inline-public-market .public-market-section:last-child { border-right:0; }
-@media(max-width:1000px) { .inline-member-picks .picks-grid { grid-template-columns:minmax(0,1fr); } }
+/* Keep Member Picks and Public Bets side by side on desktop/tablet. */
+@media (max-width:1100px) and (min-width:651px) {
+ .inline-member-picks .public-market-columns { grid-template-columns:minmax(0,1fr); }
+ .inline-member-picks .inline-public-market .public-market-section { border-right:0;border-bottom:1px solid #475569;padding:8px 0; }
+ .inline-member-picks .inline-public-market .public-market-section:last-child { border-bottom:0; }
+}
+@media (max-width:650px) {
+ .inline-member-picks .picks-grid { grid-template-columns:minmax(0,1fr); }
+}
 @media(max-width:650px) { .public-market-columns { grid-template-columns:minmax(0,1fr); } .inline-public-market .public-market-section { border-right:0;border-bottom:1px solid #475569; } }
 
 .mobile-public-market-panel { display:none; }
@@ -73,3 +81,7 @@
  .inline-member-picks .mobile-public-market-panel { display:grid;gap:16px;margin-top:16px; }
  .inline-member-picks .mobile-public-market-panel .pick-compact { margin:0;padding:16px; }
 }
+
+/* Scoped matchup columns: prevent overflowing cards without touching other pick pages. */
+.inline-member-picks .picks-grid > * { min-width:0; }
+.inline-member-picks .picks-grid > .pick-game { margin-bottom:0; }

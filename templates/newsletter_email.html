@@ -33,7 +33,7 @@
               </p>
 
               <h1 style="margin:0;color:#f8fafc;font-size:24px;line-height:1.25">
-                {{ issue.subject.split(' · ', 1)[-1] }}
+                {{ issue | plug_period_label }}
               </h1>
 
             </td>
@@ -49,7 +49,7 @@
                 {{ heading }}
               </h2>
 
-              {% for block in sections[key].split('\n\n') if block|trim %}
+              {% for block in sections[key] | plug_email_blocks(key, issue.frequency) %}
 
               <table role="presentation" cellpadding="0" cellspacing="0"
                      border="0" width="100%"
@@ -64,7 +64,7 @@
                         <p style="margin:9px 0 2px;font-size:14px">
                           <a href="{{ line }}"
                              style="color:#fbbf24;text-decoration:underline;font-weight:700">
-                            {{ 'Open game breakdown' if key in ('predictions','expert') else 'See trend evidence' if key == 'trends' else 'View matchup' if key == 'matchups' else 'Read more' }} →
+                            {{ 'View all recorded games' if issue.frequency == 'monthly' and key == 'predictions' and '/newsletter/results/' in line else 'Open game breakdown' if key in ('predictions','expert') else 'See trend evidence' if key == 'trends' else 'View matchup' if key == 'matchups' else 'Read more' }} →
                           </a>
                         </p>
 

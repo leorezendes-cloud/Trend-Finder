@@ -1,20 +1,260 @@
+<style>
+.inline-member-picks .public-market-collapse {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 360px;
+    margin: 1rem 0;
+    border: 1px solid #475569;
+    background: #1f2937;
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+.inline-member-picks .public-market-collapse > summary {
+    cursor: pointer;
+    color: #fbbf24;
+    font-weight: 700;
+    padding: 8px 0;
+}
+.inline-member-picks .public-market-collapse[open] > .picks-grid {
+    margin-top: 12px;
+    grid-template-columns: minmax(0, 1fr);
+}
+.inline-member-picks .public-market-collapse .inline-public-market {
+    width: 100%;
+    box-sizing: border-box;
+}
+/* Only the matchup page uses the combined snapshot card. */
+.inline-member-picks.inline-matchup-picks .matchup-insights {
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 14px;
+    background: #1f2937;
+    border: 1px solid #475569;
+    border-radius: 12px;
+    color: #f1f5f9;
+}
+.inline-matchup-picks .matchup-model-summary {
+    padding: 12px 14px;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    background: #111827;
+}
+.inline-matchup-picks .matchup-model-summary h3 {
+    margin: 0 0 8px;
+    font: 700 18px Arial,sans-serif;
+}
+.inline-matchup-picks .matchup-model-summary p {
+    margin: 7px 0;
+    font-size: 14px;
+    line-height: 1.45;
+}
+.inline-matchup-picks .matchup-model-summary a {
+    display: inline-block;
+    margin-top: 7px;
+    color: #fbbf24;
+}
+.inline-matchup-picks .money-headline {
+    margin: 14px 0 8px;
+    font: 700 15px Arial,sans-serif;
+}
+.inline-matchup-picks .money-snapshot-note { margin: 0 0 8px; font: 12px/1.4 Arial,sans-serif; color: #cbd5e1; }
+.inline-matchup-picks .money-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 7px;
+}
+.inline-matchup-picks .money-summary-item {
+    padding: 10px 7px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    background: #162235;
+    border: 1px solid #475569;
+    border-radius: 8px;
+}
+.inline-matchup-picks .money-summary-item small {
+    display: block;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #cbd5e1;
+}
+.inline-matchup-picks .money-summary-item strong {
+    display: block;
+    margin: 4px 0;
+    font-size: clamp(13px,1.45vw,18px);
+    line-height: 1.35;
+    color: #fbbf24;
+}
+.inline-member-picks.inline-matchup-picks .public-market-collapse {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 14px 0 0;
+    background: #162235;
+    padding: 10px 12px;
+}
+.inline-member-picks.inline-matchup-picks .public-market-collapse > .picks-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: 0;
+    margin-top: 12px;
+}
+.inline-matchup-picks .public-market-collapse .inline-public-market {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    min-width: 0;
+    padding: 12px;
+}
+@media (min-width: 651px) {
+    .inline-matchup-picks .public-market-collapse .public-market-columns {
+        display: grid;
+        grid-template-columns: repeat(3,minmax(145px,1fr));
+        gap: 8px;
+        overflow-x: auto;
+    }
+    .inline-matchup-picks .inline-public-market .public-market-section {
+        border-bottom: 0;
+        border-right: 1px solid #475569;
+        padding: 8px 6px 8px 0;
+    }
+    .inline-matchup-picks .inline-public-market .public-market-section:last-child { border-right: 0; }
+}
+@media (min-width: 800px) {
+    .inline-member-picks.inline-matchup-picks {
+        display: grid;
+        grid-template-columns: minmax(220px,0.75fr) minmax(0,1.5fr);
+        align-items: start;
+        gap: 16px;
+    }
+    .inline-matchup-picks > :not(.mobile-picks-menu):not(.matchup-insights) { grid-column: 1 / -1; }
+    .inline-matchup-picks > .mobile-picks-menu { grid-column: 1; margin: 0; min-width: 0; }
+    .inline-matchup-picks > .matchup-insights { grid-column: 2; }
+    .inline-matchup-picks .mobile-picks-menu > summary { display: block; cursor: pointer; }
+    .inline-member-picks.inline-matchup-picks .mobile-picks-menu .picks-grid {
+        grid-template-columns: minmax(0,1fr);
+    }
+}
+/* Matchup page: headings and instructions belong inside the static picks card. */
+.inline-member-picks.inline-matchup-picks > .matchup-picks-card {
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+    background: #1f2937;
+    border: 1px solid #475569;
+    border-radius: 12px;
+    color: #f1f5f9;
+}
+.inline-matchup-picks .matchup-picks-card > h2 {
+    margin: 0 0 7px;
+    font: 700 18px/1.4 Arial,sans-serif;
+}
+.inline-matchup-picks .matchup-picks-card > h3 {
+    margin: 0 0 7px;
+    color: #fbbf24;
+    font: 700 15px/1.4 Arial,sans-serif;
+}
+.inline-matchup-picks .matchup-picks-card > h3 a { color: #fbbf24; text-decoration: underline; }
+.inline-matchup-picks .pick-guide-inline {
+    margin: 0 0 14px;
+    color: #cbd5e1;
+    font: 12px/1.45 Arial,sans-serif;
+    -webkit-text-stroke: 0;
+}
+.inline-matchup-picks .matchup-picks-card .pick-game {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 12px;
+}
+@media (max-width: 799px) {
+    .inline-member-picks.inline-matchup-picks > .matchup-insights { margin-top: 16px; }
+}
+@media (max-width: 650px) {
+    .inline-matchup-picks .money-summary-item strong { font-size: 13px; }
+    .inline-matchup-picks .public-market-collapse .public-market-columns {
+        grid-template-columns: minmax(0,1fr);
+    }
+    .inline-matchup-picks .inline-public-market .public-market-section {
+        border-right: 0;
+        border-bottom: 1px solid #475569;
+    }
+}
+</style>
 {% from '_pick_cards.html' import pick_card with context %}
-<section class="inline-member-picks">
-<h2>Your picks</h2>
+{% set matchup_view = game is defined and forecast is defined %}
+<section class="inline-member-picks{% if matchup_view %} inline-matchup-picks{% endif %}">
+{% if not matchup_view %}<h2>Your picks</h2>{% endif %}
 {% if g.member %}
 {% if inline_picks %}
-<p>Choose one per category, or leave blanks to finish before kickoff.</p>
+{% if not matchup_view %}<p>Choose one per category, or leave blanks to finish before kickoff.</p>{% endif %}
 {% for message in get_flashed_messages(category_filter=['picks']) %}<p role="status">{{ message }}</p>{% endfor %}
+{% if matchup_view %}
+<div class="mobile-picks-menu matchup-picks-card">
+  <h2>Your picks</h2>
+  <h3><a href="{{ url_for('member_picks.my_picks', game_id=game.game_id) }}">Make or edit picks →</a></h3>
+  <p class="pick-guide-inline">Choose one per category, or leave blanks to finish before kickoff.</p>
+{% else %}
 <details class="mobile-picks-menu" open><summary><span data-pick-menu-label>Make or edit picks</span><small data-pick-menu-status role="status" aria-live="polite"></small></summary>
+{% endif %}
 <form class="member-picks-form" method="post" action="{{ url_for('member_picks.save_all_picks') }}" data-pick-form>
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="{{ request.full_path.rstrip('?') }}">
-<div class="picks-grid">{% for pick in inline_picks %}{{ pick_card(pick) }}{% set public_market=public_market_for_pick(pick) %}{% include '_inline_public_market.html' %}{% endfor %}</div>
+<div class="picks-grid">{% for pick in inline_picks %}{{ pick_card(pick) }}{% endfor %}</div>
 {% if inline_picks|selectattr('locked','equalto',0)|rejectattr('void_reason')|list %}<div class="pick-save-bar"><button type="submit">Save picks</button><p class="pick-save-status" role="status" aria-live="polite"></p></div>{% endif %}
 </form>
-</details>
-<div class="mobile-public-market-panel">
+{% if matchup_view %}</div>{% else %}</details>{% endif %}
+{% if matchup_view %}
+<div class="matchup-insights" aria-label="Saved prediction and public betting snapshot">
+  <section class="matchup-model-summary" aria-label="Scout saved prediction">
+    <h3>{{ 'Predicted Picks' if is_final else 'Prediction' }}</h3>
+    {% if forecast %}
+      {% set prediction = forecast.components['Blend'] %}
+      <p><strong>{{ prediction.pick or 'No pick recorded' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p>
+      <p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p>
+      {% if not is_final %}<p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% endif %}
+    {% else %}
+      <p>No saved prediction for this matchup yet.</p>
+    {% endif %}
+    <a href="{{ url_for('plug_page') }}#game-{{ game.game_id }}">See predictions and details →</a>
+  </section>
+  <h3 class="money-headline">Public money snapshot</h3>
+  <p class="money-snapshot-note">{{ "Final saved pregame snapshot—not live odds." if is_final else "Latest saved snapshot—not live odds." }}</p>
+  {% for pick in inline_picks %}
+    {% set public_market = public_market_for_pick(pick) %}
+    <div class="money-summary-grid" aria-label="{{ pick.away }} at {{ pick.home }} public money leaders">
+      {% for market in public_market.markets %}
+      <div class="money-summary-item">
+        <small>{{ market.label }}</small>
+        {% if market.sides %}
+          {% set leader = market.sides|max(attribute='money') %}
+          <strong>{{ leader.name }} {{ '%g'|format(leader.money) }}%</strong>
+          <small>of public money</small>
+        {% else %}
+          <strong>Unavailable</strong>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <details class="public-market-collapse">
+    <summary>View detailed public bets &amp; lines</summary>
+    <div class="picks-grid">
+      {% for pick in inline_picks %}
+        {% set public_market = public_market_for_pick(pick) %}
+        {% include '_inline_public_market.html' %}
+      {% endfor %}
+    </div>
+  </details>
+</div>
+{% else %}
+<details class="public-market-collapse" open>
+<summary>Public Bets and Lines</summary>
+<div class="picks-grid">
 {% for pick in inline_picks %}{% set public_market=public_market_for_pick(pick) %}{% include '_inline_public_market.html' %}{% endfor %}
 </div>
+</details>
+{% endif %}
 {% else %}<p>No shared pick sheet is available for this matchup in the current week.</p>{% endif %}
 {% else %}<p><a href="{{ url_for('membership.login') }}">Sign in</a> to make your picks here.</p>{% endif %}
 </section>
