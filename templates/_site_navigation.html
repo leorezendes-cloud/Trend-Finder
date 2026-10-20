@@ -4,13 +4,13 @@
 {% if g.member %}
 <a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
 {% endif %}
-<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt="Gravy Train — Home"></a>
+<a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/Neon Graffiti Trend Findah Logo.png') }}" alt="Gravy Train — Home"></a>
 <div class="site-header-actions">
 <details class="site-menu" id="site-menu">
 <summary><span aria-hidden="true">☰</span> Menu</summary>
 <div class="site-menu-panel">
 <nav class="site-navigation" aria-label="Main navigation">
-    <a href="{{ url_for('home') }}" {% if request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/gravy-train/gravy-train-nav.png') }}" alt=""><span>Home</span></a>
+    <a href="{{ url_for('home') }}" {% if request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}aria-current="page"{% endif %}><img class="menu-logo menu-logo-home" src="{{ url_for('static', filename='Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png') }}" alt=""><span>Home</span></a>
     <a href="{{ url_for('trend_finder') }}" {% if request.endpoint in trend_endpoints %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/trend-findah-3000-nav-transparent.png') }}" alt=""><span>TrendFindah 3000</span></a>
     <a href="{{ url_for('plug_page') }}" {% if plug_section %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png') }}" alt=""><span>The Plug</span></a>
     <a href="{{ url_for('conspiracy_dungeon_page') }}" {% if request.endpoint == 'conspiracy_dungeon_page' %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png') }}" alt=""><span>Conspiracy Dungeon</span></a>
