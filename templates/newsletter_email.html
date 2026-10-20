@@ -5,133 +5,149 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ issue.subject }}</title>
 </head>
-
-<body style="margin:0;padding:0;background:#080e18;color:#eef3fa;font-family:Arial,Helvetica,sans-serif">
-
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-         width="100%" style="border-collapse:collapse;background:#080e18">
-    <tr>
-      <td align="center" style="padding:20px 12px">
-
-        <table role="presentation" cellpadding="0" cellspacing="0"
-               border="0" width="100%"
-               style="max-width:620px;border-collapse:collapse;background:#111b2b;border:1px solid #334155">
-
-          <tr>
-            <td style="padding:28px 24px 18px;border-bottom:2px solid #fbbf24">
-
-             <a href="https://trendfindah.com">
-                <img
-                    src="https://trendfindah.com/static/Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png"
-                    alt="TrendFindah.com"
-                    width="520"
-                    style="display:block;width:100%;max-width:520px;height:auto;border:0;">
-            </a>
-
-              <p style="margin:0 0 8px;color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:2px">
-                🔌 THE {{ 'WEEKLY' if issue.frequency == 'weekly' else 'MONTHLY' }} PLUG 🔌
-              </p>
-
-              <h1 style="margin:0;color:#f8fafc;font-size:24px;line-height:1.25">
-                {{ issue | plug_period_label }}
-              </h1>
-
-            </td>
-          </tr>
-
-          {% for key, heading in headings %}
-          {% if sections.get(key) %}
-
-          <tr>
-            <td style="padding:20px 24px 2px">
-
-              <h2 style="margin:0 0 12px;color:#fbbf24;font-size:19px;line-height:1.3">
-                {{ heading }}
-              </h2>
-
-              {% for block in sections[key] | plug_email_blocks(key, issue.frequency) %}
-
-              <table role="presentation" cellpadding="0" cellspacing="0"
-                     border="0" width="100%"
-                     style="margin:0 0 10px;border-collapse:collapse;background:#182437;border:1px solid #34445c;border-radius:8px">
+<body style="margin:0;padding:0;background:#080e18;color:#f1f5f9;font-family:Arial,Helvetica,sans-serif">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;background:#080e18">
+  <tr><td align="center" style="padding:18px 10px">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:620px;border-collapse:collapse;background:#111b2b;border:1px solid #334155">
+      <tr><td style="padding:24px 22px 20px;border-bottom:2px solid #fbbf24">
+        <a href="{{ origin }}" style="display:inline-block;background-color:#fbbf24;color:#111827;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:800;line-height:1.3;text-decoration:none;border:1px solid #fbbf24;border-radius:7px;padding:11px 17px">TrendFindah.com &rarr;</a>
+        <p style="margin:14px 0 7px;color:#fbbf24;font-size:12px;font-weight:800;letter-spacing:1.6px">THE {{ 'WEEKLY' if issue.frequency == 'weekly' else 'MONTHLY' }} PLUG</p>
+        <h1 style="margin:0;color:#f8fafc;font-size:25px;line-height:1.25">{{ issue.subject.split(' · ', 1)[-1] }}</h1>
+        <p style="margin:9px 0 0;color:#cbd5e1;font-size:14px;line-height:1.55">The picks, trends, and football stories worth a closer look.</p>
+      </td></tr>
+      {% for key,heading in headings %}{% if sections.get(key) %}
+      <tr><td style="padding:24px 22px 0">
+        <h2 style="margin:0 0 13px;color:#fbbf24;font-size:19px;line-height:1.3">{{ heading }}</h2>
+        {# Some archived issues have consecutive title / URL pairs without blank
+           lines. Each trend must remain its own card in both formats. #}
+        {% if key == 'trends' %}
+          {% set trend_groups = namespace(blocks=[], pending=[]) %}
+          {% for raw_line in sections[key].split('\n') %}
+            {% set trend_line = raw_line|trim %}
+            {% if trend_line %}
+              {% set trend_groups.pending = trend_groups.pending + [trend_line] %}
+              {% if trend_line.startswith(origin ~ '/') and trend_line|length < 2000 %}
+                {% set trend_groups.blocks = trend_groups.blocks + [trend_groups.pending|join('\n')] %}
+                {% set trend_groups.pending = [] %}
+              {% endif %}
+            {% elif trend_groups.pending %}
+              {% set trend_groups.blocks = trend_groups.blocks + [trend_groups.pending|join('\n')] %}
+              {% set trend_groups.pending = [] %}
+            {% endif %}
+          {% endfor %}
+          {% if trend_groups.pending %}
+            {% set trend_groups.blocks = trend_groups.blocks + [trend_groups.pending|join('\n')] %}
+          {% endif %}
+          {% set newsletter_blocks = trend_groups.blocks %}
+        {% else %}
+          {% set newsletter_blocks = sections[key].split('\n\n') %}
+        {% endif %}
+        {% for block in newsletter_blocks if block|trim %}
+          {% set lines = block.split('\n') %}
+          {% set first = lines[0]|trim %}
+          {% set old_saved_prediction = key == 'predictions' and ' — ' in first and ': ' in first and ('ATS edge ' in first or 'scoring margin ' in first) %}
+          {% set current_saved_prediction = key == 'predictions' and lines|length > 1 and lines[1].startswith('ATS: ') %}
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 13px;border-collapse:separate;border-spacing:0;background:#1d2a3d;border:1px solid #3c506b;border-radius:10px">
+            <tr><td style="padding:16px">
+            {% if old_saved_prediction %}
+              {# Earlier drafts stored model notes in a single line. Extract only fields actually present in that saved line. #}
+              {% set matchup = first.split(' — ',1)[0] %}
+              {% set after_matchup = first.split(' — ',1)[1] %}
+              {% set kickoff = after_matchup.split(': ',1)[0] %}
+              {% set facts = after_matchup.split(': ',1)[1] %}
+              {% set opening = facts.split('. ',1)[0] %}
+              {% set ats = opening.split(' - scoring margin ',1)[0]|trim %}
+              {% set margin_source = facts.split('away scoring margin ',1)[1].split(';',1)[0] if 'away scoring margin ' in facts else '' %}
+              {% set margin_value = margin_source|float(default=none) if margin_source else none %}
+              {% set team_names = matchup.split(' at ',1) %}
+              {% set has_team_pair = team_names|length == 2 %}
+              {% set normalized_facts = facts|replace('Projected total ', 'projected total ') %}
+              {% set total_source = normalized_facts.split('projected total ',1)[1] if 'projected total ' in normalized_facts else '' %}
+              {% set total_pair = total_source.split(' vs. line ',1) if total_source else [] %}
+              {% set total_proj = total_pair[0]|trim if total_pair|length == 2 else '' %}
+              {% set total_line = total_pair[1].split('. ',1)[0]|trim if total_pair|length == 2 else '' %}
+              {% set edge_source = facts.split('ATS edge ',1)[1].split(' points',1)[0]|trim if 'ATS edge ' in facts else '' %}
+              <p style="margin:0 0 5px;font-size:19px;font-weight:800;color:#f8fafc">{{ matchup }}</p>
+              <p style="margin:0 0 15px;font-size:12px;color:#b8c6d9">{{ kickoff }}</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;background:#102033;border:1px solid #3a516b;border-radius:8px">
+                <tr><td style="padding:13px 14px">
+                  <p style="margin:0 0 6px;color:#b8c6d9;font-size:11px;font-weight:800;letter-spacing:1px">SCOUT'S SAVED SPREAD PICK</p>
+                  <p style="margin:0 0 7px;color:#86efac;font-size:27px;font-weight:800;line-height:1.2">{{ ats }}</p>
+                  {% if margin_value is not none and has_team_pair %}
+                    {% if margin_value > 0 %}
+                      <p style="margin:0;color:#e2e8f0;font-size:14px;line-height:1.55">Scout projected {{ team_names[0] }} to win by {{ '%g'|format(margin_value|abs) }} points.</p>
+                    {% elif margin_value < 0 %}
+                      <p style="margin:0;color:#e2e8f0;font-size:14px;line-height:1.55">Scout projected {{ team_names[1] }} to win by {{ '%g'|format(margin_value|abs) }} points.</p>
+                    {% else %}
+                      <p style="margin:0;color:#e2e8f0;font-size:14px;line-height:1.55">Scout projected an even matchup.</p>
+                    {% endif %}
+                  {% endif %}
+                </td></tr>
+              </table>
+              {% if edge_source or total_proj %}
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:10px;border-collapse:collapse">
                 <tr>
-                  <td style="padding:12px 14px">
-
-                    {% for line in block.split('\n') if line|trim %}
-
-                      {% if line.startswith(origin ~ '/') and line|length < 2000 %}
-
-                        <p style="margin:9px 0 2px;font-size:14px">
-                          <a href="{{ line }}"
-                             style="color:#fbbf24;text-decoration:underline;font-weight:700">
-                            {{ 'View all recorded games' if issue.frequency == 'monthly' and key == 'predictions' and '/newsletter/results/' in line else 'Open game breakdown' if key in ('predictions','expert') else 'See trend evidence' if key == 'trends' else 'View matchup' if key == 'matchups' else 'Read more' }} →
-                          </a>
-                        </p>
-
-                      {% elif loop.first %}
-
-                        <p style="margin:0 0 6px;font-size:16px;font-weight:700;line-height:1.4;color:#f8fafc">
-                          {{ line }}
-                        </p>
-
-                      {% else %}
-
-                        <p style="margin:4px 0;font-size:14px;line-height:1.5;color:#e2e8f0">
-                          {{ line }}
-                        </p>
-
-                      {% endif %}
-
-                    {% endfor %}
-
-                  </td>
+                  {% if edge_source %}
+                    <td width="50%" valign="top" style="padding:9px 9px 9px 0">
+                      <p style="margin:0;color:#b8c6d9;font-size:12px">Spread difference</p>
+                      <p style="margin:3px 0 0;color:#f8fafc;font-size:19px;font-weight:800">{{ '%g'|format(edge_source|float|abs) }} pts</p>
+                    </td>
+                  {% endif %}
+                  {% if total_proj %}
+                    <td width="50%" valign="top" style="padding:9px 0 9px 8px;border-left:1px solid #40516a">
+                      <p style="margin:0;color:#b8c6d9;font-size:12px">Projected total</p>
+                      <p style="margin:3px 0 0;color:#f8fafc;font-size:19px;font-weight:800">{{ total_proj }}</p>
+                      <p style="margin:3px 0 0;color:#b8c6d9;font-size:12px">Saved line: {{ total_line }}</p>
+                    </td>
+                  {% endif %}
                 </tr>
               </table>
+              {% endif %}
+              <p style="margin:11px 0 0;color:#a9b9cf;font-size:11px;line-height:1.55">{% if 'over 24 hours old' in facts %}Saved quote is over 24 hours old; not live odds.{% else %}Saved pregame quote; not live odds.{% endif %}</p>
+            {% elif current_saved_prediction %}
+              {% set split_title = first.split(' · ',1) %}
+              {% set selections = lines[1][5:].split(' · Total: ',1) %}
+              <p style="margin:0 0 5px;font-size:19px;font-weight:800;color:#f8fafc">{{ split_title[0] }}</p>
+              {% if split_title|length == 2 %}<p style="margin:0 0 15px;font-size:12px;color:#b8c6d9">{{ split_title[1] }}</p>{% endif %}
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;background:#102033;border:1px solid #3a516b;border-radius:8px">
+                <tr><td style="padding:13px 14px">
+                  <p style="margin:0 0 6px;color:#b8c6d9;font-size:11px;font-weight:800;letter-spacing:1px">THE PLUG'S SAVED ATS PICK</p>
+                  <p style="margin:0;color:#86efac;font-size:27px;font-weight:800;line-height:1.25">{{ selections[0] or 'No spread pick' }}</p>
+                </td></tr>
+              </table>
+              {% if selections|length == 2 %}<p style="margin:11px 0 0;color:#e2e8f0;font-size:14px;line-height:1.5"><strong>Over / Under:</strong> {{ selections[1] }}</p>{% endif %}
 
+            {% else %}
+              {% for line in lines if line|trim %}
+                {% if line.startswith(origin ~ '/') and line|length < 2000 %}
+                  <p style="margin:12px 0 0;font-size:13px"><a href="{{ line }}" style="color:#fbbf24;text-decoration:underline;font-weight:700">{{ 'Read full analysis' if key in ('predictions','expert') else 'See trend evidence' if key == 'trends' else 'View matchup' if key == 'matchups' else 'Read more' }} →</a></p>
+                {% elif loop.first %}
+                  <p style="margin:0 0 8px;font-size:16px;font-weight:800;line-height:1.4;color:#f8fafc">{{ line }}</p>
+                {% else %}
+                  <p style="margin:7px 0;font-size:14px;line-height:1.6;color:#e2e8f0">{{ line }}</p>
+                {% endif %}
               {% endfor %}
-
-            </td>
-          </tr>
-
-          {% endif %}
-          {% endfor %}
-
-          <tr>
-            <td style="padding:16px 24px 24px">
-              <a href="{{ origin }}"
-                 style="display:inline-block;background:#fbbf24;color:#111827;padding:11px 18px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:800">
-                Visit TrendFindah.com →
-              </a>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:19px 24px 24px;border-top:1px solid #334155">
-
-              <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">
-                You're receiving this email because you subscribed to Trend Findah.
-              </p>
-
-              <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">
-                {{ address }}
-              </p>
-
-              <p style="margin:0;font-size:12px;line-height:1.6">
-                <a href="{{ unsubscribe_url }}" style="color:#fbbf24">Unsubscribe</a>
-                &nbsp;·&nbsp;
-                <a href="{{ origin }}/members/preferences" style="color:#fbbf24">
-                  Manage preferences
-                </a>
-              </p>
-
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
+            {% endif %}
+            {% if old_saved_prediction or current_saved_prediction %}
+              {% for line in lines if line.startswith(origin ~ '/') and line|length < 2000 %}
+              <p style="margin:13px 0 0;font-size:14px"><a href="{{ line }}" style="color:#fbbf24;text-decoration:underline;font-weight:800">Read full analysis →</a></p>
+              {% endfor %}
+            {% endif %}
+            </td></tr>
+          </table>
+        {% endfor %}
+      </td></tr>
+      {% endif %}{% endfor %}
+      <tr><td style="padding:17px 22px 24px">
+        <a href="{{ origin }}/the-plug" style="display:inline-block;background:#fbbf24;color:#111827;padding:12px 18px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:800">Visit The Plug →</a>
+      </td></tr>
+      <tr><td style="padding:18px 22px 24px;border-top:1px solid #334155">
+        <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">You're receiving this email because you subscribed to Trend Findah.</p>
+        <p style="margin:0 0 9px;color:#cbd5e1;font-size:12px;line-height:1.6">{{ address }}</p>
+        <p style="margin:0;font-size:12px;line-height:1.6"><a href="{{ unsubscribe_url }}" style="color:#fbbf24">Unsubscribe</a> &nbsp;·&nbsp; <a href="{{ origin }}/members/preferences" style="color:#fbbf24">Manage preferences</a></p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
 </body>
 </html>

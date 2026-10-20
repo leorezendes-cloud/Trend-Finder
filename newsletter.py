@@ -404,22 +404,10 @@ def generate_draft(owner_id, frequency='weekly', now=None, root=None):
     now=now or datetime.now(timezone.utc)
     period=period_key(frequency,now)
     existing=db().execute('SELECT issue_id,metadata FROM newsletter_generated WHERE frequency=? AND period=?',(frequency,period)).fetchone()
+    # A generated issue is a historical snapshot.  Never silently replace its
+    # content on a later page view or CLI run: the games may have finished,
+    # and build_draft() only selects upcoming published picks.
     if existing:
-        issue=get_issue(existing['issue_id']);previous=json.loads(existing['metadata'])
-        if issue['status']!='draft' or json.loads(issue['sections'])!=previous.get('original_sections') or issue['subject']!=previous.get('original_subject'):
-            return existing['issue_id']
-        sections,metadata=build_draft(root or Path(current_app.root_path),now,frequency=frequency)
-        refreshed_subject=newsletter_subject(frequency, period)
-        metadata.update(original_sections=sections,original_subject=refreshed_subject)
-        connection=db();connection.execute('BEGIN IMMEDIATE')
-        try:
-            current=get_issue(existing['issue_id'])
-            if current['status']=='draft' and current['sections']==issue['sections'] and current['subject']==issue['subject']:
-                connection.execute("UPDATE newsletter_issues SET sections=?,subject=? WHERE id=? AND status='draft'",(json.dumps(sections),refreshed_subject,current['id']))
-                connection.execute('UPDATE newsletter_generated SET metadata=? WHERE issue_id=?',(json.dumps(metadata),current['id']))
-            connection.commit()
-        except Exception:
-            connection.rollback();raise
         return existing['issue_id']
     sections,metadata=build_draft(root or Path(current_app.root_path),now,frequency=frequency)
     subject=newsletter_subject(frequency, period)
