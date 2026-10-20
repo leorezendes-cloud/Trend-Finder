@@ -102,10 +102,26 @@ def update_once(root):
     # Publication copies only sealed approved records, even if this refresh failed.
     # It never calls experimental engines or AI, and cannot publish review drafts.
     from plug_publication import publish
-    attempt('Plug publication', lambda: publish(root,
-        Path(os.environ.get('TREND_FINDAH_EXPERT_STORE',
-            '/var/data/expert_beta' if os.environ.get('TREND_FINDAH_ENV')=='production' else str(root/'expert_beta'))),
+    expert_store = Path(os.environ.get('TREND_FINDAH_EXPERT_STORE',
+        '/var/data/expert_beta' if os.environ.get('TREND_FINDAH_ENV')=='production'
+        else str(root/'expert_beta')))
+    attempt('Plug publication', lambda: publish(root, expert_store,
         SOURCE/'automatic_model.json'))
+    # Gemini is explicitly opt-in and runs only after a successful production
+    # import. It saves drafts for review, never auto-approves or publishes prose.
+    if (stages.get('Plug publication') == 'ok'
+            and os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') == '1'):
+        from expert_auto_queue import bounded_run
+        def expert_drafts():
+            result = bounded_run(
+                expert_store,
+                os.environ.get('TREND_FINDAH_EXPERT_GEMINI_MODEL', 'gemini-2.5-flash'),
+                daily_limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT', '2')),
+                run_limit=int(os.environ.get('TREND_FINDAH_EXPERT_RUN_LIMIT', '1')),
+                execute=True)
+            if result['state'] == 'operator_review_required':
+                raise RuntimeError('Gemini draft requires operator review; will not retry')
+        attempt('Expert draft queue', expert_drafts)
     def grade():
         records = [json.loads(p.read_text()) for p in (root/'data/scout4/blend/predictions').glob('*.json')]
         groups, recent, excluded = prediction_performance(records, read_csv(root/'nfl_games.csv'))
