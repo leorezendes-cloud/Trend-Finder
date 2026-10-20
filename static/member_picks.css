@@ -85,3 +85,14 @@
 /* Scoped matchup columns: prevent overflowing cards without touching other pick pages. */
 .inline-member-picks .picks-grid > * { min-width:0; }
 .inline-member-picks .picks-grid > .pick-game { margin-bottom:0; }
+/* Gold underline beneath My Picks */
+.picks-page h1::after {
+    content: "";
+    display: block;
+    width: 90px;
+    height: 4px;
+    margin-top: 12px;
+    background: #d4af37;
+    border-radius: 3px;
+    align-content: center;
+}

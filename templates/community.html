@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <title>The Huddle | Trend Findah</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='community.css') }}">
+</head>
+<body>
+  {% include '_site_navigation.html' %}
+  <main class="huddle" id="discussion">
+    <header class="huddle-header">
+      <div class="huddle-identity">
+        <span class="huddle-kicker"><span class="huddle-live-dot" aria-hidden="true"></span> TREND FINDAH COMMUNITY</span>
+        <h1>The Huddle<span class="huddle-period">.</span></h1>
+        <p>Football talk, picks, fantasy and anything worth discussing. One conversation, everyone welcome.</p>
+      </div>
+      <div class="huddle-community-status"><strong>{{ total }}</strong><span>{{ ('report' if total == 1 else 'reports') if review else ('comment' if total == 1 else 'comments') }}</span></div>
+    </header>
+
+    <nav class="huddle-shortcuts" aria-label="Community areas">
+      <a class="huddle-shortcut" href="{{ url_for('fans.fantasy') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◈</span><span><b>Fantasy Football</b><small>Stats &amp; PPR</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
+      <a class="huddle-shortcut" href="{{ url_for('member_picks.my_picks') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◎</span><span><b>Member Picks</b><small>Your weekly picks</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
+      <div class="huddle-shortcut huddle-soon" aria-label="Leaderboard coming soon"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>Leaderboard</b><small>Coming soon</small></span><span class="huddle-soon-pill">SOON</span></div>
+    </nav>
+
+    <section class="huddle-panel" aria-labelledby="latest-heading">
+      {% if review %}
+      <div class="huddle-moderation-banner">
+        <div><span class="huddle-moderation-label">OWNER MODERATION</span><strong>Reported Comments</strong><p>Only reported comments are shown here. Hide inappropriate posts or restore them if needed.</p></div>
+        <a href="{{ url_for('community.discussion') }}#discussion">← Back to Comments</a>
+      </div>
+      {% endif %}
+      <div class="huddle-panel-top">
+        <div class="huddle-panel-title"><span class="huddle-chat-mark" aria-hidden="true">●</span><h2 id="latest-heading">{{ 'Reported Comments' if review else 'Comment Section' }}</h2></div>
+        {% if g.is_owner and not review %}<a class="huddle-review-link" href="{{ url_for('community.reports') }}">Review Reports{% if reported_total %} <span class="huddle-report-count">{{ reported_total }}</span>{% endif %}</a>{% endif %}
+      </div>
+      <div class="huddle-feed" aria-live="polite">
+        {% if not posts %}
+        <div class="huddle-empty"><span aria-hidden="true">☏</span><strong>{{ 'No reported comments.' if review else "It's quiet in here." }}</strong><p>{{ 'Nothing needs moderation right now.' if review else 'Be the first to get the conversation going.' }}</p></div>
+        {% endif %}
+        {% for post in posts %}
+        <article class="huddle-message {% if post['is_hidden'] %}huddle-hidden{% endif %}" id="comment-{{ post['id'] }}">
+          <div class="huddle-avatar" aria-hidden="true">F{{ post['member_id'] % 10 }}</div>
+          <div class="huddle-message-main">
+            <div class="huddle-message-meta">
+              <strong>Fan #{{ post['member_id'] }}</strong><time datetime="{{ post['created_at'].replace(' ', 'T') }}Z">{{ post['created_at'] }} UTC</time>
+              {% if post['is_hidden'] %}<span class="huddle-hidden-label">Hidden</span>{% endif %}
+            </div>
+            <p class="huddle-message-body">{{ post['body'] }}</p>
+            {% if g.member or g.is_owner %}
+            <div class="huddle-message-actions">
+              {% if g.member and not g.is_owner and g.member['id'] != post['member_id'] and not post['is_hidden'] %}
+              <form method="post" action="{{ url_for('community.report', comment_id=post['id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Report</button></form>
+              {% endif %}
+              {% if g.is_owner %}
+              {% if post['reports'] %}<span>{{ post['reports'] }} report(s)</span>{% endif %}
+              <form method="post" action="{{ url_for('community.moderate', comment_id=post['id'], action='restore' if post['is_hidden'] else 'hide') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if review %}<input type="hidden" name="return_to" value="reports">{% endif %}<button type="submit">{{ 'Restore' if post['is_hidden'] else 'Hide' }}</button></form>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% if pages > 1 %}
+      <nav class="huddle-pages" aria-label="Discussion pages">
+        {% if page > 1 %}<a href="{{ url_for('community.reports' if review else 'community.discussion', page=page-1) }}#discussion">← Newer</a>{% endif %}
+        <span>Page {{ page }} / {{ pages }}</span>
+        {% if page < pages %}<a href="{{ url_for('community.reports' if review else 'community.discussion', page=page+1) }}#discussion">Older →</a>{% endif %}
+      </nav>
+      {% endif %}
+
+      {% if not review %}
+      <div class="huddle-composer" id="composer">
+        {% with notices = get_flashed_messages(with_categories=true) %}
+          {% for kind, message in notices %}<p class="huddle-notice" role="alert">{{ message }}</p>{% endfor %}
+        {% endwith %}
+        {% if g.member %}
+          <div class="huddle-compose-heading"><strong>Join the conversation</strong><span>Posting as Fan #{{ g.member['id'] }}</span></div>
+          <form method="post" action="{{ url_for('community.post') }}" class="huddle-compose-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="huddle-compose-bar">
+              <label class="huddle-sr-only" for="huddle-body">Write a comment</label>
+              <textarea id="huddle-body" name="body" rows="1" minlength="1" maxlength="{{ max_body }}" required placeholder="Add to the conversation…"></textarea>
+            </div>
+            <button class="huddle-post-button" type="submit">Post</button>
+          </form>
+          <p class="huddle-fine-print">Keep it respectful · {{ max_body }} characters max · 4 posts per 15 minutes</p>
+        {% else %}
+          <div class="huddle-signed-out"><p><strong>Got something to say?</strong> Everyone can read. Sign in to join the discussion.</p><div><a href="{{ url_for('membership.login') }}">Log in</a><a class="huddle-register" href="{{ url_for('membership.register') }}">Join free</a></div></div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </section>
+    <p class="huddle-community-guideline">The Huddle is for football talk and friendly debate. No harassment, spam or personal information.</p>
+  </main>
+  <script>
+    (function () {
+      const field = document.getElementById('huddle-body');
+      if (!field) return;
+      const resize = () => { field.style.height = 'auto'; field.style.height = Math.min(field.scrollHeight, 120) + 'px'; };
+      // Browsers may restore form input after navigation. Clear only after a successful post;
+      // invalid or rate-limited attempts should not silently discard the draft.
+      const clearPostedDraft = () => {
+        if (new URLSearchParams(window.location.search).get('posted') === '1') field.value = '';
+        resize();
+      };
+      field.addEventListener('input', resize);
+      window.addEventListener('pageshow', clearPostedDraft);
+      clearPostedDraft();
+    })();
+  </script>
+</body>
+</html>
