@@ -52,3 +52,146 @@
         margin: 0 auto;
     }
 }
+
+/* manual-filter-layout-v1: presentation-only filter organization */
+.general-research #more-filters {
+    border: 1px solid #475569;
+    border-radius: 10px;
+    background: #111827;
+    padding: 12px 16px;
+    margin: 14px 0 18px;
+}
+.general-research #more-filters > summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #fbbf24;
+}
+.general-research #more-filters .manual-advanced-state {
+    font-size: 0.83em;
+    color: #f9a8d4;
+}
+.general-research #more-filters > .form-grid { margin-top: 14px; }
+.general-research .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.general-research .form-actions > button,
+.general-research .form-actions > .clear-button {
+    min-height: 42px;
+    white-space: normal;
+}
+
+/* manual-filter-layout-v3 — responsive compact controls */
+.general-research .home-filter-form > .form-grid,
+.general-research #more-filters .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+    row-gap: 14px;
+}
+.general-research .home-filter-form .form-grid > .field {
+    min-width: 0;
+}
+.general-research .home-filter-form .field select,
+.general-research .home-filter-form .field input[type="search"] {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}
+.general-research #more-filters .primetime-night-options {
+    grid-column: 1 / -1;
+}
+@media (max-width: 480px) {
+    .general-research .home-filter-form > .form-grid,
+    .general-research #more-filters .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* manual-filter-layout-v4: uniform action buttons and paired season controls */
+.general-research .home-filter-form .season-filter-pair {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+    min-width: 0;
+}
+.general-research .home-filter-form .season-mode-slot,
+.general-research .home-filter-form .season-values-slot,
+.general-research .home-filter-form .season-range-stack,
+.general-research .home-filter-form .season-filter-pair .field {
+    min-width: 0;
+}
+.general-research .home-filter-form .season-values-slot,
+.general-research .home-filter-form .season-range-stack {
+    display: grid;
+    gap: 10px;
+}
+.general-research .home-filter-form .season-filter-pair select { width:100%;max-width:100%;box-sizing:border-box; }
+.general-research .home-filter-form .form-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+}
+.general-research .home-filter-form .form-actions > button,
+.general-research .home-filter-form .form-actions > .clear-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: 64px;
+    min-height: 64px;
+    padding: 6px 6px;
+    margin: 0;
+    font-size: clamp(12px, 2.4vw, 18px);
+    line-height: 1.08;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
+}
+@media (max-width: 420px) {
+    .general-research .home-filter-form .form-actions {gap:6px;}
+    .general-research .home-filter-form .form-actions > button,
+    .general-research .home-filter-form .form-actions > .clear-button {font-size:12px;padding:6px 4px;}
+}
+@media (max-width: 350px) {
+    .general-research .home-filter-form .season-filter-pair {grid-template-columns: minmax(0,1fr);}
+}
+@media (max-width: 600px) {
+  .general-research .home-filter-form .form-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .general-research .home-filter-form .form-actions > button,
+  .general-research .home-filter-form .form-actions > .clear-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 54px;
+    margin: 0;
+    padding: 8px 3px;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 359px) {
+  .general-research .home-filter-form .form-actions {
+    grid-template-columns: 1fr;
+  }
+}

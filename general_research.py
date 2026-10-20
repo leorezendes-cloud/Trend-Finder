@@ -1,3 +1,4 @@
+# manual-filter-layout-v3
 """General historical NFL research: one matchup per game, explicit team contexts."""
 import csv
 import math
@@ -250,12 +251,11 @@ def render_general(form, games_page=False):
         effective_season=(max(low,discovery_window[0]),min(high,discovery_window[1]))
         outside_discovery_window=effective_season[0]>effective_season[1]
         if not outside_discovery_window:
+            # Keep the discovery window in computation only, NOT in the
+            # user's visible/submitted filter choices.
             season=effective_season
             if mode=='single' and form.get('season'):
                 season=int(form['season'])
-            else:
-                mode='range';form.update(season_mode='range',start_season=str(season[0]),end_season=str(season[1]))
-                form.pop('season',None)
     primary=('game_type','gametime','temp','wind','roof','qb_name')
     allowed=[f for f in CSV_FILTER_FIELDS if f not in ('dog_coast','game_id')]
     for field in allowed:
@@ -288,10 +288,14 @@ def render_general(form, games_page=False):
     def chip(label,fields):
         remaining={key:value for key,value in chip_scope.items() if key not in fields}
         filter_chips.append({'label':label,'url':url_for('trend_finder',**remaining,_anchor='research-results')})
-    if mode=='range' and season:
-        chip(f'Seasons {season[0]}–{season[1]}',('season_mode','season','start_season','end_season'))
-    elif season is not None:
-        chip(f'Season {season}',('season',))
+    # Chips represent explicit user choices, not the automatic last-five-season
+    # combinations discovery limit. Removing a chip must remove the actual input.
+    if mode=='range' and (form.get('start_season') or form.get('end_season')):
+        start=form.get('start_season') or str(min(years))
+        end=form.get('end_season') or str(max(years))
+        chip(f'Seasons {start}–{end}',('season_mode','season','start_season','end_season'))
+    elif mode=='single' and form.get('season'):
+        chip(f"Season {form['season']}",('season',))
     if team:chip('Team: '+team,('research_team',))
     if role!='all':chip('Role: '+ROLES[role],('research_role',))
     if location:chip('Location: '+location.title(),('research_location',))
