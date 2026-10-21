@@ -44,11 +44,20 @@ def combined_cards(records, render_record, now):
         if total:quotes['Total']={'line_a':total['quote']['line']}
         selections = {'spread':{'side':pick['pick'],'label':'Pick'},
                       'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
+        approved = False
+        if instant(game['kickoff_utc']) > now:
+            try:
+                import hashlib
+                from plug_publication import convert
+                convert(record, hashlib.sha256((ROOT/'automatic_model.json').read_bytes()).hexdigest())
+                approved = True
+            except (OSError, ValueError, KeyError, TypeError):
+                pass  # Keep historical cohorts intact; never relabel an incompatible seal.
         items[game['game_id']] = dict(scout={'game':game,'sources':[]},saved_picks=selections,
             locked_quotes=quotes,show_scores=False,prediction_margin=pick['away_margin'],
             expert_picks=None,expert_available=False,expert_access=False,assessment=None,
             url=url_for('fans.matchup',game_id=game['game_id']),
-            legacy=True,ats_result=record.get('results',{}).get('Blend'))
+            legacy=True,production_compatible=approved,ats_result=record.get('results',{}).get('Blend'))
     upcoming, earlier = [], []
     wanted={game_id for game_id,item in items.items() if instant(item['scout']['game']['kickoff_utc'])>now}
     market_rows=[]
@@ -71,3 +80,69 @@ def combined_cards(records, render_record, now):
     upcoming.sort(key=lambda item:item['scout']['game']['kickoff_utc'])
     earlier.sort(key=lambda item:item['scout']['game']['kickoff_utc'],reverse=True)
     return upcoming, earlier
+
+
+def load_schedule():
+    from scout4.stats import read_csv
+    from pregame_lines import effective_rows
+    path = ROOT/'nfl_games.csv'
+    return effective_rows(read_csv(path), path, include_scores=False)
+
+
+def weekly_dashboard(records, render_record, now):
+    """Join the authoritative current slate to immutable forecasts by game ID."""
+    from site_week import active_slate
+    from scout4.shadow import kickoff
+    from scout4.stats import team_code
+    import time
+    rows = load_schedule()
+    active, slate = active_slate(rows, now)
+    future, earlier = combined_cards(records, render_record, now)
+    by_id = {item['scout']['game']['game_id']:item for item in future+earlier}
+    sections = {'games':[], 'underway_games':[], 'completed_games':[], 'awaiting_games':[],
+                'historical_games':[], 'active_slate':active}
+    current_ids = {row['game_id'] for row in slate}
+    from fan_views import _score_cache
+    live = (_score_cache['games'] if not _score_cache.get('stale') and
+            time.monotonic() < _score_cache['expires'] else [])
+    for row in slate:
+        try:
+            ko = kickoff(row)
+        except (KeyError, ValueError, TypeError):
+            continue
+        game = {name:row[name] for name in ('game_id','season','week','away_team','home_team')}
+        game['kickoff_utc'] = ko.isoformat()
+        item = by_id.get(game['game_id'])
+        if item is None or item.get('legacy') and ko > now and not item.get('production_compatible'):
+            item = dict(scout={'game':game,'sources':[]}, saved_picks={}, locked_quotes={},
+                show_scores=False, expert_available=False, expert_access=False,
+                expert_picks=None, assessment=None, market=None, line_movement=None,
+                pending=True, legacy=True, url=url_for('fans.matchup',game_id=game['game_id']))
+        else:
+            # Schedule identity wins; never attach a forecast to another kickoff.
+            saved = item['scout']['game']
+            if (saved['away_team'],saved['home_team'],instant(saved['kickoff_utc'])) != (
+                    game['away_team'],game['home_team'],ko):
+                item = dict(scout={'game':game,'sources':[]}, saved_picks={}, locked_quotes={},
+                    show_scores=False, expert_available=False, expert_access=False,
+                    expert_picks=None, assessment=None, market=None, line_movement=None,
+                    pending=True, legacy=True, url=url_for('fans.matchup',game_id=game['game_id']))
+            else:
+                item['pending'] = False
+        item['upcoming'] = ko > now
+        observed = next((g for g in live if team_code(g.get('away')) == team_code(game['away_team'])
+                        and team_code(g.get('home')) == team_code(game['home_team'])
+                        and instant(g['date']) == ko), None)
+        final = row.get('away_score') not in ('',None) and row.get('home_score') not in ('',None)
+        if ko <= now and (final or observed and observed.get('state')=='post' and observed.get('completed') is True):
+            sections['completed_games'].append(item)
+        elif ko <= now and observed and observed.get('state')=='in':
+            sections['underway_games'].append(item)
+        elif ko > now:
+            sections['games'].append(item)
+        else:
+            sections['awaiting_games'].append(item)
+    sections['historical_games'] = [item for item in earlier if item['scout']['game']['game_id'] not in current_ids]
+    for key in ('games','underway_games','completed_games','awaiting_games'):
+        sections[key].sort(key=lambda item:instant(item['scout']['game']['kickoff_utc']))
+    return sections

@@ -82,7 +82,13 @@ class PublicationTests(unittest.TestCase):
         self.record['quote']['kickoff_utc']=future
         self.record['totals']['quote']['kickoff_utc']=future
         self.save();self.run_publish()
-        with patch.dict(app.config,{'EXPERT_BETA_ENABLED':True,'EXPERT_BETA_STORE':str(self.dest),'MEMBERSHIP_DATABASE':str(self.root/'members.db'),'TESTING':True}):
+        from expert_beta import instant
+        from site_week import EASTERN
+        ko=instant(future).astimezone(EASTERN)
+        schedule=[dict(game_id=self.record['game_id'],season='2026',week='6',game_type='REG',
+            away_team='HOU',home_team='JAX',gameday=ko.date().isoformat(),
+            gametime=ko.strftime('%H:%M:%S.%f'),away_score='',home_score='')]
+        with patch('plug_dashboard.load_schedule',return_value=schedule), patch.dict(app.config,{'EXPERT_BETA_ENABLED':True,'EXPERT_BETA_STORE':str(self.dest),'MEMBERSHIP_DATABASE':str(self.root/'members.db'),'TESTING':True}):
             with app.app_context():migrate()
             response=app.test_client().get('/the-plug')
             self.assertEqual(response.status_code,200)

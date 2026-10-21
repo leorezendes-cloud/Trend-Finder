@@ -114,9 +114,11 @@ class ExpertPipelineTests(unittest.TestCase):
  def test_hosted_worker_timeout_covers_maximum_four_request_batch(self):
   import ast
   tree=ast.parse((Path(__file__).parent/'hosted_updates.py').read_text())
-  worker=next(n for n in ast.walk(tree) if isinstance(n,ast.FunctionDef) and n.name=='expert_loop')
-  call=next(n for n in ast.walk(worker) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr=='run')
-  timeout=next(k.value.value for k in call.keywords if k.arg=='timeout')
+  call=next(n for n in ast.walk(tree) if isinstance(n,ast.Call)
+            and isinstance(n.func,ast.Name) and n.func.id=='run_worker'
+            and n.args and isinstance(n.args[0],ast.Constant)
+            and n.args[0].value=='expert_automation.py')
+  timeout=call.args[2].value
   self.assertGreater(timeout,4*120+3*75)
  def test_changed_review_prose_is_not_published(self):
   self.seals(1);self.worker();self.approve();p=next((self.store/'drafts').glob('*.review.json'));value=json.loads(p.read_text());value['summary']='Altered claim';p.write_text(json.dumps(value))

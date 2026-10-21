@@ -6,8 +6,10 @@
         {{ g.away_team }} @ {{ g.home_team }}
     </a>
 </h2>
+{% if item.pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
 {% if item.show_scores %}<p class="expert-score">{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
 <p class="{{ 'plug-upcoming-picks' if item.upcoming else '' }}">The Plug ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>The Plug total: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>
+{% endif %}
 <section class="plug-market-context">
 
     {% include '_plug_line_movement.html' %}
@@ -80,7 +82,7 @@
 {% endif %}
 {% if item.ats_result %}<p>ATS result: {{ item.ats_result }}</p>{% endif %}
 {% if not item.legacy and not item.expert_available %}
-<p>🧠 The Expert Is Calculating 🧠</p>
+<p>Expert report pending</p>
 {% endif %}
 
 <a href="{{ item.url }}">
@@ -88,5 +90,13 @@
 </a>
 </article>
 {% endfor %}</div>{% endmacro %}
-{% block content %}<div id="plug-refresh" data-scores-url="{{ url_for('fans.scores') }}"></div><script src="{{ url_for('static',filename='plug_updates.js') }}" defer></script><h2>Upcoming games</h2>{{ cards(games) }}{% if not games %}<p>No upcoming forecasts yet.</p>{% endif %}
-{% if earlier_games %}<section class="plug-earlier"><h2>Games played &amp; underway</h2>{{ cards(earlier_games) }}</section>{% endif %}{% endblock %}
+{% block content %}<div id="plug-refresh" data-scores-url="{{ url_for('fans.scores') }}"></div><script src="{{ url_for('static',filename='plug_updates.js') }}" defer></script>
+<div id="plug-weekly-slate">
+{% if active_slate %}<p class="expert-meta">{{ active_slate[0] }} · {{ 'NFL Week ' ~ active_slate[2] if active_slate[1]=='REG' else active_slate[1] ~ ' · Week ' ~ active_slate[2] }}</p>{% endif %}
+<h2>Upcoming Games</h2>{{ cards(games) }}{% if not games %}<p>No upcoming games in the current scheduled slate.</p>{% endif %}
+{% if underway_games %}<section><h2>Games Underway</h2>{{ cards(underway_games) }}</section>{% endif %}
+{% if completed_games %}<section><h2>Completed Games</h2>{{ cards(completed_games) }}</section>{% endif %}
+{% if awaiting_games %}<section><h2>Game Status Awaiting Confirmation</h2>{{ cards(awaiting_games) }}</section>{% endif %}
+<section class="plug-earlier"><h2>Historical Results</h2><p><a href="{{ url_for('expert_beta.archive') }}">Prediction archive and grading →</a> · <a href="{{ url_for('fans.prediction_results') }}">The Plug’s Record →</a></p>
+{% if historical_games %}<details><summary>Previous saved forecasts</summary>{{ cards(historical_games) }}</details>{% endif %}</section>
+</div>{% endblock %}

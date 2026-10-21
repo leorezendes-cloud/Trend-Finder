@@ -334,16 +334,17 @@ def records_or_fail():
 
 def dashboard():
     records = records_or_fail()
-    from plug_dashboard import combined_cards
-    games, earlier_games = combined_cards(records, public_record, clock())
-    response = current_app.make_response(render_template('expert_dashboard.html', games=games, earlier_games=earlier_games))
+    from plug_dashboard import weekly_dashboard
+    context = weekly_dashboard(records, public_record, clock())
+    response = current_app.make_response(render_template('expert_dashboard.html', **context))
     return private_cache(response)
 
 
 @bp.route('/api/the-plug')
 def api_dashboard():
-    latest = {identity(r['scout']): r for r in records_or_fail()}
-    return jsonify(games=[public_record(r) for r in latest.values() if instant(r['scout']['game']['kickoff_utc']) > clock()], label='In development')
+    from plug_dashboard import weekly_dashboard
+    context = weekly_dashboard(records_or_fail(), public_record, clock())
+    return jsonify(**context, label='In development')
 
 
 @bp.route('/the-plug/archive')

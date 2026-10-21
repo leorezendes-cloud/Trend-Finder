@@ -11,9 +11,9 @@ class DashboardTests(ExpertBetaTests):
             quote={'line':3},totals={'prediction':{'lean':'Under'},'quote':{'line':42.5}},results={'Blend':'Win'})
         with patch('plug_dashboard.legacy_records',return_value=[legacy]):
             html=self.client.get('/the-plug').text
-        self.assertLess(html.index('Upcoming games'),html.index('Games played &amp; underway'))
+        self.assertLess(html.index('Upcoming Games'),html.index('Historical Results'))
         self.assertLess(html.index('HOU @ JAX'),html.index('SEA @ DEN'))
-        for text in ('Live market lines are unavailable','Saved picks and scores shown','premium access','Prediction archive','Existing forecasts','No calibrated confidence'):
+        for text in ('Live market lines are unavailable','Saved picks and scores shown','premium access','Existing forecasts','No calibrated confidence'):
             self.assertNotIn(text,html)
         self.assertIn('The Plug’s Record',html)
         self.assertEqual(self.client.get('/sunday-scout').status_code,302)
@@ -26,8 +26,8 @@ class DashboardTests(ExpertBetaTests):
         before={p:p.read_bytes() for p in self.root.glob('forecasts/**/*.json')}
         with patch('plug_dashboard.legacy_records',return_value=[legacy]):
             html=self.client.get('/the-plug').text
-        self.assertEqual(html.count('<h2>HOU @ JAX</h2>'),1)
-        self.assertIn('Earlier locked forecast',html)
+        self.assertEqual(html.count('data-away="HOU" data-home="JAX"'),1)
+        self.assertIn('Market Spread & Over/Under',html)
         self.assertIn('JAX -7',html)
         for p,b in before.items():self.assertEqual(p.read_bytes(),b)
 
@@ -46,7 +46,7 @@ class DashboardTests(ExpertBetaTests):
         with patch('plug_dashboard.matchup_public_market',return_value=market):
             html=self.client.get('/the-plug').text
         self.assertIn('HOU +3',html)
-        self.assertIn('HOU +7.5',html)
+        self.assertIn('HOU +7.5',' '.join(html.split()))
         self.assertIn('Fixture market',html)
         self.assertEqual(self.store.records()[0]['scout']['quotes']['Spread']['line_a'],3)
 

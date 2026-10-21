@@ -16,15 +16,13 @@
         const game = data.games.find(g => g.away === card.dataset.away && g.home === card.dataset.home && new Date(g.date).toISOString().slice(0,10) === day);
         if (game && game.state !== 'pre') card.querySelector('.plug-live-score').textContent = `${game.away} ${game.away_score ?? '—'} · ${game.home} ${game.home_score ?? '—'} · ${game.status}`;
       }
-      if (Date.now() - marketChecked >= 300000) {
+      if (Date.now() - marketChecked >= 60000) {
         const page = await fetch(location.href, {cache:'no-store', signal:AbortSignal.timeout(10000)});
         if (page.ok) {
           const documentCopy = new DOMParser().parseFromString(await page.text(),'text/html');
-          const freshCards = [...documentCopy.querySelectorAll('.expert-grid > .expert-card')];
-          for (const card of document.querySelectorAll('.expert-grid > .expert-card')) {
-            const fresh = freshCards.find(c => c.dataset.away === card.dataset.away && c.dataset.home === card.dataset.home && c.dataset.kickoff === card.dataset.kickoff);
-            if (fresh) card.querySelector('.plug-market-context').replaceChildren(...fresh.querySelector('.plug-market-context').childNodes);
-          }
+          const fresh = documentCopy.getElementById('plug-weekly-slate');
+          const current = document.getElementById('plug-weekly-slate');
+          if (fresh && current) current.replaceChildren(...fresh.childNodes);
           marketChecked = Date.now();
         }
       }

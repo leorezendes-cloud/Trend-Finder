@@ -1,5 +1,8 @@
 """Versioned personnel evidence. No automatic injury point penalties or starter claims."""
 import argparse
+import csv
+import gzip
+import os
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -67,6 +70,57 @@ def qb_profile(rows, player_id, season, before_week, prior=100):
             'point_adjustment': None}
 
 
+def _release_cache(stream):
+    """Release our own newly written raw evidence pages on memory-limited Linux."""
+    stream.flush()
+    if hasattr(os, 'posix_fadvise'):
+        os.fsync(stream.fileno())
+        try: os.posix_fadvise(stream.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
+        except OSError: pass  # Cache advice is optional; evidence bytes are unchanged.
+
+
+def _json_rows(path):
+    """Read our raw JSON array incrementally instead of materializing its text/list."""
+    decoder=json.JSONDecoder()
+    opener = gzip.open if path.suffix=='.gz' else open
+    with opener(path,'rt') as stream:
+        buffer=''; first=True; opened=False; since_advice=0
+        def block_read():
+            nonlocal since_advice
+            block=stream.read(65536); since_advice+=len(block)
+            if since_advice>=4*1024*1024 and hasattr(os,'posix_fadvise'):
+                try: os.posix_fadvise(stream.fileno(),0,0,os.POSIX_FADV_DONTNEED)
+                except OSError: pass
+                since_advice=0
+            return block
+        while True:
+            buffer=buffer.lstrip()
+            if not buffer:
+                block=block_read()
+                if not block: raise ValueError('Incomplete personnel evidence')
+                buffer=block.lstrip()
+            if not opened:
+                if not buffer.startswith('['): raise ValueError('Expected personnel array')
+                buffer=buffer[1:]; opened=True; continue
+            if buffer.startswith(']'):
+                if buffer[1:].strip() or stream.read().strip(): raise ValueError('Trailing personnel data')
+                return
+            if not first:
+                if not buffer.startswith(','): raise ValueError('Missing personnel row separator')
+                buffer=buffer[1:].lstrip()
+            while True:
+                buffer=buffer.lstrip()
+                try: value,end=decoder.raw_decode(buffer)
+                except json.JSONDecodeError:
+                    block=block_read()
+                    if not block: raise ValueError('Incomplete personnel row')
+                    buffer+=block
+                else: break
+            if not isinstance(value,dict): raise ValueError('Invalid personnel row')
+            yield value
+            buffer=buffer[end:]; first=False
+
+
 def collect(season, root=ROOT):
     import nflreadpy as nfl
     started = datetime.now(timezone.utc).isoformat()
@@ -80,13 +134,28 @@ def collect(season, root=ROOT):
                                 'Injury publication times unavailable; retrieval time governs availability.',
                                 'No record does not mean healthy. No fitted point adjustment.']}
     for kind, frame in frames.items():
-        rows = frame.to_dicts()
-        if kind == 'depth_charts':
-            rows = [r for r in rows if timestamp(r['dt']) <= retrieved]
-        path = folder/(kind+'.json')
-        path.write_text(json.dumps(rows, default=str))
-        manifest['files'][kind] = {'path': str(path.relative_to(root)), 'rows': len(rows),
-                                  'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+        # Preserve the original JSON representation without a full dict-list copy.
+        path = folder/(kind+'.json.gz'); count = 0
+        content_hash = hashlib.sha256()
+        with gzip.open(path,'wt',compresslevel=1) as stream:
+            stream.write('['); content_hash.update(b'[')
+            for row in frame.iter_rows(named=True):
+                if kind == 'depth_charts' and timestamp(row['dt']) > retrieved:
+                    continue
+                text = (', ' if count else '')+json.dumps(row,default=str)
+                stream.write(text); content_hash.update(text.encode()); count += 1
+                if count % 8192 == 0: _release_cache(stream)
+            stream.write(']'); content_hash.update(b']'); _release_cache(stream)
+        fingerprint = hashlib.sha256()
+        with path.open('rb') as stream:
+            for block in iter(lambda: stream.read(1024*1024), b''):
+                fingerprint.update(block)
+            if hasattr(os,'posix_fadvise'):
+                try: os.posix_fadvise(stream.fileno(),0,0,os.POSIX_FADV_DONTNEED)
+                except OSError: pass
+        manifest['files'][kind] = {'path': str(path.relative_to(root)), 'rows': count,
+                                  'sha256': fingerprint.hexdigest(), 'encoding':'gzip',
+                                  'content_sha256':content_hash.hexdigest()}
     (folder/'manifest.json').write_text(json.dumps(manifest, indent=2))
     return manifest
 
@@ -111,10 +180,19 @@ def refresh_tracker(season=2026,root=ROOT):
     from .stats import read_csv
     manifest=collect(season,root)
     folder=root/Path(manifest['files']['injuries']['path']).parent
-    depth=json.loads((folder/'depth_charts.json').read_text())
-    injuries=json.loads((folder/'injuries.json').read_text())
+    # evidence() only uses each team's latest pre-cutoff QB depth rows. Keep
+    # those exact rows while retaining the complete raw feed on disk.
+    latest={}; depth=[]
+    for row in _json_rows(root/manifest['files']['depth_charts']['path']):
+        if row.get('pos_abb')!='QB': continue
+        team=team_code(row['team']); stamp=timestamp(row['dt'])
+        if team not in latest or stamp > latest[team][0]: latest[team]=(stamp,[row])
+        elif stamp == latest[team][0]: latest[team][1].append(row)
+    for _,rows in latest.values(): depth.extend(rows)
+    injuries=list(_json_rows(root/manifest['files']['injuries']['path']))
     cache=root/'data/scout4';pointer=json.loads((cache/str(season)/'latest.json').read_text())
-    players=read_csv(cache/pointer['files']['player']['path'])
+    with (cache/pointer['files']['player']['path']).open(newline='') as stream:
+        players=[row for row in csv.DictReader(stream) if row.get('position')=='QB']
     games=[];now=timestamp(manifest['retrieved_at'])
     for g in read_csv(root/'nfl_games.csv'):
         if str(g['season'])!=str(season) or g['game_type']!='REG':continue

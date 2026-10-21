@@ -28,6 +28,9 @@ def run(kind, root, season):
     elif kind == 'stats':
         from scout4.collect import collect
         collect(season, root/'data/scout4')
+    elif kind == 'context':
+        from scout4.context_model import refresh_sources
+        refresh_sources(season, root)
     else:
         raise ValueError('Unknown feed stage')
 
@@ -35,11 +38,11 @@ def run(kind, root, season):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('kind', choices=('finals', 'stats'))
+    parser.add_argument('kind', choices=('finals', 'stats', 'context'))
     parser.add_argument('root', type=Path)
     parser.add_argument('season', type=int)
     args = parser.parse_args()
-    arm_feed_deadline()
+    arm_feed_deadline(60 if args.kind=='context' else 180)
     import resource
     from hosted_updates import scheduler_event
     job = 'feed-'+args.kind

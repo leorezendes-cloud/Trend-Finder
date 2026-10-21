@@ -42,6 +42,17 @@ class ExpertBetaTests(unittest.TestCase):
                 db().execute("INSERT INTO members(id,email,password_hash) VALUES(1,'premium@example.test','unused'),(2,'free@example.test','unused')")
         self.store=Store(self.root)
         self.games=[fixture(),fixture('CHI','ATL'),fixture('BUF','NYJ')]
+        def fixture_slate(rows, now=None):
+            from expert_beta import instant
+            from site_week import EASTERN
+            schedule=[]
+            for scout in self.games:
+                game=scout['game'];ko=instant(game['kickoff_utc']).astimezone(EASTERN)
+                schedule.append(dict(game, game_type='REG', gameday=ko.date().isoformat(),
+                                     gametime=ko.strftime('%H:%M:%S.%f'),away_score='',home_score=''))
+            return (2026,'REG',1),schedule
+        slate_patch=patch('site_week.active_slate',side_effect=fixture_slate)
+        slate_patch.start();self.addCleanup(slate_patch.stop)
         for s in self.games:self.store.append(s,expert=report(s))
         feature(self.root,2026,1,['HOU-JAX','CHI-ATL'])
         self.client=app.test_client()

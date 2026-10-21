@@ -87,13 +87,16 @@ def update_once(root, feed_lock_fd=None):
         if feed_lock_fd is not None:
             # Child retains the shared lock even if this supervisor is killed.
             subprocess.run([sys.executable, str(SOURCE/'update_feed_worker.py'),
-                kind, str(root), str(season)], check=True, timeout=180,
+                kind, str(root), str(season)], check=True, timeout=75 if kind=='context' else 180,
                 pass_fds=(feed_lock_fd,), cwd=SOURCE,
                 env={**os.environ, 'POLARS_MAX_THREADS':'1'})
         elif kind == 'finals':
             import update_nfl_games as finals
             finals.BACKUPS = root/'backups'
             finals.main(['--apply','--season',str(season),'--file',str(root/'nfl_games.csv')])
+        elif kind == 'context':
+            from scout4.context_model import refresh_sources
+            refresh_sources(season, root)
         else:
             from scout4.collect import collect
             collect(season, root/'data/scout4')
@@ -107,8 +110,7 @@ def update_once(root, feed_lock_fd=None):
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1' and stages['stats']=='ok':
-        from scout4.context_model import refresh_sources
-        attempt('injury/weather collection', lambda: refresh_sources(season, root))
+        attempt('injury/weather collection', lambda: feed('context'))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
         from prediction_staging import run_staged as predictions
         attempt('predictions', lambda: predictions(root, SOURCE, SOURCE/'automatic_model.json'))
