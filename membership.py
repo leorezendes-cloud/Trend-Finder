@@ -290,7 +290,16 @@ def preferences():
     from saved_trends import manual_trend_title
     for item in watchlist:
         if item['kind']=='trend' and urlsplit(item['target']).path=='/trend-finder':item['title']=manual_trend_title(item['target'])
-    return render_template('membership.html',mode='preferences',error=error,saved=saved,watchlist=watchlist),400 if error else 200
+    # Same read-only, already-graded counts shown in My Picks; no grading or weekly jobs.
+    records = {}
+    for market in ('su', 'ats', 'ou'):
+        results = db().execute(
+            f'SELECT {market}_result AS result, COUNT(*) AS n FROM member_picks '
+            f'WHERE member_id=? AND {market} IS NOT NULL GROUP BY {market}_result',
+            (g.member['id'],)
+        ).fetchall()
+        records[market] = {row['result']: row['n'] for row in results}
+    return render_template('membership.html',mode='preferences',error=error,saved=saved,watchlist=watchlist,records=records),400 if error else 200
 
 
 def allow_attempt(action, email):

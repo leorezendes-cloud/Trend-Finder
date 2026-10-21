@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Owner Preview · The Huddle Leaderboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='community.css') }}">
+  <style>
+    .huddle-standings{margin:16px 0;padding:18px 22px;background:#151e2c;border:1px solid #2a3546;border-radius:15px}
+    .huddle-standings h2{margin-bottom:12px}.huddle-standings table{width:100%;border-collapse:collapse;font-size:13px}
+    .huddle-standings th,.huddle-standings td{text-align:left;padding:9px 6px;border-bottom:1px solid #344154}
+    .huddle-standings th{color:#ffc94a}.huddle-standings p{color:#a8b7c9}
+    .huddle-owner-note{margin:15px 0;color:#ffc94a}
+  </style>
+</head><body>
+{% include '_site_navigation.html' %}
+<main class="huddle">
+  <header class="huddle-header"><div class="huddle-identity">
+    <span class="huddle-kicker">OWNER PREVIEW · NOT PUBLIC</span>
+    <h1>Leaderboard<span class="huddle-period">.</span></h1>
+    <p>Already-graded member picks only · {{ 'All seasons' if season is none else season }} · Minimum {{ minimum }} graded decisions per market.</p>
+  </div></header>
+  <p class="huddle-owner-note">The public Huddle still displays “Coming soon.” No member can open this preview.</p>
+  {% for market, heading in markets.items() %}
+    <section class="huddle-standings" aria-labelledby="standings-{{market}}"><h2 id="standings-{{market}}">{{ heading }}</h2>
+    {% if tables[market] %}
+      <div style="overflow-x:auto"><table><thead><tr><th>Rank</th><th>Member</th><th>W–L</th><th>Pushes</th><th>Win %</th></tr></thead>
+      <tbody>{% for row in tables[market] %}<tr><td>{{ row.rank }}</td><td>{{ row.name }}</td><td>{{ row.wins }}–{{ row.losses }}</td><td>{{ row.pushes }}</td><td>{{ '%.1f'|format(row.win_pct) }}%</td></tr>{% endfor %}</tbody></table></div>
+    {% else %}<p>No members have {{ minimum }} graded decisions in this category yet.</p>{% endif %}
+    </section>
+  {% endfor %}
+  <p><a href="{{ url_for('community.discussion') }}" style="color:#ffc94a">← Back to The Huddle</a></p>
+</main>
+</body></html>

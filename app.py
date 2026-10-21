@@ -24,6 +24,8 @@ from membership import init_membership
 init_membership(app)
 from community_comments import init_community
 init_community(app)
+from huddle_leaderboard import init_huddle_leaderboard
+init_huddle_leaderboard(app)
 from fan_views import bp as fans_bp
 app.register_blueprint(fans_bp)
 from sunday_scout import scout_bp

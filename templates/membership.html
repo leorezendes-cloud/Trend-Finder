@@ -2,19 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% if seo and seo.title %}{{ seo.title }}{% else %}Membership | Gravy Train{% endif %}</title>
+<title>{% if seo and seo.title %}{{ seo.title }}{% else %}{{ {'register':'Join Free','login':'Sign in','preferences':'My Profile'}[mode] }} | Trend Findah{% endif %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+{% if mode == 'preferences' %}<link rel="stylesheet" href="{{ url_for('static', filename='member_picks.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='community.css') }}">{% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='membership.css') }}">
 {% include '_branding_head.html' %}
 </head>
 <body>
-<h1>Gravy Train</h1>
 {% include '_site_navigation.html' %}
-<main class="membership">
-{% if mode == 'preferences' %}<p><a href="{{ url_for('home') }}">Back to main menu</a></p>{% endif %}
-<h2>{{ {'register':'Join Free', 'login':'Sign in', 'preferences':'My Profile'}[mode] }}</h2>
-<p>{% if mode == 'preferences' %}Your saved teams and trends, plus newsletter preferences.{% else %}Explore freely. Sign in to save teams and trends to My Watchlist.{% endif %}</p>
+<main class="membership{% if mode == 'preferences' %} profile-page{% endif %}">
+{% if mode == 'preferences' %}
+<section class="huddle profile-huddle" aria-label="My Profile and all-time picks records">
+  <header class="huddle-header">
+    <div class="huddle-identity">
+      <span class="huddle-kicker"><span class="huddle-live-dot" aria-hidden="true"></span> TREND FINDAH MEMBERS</span>
+      <h1>My Profile<span class="huddle-period">.</span></h1>
+      <p>Your records, saved teams and trends, and newsletter preferences.</p>
+    </div>
+    <div class="huddle-community-status"><strong>{{ watchlist|length }}</strong><span>saved items</span></div>
+  </header>
+  <div class="picks-records profile-records">
+    {% for key,title in [('su','Straight-up'),('ats','Against the spread'),('ou','Over / Under')] %}
+    <section><h2>{{ title }}</h2><strong>{{ records[key].get('Win',0) }}–{{ records[key].get('Loss',0) }}</strong><p>{{ records[key].get('Push',0) }} pushes · {{ records[key].get('Tie',0) }} ties · {{ records[key].get('Void',0) }} void · {{ records[key].get('Pending',0) }} pending</p><small>All-time record</small></section>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<h1 class="membership-auth-heading">{{ {'register':'Join Free','login':'Sign in'}[mode] }}</h1>
+<p>Explore freely. Sign in to save teams and trends to My Watchlist.</p>
+{% endif %}
 {% if error %}<p class="member-message" role="alert">{{ error }}</p>{% endif %}
 {% if saved %}<p class="member-message" role="status">Preferences saved.</p>{% endif %}
 {% if mode == 'login' and request.args.get('reset') == 'complete' %}<p class="member-message" role="status">Password updated. Log in with your new password.</p>{% endif %}

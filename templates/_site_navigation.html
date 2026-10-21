@@ -1,9 +1,22 @@
 {% set trend_endpoints = ['trend_finder', 'trends_page', 'trend_details', 'trend_games', 'combination_details', 'backtest_page'] %}
 {% set plug_section = request.endpoint in ['plug_page','market_page'] or request.endpoint == 'sunday_scout.sunday_scout_page' or ((request.endpoint or '').startswith('scout4.') or (request.endpoint or '').startswith('fans.') or (request.endpoint or '').startswith('expert_beta.')) %}
 <div class="site-header">
-{% if g.member %}
-<a class="site-profile" href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}><span>Profile</span><small>Signed in</small></a>
-{% endif %}
+<details class="site-profile-dropdown">
+  <summary class="site-profile" aria-label="Account menu, {{ 'signed in' if g.member else 'signed out' }}"><span>Profile</span><small>{{ 'Signed in' if g.member else 'Signed out' }}</small></summary>
+  <div class="site-profile-panel">
+    <p class="site-profile-panel-status">{{ 'You are signed in' if g.member else 'You are not signed in' }}</p>
+    <a href="{{ url_for('membership.preferences') }}">My Profile</a>
+    <a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>
+    {% if g.member %}
+    <form method="post" action="{{ url_for('membership.logout') }}" class="site-profile-logout">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button>
+    </form>
+    {% else %}
+    <a href="{{ url_for('membership.login') }}">Log in</a>
+    <a href="{{ url_for('membership.register') }}">Join Free</a>
+    {% endif %}
+  </div>
+</details>
 <a class="site-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='Images/Branding/Neon Graffiti Trend Findah Logo.png') }}" alt="Trend Findah — Home"></a>
 <div class="site-header-actions">
 <details class="site-menu" id="site-menu">
@@ -58,3 +71,20 @@
 </div>
 
 {% if current_site_week %}<p class="site-week-label">{{ current_site_week[0] }} · NFL Week {{ current_site_week[1] }} · Changes Wednesday, 8 a.m. ET</p>{% endif %}
+<script>
+(() => {
+  const menu = document.querySelector('.site-profile-dropdown');
+  if (!menu) return;
+
+  document.addEventListener('pointerdown', event => {
+    if (!menu.contains(event.target)) menu.open = false;
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu.open) {
+      menu.open = false;
+      menu.querySelector('summary').focus();
+    }
+  });
+})();
+</script>

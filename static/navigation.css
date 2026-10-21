@@ -150,3 +150,21 @@ html body nav.site-navigation .menu-logo-home {
     width: 130px;
     object-fit: contain;
 }
+
+
+/* Profile / Huddle account-dropdown refresh 2026-10 */
+.site-header > .site-profile-dropdown {position:relative;flex:0 0 auto;min-width:0;z-index:25;font-family:Arial,sans-serif}
+.site-profile-dropdown > summary.site-profile {display:flex;list-style:none;cursor:pointer;align-items:center;justify-content:center;min-width:85px;box-sizing:border-box}
+.site-profile-dropdown > summary.site-profile::-webkit-details-marker {display:none}
+.site-profile-dropdown > summary.site-profile::marker {content:""}
+.site-profile-dropdown[open] > summary.site-profile {outline:2px solid #fbbf24;outline-offset:2px}
+.site-profile-dropdown > summary.site-profile small {color:#86efac}
+.site-profile-dropdown > summary.site-profile[aria-label*="signed out"] small {color:#cbd5e1}
+.site-profile-panel {position:absolute;top:calc(100% + 9px);left:0;width:min(245px,calc(100vw - 24px));max-width:calc(100vw - 24px);padding:10px;background:#080e18;border:1px solid #c99c3a;border-radius:12px;box-shadow:0 16px 42px #000a;z-index:55;box-sizing:border-box}
+.site-profile-panel-status {margin:0 0 9px!important;padding:4px 6px;color:#cbd5e1!important;font:12px/1.4 Arial,sans-serif!important;text-align:left!important;-webkit-text-stroke:0}
+.site-profile-panel a,html body .site-profile-panel .site-profile-logout button {display:block;box-sizing:border-box;width:100%;margin:5px 0;padding:11px 12px;border:1px solid #334155;border-radius:8px;background:#141e2c;color:white;font:700 14px/1.2 Arial,sans-serif;text-decoration:none;text-align:left;-webkit-text-stroke:0;cursor:pointer}
+.site-profile-panel a:hover,html body .site-profile-panel .site-profile-logout button:hover,.site-profile-panel a:focus-visible,html body .site-profile-panel .site-profile-logout button:focus-visible {border-color:#fbbf24;background:#243044;outline:none}
+html body .site-profile-panel .site-profile-logout {margin:0;padding:0;border:0;border-radius:0;background:transparent;max-width:none;box-shadow:none}
+.site-header:has(> .site-profile-dropdown) {gap:12px}
+.site-header:has(> .site-profile-dropdown) > .site-brand {margin:0 auto;min-width:0;flex:1}
+@media(max-width:600px){.site-profile-dropdown > summary.site-profile {min-width:72px;padding:8px}.site-profile-panel {left:0}}

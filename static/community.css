@@ -43,3 +43,16 @@ html body .huddle{--hd-bg:#101622;--hd-card:#151e2c;--hd-edge:#2a3546;--hd-text:
 @media(prefers-reduced-motion:reduce){.huddle-shortcut{transition:none}}
 
 @media(max-width:490px){.huddle-compose-form{gap:8px}.huddle-compose-bar{padding:3px 9px}.huddle-moderation-banner{flex-direction:column;align-items:flex-start;padding:16px}.huddle-post-button{min-height:42px}}
+/* Match My Picks' outer dark panel spacing */
+html body main.huddle {
+    padding-top: 28px;
+    padding-bottom: 28px;
+    border-radius: 18px;
+}
+
+@media (max-width: 700px) {
+    html body main.huddle {
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+}
