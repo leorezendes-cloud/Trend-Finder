@@ -391,8 +391,10 @@ def trend_finder():
     for key,value in csv_filters.items():filter_chips.append(dict(label=f"{'QB' if key=='qb_name' else 'Underdog QB' if key=='dog_qb_name' else key.replace('_',' ').title()}: {value}",fields=['dog_qb_name','historical_dog_qb_name'] if key=='dog_qb_name' else [key]))
     from saved_trends import manual_trend_title
     manual_search_url=url_for('trend_finder',run='analyze',**{k:v for k,v in form_data.items() if v and k not in ('run','action','csrf_token')})
+    from active_trends import load_highlights
     return render_template(
         "index.html",
+        active_highlights=load_highlights(),
         manual_search_url=manual_search_url,manual_search_title=manual_trend_title(manual_search_url),
         filter_chips=filter_chips,qb_summaries=qb_summaries(matchup_groups),results_freshness=results_freshness(),
         filter_options=filter_options,

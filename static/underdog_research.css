@@ -1,0 +1,54 @@
+/* Visual consistency for specialized Underdog Research.
+   No changes to filters, calculations or pick cards. */
+html body.underdog-research .home-filter-form .research-mode-switch,
+html body.underdog-research .research-mode-switch {
+    margin: 0 0 14px;
+    color: #cbd5e1;
+    font: 700 14px/1.5 Arial, sans-serif;
+    text-align: left;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+}
+html body.underdog-research .research-mode-switch a,
+html body.underdog-research .research-mode-switch a:visited { color: #fbbf24; }
+html body.underdog-research .home-filter-form .search-panel-title {
+    margin: 0 auto 10px;
+    padding: 0;
+    text-align: center;
+    text-decoration: none;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+}
+html body.underdog-research .home-filter-form .search-panel-title img {
+    display: block;
+    max-width: 100%;
+    width: min(100%, 500px);
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+}
+/* Fix former inline black text on a dark game-details panel. */
+html body.underdog-research .dog-matching-games {
+    min-width: 0;
+    padding: 16px;
+    color: #f3f7fd;
+    background: #151e2b;
+    border: 1px solid #334154;
+    border-radius: 12px;
+    font: 14px/1.5 Arial, sans-serif;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+}
+html body.underdog-research .dog-matching-games summary { color: #fff; }
+html body.underdog-research .dog-matching-games a,
+html body.underdog-research .dog-matching-games a:visited { color: #fbbf24; }
+html body.underdog-research .dog-matching-games .evidence-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+html body.underdog-research .dog-matching-games table { color: #f3f7fd; }
+@media (max-width: 650px) {
+    html body.underdog-research .dog-matching-games { padding: 12px; }
+    html body.underdog-research .research-mode-switch { font-size: 13px; }
+}

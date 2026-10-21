@@ -215,3 +215,7 @@
     box-sizing: border-box;
   }
 }
+/* Keep the mode switch directly above the research title. */
+.general-research .home-filter-form .research-mode-switch { margin:0 0 14px; padding:0; color:#cbd5e1; text-align:left; font:700 14px/1.5 Arial,sans-serif; -webkit-text-stroke:0; }
+.general-research .home-filter-form .research-mode-switch a, .general-research .home-filter-form .research-mode-switch a:visited { color:#fbbf24; }
+@media(max-width:650px) { .general-research .home-filter-form .research-mode-switch {font-size:13px} }

@@ -8,16 +8,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='underdog_research.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='trend_games.css') }}">
 </head>
-<body>
+<body class="underdog-research">
 
     <div class="section-logo-title"><img src="{{ url_for('static', filename='Images/Branding/trend-findah-nav.png') }}" alt="Trendfindah 3000" width="953" height="179"></div>
     {% include '_site_navigation.html' %}
 
     <p class="section-intro">Trendfindah 3000 is your NFL trend finder for historical ATS records and custom filters. <a href="{{ url_for('trends_page') }}">Discover Trends</a> highlights patterns and streaks.</p>
+    {% include '_active_trends.html' %}
+    <nav class="research-mode-switch tf-mode-links" aria-label="Research views and presets">
+        <a href="{{ url_for('trend_finder') }}">← General NFL Research</a>
+        <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset ↗</a>
+    </nav>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
-        <input type="hidden" name="research_view" value="dogs"><h1 class="search-panel-title">Trendfindah 3000</h1><p>Underdog research · <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">General NFL research</a></p>
-        {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a class="clear-combination-link" href="{{ url_for('trend_finder') }}">Clear combination</a></p>{% endif %}
+        <input type="hidden" name="research_view" value="dogs">
+        <h1 class="search-panel-title"><img src="{{ url_for('static', filename='Images/Branding/TrendFindah-3000-Retro-Transparent-Small.png') }}" alt="Trendfindah 3000" width="500" height="220"></h1>
+        <p>Underdog research</p>
+        {% if combination_conditions %}<input type="hidden" name="combination_conditions" value="{{ combination_conditions|tojson|forceescape }}"><p>Verifying: {{ combination_conditions|display_trend_filters }}. These grouped conditions remain applied when you analyze. <a class="clear-combination-link" href="{{ url_for('trend_finder',research_view='dogs') }}">Clear combination</a></p>{% endif %}
         <div class="form-grid">
             <div class="filter-mode-row">
             <div class="field">
@@ -219,7 +228,7 @@
             <button type="submit" name="action" value="analyze">Analyze</button>
             <button type="submit" name="action" value="combinations">Find combinations</button>
 
-            <a href="{{ url_for('trend_finder') }}" class="clear-button">Clear Filters</a>
+            <a href="{{ url_for('trend_finder',research_view='dogs') }}" class="clear-button">Clear Filters</a>
 
         </div>
     </form>
@@ -289,19 +298,33 @@
                 <span class="stat-value">{{ summary.trend_signal }}</span>
             </div>
         </div>
-        <details open class="home-matching-games" style="margin-top: 24px; color: black; -webkit-text-stroke: 0;">
+        <details open class="home-matching-games dog-matching-games tf-games-section" style="margin-top: 24px;">
             <summary style="cursor: pointer; font-size: 20px; font-weight: bold;">Games Involved in Trend ({{ summary.games }})</summary>
             {% for group in matchup_groups %}
             <details{% if loop.first %} open{% endif %} style="margin-top: 12px;">
                 <summary style="cursor: pointer; font-weight: bold;">{{ group.games|length }} {% if is_primetime is sameas true %}primetime {% elif is_primetime is sameas false %}non-primetime {% endif %}games from {{ group.year }}</summary>
-                <div class="evidence-table-scroll" style="background: #1f2937; border-radius: 8px;">
-                    <table class="evidence-table">
-                        <thead><tr><th>Date</th><th>Matchup</th><th>Score</th><th>Underdog</th><th>Spread</th><th>Dog ATS</th><th>Spread source</th>{% if group.show_qb_ats %}<th>QB Team ATS</th>{% endif %}</tr></thead>
-                        <tbody>{% for game in group.games %}
-                            <tr><td>{{ game.gameday }}</td><td>{{ game.away_team }} @ {{ game.home_team }}</td><td>{{ game.away_score }}–{{ game.home_score }}</td><td>{{ game.dog_team or "Pick’em" }}</td><td>{% if game.dog_team %}{{ "%+.1f"|format(game.dog_spread) }}{% else %}0{% endif %}</td><td>{{ game.ats_result }}</td><td><small>{{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }}<br>{{ game.line_minutes }} min before kickoff{% if game.line_minutes > 15 %}<br>No capture in final 15 minutes{% endif %}{% endif %}{% if game.line_url %}<br><a href="{{ game.line_url }}" target="_blank" rel="noopener noreferrer">View Source</a>{% endif %}</small></td>{% if group.show_qb_ats %}<td>{% for qb in game.qb_results %}<div><strong>{{ qb.team }}: {{ qb.result }}</strong><br><small>{{ qb.name }} • {{ "%+.1f"|format(qb.spread) }}</small></div>{% else %}—{% endfor %}</td>{% endif %}</tr>
-                        {% endfor %}</tbody>
-                    </table>
-                </div>
+<div class="tf-compact-games" aria-label="{{ group.year }} matching underdog games">
+    {% for game in group.games %}
+    <details class="tf-compact-game">
+      <summary>
+        <span class="tf-game-title">{{ game.away_team }} @ {{ game.home_team }}</span>
+        <strong class="tf-game-score">{{ game.away_score }}–{{ game.home_score }}</strong>
+      </summary>
+      <div class="tf-game-facts">
+        <div class="tf-game-fact tf-game-fact--wide"><span>Date</span>{{ game.gameday }}</div>
+        <div class="tf-game-fact"><span>Underdog</span>{{ game.dog_team or "Pick’em" }}</div>
+        <div class="tf-game-fact"><span>Dog spread</span>{% if game.dog_team %}{{ "%+.1f"|format(game.dog_spread) }}{% else %}0{% endif %}</div>
+        <div class="tf-game-fact"><span>Dog ATS</span>{{ game.ats_result }}</div>
+        <div class="tf-game-fact"><span>Spread source</span>{{ game.line_source or 'Unavailable' }}</div>
+        {% if game.line_capture %}<div class="tf-game-fact tf-game-fact--wide"><span>Line captured</span>{{ game.line_capture }} · {{ game.line_minutes }} min before kickoff{% if game.line_minutes > 15 %} · No capture in final 15 minutes{% endif %}</div>{% endif %}
+        {% if game.line_url %}<p class="tf-game-full-link"><a href="{{ game.line_url }}" target="_blank" rel="noopener noreferrer">View spread source →</a></p>{% endif %}
+        {% if group.show_qb_ats %}
+        <div class="tf-game-fact tf-game-fact--wide"><span>QB Team ATS</span>{% for qb in game.qb_results %}<div>{{ qb.team }}: {{ qb.result }} · {{ qb.name }} ({{ "%+.1f"|format(qb.spread) }})</div>{% else %}—{% endfor %}</div>
+        {% endif %}
+      </div>
+    </details>
+    {% endfor %}
+</div>
             </details>
             {% else %}<p>No completed games match these filters.</p>{% endfor %}
         </details>
