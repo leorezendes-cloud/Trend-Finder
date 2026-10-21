@@ -92,9 +92,9 @@ class WeeklyRolloverTests(unittest.TestCase):
             (root/'data/scout4/blend/predictions').mkdir(parents=True)
             def execute(command, **kwargs):
                 if command[2]=='context':
-                    self.assertEqual(kwargs['timeout'],75)
+                    self.assertEqual(kwargs['timeout'],180)
                     self.assertTrue(kwargs['pass_fds'])
-                    raise subprocess.TimeoutExpired(command,75)
+                    raise subprocess.TimeoutExpired(command,180)
                 return subprocess.CompletedProcess(command,0)
             with patch.object(hosted.subprocess,'run',side_effect=execute), \
                     patch.object(hosted,'backup_database'),patch('qb_verification.refresh_qbs'), \

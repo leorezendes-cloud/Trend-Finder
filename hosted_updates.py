@@ -77,7 +77,7 @@ def update_once(root, feed_lock_fd=None):
             stages[name] = 'ok'
         except Exception as error:
             stages[name] = 'failed: ' + type(error).__name__
-            print(f'Automatic update {name} failed: {type(error).__name__}', flush=True)
+            print(f'Automatic update {name} failed: {type(error).__name__}; returncode={getattr(error, "returncode", None)}', flush=True)
         progress()
         scheduler_event(root, 'scout-worker', 'stage_finished', stage=name, result=stages[name])
     attempt('account backup', lambda: backup_database(
@@ -87,7 +87,7 @@ def update_once(root, feed_lock_fd=None):
         if feed_lock_fd is not None:
             # Child retains the shared lock even if this supervisor is killed.
             subprocess.run([sys.executable, str(SOURCE/'update_feed_worker.py'),
-                kind, str(root), str(season)], check=True, timeout=75 if kind=='context' else 180,
+                kind, str(root), str(season)], check=True, timeout=180,
                 pass_fds=(feed_lock_fd,), cwd=SOURCE,
                 env={**os.environ, 'POLARS_MAX_THREADS':'1'})
         elif kind == 'finals':

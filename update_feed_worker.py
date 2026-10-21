@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('root', type=Path)
     parser.add_argument('season', type=int)
     args = parser.parse_args()
-    arm_feed_deadline(60 if args.kind=='context' else 180)
+    arm_feed_deadline(175 if args.kind=='context' else 180)
     import resource
     from hosted_updates import scheduler_event
     job = 'feed-'+args.kind
