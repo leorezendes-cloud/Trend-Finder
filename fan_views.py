@@ -12,11 +12,60 @@ from scout4.web import sources, view_data
 from scout4.stats import read_csv, team_records, player_records, summarize_team, summarize_player, team_code, betting_result
 from pathlib import Path
 from pregame_lines import effective_rows
+from hot_matchups import (matches_for_score, upcoming_for_trend, hot_trend_id,
+                          current_season_evidence, earlier_evidence,
+                          is_fireworthy, scorecard_trends,
+                          current_season_research_params)
 
 ROOT = Path(__file__).resolve().parent
 bp = Blueprint('fans', __name__)
 _score_lock = Lock()
 _score_cache = {'expires': 0, 'games': [], 'updated': None}
+
+
+@bp.app_template_global('hot_trend_id')
+def hot_trend_anchor(trend):
+    return hot_trend_id(trend)
+
+
+@bp.app_template_global('hot_current_evidence')
+def hot_current_evidence(trend):
+    return current_season_evidence(trend)
+
+
+@bp.app_template_global('hot_earlier_evidence')
+def hot_earlier_evidence(trend):
+    return earlier_evidence(trend)
+
+
+@bp.app_template_global('hot_research_params')
+def hot_research_params(trend):
+    return current_season_research_params(trend)
+
+
+@bp.app_template_global('hot_fireworthy')
+def hot_fireworthy(trend):
+    return is_fireworthy(trend)
+
+
+@bp.app_template_global('hot_upcoming_for')
+def hot_upcoming_for(trend):
+    """Lazy, request-local reuse of the existing saved schedule and week."""
+    from flask import g
+    from site_week import active_week
+    if not hasattr(g, '_hot_upcoming_context'):
+        path = ROOT / 'nfl_games.csv'
+        try:
+            rows = read_csv(path)
+            g._hot_upcoming_context = (
+                effective_rows(rows, path, include_scores=False), active_week(rows),
+                datetime.now(ZoneInfo('America/New_York')))
+        except (OSError, ValueError, KeyError, TypeError):
+            g._hot_upcoming_context = ([], None, datetime.now(ZoneInfo('America/New_York')))
+    rows, week, now = g._hot_upcoming_context
+    if not week:
+        return []
+    return upcoming_for_trend(rows, trend, now=now, active_week=week)
 
 
 def parse_scores(payload):
@@ -62,7 +111,19 @@ def scores():
             interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
             _score_cache['expires'] = time.monotonic() + interval
         schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv',include_scores=False)
+        # Keep normal badges limited to the homepage's featured Top 8.
+        # Explicitly include an exceptional 10+ game primetime dog COVER streak
+        # even if the Top 8 category-balancing rule omits it. Both calls reuse
+        # active_trends' cache; never build a new trend from live scores.
+        from active_trends import load_highlights
+        try:
+            hot_trends = scorecard_trends(
+                load_highlights(), load_highlights(all_trends=True)
+            ) if _score_cache['games'] else []
+        except (OSError, ValueError, KeyError, TypeError):
+            hot_trends = []  # Never take the live scores endpoint down for badges.
         games = []
+        now = datetime.now(ZoneInfo('America/New_York'))
         for game in _score_cache['games']:
             row = dict(game)
             matches = [g for g in schedule if team_code(g['away_team']) == row['away']
@@ -75,6 +136,16 @@ def scores():
                 saved.update(home_score=row['home_score'] if row['state']=='post' else '',
                              away_score=row['away_score'] if row['state']=='post' else '')
                 row['market'] = betting_result(saved)
+                # A game only gets a flame for an exact recent evidence ID or
+                # for fully checked pregame conditions. Build links server-side.
+                qualifying = matches_for_score(matches[0], hot_trends,
+                                               state=row['state'], now=now,
+                                               active_week=current)
+                row['hot_matches'] = [
+                    {'label': f"{trend['title']} · {trend['outcome']}",
+                     'url': url_for('hot_trends_page') + '#' + hot_trend_id(trend),
+                     'confirmed': True}
+                    for trend in qualifying]
             games.append(row)
         result = jsonify(games=games, updated=_score_cache['updated'],
                          stale=_score_cache.get('stale', False), source='ESPN',

@@ -1,0 +1,20 @@
+
+{% macro fire(matches) %}
+{% if matches %}
+<details class="tf-trend-fire">
+  <summary aria-label="View {{ matches|length }} matching hot trends"
+           title="Matching Hot Trends">🔥</summary>
+
+  <div class="tf-trend-fire-panel">
+    <strong>🔥 Hot Trends</strong>
+    <ul>
+      {% for trend in matches %}
+      <li>
+        <a href="{{ trend.url }}">{{ trend.label }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</details>
+{% endif %}
+{% endmacro %}

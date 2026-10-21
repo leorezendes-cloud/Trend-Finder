@@ -3,7 +3,7 @@
 <h2 id="active-trends-title">🔥 Top 8 Current Trends 🔥</h2>
 <div class="trend-card-grid hot-trends-grid">
 {% for trend in active_highlights %}
-<details class="trend-card compact-card hot-trend-card">
+<details class="trend-card compact-card hot-trend-card" id="{{ hot_trend_id(trend) }}">
 <summary class="hot-trend-summary">
 <span class="hot-trend-title">{{ trend.title }}</span>
 {% if trend.streak >= 5 %}
@@ -16,17 +16,49 @@
 </summary>
 <div class="hot-trend-details">
 <p>Last seven games: <strong>{{ trend.wins }} matching · {{ trend.losses }} opposite · {{ trend.pushes }} pushes/ties{% if trend.missing %} · {{ trend.missing }} missing{% endif %}</strong>{% if trend.sample < 7 %} ({{ trend.sample }} games available){% endif %}.</p>
-<p>{{ 'QB games' if trend.scope == 'qb' else 'Team games' if trend.scope == 'team' else 'Situation' }} · Last played {{ trend.latest }}{% if trend.spans_seasons %} · Streak spans seasons{% endif %}.</p>
-<details class="hot-trend-evidence"><summary>Recent game evidence</summary>
-<ul>{% for game in trend.evidence %}<li>{{ game.date }} · {{ game.matchup }} · {{ game.result }}</li>{% endfor %}</ul>
+<p>{{ 'QB games' if trend.scope == 'qb' else 'Team games' if trend.scope == 'team' else 'Situation' }} · Last played {{ trend.latest }}{% if trend.spans_seasons %} · Includes games from earlier seasons{% endif %}.</p>
+{% set current_games = hot_current_evidence(trend) %}
+{% set earlier_games = hot_earlier_evidence(trend) %}
+<details class="hot-trend-evidence"><summary>{{ trend.season }} games behind this trend ({{ current_games|length }})</summary>
+{% if current_games %}
+<ul>{% for game in current_games %}<li><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.date }} · {{ game.matchup }}</a> · {{ game.result }}</li>{% endfor %}</ul>
+{% else %}<p>Recent results are from an earlier season.</p>{% endif %}
+{% if earlier_games %}<details class="hot-trend-evidence"><summary>Earlier-season evidence ({{ earlier_games|length }})</summary><ul>{% for game in earlier_games %}<li>{{ game.date }} · {{ game.matchup }} · {{ game.result }}</li>{% endfor %}</ul></details>{% endif %}
 </details>
-<a class="hot-trend-games" href="{{ url_for('trend_finder', **trend.params) ~ '#matching-games' }}">See matching games in Trend Finder →</a>
+{% if hot_fireworthy(trend) %}
+{% set future_games = hot_upcoming_for(trend) %}
+<details class="hot-trend-evidence hot-trend-upcoming">
+<summary>🔥 Upcoming games matching this trend ({{ future_games|length }})</summary>
+{% if future_games %}
+<ul>{% for game in future_games %}
+<li><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.away_team }} @ {{ game.home_team }}</a> · {{ game.gameday }} · {{ game.gametime }} ET</li>
+{% endfor %}</ul>
+{% else %}<p>No qualifying upcoming games this week.</p>{% endif %}
+</details>
+{% endif %}
+<a class="hot-trend-games" href="{{ url_for('trend_finder', **hot_research_params(trend)) ~ '#matching-games' }}">Explore {{ trend.season }} games in Trend Finder →</a>
 </div>
 </details>
 {% endfor %}
 </div>
 {% if not all_hot_trends|default(false) %}<p><a class="hot-trend-games" href="{{ url_for('hot_trends_page') }}">🔥 See All Hot Trends →</a></p>{% endif %}
 </section>
+<script>
+// Follow fire links directly to the right Hot Trends card, opening its details.
+(function () {
+  function openTarget() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id.startsWith('hot-')) return;
+    const card = document.getElementById(id);
+    if (card && card.matches('details.hot-trend-card')) {
+      card.open = true;
+      card.scrollIntoView({block: 'center'});
+    }
+  }
+  addEventListener('hashchange', openTarget);
+  openTarget();
+})();
+</script>
 {% elif not all_hot_trends|default(false) %}
 <section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title"><h2 id="active-trends-title">Hot Right Now</h2><p>No verified trends meet the five-straight or five-of-seven requirements right now.</p><p><a href="{{ url_for('hot_trends_page') }}">See All Hot Trends →</a></p></section>
 {% else %}<p>No qualifying Hot Right Now trends currently.</p>{% endif %}
