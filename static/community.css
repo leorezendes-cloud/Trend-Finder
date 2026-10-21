@@ -56,3 +56,64 @@ html body main.huddle {
         padding-bottom: 20px;
     }
 }
+/* Fix The Huddle comment box on mobile */
+@media (max-width: 650px) {
+    html body .huddle .huddle-compose-form {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: none;
+    }
+
+    html body .huddle .huddle-compose-bar {
+        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
+    }
+
+    html body .huddle .huddle-compose-bar textarea {
+        width: 100%;
+        min-width: 0;
+    }
+
+    html body .huddle .huddle-post-button {
+        flex: 0 0 auto;
+        width: 120px;
+        margin: 0;
+        align-self: flex-end;
+    }
+}
+/* Huddle composer — responsive alignment fix */
+html body .huddle .huddle-compose-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px;
+    align-items: end;
+    gap: 12px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+html body .huddle .huddle-compose-bar {
+    width: 100%;
+    min-width: 0;
+}
+
+html body .huddle .huddle-post-button {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    align-self: auto;
+}
+
+/* Tablets and mobile: stack input above button */
+@media (max-width: 800px) {
+    html body .huddle .huddle-compose-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    html body .huddle .huddle-post-button {
+        width: 120px;
+        justify-self: end;
+    }
+}
