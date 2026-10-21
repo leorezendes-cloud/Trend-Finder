@@ -51,13 +51,7 @@ def configure_persistent_data():
     initialize_data(SOURCE, target)
 
 
-def update_once(root):
-    import update_nfl_games as finals
-    from scout4.collect import collect
-    from scheduled_ats_capture import run as quotes
-    from prediction_staging import run_staged as predictions
-    from fan_views import prediction_performance
-    from scout4.stats import read_csv
+def update_once(root, feed_lock_fd=None):
     root = Path(root)
     season = datetime.now(timezone.utc).year
     if datetime.now(timezone.utc).month < 8:
@@ -70,21 +64,45 @@ def update_once(root):
         return status
     stages = {}
     def attempt(name, action):
+        from scheduler_runtime import atomic_json
+        stages[name] = 'running'
+        def progress():
+            atomic_json(root/'logs/auto_update_status.json', {
+                'started':started, 'checked_at':datetime.now(timezone.utc).isoformat(),
+                'state':'running', 'pid':os.getpid(), 'stages':dict(stages)})
+        progress()
+        scheduler_event(root, 'scout-worker', 'stage_started', stage=name)
         try:
             action()
             stages[name] = 'ok'
         except Exception as error:
             stages[name] = 'failed: ' + type(error).__name__
             print(f'Automatic update {name} failed: {type(error).__name__}', flush=True)
+        progress()
+        scheduler_event(root, 'scout-worker', 'stage_finished', stage=name, result=stages[name])
     attempt('account backup', lambda: backup_database(
         os.environ.get('TREND_FINDAH_DATABASE', '/var/data/members.sqlite3'),
         Path(os.environ.get('TREND_FINDAH_DATABASE', '/var/data/members.sqlite3')).resolve().parent/'account-backups'))
-    finals.BACKUPS = root / 'backups'
-    attempt('finals', lambda: finals.main(['--apply','--season',str(season),'--file',str(root/'nfl_games.csv')]))
+    def feed(kind):
+        if feed_lock_fd is not None:
+            # Child retains the shared lock even if this supervisor is killed.
+            subprocess.run([sys.executable, str(SOURCE/'update_feed_worker.py'),
+                kind, str(root), str(season)], check=True, timeout=180,
+                pass_fds=(feed_lock_fd,), cwd=SOURCE,
+                env={**os.environ, 'POLARS_MAX_THREADS':'1'})
+        elif kind == 'finals':
+            import update_nfl_games as finals
+            finals.BACKUPS = root/'backups'
+            finals.main(['--apply','--season',str(season),'--file',str(root/'nfl_games.csv')])
+        else:
+            from scout4.collect import collect
+            collect(season, root/'data/scout4')
+    attempt('finals', lambda: feed('finals'))
     from qb_verification import refresh_qbs
     attempt('QB verification', lambda: refresh_qbs(root,season))
-    attempt('stats', lambda: collect(season, root/'data/scout4'))
+    attempt('stats', lambda: feed('stats'))
     def capture():
+        from scheduled_ats_capture import run as quotes
         if quotes(root) != 0:
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
@@ -92,6 +110,7 @@ def update_once(root):
         from scout4.context_model import refresh_sources
         attempt('injury/weather collection', lambda: refresh_sources(season, root))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
+        from prediction_staging import run_staged as predictions
         attempt('predictions', lambda: predictions(root, SOURCE, SOURCE/'automatic_model.json'))
     else:
         stages['predictions'] = 'skipped: upstream update failed'
@@ -119,10 +138,13 @@ def update_once(root):
                 raise RuntimeError('Gemini draft requires operator review; will not retry')
         attempt('Expert draft queue', expert_drafts)
     def grade():
+        from fan_views import prediction_performance
+        from scout4.stats import read_csv
         records = [json.loads(p.read_text()) for p in (root/'data/scout4/blend/predictions').glob('*.json')]
-        groups, recent, excluded = prediction_performance(records, read_csv(root/'nfl_games.csv'))
+        schedule_rows = read_csv(root/'nfl_games.csv')
+        groups, recent, excluded = prediction_performance(records, schedule_rows)
         from scout4.research_benchmarks import grade_benchmarks
-        schedule = {g['game_id']:g for g in read_csv(root/'nfl_games.csv')}
+        schedule = {g['game_id']:g for g in schedule_rows}
         research = {}
         for record in records:
             try: outcomes = grade_benchmarks(record, schedule.get(record['game_id']))
@@ -172,6 +194,7 @@ _SCHEDULER_THREAD = None
 
 def scheduler_event(root, job, state, **details):
     """Append durable attempt history; logging trouble must not kill a timer."""
+    details.setdefault('pid', os.getpid())
     event = dict(at=datetime.now(timezone.utc).isoformat(), job=job,
                  state=state, **details)
     LOGGER.info('Hosted scheduler %s', json.dumps(event))
@@ -184,10 +207,11 @@ def scheduler_event(root, job, state, **details):
         LOGGER.exception('Cannot persist scheduler event for %s', job)
 
 
-def scheduler_loop(job, action, interval, root=HOSTED_ROOT, stop=None):
+def scheduler_loop(job, action, interval, root=HOSTED_ROOT, stop=None, log_poll=True):
     stop = stop or threading.Event()
     while not stop.is_set():
-        scheduler_event(root, job, 'attempt')
+        if log_poll:
+            scheduler_event(root, job, 'attempt')
         delay = interval
         try:
             result = action()
@@ -230,8 +254,7 @@ def scout_status(root, state, reason):
                   'state':state, 'stages':{'scheduler':reason}}
         if state == 'needs attention' and path.exists():
             previous = json.loads(path.read_text())
-            if previous.get('state') == 'needs attention':
-                report['stages'] = {**previous.get('stages', {}), 'scheduler':reason}
+            report['stages'] = {**previous.get('stages', {}), 'scheduler':reason}
         atomic_json(path, report)
     except Exception:
         LOGGER.exception('Cannot persist Scout scheduler status')
@@ -310,9 +333,18 @@ def run_leader(root, stop):
         for name, action, interval in jobs:
             timeout = 900 if name == 'expert-only-updates' else 1500 if name == 'automatic-data-updates' else 180
             def scheduled(name=name, action=action, interval=interval, timeout=timeout):
-                return due_job(root, name, action, interval, timeout)
+                def execute():
+                    scheduler_event(root, name, 'attempt')
+                    return action()
+                def recovery(saved):
+                    scheduler_event(root, name, 'interrupted', reservation=saved)
+                    if name == 'automatic-data-updates':
+                        scout_status(root, 'needs attention',
+                            'Previous supervisor exited without completion; recovery lease retained until '
+                            + datetime.fromtimestamp(saved['next_due'], timezone.utc).isoformat())
+                return due_job(root, name, execute, interval, timeout, on_recovery=recovery)
             thread = threading.Thread(target=scheduler_loop,
-                args=(name, scheduled, min(interval, 30), root, stop), name=name, daemon=True)
+                args=(name, scheduled, min(interval, 30), root, stop, False), name=name, daemon=True)
             thread.start()
             threads.append(thread)
         # Keep leadership until every owned loop has stopped.
@@ -338,7 +370,8 @@ def locked_update(root, market=False):
             scheduler_event(root, job, 'lock_busy')
             return LOCK_BUSY
         try:
-            result = (refresh_game_day_market if market else update_once)(root)
+            result = (refresh_game_day_market(root) if market
+                      else update_once(root, feed_lock_fd=lock.fileno()))
             failed = isinstance(result, dict) and result.get('state') != 'ok'
             scheduler_event(root, job, 'failure' if failed else 'success')
             return 1 if failed else 0

@@ -7,6 +7,10 @@ from scout4.stats import recent_form, betting_result, team_records, summarize_te
 
 
 class FanViewsTests(unittest.TestCase):
+    def setUp(self):
+        from fan_views import _score_response
+        _score_response.update(key=None, expires=0, body=None)
+
     def test_scheduled_scores_are_not_reported_as_zero(self):
         event = {'date':'2026-10-09T00:15Z', 'competitions':[{
             'status':{'type':{'state':'pre', 'shortDetail':'Scheduled'}},
@@ -48,13 +52,30 @@ class FanViewsTests(unittest.TestCase):
             self.assertIn('week=6',provider.call_args.args[0].full_url)
 
     def test_matchup_stats_stop_before_game_week_and_link_to_players(self):
-        response = app.test_client().get('/matchup/2026_06_BUF_LV')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('before Week 6', response.text)
-        self.assertIn('Top passer', response.text)
-        self.assertIn('player=', response.text)
-        self.assertIn('Prediction', response.text)
-        self.assertEqual(app.test_client().get('/matchup/not-a-game').status_code, 404)
+        # Keep this route test independent of checked-in production datasets.
+        game = dict(game_id='2026_06_BUF_LV',season='2026',week='6',
+                    away_team='BUF',home_team='LV',gameday='2026-10-18',gametime='16:25',
+                    game_type='REG',away_score='',home_score='',spread_line='3',total_line='45')
+        from scout4.stats import team_records, player_records
+        history = [dict(game,game_id=f'2026_{week:02}_BUF_LV',week=str(week),
+                        away_score='24',home_score='21',result='-3',gameday=f'2026-09-{week:02}')
+                   for week in range(1,7)]
+        people = [dict(game_id=f'2026_{week:02}_BUF_LV',season='2026',week=str(week),season_type='REG',team='BUF',
+                       player_id='fixture-qb',player_display_name='Fixture QB',position='QB',
+                       passing_yards='200') for week in range(1,7)]
+        records=team_records(history,[],2026,6)
+        players=player_records(history,people,2026,6)
+        self.assertTrue(all(row['week']<6 for row in records+players))
+        with patch('fan_views.read_csv',return_value=[game]), \
+                patch('fan_views.effective_rows',side_effect=lambda rows,*a,**kw:rows), \
+                patch('fan_views.fan_context',return_value=(2026,6,records,players,{},[],[])):
+            response = app.test_client().get('/matchup/2026_06_BUF_LV')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('before_week=6', response.text)
+            self.assertIn('Top passer', response.text)
+            self.assertIn('player=', response.text)
+            self.assertIn('Prediction', response.text)
+            self.assertEqual(app.test_client().get('/matchup/not-a-game').status_code, 404)
 
     def test_form_is_latest_five_and_streak_uses_chronology(self):
         rows = [{'date':f'2026-09-{i:02d}', 'week':i, 'game_id':str(i),

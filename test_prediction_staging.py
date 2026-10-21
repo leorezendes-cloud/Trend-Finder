@@ -293,7 +293,7 @@ class AtomicPipelineTests(unittest.TestCase):
         self.assertFalse(self.target().exists())
 
     def test_scheduler_lock_due_state_and_pipeline_integration(self):
-        def update(root):
+        def update(root, **kwargs):
             self.run_pipeline()
             return {'state':'ok'}
         with patch.object(hosted, 'update_once', side_effect=update):

@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
+from threading import RLock
 from zoneinfo import ZoneInfo
 
 from general_research import research_games
@@ -221,7 +222,10 @@ def active_highlights(rows, as_of=None, *, featured=False):
     return _feature(output) if featured else output
 
 
-@lru_cache(maxsize=8)
+_highlights_lock = RLock()
+
+
+@lru_cache(maxsize=1)
 def _cached_highlights(path, signature, today):
     with open(path, newline='') as source:
         rows = research_rows(list(effective_rows(csv.DictReader(source), path)), path)
@@ -238,7 +242,8 @@ def qb_source_signature(path):
 def load_highlights(*, all_trends=False):
     from trend_finder_2 import game_file, _trend_data_signature
     today = datetime.now(ZoneInfo('America/New_York')).date().isoformat()
-    all_results = _cached_highlights(str(game_file),
+    with _highlights_lock:
+        all_results = _cached_highlights(str(game_file),
                                      (_trend_data_signature(), qb_source_signature(game_file)),
                                      today)
     return all_results if all_trends else _feature(all_results)

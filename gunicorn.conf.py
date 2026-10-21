@@ -16,12 +16,9 @@ capture_output = True
 
 
 def post_worker_init(worker):
-    # Prepare the default homepage before this worker accepts public requests.
+    # Accept health probes before any historical analysis is requested.
     from hosted_updates import start_scheduler
     start_scheduler()
-    from trend_finder_2 import scan_basic_trends
-    scan_basic_trends(season='2026')
-    scan_basic_trends(season=(1999, 2025))
 
 # Reset tokens live in URL paths; exclude paths and query strings from access logs.
 access_log_format = '%(h)s %(m)s %(s)s %(L)s'

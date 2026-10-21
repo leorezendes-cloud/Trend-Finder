@@ -102,6 +102,29 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(due_job(self.root, 'job', action, 21600, 600, lambda:159), 'not_due')
         self.assertEqual(due_job(self.root, 'job', action, 21600, 600, lambda:160), 0)
 
+    def test_restart_reports_interruption_once_without_shortening_reservation(self):
+        path = self.root/'logs/job.schedule.json'
+        atomic_json(path, {'state':'running', 'attempted_at':100, 'next_due':180})
+        action, report = Mock(return_value=0), Mock()
+        self.assertEqual(due_job(self.root, 'job', action, 600, 20, lambda:110, report), 'not_due')
+        self.assertEqual(json.loads(path.read_text())['next_due'], 180)
+        self.assertEqual(json.loads(path.read_text())['state'], 'interrupted')
+        self.assertEqual(due_job(self.root, 'job', action, 600, 20, lambda:120, report), 'not_due')
+        report.assert_called_once()
+        action.assert_not_called()
+        self.assertEqual(due_job(self.root, 'job', action, 600, 20, lambda:180, report), 0)
+        action.assert_called_once()
+
+    def test_live_supervisor_is_not_misclassified_as_interrupted(self):
+        path = self.root/'logs/job.schedule.json'
+        atomic_json(path, {'state':'running', 'next_due':180})
+        report, action = Mock(), Mock()
+        with exclusive(self.root/'logs/job.job.lock'):
+            self.assertEqual(due_job(self.root, 'job', action, 600, 20, lambda:110, report), 75)
+        report.assert_not_called()
+        action.assert_not_called()
+        self.assertEqual(json.loads(path.read_text())['state'], 'running')
+
     def test_overlapping_job_cannot_execute_action(self):
         with exclusive(self.root/'logs/job.job.lock'):
             action = Mock()

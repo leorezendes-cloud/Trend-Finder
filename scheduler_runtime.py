@@ -45,7 +45,7 @@ def atomic_json(path, value):
             temporary.unlink(missing_ok=True)
 
 
-def due_job(root, job, action, interval, timeout, clock=time.time):
+def due_job(root, job, action, interval, timeout, clock=time.time, on_recovery=None):
     """Reserve before spawning; retain a bounded recovery lease on interruption."""
     logs = Path(root)/'logs'
     with exclusive(logs/(job+'.job.lock')) as acquired:
@@ -54,6 +54,13 @@ def due_job(root, job, action, interval, timeout, clock=time.time):
         path = logs/(job+'.schedule.json')
         saved = json.loads(path.read_text()) if path.exists() else {}
         now = clock()
+        # Owning this lock proves the prior supervising action no longer owns it.
+        # An orphan child may still exist: retain the full recovery lease.
+        if saved.get('state') == 'running':
+            saved.update(state='interrupted', detected_at=now)
+            atomic_json(path, saved)
+            if on_recovery is not None:
+                on_recovery(dict(saved))
         # Migrate the last known successful pre-patch runs without rerunning them.
         if not saved:
             legacy = {'automatic-data-updates':('auto_update_status.json','finished'),

@@ -31,17 +31,23 @@ def collect(season, outdir):
         if missing:
             raise ValueError(f'{kind} feed missing identity fields: {sorted(missing)}')
         fields = identity + list(metrics)
-        rows = frame.to_dicts()
-        if not rows:
+        count = frame.height
+        if not count:
             raise ValueError(f'No {kind} statistics for {season}; existing cache retained')
         path = folder / f'{kind}.csv'
         with path.open('x', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=fields)
             writer.writeheader()
-            writer.writerows({k: row.get(k) for k in fields} for row in rows)
-        manifest['files'][kind] = {'path': str(path.relative_to(outdir)), 'rows': len(rows),
+            # Keep CSV values/order unchanged without duplicating the entire wide
+            # feed as Python objects. Missing metrics still serialize as blanks.
+            selected = frame.select([k for k in fields if k in frame.columns])
+            writer.writerows({k: row.get(k) for k in fields}
+                             for row in selected.iter_rows(named=True))
+            del selected
+        manifest['files'][kind] = {'path': str(path.relative_to(outdir)), 'rows': count,
                                    'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
                                    'missing_metrics': sorted(set(metrics) - set(frame.columns))}
+        del frame
     manifest['retrieved_at'] = datetime.now(timezone.utc).isoformat()
     (folder / 'manifest.json').write_text(json.dumps(manifest, indent=2))
     pointer = outdir / str(season) / 'latest.json'

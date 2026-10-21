@@ -32,6 +32,10 @@ def configure_hosted_app(application):
             if request.endpoint not in ('home', 'trend_finder') and request.blueprint not in ('membership', 'newsletter', 'member_picks', 'community'):
                 abort(403, description='Data refresh and research editing are available only in the local research app.')
 
+    # Reject forbidden mutations before analytics admission, including under load.
+    from hosted_memory import install_memory_gate
+    install_memory_gate(application)
+
     # Public assets bypass page/session work; browsers may cache them for an hour.
     # CSS/JS URLs already carry content hashes so deployments fetch changed files.
     if application.static_folder:

@@ -87,8 +87,44 @@ def parse_scores(payload):
     return sorted(games, key=lambda g: (0 if g['state'] == 'in' else 1, g['date']))
 
 
+_score_response_lock = Lock()
+_score_response = {'key': None, 'expires': 0, 'body': None}
+
+
 @bp.get('/scores.json')
 def scores():
+    # Cache the complete badge response, not just ESPN's feed. One refresh at a
+    # time; waiting visitors must not tie up the health-check thread pool.
+    from flask import Response
+    from active_trends import qb_source_signature
+    paths = (ROOT/'nfl_games.csv', ROOT/'public_money_snapshots.csv', ROOT/'manual_spread_overrides.csv')
+    signature = tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else (str(p), None, None) for p in paths)
+    key = (signature, qb_source_signature(ROOT/'nfl_games.csv'),
+           datetime.now(ZoneInfo('America/New_York')).date().isoformat())
+    def cached():
+        return Response(_score_response['body'], mimetype='application/json',
+                        headers={'Cache-Control':'no-store'})
+    if (_score_response['key'] == key and time.monotonic() < _score_response['expires']
+            and time.monotonic() < _score_cache['expires']):
+        return cached()
+    if not _score_response_lock.acquire(blocking=False):
+        if _score_response['key'] == key and _score_response['body'] is not None:
+            return cached()
+        return ('Scores are refreshing. Please retry shortly.', 503,
+                {'Retry-After':'1', 'Cache-Control':'no-store'})
+    try:
+        if (_score_response['key'] == key and time.monotonic() < _score_response['expires']
+            and time.monotonic() < _score_cache['expires']):
+            return cached()
+        response = _scores_uncached()
+        _score_response.update(key=key, expires=time.monotonic()+5,
+                               body=response.get_data())
+        return response
+    finally:
+        _score_response_lock.release()
+
+
+def _scores_uncached():
     # Separate from homepage rendering: a slow feed never delays the main menu.
     from site_week import active_week
     current=active_week(read_csv(ROOT/'nfl_games.csv'))
@@ -100,7 +136,7 @@ def scores():
                 query=f'?dates={current[0]}&seasontype=2&week={current[1]}' if current else ''
                 req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'+query,
                               headers={'User-Agent': 'TrendFindah/1.0'})
-                with urlopen(req, timeout=5) as response:
+                with urlopen(req, timeout=2) as response:
                     payload = json.loads(response.read(2_000_000))
                 if not isinstance(payload, dict) or not isinstance(payload.get('events'), list):
                     raise ValueError('Invalid scoreboard')
@@ -110,6 +146,11 @@ def scores():
                 _score_cache['stale'] = True
             interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
             _score_cache['expires'] = time.monotonic() + interval
+        # Break scores -> highlights -> confirmed finals -> scores recursion.
+        # Only provider-confirmed finals enter the read-only display overlay.
+        from flask import g
+        g.public_confirmed_finals = [game for game in _score_cache['games']
+                                    if game.get('completed') is True and game.get('state') == 'post']
         schedule = effective_rows(read_csv(ROOT / 'nfl_games.csv'), ROOT / 'nfl_games.csv',include_scores=False)
         # Keep normal badges limited to the homepage's featured Top 8.
         # Explicitly include an exceptional 10+ game primetime dog COVER streak
