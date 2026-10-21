@@ -101,7 +101,7 @@ def scheduled_capture(root):
     root=Path(root);logs=root/'logs';logs.mkdir(parents=True,exist_ok=True)
     with (logs/'auto_update.lock').open('a') as lock:
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        except BlockingIOError:return
+        except BlockingIOError:return 75
         now=datetime.now(timezone.utc)
         report=available_snapshot(root,now)
         if report:
@@ -126,4 +126,4 @@ def scheduled_capture(root):
 if __name__=='__main__':
     if os.environ.get('TREND_FINDAH_AUTO_UPDATE')!='1' or os.environ.get('TREND_FINDAH_ENV')!='production':
         raise SystemExit('Weekly capture is enabled only in hosted production')
-    scheduled_capture(Path('/var/data/site-data'))
+    raise SystemExit(scheduled_capture(Path('/var/data/site-data')) or 0)

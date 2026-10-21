@@ -29,7 +29,7 @@ class HostedUpdatesTests(unittest.TestCase):
             (root/'logs').mkdir()
             (root/'nfl_games.csv').write_text('game_id,away_team,home_team\n')
             (root/'data/scout4/blend/predictions').mkdir(parents=True)
-            with patch('update_nfl_games.main',side_effect=ValueError('unverified final')), patch('scout4.collect.collect'), patch('scheduled_ats_capture.run',return_value=0), patch('scout4.blend.run') as predictions:
+            with patch('update_nfl_games.main',side_effect=ValueError('unverified final')), patch('scout4.collect.collect'), patch('scheduled_ats_capture.run',return_value=0), patch('prediction_staging.run_staged') as predictions, patch('hosted_updates.backup_database'), patch('qb_verification.refresh_qbs'), patch('plug_publication.publish'), patch.dict('os.environ', {'TREND_FINDAH_CONTEXT_RESEARCH':'0','TREND_FINDAH_EXPERT_AUTO_DRAFT':'0'}):
                 status=update_once(root)
             self.assertEqual(status['state'],'needs attention')
             self.assertIn('skipped',status['stages']['predictions'])

@@ -1,5 +1,6 @@
 """Opt-in updates on Render's persistent disk; never run on page requests."""
 import json
+import logging
 from membership_backups import backup_database
 import os
 import shutil
@@ -54,7 +55,7 @@ def update_once(root):
     import update_nfl_games as finals
     from scout4.collect import collect
     from scheduled_ats_capture import run as quotes
-    from scout4.blend import run as predictions, CORE
+    from prediction_staging import run_staged as predictions
     from fan_views import prediction_performance
     from scout4.stats import read_csv
     root = Path(root)
@@ -91,12 +92,7 @@ def update_once(root):
         from scout4.context_model import refresh_sources
         attempt('injury/weather collection', lambda: refresh_sources(season, root))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
-        for name in CORE:
-            path = root / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(SOURCE/name, path)
-        os.environ['TREND_FINDAH_AUTO_MODEL_CONFIG'] = str(SOURCE/'automatic_model.json')
-        attempt('predictions', lambda: predictions(root))
+        attempt('predictions', lambda: predictions(root, SOURCE, SOURCE/'automatic_model.json'))
     else:
         stages['predictions'] = 'skipped: upstream update failed'
     # Publication copies only sealed approved records, even if this refresh failed.
@@ -166,84 +162,204 @@ def refresh_game_day_market(root, now=None):
             raise RuntimeError('Game-day market refresh failed')
 
 
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
+HOSTED_ROOT = Path('/var/data/site-data')
+LOCK_BUSY = 75
+_START_LOCK = threading.Lock()
+_SCHEDULER_THREAD = None
+
+
+def scheduler_event(root, job, state, **details):
+    """Append durable attempt history; logging trouble must not kill a timer."""
+    event = dict(at=datetime.now(timezone.utc).isoformat(), job=job,
+                 state=state, **details)
+    LOGGER.info('Hosted scheduler %s', json.dumps(event))
+    try:
+        logs = Path(root)/'logs'
+        logs.mkdir(parents=True, exist_ok=True)
+        with (logs/(job + '_scheduler.jsonl')).open('a') as stream:
+            stream.write(json.dumps(event) + '\n')
+    except Exception:
+        LOGGER.exception('Cannot persist scheduler event for %s', job)
+
+
+def scheduler_loop(job, action, interval, root=HOSTED_ROOT, stop=None):
+    stop = stop or threading.Event()
+    while not stop.is_set():
+        scheduler_event(root, job, 'attempt')
+        delay = interval
+        try:
+            result = action()
+            if result == LOCK_BUSY:
+                scheduler_event(root, job, 'lock_busy', retry_seconds=60)
+                delay = 60
+                if job == 'automatic-data-updates':
+                    scout_status(root, 'waiting for lock', 'lock contention; retry in 60 seconds')
+            elif result != 'not_due':
+                scheduler_event(root, job, 'success')
+        except Exception as error:
+            LOGGER.exception('Hosted scheduler %s failed', job)
+            scheduler_event(root, job, 'failure', error_type=type(error).__name__,
+                            error=str(error))
+            if job == 'automatic-data-updates':
+                reason = type(error).__name__
+                if isinstance(error, subprocess.TimeoutExpired):
+                    reason += f' after {error.timeout} seconds'
+                elif isinstance(error, subprocess.CalledProcessError):
+                    reason += f' (exit {error.returncode})'
+                scout_status(root, 'needs attention', reason)
+            delay = interval
+        stop.wait(delay)
+
+
+def run_worker(script, arguments=(), timeout=180):
+    result = subprocess.run([sys.executable, str(SOURCE/script), *arguments],
+        cwd=SOURCE, timeout=timeout, check=False,
+        env={**os.environ, 'POLARS_MAX_THREADS':'1'})
+    if result.returncode not in (0, LOCK_BUSY):
+        raise subprocess.CalledProcessError(result.returncode, result.args)
+    return result.returncode
+
+
+def scout_status(root, state, reason):
+    from scheduler_runtime import atomic_json
+    try:
+        path = Path(root)/'logs/auto_update_status.json'
+        report = {'checked_at':datetime.now(timezone.utc).isoformat(),
+                  'state':state, 'stages':{'scheduler':reason}}
+        if state == 'needs attention' and path.exists():
+            previous = json.loads(path.read_text())
+            if previous.get('state') == 'needs attention':
+                report['stages'] = {**previous.get('stages', {}), 'scheduler':reason}
+        atomic_json(path, report)
+    except Exception:
+        LOGGER.exception('Cannot persist Scout scheduler status')
+
+
 def start_scheduler():
+    global _SCHEDULER_THREAD
     if os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         return
-    def market_loop():
-        while True:
-            try:
-                subprocess.run([sys.executable,str(SOURCE/'hosted_updates.py'),'--game-day-market'],
-                    cwd=SOURCE,timeout=180,check=True,env={**os.environ,'POLARS_MAX_THREADS':'1'})
-            except (OSError,subprocess.SubprocessError) as error:
-                print(f'Game-day market refresh failed: {type(error).__name__}',flush=True)
-            threading.Event().wait(900)
-    def weekly_loop():
-        # Separate timer: a long statistics update cannot delay the 8 a.m. check.
-        from site_week import week_window
-        checked=None
-        while True:
-            now=datetime.now(timezone.utc)
-            cutoff=week_window(now)[0].astimezone(timezone.utc)
-            if checked!=cutoff:
-                try:
-                    subprocess.run([sys.executable,str(SOURCE/'weekly_pick_lines.py')],
-                        cwd=SOURCE,timeout=180,check=True,env={**os.environ,'POLARS_MAX_THREADS':'1'})
-                    status=Path('/var/data/site-data/logs/weekly_lines_status.json')
-                    if status.exists():
-                        result=json.loads(status.read_text())
-                        if result.get('state')=='ready' and result.get('scheduled_cutoff')==cutoff.isoformat():checked=cutoff
-                except (OSError,ValueError,subprocess.SubprocessError) as error:
-                    path=Path('/var/data/site-data/logs/weekly_lines_status.json')
-                    path.write_text(json.dumps({'state':'pending','reason':type(error).__name__}))
-            threading.Event().wait(30)
-    def loop():
-        while True:
-            # Keep the shared update lock free around the scheduled weekly capture.
-            from site_week import week_window
-            now=datetime.now(timezone.utc)
-            current_cutoff,next_cutoff=week_window(now)
-            current_cutoff=current_cutoff.astimezone(timezone.utc)
-            next_cutoff=next_cutoff.astimezone(timezone.utc)
-            if 0<=(now-current_cutoff).total_seconds()<180:
-                threading.Event().wait(180-(now-current_cutoff).total_seconds())
-            if 0<=(next_cutoff-now).total_seconds()<=600:
-                threading.Event().wait((next_cutoff-now).total_seconds()+180)
-            try:
-                subprocess.run([sys.executable,str(SOURCE/'hosted_updates.py'),'--once'],
-                    cwd=SOURCE, timeout=600, check=True,
-                    env={**os.environ, 'POLARS_MAX_THREADS':'1'})
-            except (OSError, subprocess.SubprocessError) as error:
-                path=Path('/var/data/site-data/logs/auto_update_status.json')
-                path.write_text(json.dumps({'finished':datetime.now(timezone.utc).isoformat(),
-                    'state':'needs attention','stages':{'worker':type(error).__name__}}))
-            threading.Event().wait(21600)
-    # Lightweight Expert-only processing is independent of the full NFL data
-    # refresh. It reads sealed production forecasts and approved reviews; it
-    # cannot call Gemini unless the existing explicit opt-ins are enabled.
-    def expert_loop():
-        while True:
-            try:
-                subprocess.run([sys.executable, str(SOURCE/'expert_automation.py'), '--once'],
-                    cwd=SOURCE, timeout=900, check=True,
-                    env={**os.environ, 'POLARS_MAX_THREADS':'1'})
-            except (OSError, subprocess.SubprocessError) as error:
-                print(f'Expert-only worker failed: {type(error).__name__}', flush=True)
-            threading.Event().wait(3600)
+    with _START_LOCK:
+        if _SCHEDULER_THREAD is not None and _SCHEDULER_THREAD.is_alive():
+            return
+        _SCHEDULER_THREAD = threading.Thread(target=leadership_loop,
+                                            name='scheduler-leadership', daemon=True)
+        _SCHEDULER_THREAD.start()
 
-    threading.Thread(target=expert_loop,name='expert-only-updates',daemon=True).start()
-    threading.Thread(target=market_loop,name='game-day-market',daemon=True).start()
-    threading.Thread(target=weekly_loop,name='automatic-weekly-lines',daemon=True).start()
-    threading.Thread(target=loop, name='automatic-data-updates', daemon=True).start()
+
+def leadership_loop(root=None, stop=None):
+    from scheduler_runtime import exclusive
+    root = Path(root or HOSTED_ROOT)
+    stop = stop or threading.Event()
+    while not stop.is_set():
+        try:
+            with exclusive(root/'logs/scheduler-leader.lock') as leader:
+                if leader:
+                    scheduler_event(root, 'leadership', 'acquired', pid=os.getpid())
+                    run_leader(root, stop)
+                else:
+                    scheduler_event(root, 'leadership', 'standby', pid=os.getpid())
+        except Exception as error:
+            scheduler_event(root, 'leadership', 'failure', error_type=type(error).__name__)
+        stop.wait(5)
+
+
+def run_leader(root, stop):
+    from scheduler_runtime import due_job
+    checked = None
+    def weekly():
+        nonlocal checked
+        from site_week import week_window
+        cutoff = week_window(datetime.now(timezone.utc))[0].astimezone(timezone.utc)
+        if checked != cutoff:
+            if run_worker('weekly_pick_lines.py') == LOCK_BUSY:
+                return LOCK_BUSY
+            status = root/'logs/weekly_lines_status.json'
+            if status.exists():
+                result = json.loads(status.read_text())
+                if result.get('state') == 'ready' and result.get('scheduled_cutoff') == cutoff.isoformat():
+                    checked = cutoff
+
+    def scout():
+        from site_week import week_window
+        now = datetime.now(timezone.utc)
+        current, upcoming = (value.astimezone(timezone.utc) for value in week_window(now))
+        # Recheck after each wait so we never run inside the weekly capture window.
+        while (0 <= (now-current).total_seconds() < 180
+               or 0 <= (upcoming-now).total_seconds() <= 600):
+            delay = (180-(now-current).total_seconds() if now >= current
+                     and (now-current).total_seconds() < 180
+                     else (upcoming-now).total_seconds()+180)
+            if stop.wait(delay):
+                return 'not_due'
+            now = datetime.now(timezone.utc)
+            current, upcoming = (value.astimezone(timezone.utc) for value in week_window(now))
+        scout_status(root, 'running', 'scheduled update started')
+        return run_worker('hosted_updates.py', ['--once'], timeout=600)
+
+    jobs = (
+        ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 3600),
+        ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
+        ('automatic-weekly-lines', weekly, 30),
+        ('automatic-data-updates', scout, 21600),
+    )
+    threads = []
+    try:
+        for name, action, interval in jobs:
+            timeout = 900 if name == 'expert-only-updates' else 1500 if name == 'automatic-data-updates' else 180
+            def scheduled(name=name, action=action, interval=interval, timeout=timeout):
+                return due_job(root, name, action, interval, timeout)
+            thread = threading.Thread(target=scheduler_loop,
+                args=(name, scheduled, min(interval, 30), root, stop), name=name, daemon=True)
+            thread.start()
+            threads.append(thread)
+        # Keep leadership until every owned loop has stopped.
+        for thread in threads:
+            thread.join()
+    finally:
+        stop.set()
+        for thread in threads:
+            thread.join()
+
+
+def locked_update(root, market=False):
+    """Return a distinct retryable code on contention; keep the shared lock."""
+    import fcntl
+    root = Path(root)
+    (root/'logs').mkdir(parents=True, exist_ok=True)
+    job = 'market-worker' if market else 'scout-worker'
+    scheduler_event(root, job, 'attempt')
+    with (root/'logs/auto_update.lock').open('a') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            scheduler_event(root, job, 'lock_busy')
+            return LOCK_BUSY
+        try:
+            result = (refresh_game_day_market if market else update_once)(root)
+            failed = isinstance(result, dict) and result.get('state') != 'ok'
+            scheduler_event(root, job, 'failure' if failed else 'success')
+            return 1 if failed else 0
+        except Exception as error:
+            LOGGER.exception('Hosted worker %s failed', job)
+            scheduler_event(root, job, 'failure', error_type=type(error).__name__, error=str(error))
+            if not market:
+                try:
+                    status = {'finished': datetime.now(timezone.utc).isoformat(),
+                              'state': 'needs attention',
+                              'stages': {'worker': type(error).__name__ + ': ' + str(error)}}
+                    path = root/'logs/auto_update_status.json'
+                    temporary = path.with_suffix('.tmp')
+                    temporary.write_text(json.dumps(status, indent=2))
+                    temporary.replace(path)
+                except Exception:
+                    LOGGER.exception('Cannot persist Scout failure status')
+            return 1
 
 
 if __name__ == '__main__':
     if sys.argv[1:] not in (['--once'], ['--game-day-market']) or os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         raise SystemExit('This updater is enabled only through hosted automatic updates')
-    import fcntl
-    root=Path('/var/data/site-data')
-    with (root/'logs/auto_update.lock').open('a') as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
-        except BlockingIOError:
-            raise SystemExit(0)
-        (refresh_game_day_market if sys.argv[1:] == ['--game-day-market'] else update_once)(root)
+    raise SystemExit(locked_update(HOSTED_ROOT, market=sys.argv[1:] == ['--game-day-market']))

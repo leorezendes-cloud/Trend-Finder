@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 
-def execute_once(source=None, root=None, archive=None, *, publish_reports=None):
+def _execute_once(source=None, root=None, archive=None, *, publish_reports=None):
     source = Path(source or Path(__file__).resolve().parent)
     root = Path(root or '/var/data/site-data')
     archive = Path(archive or os.environ.get('TREND_FINDAH_EXPERT_STORE', '/var/data/expert_beta'))
@@ -49,10 +49,21 @@ def execute_once(source=None, root=None, archive=None, *, publish_reports=None):
     finally:
         target = root/'logs'/'expert_automation_status.json'
         target.parent.mkdir(parents=True, exist_ok=True)
-        tmp = target.with_suffix('.tmp')
-        tmp.write_text(json.dumps(status, indent=2))
-        tmp.replace(target)
+        from scheduler_runtime import atomic_json
+        atomic_json(target, status)
     return status
+
+
+def execute_once(source=None, root=None, archive=None, *, publish_reports=None):
+    # Scout's full refresh uses this same lock, including its Expert stages.
+    from scheduler_runtime import exclusive
+    from hosted_updates import scheduler_event
+    root = Path(root or '/var/data/site-data')
+    with exclusive(root/'logs/auto_update.lock') as acquired:
+        if not acquired:
+            scheduler_event(root, 'expert-worker', 'lock_busy')
+            return {'state':'lock_busy'}
+        return _execute_once(source, root, archive, publish_reports=publish_reports)
 
 
 def main(argv=None):
@@ -63,7 +74,10 @@ def main(argv=None):
         parser.error('Use --once (for the dedicated Render worker)')
     if os.environ.get('TREND_FINDAH_ENV') != 'production' or os.environ.get('TREND_FINDAH_AUTO_UPDATE') != '1':
         parser.error('Production Expert worker requires existing hosted environment')
-    print(json.dumps(execute_once(), indent=2))
+    result = execute_once()
+    print(json.dumps(result, indent=2))
+    if result.get('state') == 'lock_busy':
+        raise SystemExit(75)
 
 
 if __name__ == '__main__':

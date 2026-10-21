@@ -11,7 +11,12 @@ from membership import db
 
 
 class AutomaticLinesTests(unittest.TestCase):
-    setUp=test_member_picks.MemberPicksTests.setUp
+    def setUp(self):
+        test_member_picks.MemberPicksTests.setUp(self)
+        # Navigation-only endpoint absent from this isolated fixture app.
+        for endpoint in ('discussion', 'save_identity', 'upload_identity_photo'):
+            self.app.add_url_rule('/fixture-community/'+endpoint, 'community.'+endpoint, lambda: '')
+        self.app.add_url_rule('/fixture-avatar/<int:member_id>', 'community.avatar_image', lambda member_id: '')
     tearDown=test_member_picks.MemberPicksTests.tearDown
     login_owner=test_member_picks.MemberPicksTests.login_owner
     write_schedule=test_member_picks.MemberPicksTests.write_schedule
