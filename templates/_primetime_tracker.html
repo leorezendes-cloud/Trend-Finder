@@ -1,0 +1,56 @@
+<section class="primetime-current" aria-labelledby="primetime-current-title">
+  <h2 id="primetime-current-title">🌙 {{ view.primetime_tracker.season }} Primetime Underdog Tracker</h2>
+  <div class="primetime-current-grid">
+    <div class="primetime-current-stat primetime-current-streak">
+      <span>Active ATS streak</span>
+      <strong>{{ view.primetime_tracker.streak }} straight covers</strong>
+      {% if view.primetime_tracker.streak_start %}<small>Since {{ view.primetime_tracker.streak_start }}</small>{% endif %}
+    </div>
+    {% for label, record in [('Season ATS', view.primetime_tracker.overall),
+                             ('Home primetime dogs', view.primetime_tracker.home),
+                             ('Away primetime dogs', view.primetime_tracker.away)] %}
+    <div class="primetime-current-stat">
+      <span>{{ label }}</span>
+      <strong>{{ record.wins }}–{{ record.losses }}–{{ record.pushes }}</strong>
+      <small>{% if record.ats_pct is not none %}{{ record.ats_pct }}% ATS{% else %}No graded decisions{% endif %}</small>
+    </div>
+    {% endfor %}
+  </div>
+  <details class="primetime-recent">
+    <summary>Last {{ view.primetime_tracker.recent|length }} primetime games</summary>
+    <div class="sunday-table-wrapper">
+      <table class="sunday-trend-table">
+        <thead><tr><th>Date</th><th>Game</th><th>Underdog</th><th>Score</th><th>ATS</th></tr></thead>
+        <tbody>
+        {% for game in view.primetime_tracker.recent %}
+        <tr>
+          <td>{{ game.date }}</td>
+          <td>{{ game.matchup }}</td>
+          <td>{{ game.dog }} +{{ '%g'|format(game.spread) }}</td>
+          <td>{{ game.away_score }}–{{ game.home_score }}</td>
+          <td>{{ 'Cover' if game.result == 'Win' else 'Loss' if game.result == 'Loss' else 'Push' }}</td>
+        </tr>
+        {% else %}<tr><td colspan="5">No completed primetime games yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+<style>
+.primetime-current { max-width:1200px; margin:22px auto 34px; font-family:Arial,sans-serif; -webkit-text-stroke:0; }
+.primetime-current h2 { font-size:clamp(23px,3vw,32px); text-align:center; margin:0 0 17px; }
+.primetime-current-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.primetime-current-stat { display:flex; flex-direction:column; gap:9px; justify-content:center; min-width:0; padding:19px 14px; background:#1f2937; border:1px solid #475569; border-radius:12px; text-align:center; }
+.primetime-current-stat span { color:#cbd5e1; font-size:13px; font-weight:600; }
+.primetime-current-stat strong { color:#fff; font-size:clamp(22px,2.3vw,30px); overflow-wrap:anywhere; }
+.primetime-current-streak strong { color:#86efac; }
+.primetime-current-stat small { color:#cbd5e1; font-size:12px; }
+.primetime-recent { background:#1f2937; border:1px solid #475569; border-radius:10px; margin-top:15px; padding:15px 18px; }
+.primetime-recent summary { cursor:pointer; font-weight:bold; color:#fbbf24; }
+.primetime-recent .sunday-table-wrapper { margin-top:12px; }
+.primetime-historical { margin-top:16px; padding-top:14px; border-top:1px solid #64748b; }
+.primetime-historical > summary { color:#fbbf24; font-weight:bold; cursor:pointer; }
+.primetime-historical .profile-rate { font-size:24px; }
+@media(max-width:900px) { .primetime-current-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:450px) { .primetime-current-grid { grid-template-columns:1fr 1fr; gap:8px; } .primetime-current-stat { padding:14px 9px; } .primetime-current-stat strong { font-size:20px; } }
+</style>
