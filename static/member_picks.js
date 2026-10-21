@@ -46,7 +46,11 @@ document.querySelectorAll('[data-pick-form]').forEach((form) => {
       const result = await sendPicks(form, data);
       status.textContent = result.message;
       const menu = form.closest('.mobile-picks-menu');
-      if (mobilePicks.matches && result.saved > 0 && menu) {
+      if (mobilePicks.matches && result.saved > 0 &&
+          menu?.matches('details.mobile-picks-menu') &&
+          menu.querySelector('[data-pick-menu-label]') &&
+          menu.querySelector('[data-pick-menu-status]') &&
+          menu.querySelector('summary')) {
         menu.querySelector('[data-pick-menu-label]').textContent = 'Your picks — saved';
         menu.querySelector('[data-pick-menu-status]').textContent = 'Progress saved. Tap to view or finish your picks.';
         menu.open = false;
