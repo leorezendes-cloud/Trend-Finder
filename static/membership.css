@@ -39,3 +39,35 @@ html body .membership.profile-page {max-width:1010px;width:calc(100% - 30px);mar
 .membership-auth-heading {color:#fff!important;text-align:center;-webkit-text-stroke:0;text-decoration:none;font:800 clamp(32px,5vw,46px)/1.1 Arial,sans-serif;margin:18px 0 24px}
 @media(max-width:700px){html body .membership.profile-page {width:calc(100% - 20px);margin:12px auto 50px}.profile-page .profile-records {gap:8px}.profile-page .profile-records section {padding:12px 6px}.profile-page .profile-records h2 {font-size:11px}.profile-page .profile-records p {font-size:10px}}
 @media(max-width:470px){.profile-page .profile-records {grid-template-columns:1fr}.profile-page .profile-records section {padding:14px}.profile-page .profile-records strong {font-size:28px}}
+
+
+/* Huddle member identity presets, v1 */
+html body .community-identity-settings{padding:20px;margin:22px 0 28px;border:1px solid #334154;border-radius:14px;background:#151e2b;font:14px/1.5 Arial,sans-serif;color:#f4f7fb;-webkit-text-stroke:0}
+html body .community-identity-settings h2{font:800 23px/1.3 Arial,sans-serif;color:#fff;text-decoration:none;text-align:left;margin:0 0 7px;-webkit-text-stroke:0}
+html body .community-identity-settings p{font:14px/1.5 Arial,sans-serif;color:#b7c6d9;margin:5px 0 16px}
+html body .community-identity-settings .community-identity-notice{border:1px solid #c99c3a;border-radius:8px;padding:9px 11px;color:#ffe3a2}
+html body .community-identity-form{margin:0;padding:0;border:0;background:transparent;box-shadow:none;max-width:none}
+html body .community-identity-form>label{display:block;font:700 14px Arial,sans-serif;-webkit-text-stroke:0;margin:0 0 7px;color:#f5f8ff}
+html body .community-identity-form #community-display-name{box-sizing:border-box;max-width:450px;width:100%;padding:11px 12px;margin:0 0 5px;background:#fff;color:#111827;border:1px solid #64748b;font:15px Arial,sans-serif;-webkit-text-stroke:0}
+html body .community-identity-settings .community-identity-help{font-size:12px;margin:3px 0 17px}
+html body .community-avatar-choices{border:0;padding:0;margin:0}
+html body .community-avatar-choices legend{font:700 14px Arial,sans-serif;color:#f5f8ff;margin-bottom:9px}
+html body .community-avatar-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;max-width:550px}
+html body .community-avatar-option{position:relative;display:block;cursor:pointer;font:12px Arial,sans-serif;margin:0;-webkit-text-stroke:0}
+html body .community-avatar-option input[type=radio]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;margin:0;padding:0}
+html body .community-avatar-option>span{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;min-height:80px;padding:10px 4px;border:1px solid #3a4b61;border-radius:11px;background:#1b2b40;color:#fff;box-sizing:border-box}
+html body .community-avatar-option .community-avatar-icon{font-size:27px;line-height:1.1}
+html body .community-avatar-option small{font:11px/1.2 Arial,sans-serif;color:#c6d2e0}
+html body .community-avatar-option input:checked+span{border-color:#ffc94a;outline:2px solid #ffc94a;background:#29364c}
+html body .community-avatar-option input:focus-visible+span{outline:3px solid #93c5fd;outline-offset:3px}
+html body .community-identity-form .community-identity-save{box-sizing:border-box;width:auto;min-width:170px;margin:18px 0 0;padding:12px 16px;border-radius:9px;border:0;background:#ffc94a;color:#101827;cursor:pointer;font:800 14px Arial,sans-serif;-webkit-text-stroke:0}
+@media(max-width:470px){html body .community-identity-settings{padding:15px}html body .community-avatar-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}html body .community-avatar-option>span{min-height:71px;padding:7px 2px}html body .community-avatar-option small{font-size:9px}}
+
+
+/* Huddle image avatars v2; preserve existing profile and records styles. */
+html body .community-avatar-option .community-logo-avatar{display:block;width:48px;height:48px;object-fit:cover;border-radius:10px;max-width:100%}
+html body .community-avatar-upload-form{margin:16px 0 0;padding:14px 0 0;background:transparent;border:0;border-top:1px solid #384658;box-shadow:none;max-width:none}
+html body .community-avatar-upload-form label{display:block;font:700 14px Arial,sans-serif;color:#fff;-webkit-text-stroke:0;margin:0 0 8px}
+html body .community-avatar-upload-form input[type=file]{display:block;width:100%;max-width:440px;color:#dce7f8;font:13px Arial,sans-serif;margin:0 0 8px}
+html body .community-avatar-upload-form p{margin:7px 0;font:12px/1.45 Arial,sans-serif;color:#aebfd1}
+html body .community-avatar-upload-form button{display:inline-block;width:auto;margin:8px 0 0;padding:10px 16px;border:0;border-radius:8px;background:#ffc94a;color:#111827;font:700 13px Arial,sans-serif;cursor:pointer;-webkit-text-stroke:0}

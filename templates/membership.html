@@ -38,6 +38,56 @@
 {% if mode == 'preferences' %}
 {% if g.is_owner %}<p><a href="{{ url_for('membership.feedback_review') }}">Review beta feedback →</a></p>{% endif %}
 <p><a href="{{ url_for('member_picks.my_picks') }}">My Picks &amp; records →</a></p>
+
+<section class="community-identity-settings" id="community-identity" aria-labelledby="community-identity-heading">
+  {% set identity = public_identity() if public_identity is defined else {'display_name': None, 'avatar_key': None} %}
+  <h2 id="community-identity-heading">Huddle identity</h2>
+  <p>Choose how you appear in The Huddle. Your email stays private. Your existing comments update automatically.</p>
+  {% for message in (get_flashed_messages(category_filter=['identity']) if get_flashed_messages is defined else []) %}
+  <p class="community-identity-notice" role="status">{{ message }}</p>
+  {% endfor %}
+  <form method="post" action="{{ url_for('community.save_identity') }}" class="community-identity-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="community-display-name">Public nickname</label>
+    <input id="community-display-name" type="text" name="display_name" minlength="3" maxlength="24"
+           pattern="[A-Za-z0-9][A-Za-z0-9 _-]{1,22}[A-Za-z0-9]"
+           value="{{ identity.display_name or '' }}" placeholder="Fan #{{ g.member['id'] }} (default)"
+           autocomplete="nickname" aria-describedby="community-name-help">
+    <p id="community-name-help" class="community-identity-help">3–24 characters, letters and numbers with spaces, underscores or hyphens. Leave blank to use Fan #{{ g.member['id'] }}.</p>
+    <fieldset class="community-avatar-choices"><legend>Choose an avatar</legend>
+      <div class="community-avatar-grid">
+        {% for key, avatar in (community_avatars.items() if community_avatars is defined else []) %}
+        <label class="community-avatar-option">
+          <input type="radio" name="avatar" value="{{ key }}" {% if (identity.avatar_key or 'football') == key %}checked{% endif %}>
+
+          {% if key in community_logo_paths %}
+          <span><img class="community-logo-avatar" src="{{ url_for('static', filename=community_logo_paths[key]) }}" alt=""><small>{{ avatar[1] }}</small></span>
+          {% else %}
+          <span><span class="community-avatar-icon" aria-hidden="true">{{ avatar[0] }}</span><small>{{ avatar[1] }}</small></span>
+          {% endif %}
+
+        </label>
+        {% endfor %}
+
+        {% if identity.avatar_key == 'custom' %}
+        <label class="community-avatar-option">
+          <input type="radio" name="avatar" value="custom" checked>
+          <span><img class="community-logo-avatar" src="{{ url_for('community.avatar_image', member_id=g.member['id']) }}" alt=""><small>My photo</small></span>
+        </label>
+        {% endif %}
+      </div>
+    </fieldset>
+    <button type="submit" class="community-identity-save">Save Huddle identity</button>
+  </form>
+  <form method="post" action="{{ url_for('community.upload_identity_photo') }}" enctype="multipart/form-data" class="community-avatar-upload-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="community-photo-upload">Or upload your own picture</label>
+    <input type="file" name="photo" id="community-photo-upload" accept="image/jpeg,image/png,image/webp" required>
+    <p>JPG, PNG, or WebP · up to 1 MB. Images become public, square avatars. For a Facebook profile photo, save it to your device and upload it here.</p>
+    <button type="submit">Use my photo</button>
+  </form>
+
+</section>
 <section id="my-watchlist"><h2>My Watchlist</h2><p>Saved teams reopen current stats. Saved trends reopen the original filters; their results may change as new games arrive.</p>
 {% for kind,label in [('team','Teams'),('trend','Trends')] %}<h3>{{ label }}</h3><ul class="watchlist-items">{% for item in watchlist if item.kind == kind %}<li><a href="{{ item.target }}">{{ item.title }}</a><form action="{{ url_for('membership.remove_watchlist',item_id=item.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" aria-label="Remove {{ item.title }}">Remove</button></form></li>{% else %}<li>No saved {{ label|lower }} yet.</li>{% endfor %}</ul>{% endfor %}
 </section><h2>Newsletter preferences</h2>

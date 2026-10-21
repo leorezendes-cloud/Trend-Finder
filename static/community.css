@@ -117,3 +117,13 @@ html body .huddle .huddle-post-button {
         justify-self: end;
     }
 }
+
+
+/* Huddle member identity presets, v1 */
+html body .huddle-avatar-emoji{font-size:22px;line-height:1;flex-shrink:0}
+@media(max-width:490px){html body .huddle-avatar-emoji{font-size:19px}}
+
+
+/* Huddle image avatars v2; styles scoped to community comments only. */
+html body .huddle-avatar-image{overflow:hidden;padding:0;background:#1b2940}
+html body .huddle-avatar-image img{display:block;width:100%;height:100%;border-radius:inherit;object-fit:cover}

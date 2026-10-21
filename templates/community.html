@@ -46,10 +46,18 @@
         {% endif %}
         {% for post in posts %}
         <article class="huddle-message {% if post['is_hidden'] %}huddle-hidden{% endif %}" id="comment-{{ post['id'] }}">
-          <div class="huddle-avatar" aria-hidden="true">F{{ post['member_id'] % 10 }}</div>
+          {% if post['avatar_key'] in community_logo_paths or post['avatar_key'] == 'custom' %}<div class="huddle-avatar huddle-avatar-image" aria-hidden="true">
+            {% if post['avatar_key'] in community_logo_paths %}
+            <img src="{{ url_for('static', filename=community_logo_paths[post['avatar_key']]) }}" alt="" loading="lazy">
+            {% elif post['avatar_key'] == 'custom' %}
+            <img src="{{ url_for('community.avatar_image', member_id=post['member_id']) }}" alt="" loading="lazy">
+            {% else %}
+            {{ community_avatars[post['avatar_key']][0] if post['avatar_key'] in community_avatars else 'F' ~ (post['member_id'] % 10) }}
+            {% endif %}
+          </div>{% else %}<div class="huddle-avatar{% if post['avatar_key'] in community_avatars %} huddle-avatar-emoji{% endif %}" aria-hidden="true">{{ community_avatars[post['avatar_key']][0] if post['avatar_key'] in community_avatars else 'F' ~ (post['member_id'] % 10) }}</div>{% endif %}
           <div class="huddle-message-main">
             <div class="huddle-message-meta">
-              <strong>Fan #{{ post['member_id'] }}</strong><time datetime="{{ post['created_at'].replace(' ', 'T') }}Z">{{ post['created_at'] }} UTC</time>
+              <strong>{{ post['display_name'] or ('Fan #' ~ post['member_id']) }}</strong><time datetime="{{ post['created_at'].replace(' ', 'T') }}Z">{{ post['created_at'] }} UTC</time>
               {% if post['is_hidden'] %}<span class="huddle-hidden-label">Hidden</span>{% endif %}
             </div>
             <p class="huddle-message-body">{{ post['body'] }}</p>
@@ -59,6 +67,7 @@
               <form method="post" action="{{ url_for('community.report', comment_id=post['id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Report</button></form>
               {% endif %}
               {% if g.is_owner %}
+              {% if post['avatar_key'] == 'custom' %}<form method="post" action="{{ url_for('community.moderate_avatar', member_id=post['member_id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Remove photo</button></form>{% endif %}
               {% if post['reports'] %}<span>{{ post['reports'] }} report(s)</span>{% endif %}
               <form method="post" action="{{ url_for('community.moderate', comment_id=post['id'], action='restore' if post['is_hidden'] else 'hide') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if review %}<input type="hidden" name="return_to" value="reports">{% endif %}<button type="submit">{{ 'Restore' if post['is_hidden'] else 'Hide' }}</button></form>
               {% endif %}
@@ -82,7 +91,7 @@
           {% for kind, message in notices %}<p class="huddle-notice" role="alert">{{ message }}</p>{% endfor %}
         {% endwith %}
         {% if g.member %}
-          <div class="huddle-compose-heading"><strong>Join the conversation</strong><span>Posting as Fan #{{ g.member['id'] }}</span></div>
+          <div class="huddle-compose-heading"><strong>Join the conversation</strong><span>Posting as {{ public_identity()['display_name'] or ('Fan #' ~ g.member['id']) }}</span></div>
           <form method="post" action="{{ url_for('community.post') }}" class="huddle-compose-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="huddle-compose-bar">
