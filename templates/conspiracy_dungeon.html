@@ -31,8 +31,42 @@
         
         .dungeon-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            max-width: 1100px;
+            margin: 24px auto;
+        }
+
+        .dungeon-card {
+            min-width: 0;
+        }
+
+        /* Tablets: three narrower, taller cards */
+        @media (min-width: 651px) and (max-width: 1100px) {
+            .dungeon-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .dungeon-card {
+                padding: 16px 12px;
+            }
+
+            .dungeon-card h2 {
+                font-size: 19px;
+                line-height: 1.2;
+            }
+
+            .dungeon-card p {
+                font-size: 14px;
+            }
+        }
+
+        /* Phones */
+        @media (max-width: 650px) {
+            .dungeon-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Tablets */
@@ -73,12 +107,47 @@
         .weekly-history { color: black; font-size: 14px; text-align: center; font-weight: bold; margin: 12px 0; -webkit-text-stroke: 0; }
         .weekly-history summary { cursor: pointer; }
 
-        .primetime-grid { max-width: 1200px; margin: 30px auto; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        .primetime-grid {
+    max-width: 1200px;
+    margin: 24px auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px;
+}
+.primetime-underdog {
+    color: #4ade80;
+    font-weight: bold;
+}
+
+.primetime-grid .trend-card {
+    min-height: 260px;
+    padding: 18px;
+}
         .primetime-grid .trend-card { min-height: 350px; padding: 26px; -webkit-text-stroke: 0; font-family: Arial, sans-serif; }
         .primetime-grid h3 { color: white; font-size: 22px; }
         .primetime-grid .profile-rate { font-size: 32px; font-weight: bold; margin: 18px 0 8px; }
         .primetime-grid .profile-note { font-size: 13px; line-height: 1.5; color: #d1d5db; }
-        @media (max-width: 760px) { .primetime-grid { grid-template-columns: 1fr !important; } }
+        /* Tablets: keep all three cards side by side */
+@media (min-width: 651px) and (max-width: 1100px) {
+    .primetime-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .primetime-grid .trend-card {
+        padding: 14px;
+        min-height: 260px;
+    }
+
+    .primetime-grid .compact-title {
+        font-size: 22px;
+    }
+}
+
+/* Phones: stack cards */
+@media (max-width: 650px) {
+    .primetime-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
         .dungeon a {
             color: white;
         }
@@ -113,6 +182,7 @@
             body.mobile-results .mobile-dungeon-back { display: inline-block !important; }
             body.mobile-results .dungeon-results > .results:first-child { margin-top: 12px; }
         }
+
     </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
@@ -137,50 +207,30 @@
         Follow the evidence.
     </p>
 
-    <div class="dungeon-grid">
+   <div class="dungeon-grid">
 
-        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='money') }}" {% if view.panel == 'money' %}aria-current="page"{% endif %}>
+        <a class="dungeon-card dungeon-card-link"
+        href="{{ url_for('conspiracy_dungeon_page', panel='money') }}"
+        {% if view.panel == 'money' %}aria-current="page"{% endif %}>
             <h2>💰 Mike's Fade the Public</h2>
-
-            <p>
-                Fade teams receiving 65% or more
-                of public dollars: spread, moneyline, or totals.
-            </p>
-
+            <p>Mike's 65% Rule + Reverse Line Movement.
+            Track public money, contrarian fades, and changes in betting lines.</p>
             <p>Status: Collecting evidence</p>
         </a>
 
-        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='primetime') }}" {% if view.panel == 'primetime' %}aria-current="page"{% endif %}>
+        <a class="dungeon-card dungeon-card-link"
+        href="{{ url_for('conspiracy_dungeon_page', panel='primetime') }}"
+        {% if view.panel == 'primetime' %}aria-current="page"{% endif %}>
             <h2>🌙 Primetime Underdogs</h2>
-
-            <p>
-                Investigating underdog performance
-                in nationally televised games.
-            </p>
-
+            <p>Investigating underdog performance in nationally televised games.</p>
             <p>Status: Weekly results</p>
         </a>
 
-        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='movement') }}" {% if view.panel == 'movement' %}aria-current="page"{% endif %}>
-            <h2>📉 Reverse Line Movement</h2>
-
-            <p>
-                Investigating games where betting
-                lines move against the heavily
-                backed side.
-            </p>
-
-            <p>Status: Tracking recorded lines</p>
-        </a>
-
-        <a class="dungeon-card dungeon-card-link" href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}" {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
+        <a class="dungeon-card dungeon-card-link"
+        href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}"
+        {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
             <h2>🏈 NFL Anomalies</h2>
-
-            <p>
-                Unusual fumbles, turnovers,
-                penalties, and other patterns.
-            </p>
-
+            <p>Unusual fumbles, turnovers, penalties, and other patterns.</p>
             <p>Status: Four event categories</p>
         </a>
 
@@ -223,6 +273,14 @@
             <div class="stat"><span class="stat-label">{{ label }}</span><span class="stat-value">{{ value }}</span></div>
             {% endfor %}
             <div class="stat"><span class="stat-label">ATS Cover Rate</span><span class="stat-value">{% if view.summary.ats_pct is not none %}{{ view.summary.ats_pct }}%{% else %}N/A{% endif %}</span></div>
+        <div class="stat"><span class="stat-label">Overs</span>
+            <span class="stat-value">{{ view.primetime_totals.over }}</span>
+
+        </div>
+        <div class="stat"><span class="stat-label">Unders</span>
+            <span class="stat-value">{{ view.primetime_totals.under }}</span>
+
+        </div>
         </div>
         {% endif %}
         <p class="active-filters" style="font-size: 14px;">New week appears Wednesday at noon Eastern. Cover rate excludes pushes.</p>
@@ -231,9 +289,16 @@
         {% endif %}
     </section>
 
+    {% if view.panel == 'primetime' and view.primetime_tracker %}{% include '_primetime_tracker.html' %}{% endif %}
     {% if view.panel == 'money' %}
     <section class="money-scoreboard">
-        <h2>Market Tallies</h2>
+        <h2>Mike's Fade the Public — Market Tallies</h2>
+        <p class="active-filters" style="font-size: 15px;">
+            Mike's Rule: When at least 65% of public betting dollars
+            back one side, take the opposite side.
+            Reverse Line Movement is evaluated separately using
+            recorded pregame line changes.
+        </p>
         <p class="active-filters" style="font-size: 15px;">{{ view.week_label }} • {{ view.public_markets.total.qualifying }} qualifying fades • {{ view.public_markets.total.pending }} pending</p>
         <div class="money-tally-grid">
             {% for tally in view.public_markets.tallies %}
@@ -263,19 +328,98 @@
     </section>
     <div class="money-matchups">
         {% for game in view.public_markets.cards %}
-        <section class="trend-card">
-            <strong class="compact-title">{{ game.matchup }}</strong>
-            <p>Week {{ game.week }} • {{ game.gameday }}</p>
-            {% for market in game.markets %}
-            <div class="market-row">
-                <div class="market-name">{{ market.market_label }}</div>
-                <div><strong>Public money</strong><br>{{ market.side_a }} {{ market.handle_a }}% • {{ market.side_b }} {{ market.handle_b }}%<small>Bets: {{ market.side_a }} {{ market.bets_a }}% • {{ market.side_b }} {{ market.bets_b }}%</small></div>
-                <div><span class="{{ 'fade-qualified' if market.qualifies else '' }}">{{ market.pick }}</span><small>{{ 'Cover' if market.result == 'Win' and market.market != 'Moneyline' else 'SU Win' if market.result == 'Win' else market.result }}{% if market.profit is not none %} • {{ "%+.2f"|format(market.profit) }}u{% endif %}</small></div>
+        <section class="trend-card dungeon-game-card">
+
+            <header class="dungeon-game-heading">
+                <h3>{{ game.matchup }}</h3>
+                <p>Week {{ game.week }} • {{ game.gameday }}</p>
+            </header>
+
+            <div class="dungeon-market-grid">
+                {% for market in game.markets %}
+                <article class="dungeon-market-card">
+
+                    <h4>{{ market.market_label }}</h4>
+
+                    {% if market.movement %}
+                    <p class="market-line">
+                        {{ market.movement.latest_quote }}
+                    </p>
+                    {% endif %}
+
+                    <div class="market-info">
+                        <strong>Public Money</strong>
+                        <p>
+                            {{ market.side_a }} {{ market.handle_a }}%
+                            /
+                            {{ market.side_b }} {{ market.handle_b }}%
+                        </p>
+                    </div>
+
+                    <div class="market-info">
+                        <strong>Mike's 65% Rule</strong>
+                        <p class="{{ 'fade-qualified' if market.qualifies else '' }}">
+                            {{ market.pick }}
+                        </p>
+                        <small>
+                            {{ market.result }}
+                            {% if market.profit is not none %}
+                            • {{ "%+.2f"|format(market.profit) }}u
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <div class="market-info">
+                        <strong>Reverse Line Movement</strong>
+
+                        {% if market.movement %}
+                            <p>{{ market.movement.status }}</p>
+
+                            {% if market.movement.qualifies %}
+                            <small class="fade-qualified">
+                                {{ market.movement.pick }}
+                                • {{ market.movement.result }}
+                            </small>
+                            {% endif %}
+                        {% else %}
+                            <p>Insufficient movement data</p>
+                        {% endif %}
+                    </div>
+
+                    {% if market.movement %}
+                    <details class="movement-review">
+                        <summary>Review line movement</summary>
+                        <p>
+                            <strong>Recorded change:</strong>
+                            {{ market.movement.first_quote }}
+                            →
+                            {{ market.movement.latest_quote }}
+                        </p>
+                        <small>
+                            {{ market.movement.snapshot_count }}
+                            pregame observations
+                        </small>
+                    </details>
+                    {% endif %}
+
+                </article>
+                {% endfor %}
             </div>
-            {% endfor %}
-            <p><a href="{{ game.source_url }}" target="_blank" rel="noopener noreferrer">View Source</a></p>
+
+            <p class="dungeon-game-source">
+                <a href="{{ game.source_url }}"
+                target="_blank"
+                rel="noopener noreferrer">
+                    View Source
+                </a>
+            </p>
+
         </section>
-        {% else %}<p class="active-filters">Awaiting recorded public-money quotes for this week.</p>{% endfor %}
+        {% else %}
+        <p class="active-filters">
+            Awaiting recorded public-money quotes for this week.
+        </p>
+        {% endfor %}
     </div>
     {% endif %}
 
@@ -291,7 +435,12 @@
             <div class="compact-summary">
                 <strong class="compact-title">{{ game.matchup }}</strong>
                 <p>Week {{ game.week }} • {{ game.gameday }}</p>
-                <span class="compact-spread">Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}</span>
+                <span class="compact-spread primetime-underdog">
+                    Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}
+                </span>
+                <p><strong>Current season:</strong> {{ view.primetime_tracker.overall.wins }}–{{ view.primetime_tracker.overall.losses }}–{{ view.primetime_tracker.overall.pushes }} ATS overall</p>
+                <details class="primetime-historical">
+                    <summary>Historical Investigation</summary>
                 <h3>{{ game.profile.description }}</h3>
                 <p>ATS Result: {{ 'Cover' if game.result == 'Win' else game.result }}</p>
                 {% set baseline = game.profile.baseline %}
@@ -309,6 +458,7 @@
                 </div>
                 {% else %}<p>Not enough prior games for additional comparisons.</p>{% endif %}
                 <p class="profile-note">Team{% if game.qb %} + quarterback{% endif %} history before this matchup. Baseline: {{ game.location.lower() }} dogs. Comparisons are exploratory, exclude pushes from rates, and require at least five decided games; small samples can swing sharply.</p>
+                </details>
             </div>
         </section>
         {% else %}<p class="active-filters">No {% if view.archive_week is none %}upcoming {% endif %}primetime underdogs with a recorded spread for this week.</p>{% endfor %}

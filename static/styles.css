@@ -1120,3 +1120,153 @@ h2 {
 .hot-trend-date { font-size: .8rem; color: #d1d5db; }
 .hot-trends .hot-trend-games,
 .hot-trends .hot-trend-games:visited { display: inline-block; margin-top: 6px; color: #fbbf24; font-size: .85rem; font-weight: 500; -webkit-text-stroke: 0; text-underline-offset: 3px; }
+/* Mike's Fade the Public — reverse line movement details */
+
+.movement-detail {
+    margin: 0 0 18px;
+    padding: 14px 16px;
+    background: #111827;
+    border-left: 3px solid #fbbf24;
+    border-radius: 8px;
+    color: white;
+    font-family: Arial, sans-serif;
+    -webkit-text-stroke: 0;
+}
+
+.movement-detail strong {
+    color: #fbbf24;
+}
+
+.movement-detail p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.movement-detail small {
+    display: block;
+    color: #cbd5e1;
+}
+
+.movement-detail details {
+    margin-top: 12px;
+}
+
+.movement-detail summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+@media (max-width: 650px) {
+    .movement-detail {
+        padding: 12px;
+        overflow-wrap: anywhere;
+    }
+}
+/* Conspiracy Dungeon — compact market cards */
+
+.dungeon-game-card {
+    padding: 22px;
+    margin-bottom: 22px;
+}
+
+.dungeon-game-heading {
+    border-bottom: 1px solid #475569;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.dungeon-game-heading h3 {
+    font: bold 24px Arial, sans-serif;
+    color: white;
+    margin: 0 0 8px;
+}
+
+.dungeon-game-heading p {
+    margin: 0;
+    font: 14px Arial, sans-serif;
+    color: #cbd5e1;
+}
+
+.dungeon-market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dungeon-market-card {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    background: #111827;
+    font-family: Arial, sans-serif;
+    -webkit-text-stroke: 0;
+    overflow-wrap: anywhere;
+}
+
+.dungeon-market-card h4 {
+    color: #fbbf24;
+    font-size: 18px;
+    margin: 0 0 12px;
+}
+
+.market-line {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 14px;
+}
+
+.market-info {
+    margin: 12px 0;
+}
+
+.market-info strong {
+    display: block;
+    font-size: 13px;
+    color: #fbbf24;
+    margin-bottom: 5px;
+}
+
+.market-info p {
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0 0 4px;
+}
+
+.market-info small,
+.movement-review small {
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.movement-review {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #475569;
+    font-size: 13px;
+}
+
+.movement-review summary {
+    cursor: pointer;
+    color: #fbbf24;
+    font-weight: bold;
+}
+
+.movement-review p {
+    line-height: 1.5;
+}
+
+.dungeon-game-source {
+    margin: 16px 0 0;
+    font: 13px Arial, sans-serif;
+}
+
+@media (max-width: 650px) {
+    .dungeon-market-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dungeon-game-card {
+        padding: 14px;
+    }
+}

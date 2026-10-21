@@ -40,7 +40,12 @@ def primetime_records(games, only_primetime=True):
 
 
 def build_view(panel='money', now=None, games_path=GAMES, money_report=None, archive_week=None, archive_stage='REG', anomaly_category='world', anomaly_year=None):
-    panel=panel if panel in PANELS else 'money'
+    panel = panel if panel in PANELS else 'money'
+
+    # Keep old Reverse Line Movement links working.
+    # Both features now live under Mike's section.
+    if panel == 'movement':
+        panel = 'money'
     games=load_games(games_path)
     start,end=weekly_window(now)
     scheduled=[g for g in games.values() if start.isoformat()<=g.get('gameday','')<end.isoformat() and g.get('game_type') in {'REG','WC','DIV','CON','SB'}]
@@ -89,22 +94,138 @@ def build_view(panel='money', now=None, games_path=GAMES, money_report=None, arc
     history=[]
     for (s,t,w),rows in sorted(grouped.items(),key=lambda item:max(r['gameday'] for r in item[1]),reverse=True):
         history.append(dict(week=w,stage=t,label=f'{s} • Week {w}' if t=='REG' else f'{s} • {t}',summary=summarize(rows)))
-    public_markets=None
-    if panel=='money':
+    primetime_tracker = (build_primetime_tracker(games, season, now)
+                         if panel == 'primetime' else None)
+    primetime_totals_view = (primetime_totals(games, season, now)
+                            if panel == 'primetime' else None)
+    public_markets = None
+    movement = None
+    anomalies = None
+
+    if panel == 'money':
         from public_money import build_market_view
-        public_markets=build_market_view(games_path.parent,games,start,end,season,archive_week,archive_stage)
-    movement=None
-    if panel=='movement':
         from reverse_line_analysis import build_movement_view
-        movement=build_movement_view(games_path.parent,games,start,end,season,archive_week,archive_stage)
-        history=movement['history']
-        past=[]
-    anomalies=None
+
+        public_markets = build_market_view(
+            games_path.parent, games, start, end,
+            season, archive_week, archive_stage
+        )
+
+        movement = build_movement_view(
+            games_path.parent, games, start, end,
+            season, archive_week, archive_stage
+        )
+
+        # Match each market's movement data to Mike's existing game cards.
+        movement_lookup = {
+            (card['matchup'], card['gameday']): {
+                market['market']: market
+                for market in card['markets']
+            }
+            for card in movement['markets']['cards']
+        }
+
+        for card in public_markets['cards']:
+            by_market = movement_lookup.get(
+                (card['matchup'], card['gameday']), {}
+            )
+            for market in card['markets']:
+                market['movement'] = by_market.get(market['market'])
+        anomalies=None
     if panel=='anomalies':
         from anomaly_analysis import build_anomalies
         anomalies=build_anomalies(games_path.parent,games,season,anomaly_category,anomaly_year)
-    return dict(anomalies=anomalies,movement=movement,public_markets=public_markets,all_handles=all_handles,panel=panel,title=PANELS[panel],week_label='All recorded weeks • Editing preview' if EDITING_PREVIEW else label,scheduled_week_label=label,running=running,games=current,summary=movement['summary'] if movement is not None else summarize(records) if panel=='primetime' and archive_week is None else summarize(current),season=season,archive_week=archive_week,current_week=week,current_stage=game_type,history=history,previous=movement['previous'] if movement is not None else summarize(past),ready=panel in {'money','primetime','movement','anomalies'})
+    return dict(primetime_totals=primetime_totals_view,primetime_tracker=primetime_tracker,anomalies=anomalies,movement=movement,public_markets=public_markets,all_handles=all_handles,panel=panel,title=PANELS[panel],week_label='All recorded weeks • Editing preview' if EDITING_PREVIEW else label,scheduled_week_label=label,running=running,games=current,summary=movement['summary'] if movement is not None else summarize(records) if panel=='primetime' and archive_week is None else summarize(current),season=season,archive_week=archive_week,current_week=week,current_stage=game_type,history=history,previous=movement['previous'] if movement is not None else summarize(past),ready=panel in {'money','primetime','movement','anomalies'})
 
+
+
+def build_primetime_tracker(games, season, now=None):
+    """Current-season primetime ATS, home/away and chronological cover streak."""
+    instant = now or datetime.now(ZoneInfo('America/New_York'))
+    if instant.tzinfo is None:
+        raise ValueError('Timezone-aware time required')
+    instant = instant.astimezone(ZoneInfo('America/New_York'))
+    # The site's existing grading excludes pick'ems and uses the saved spread.
+    rows = primetime_records(games)
+    if season is None:
+        eligible = [int(r['season']) for r in rows if int(r['season']) <= instant.year]
+        season = str(max(eligible)) if eligible else str(instant.year)
+    rows = [r for r in rows if str(r['season']) == str(season)
+            and r['game_type'] == 'REG' and r['result'] in ('Win', 'Loss', 'Push')]
+
+    def played(row):
+        source = games[row['game_id']]
+        clock = source.get('gametime') or '00:00'
+        kickoff = datetime.fromisoformat(row['gameday'] + 'T' + clock).replace(
+            tzinfo=ZoneInfo('America/New_York'))
+        return kickoff <= instant
+
+    rows = [r for r in rows if played(r)]
+    rows.sort(key=lambda r: (
+        r['gameday'], games[r['game_id']].get('gametime') or '', r['game_id']))
+    streak = []
+    for row in reversed(rows):
+        if row['result'] == 'Push':
+            continue  # Same convention as find_active_streak in Trend Finder.
+        if row['result'] != 'Win':
+            break
+        streak.append(row)
+    streak.reverse()
+
+    recent = []
+    for row in reversed(rows[-10:]):
+        source = games[row['game_id']]
+        recent.append(dict(date=row['gameday'], matchup=row['matchup'],
+                           dog=row['pick'], spread=row['pick_spread'],
+                           location=row['location'], result=row['result'],
+                           away_score=source.get('away_score'),
+                           home_score=source.get('home_score')))
+    return dict(season=season, overall=summarize(rows),
+                home=summarize([r for r in rows if r['location'] == 'Home']),
+                away=summarize([r for r in rows if r['location'] == 'Away']),
+                streak=len(streak),
+                streak_start=streak[0]['gameday'] if streak else None,
+                streak_end=streak[-1]['gameday'] if streak else None,
+                recent=recent)
+
+
+def primetime_totals(games, season, now=None):
+    """Score recorded totals for finished regular-season primetime dog games."""
+    instant = now or datetime.now(ZoneInfo('America/New_York'))
+    if instant.tzinfo is None:
+        raise ValueError('Timezone-aware time required')
+    instant = instant.astimezone(ZoneInfo('America/New_York'))
+    over = under = pushes = 0
+    for record in primetime_records(games):
+        if str(record['season']) != str(season) or record['game_type'] != 'REG':
+            continue
+        game = games[record['game_id']]
+        if record['result'] == 'Pending':
+            continue
+        try:
+            total_line = float(game['total_line'])
+            home_score = float(game['home_score'])
+            away_score = float(game['away_score'])
+        except (ValueError, TypeError, KeyError):
+            continue
+        if not all(math.isfinite(x) for x in (total_line, home_score, away_score)):
+            continue
+        kickoff = datetime.fromisoformat(
+            record['gameday'] + 'T' + (game.get('gametime') or '00:00')
+        ).replace(tzinfo=ZoneInfo('America/New_York'))
+        if kickoff > instant:
+            continue
+        points = home_score + away_score
+        if points > total_line:
+            over += 1
+        elif points < total_line:
+            under += 1
+        else:
+            pushes += 1
+    decided = over + under
+    return dict(over=over, under=under, pushes=pushes,
+                over_pct=round(100 * over / decided, 1) if decided else None,
+                under_pct=round(100 * under / decided, 1) if decided else None)
 
 def dog_profile(target, historical):
     # Historical comparisons stop before the matchup; final scores never select filters.
