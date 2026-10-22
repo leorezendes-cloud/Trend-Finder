@@ -41,7 +41,7 @@
 </details>
 {% endfor %}
 </div>
-{% if not all_hot_trends|default(false) %}<p><a class="hot-trend-games" href="{{ url_for('hot_trends_page') }}">🔥 See All Hot Trends →</a></p>{% endif %}
+{% if not all_hot_trends|default(false) and not research_navigation|default(false) %}<p><a class="hot-trend-games" href="{{ url_for('hot_trends_page') }}">🔥 See All Hot Trends →</a></p>{% endif %}
 </section>
 <script>
 // Follow fire links directly to the right Hot Trends card, opening its details.
@@ -60,5 +60,5 @@
 })();
 </script>
 {% elif not all_hot_trends|default(false) %}
-<section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title"><h2 id="active-trends-title">Hot Right Now</h2><p>No verified trends meet the five-straight or five-of-seven requirements right now.</p><p><a href="{{ url_for('hot_trends_page') }}">See All Hot Trends →</a></p></section>
+<section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title"><h2 id="active-trends-title">Hot Right Now</h2><p>No verified trends meet the five-straight or five-of-seven requirements right now.</p>{% if not research_navigation|default(false) %}<p><a href="{{ url_for('hot_trends_page') }}">See All Hot Trends →</a></p>{% endif %}</section>
 {% else %}<p>No qualifying Hot Right Now trends currently.</p>{% endif %}

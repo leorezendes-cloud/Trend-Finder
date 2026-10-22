@@ -17,11 +17,12 @@
     {% include '_site_navigation.html' %}
 
     <p class="section-intro">Trendfindah 3000 is your NFL trend finder for historical ATS records and custom filters. <a href="{{ url_for('trends_page') }}">Discover Trends</a> highlights patterns and streaks.</p>
-    {% include '_active_trends.html' %}
-    <nav class="research-mode-switch tf-mode-links" aria-label="Research views and presets">
-        <a href="{{ url_for('trend_finder') }}">← General NFL Research</a>
-        <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset ↗</a>
-    </nav>
+    {% with research_navigation=true %}{% include '_active_trends.html' %}{% endwith %}
+    <nav class="research-mode-switch tf-mode-links research-navigation" aria-label="Research views and presets">
+    <a href="{{ url_for('hot_trends_page') }}">See All Hot Trends</a>
+    <a href="{{ url_for('trend_finder') }}">General NFL Research</a>
+    <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs Preset</a>
+</nav>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
         <input type="hidden" name="research_view" value="dogs">
         <h1 class="search-panel-title"><img src="{{ url_for('static', filename='Images/Branding/TrendFindah-3000-Retro-Transparent-Small.png') }}" alt="Trendfindah 3000" width="500" height="220"></h1>

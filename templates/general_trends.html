@@ -5,11 +5,15 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% if seo and seo.title %}{{ seo.title }}{% else %}Trendfindah 3000 | Gravy Train{% endif %}</title><link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}">{% include '_branding_head.html' %}<link rel="stylesheet" href="{{ url_for('static',filename='general_research.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='trend_games.css') }}"><script src="{{ url_for('static',filename='general_research.js') }}" defer></script></head>
 <body class="general-research"><div class="section-logo-title"><img src="{{ url_for('static',filename='Images/Branding/trend-findah-nav.png') }}" alt="Trendfindah 3000" width="953" height="179"></div>{% include '_site_navigation.html' %}
 <p class="section-intro"><a href="{{ url_for('trends_page') }}">Discover Trends</a></p>
-{% include '_active_trends.html' %}
+{% with research_navigation=true %}{% include '_active_trends.html' %}{% endwith %}
 {% set labels={'game_type':'Season stage','gametime':'Kickoff time (Eastern)','temp':'Recorded temperature','wind':'Recorded wind','roof':'Stadium roof','qb_name':'QB on either team'} %}
 {% set game_types={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl','PRE':'Preseason','POST':'Postseason'} %}
 <!-- manual-filter-layout-v3 -->
-<nav class="research-mode-switch tf-mode-links" aria-label="Research views and presets"><a href="{{ url_for('trend_finder',research_view='dogs') }}">Underdog Research →</a><a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs preset ↗</a></nav>
+<nav class="research-mode-switch tf-mode-links research-navigation" aria-label="Research views and presets">
+    <a href="{{ url_for('hot_trends_page') }}">See All Hot Trends</a>
+    <a href="{{ url_for('trend_finder',research_view='dogs') }}">Underdog Research</a>
+    <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs Preset</a>
+</nav>
 <form method="get" action="{{ url_for('trend_finder') }}#research-results" class="home-filter-form"><input type="hidden" name="research_view" value="general"><input type="hidden" name="run" value="analyze"><h1 class="search-panel-title"><img src="{{ url_for('static',filename='Images/Branding/TrendFindah-3000-Retro-Transparent-Small.png') }}" alt="Trendfindah 3000" width="500" height="220"></h1><p>General NFL research</p>
 <div class="form-grid">
 <!-- manual-filter-layout-v4 -->

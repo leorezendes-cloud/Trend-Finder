@@ -61,3 +61,9 @@ html body .tf-games-pager {display:flex;gap:18px;margin:14px 0 4px;}
     html body .tf-compact-games {gap:8px;}
     html body .tf-compact-games .tf-compact-game > summary {min-height:46px;padding:9px 10px;}
 }
+
+/* Equal, compact buttons directly beneath the research Hot Trends cards. */
+html body .tf-mode-links.research-navigation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:590px;margin:12px auto 18px;padding:0}
+html body .tf-mode-links.research-navigation a{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:40px;padding:8px 10px;font:700 13px/1.3 Arial,sans-serif;text-align:center}
+html body .tf-mode-links.research-navigation a:focus-visible{outline:2px solid #ffc94a;outline-offset:3px}
+@media(max-width:600px){html body .tf-mode-links.research-navigation{grid-template-columns:minmax(0,1fr);max-width:220px}html body .tf-mode-links.research-navigation a{min-height:42px}}
