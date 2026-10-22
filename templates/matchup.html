@@ -1,11 +1,13 @@
 {% extends 'scout4_base.html' %}
 {% from '_save_watchlist.html' import save_item with context %}
+{% from '_expert_panel.html' import expert_panel %}
 {% block title %}{{ game.away_team }} vs {{ game.home_team }}{% endblock %}
 {% block heading %}{{ game.away_team }} @ {{ game.home_team }}{% endblock %}
 {% block intro %}<p>{% if is_final %}Explore what happened, compare matchups, and see how much evidence supports each number.{% else %}Compare the teams, explore key matchups, and see the statistics behind each comparison.{% endif %}</p>{% endblock %}
 {% block filter_form %}{% endblock %}
 {% block data_notes %}{% endblock %}
 {% block content %}{% include '_inline_picks.html' %}
+<link rel="stylesheet" href="{{ url_for('static',filename='prediction_cards.css') }}">
 <style>
 .matchup-final-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
 .matchup-final-head h2{margin:0}
@@ -26,7 +28,7 @@
 .matchup-final-player small{color:#94a3b8;font-weight:700}
 .matchup-final-player strong{font-size:.96rem}
 .matchup-final-player span{font-size:.82rem;color:#cbd5e1}
-@media (min-width:768px){.matchup-prediction{width:100%;max-width:600px;margin-left:auto;margin-right:auto}}
+
 @media(max-width:540px){.matchup-final-head{display:block}.matchup-final-score{margin-top:6px;font-size:1.05rem}.matchup-final-column-head,.matchup-final-metric{gap:3px;padding:9px 4px}.matchup-final-metric span{font-size:.78rem}.matchup-final-metric strong{font-size:.95rem}.matchup-final-team{padding:9px}.matchup-final-leaders{gap:8px}.matchup-final-player strong{font-size:.85rem}.matchup-final-player span{font-size:.74rem}}
 </style>
 {% if is_final %}
@@ -73,12 +75,22 @@
   </details>
 </section>
 {% endif %}
-{% if not g.member or not inline_picks %}
-<section class="stats-card matchup-panel matchup-prediction"><h2>{{ 'Predicted Picks' if game.away_score not in ('', none) and game.home_score not in ('', none) else 'Prediction' }}</h2>
-{% if forecast %}{% set prediction = forecast.components['Blend'] %}<p><strong>{{ prediction.pick or 'No pick recorded' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p><p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p>{% if game.away_score in ('', none) or game.home_score in ('', none) %}<p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% endif %}{% else %}<p>No saved prediction for this matchup yet.</p>{% endif %}
-<a href="{{ url_for('plug_page') }}#game-{{ game.game_id }}">See predictions and details →</a>
+<section class="stats-card matchup-panel matchup-prediction">
+<div class="prediction-columns"><div class="prediction-quantitative">
+<div class="prediction-heading"><h2>Prediction</h2>{% if prediction_item %}<small>({{ (prediction_item.saved_at|eastern_time).split(',')[0] }})</small>{% elif forecast %}<small>({{ (forecast.decision_cutoff_utc|eastern_time).split(',')[0] }})</small>{% endif %}</div>
+{% if prediction_item %}
+{% set picks=prediction_item.saved_picks %}{% set quotes=prediction_item.locked_quotes %}{% set margin=prediction_item.prediction_margin %}
+<p><strong>ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
+<p><strong>Straight Up:</strong> {% if margin %}{{ game.away_team if margin>0 else game.home_team }} by {{ margin|abs|stat }} points{% else %}Even{% endif %}</p>
+<p><strong>Over/Under:</strong> {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ '%g'|format(quotes['Total'].line_a|float) }}{% endif %}</p>
+{% elif forecast %}
+{% set prediction=forecast.components['Blend'] %}
+<p><strong>ATS:</strong> {{ prediction.pick or 'No pick recorded' }}{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }}{% endif %}</p>
+<p><strong>Straight Up:</strong> {% if prediction.away_margin %}{{ game.away_team if prediction.away_margin>0 else game.home_team }} by {{ prediction.away_margin|abs|stat }} points{% else %}Even{% endif %}</p>
+<p><strong>Over/Under:</strong> {% if forecast.totals and forecast.totals.prediction.lean %}{{ forecast.totals.prediction.lean }} {{ '%g'|format(forecast.totals.quote.line|float) }}{% else %}Forecast pending{% endif %}</p>
+{% else %}<p>Scout forecast pending</p>{% endif %}
+</div>{{ expert_panel(prediction_item, comparison=true) }}</div>
 </section>
-{% endif %}
 <section class="stats-card matchup-panel matchup-comparison"><h2>Team comparison</h2><div class="table-scroll"><table><thead><tr><th>Per game</th>{% for side in teams %}<th><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} →</a></th>{% endfor %}</tr></thead><tbody>
 <tr><td>Record</td>{% for side in teams %}<td>{{ side.summary.wins }}–{{ side.summary.losses }}–{{ side.summary.ties }}</td>{% endfor %}</tr>
 <tr><td>ATS record</td>{% for side in teams %}<td>{{ side.summary.markets.ats_w }}–{{ side.summary.markets.ats_l }}–{{ side.summary.markets.ats_p }} <small>({{ side.summary.markets.ats_known }} graded)</small></td>{% endfor %}</tr>
