@@ -22,7 +22,10 @@
 {% if g.member %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Join League</button></form>{% else %}<div class="league-actions"><a href="{{ url_for('membership.login') }}">Sign in to join</a><a href="{{ url_for('membership.register') }}">Register free</a></div>{% endif %}</section>
 {% elif mode=='standings' %}
 <section class="league-panel"><h2>{{ league.name }}</h2><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %} · 1 point per win</p><p>Pushes, ties, voids and pending picks earn no points. Standings use verified My Picks grades.</p>
-<label for="league-share">Share this invitation with your friends</label><input id="league-share" class="league-invitation" value="{{ invitation }}" readonly>
+<label for="league-share">Share this invitation with your friends</label>
+<div class="league-share-controls"><input id="league-share" class="league-invitation" value="{{ invitation }}" readonly><button id="league-copy" type="button" hidden>Copy Link</button></div>
+<p id="league-copy-status" class="league-copy-status" role="status" aria-live="polite"></p>
+<script src="{{ url_for('static',filename='huddle_leagues.js') }}" defer></script>
 {% if league.commissioner_id==g.member.id %}<form class="league-rotate" method="post" action="{{ url_for('huddle_leagues.rotate_invitation',league_id=league.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Replace invitation link</button><small>Only the commissioner can replace it. Old links will stop working.</small></form>{% endif %}
 </section>
 <div class="league-filters">{% if weeks %}<form method="get"><input type="hidden" name="season" value="{{ season }}"><select id="league-week" name="week_id" aria-label="Week">{% for week in weeks %}<option value="{{ week.id }}"{% if week.id==selected %} selected{% endif %}>Week {{ week.week }} · {{ week.stage }}</option>{% endfor %}</select><button type="submit">View week</button></form>{% endif %}</div>
