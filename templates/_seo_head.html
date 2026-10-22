@@ -13,5 +13,5 @@
 <meta name="twitter:title" content="{{ seo.title or 'TrendFindah' }}">
 <meta name="twitter:description" content="{{ seo.description }}">
 <meta name="twitter:image" content="{{ url_for('static', filename='Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png', _external=True) }}">
-{% if request.endpoint=='home' %}<script type="application/ld+json">{{ {'@context':'https://schema.org','@type':'WebSite','name':'Gravy Train','alternateName':'Trend Findah','url':seo.origin+'/'}|tojson }}</script>{% endif %}
+{% if request.endpoint=='home' %}<script type="application/ld+json">{{ {'@context':'https://schema.org','@type':'WebSite','name':'Trend Findah','alternateName':'Trend Findah','url':seo.origin+'/'}|tojson }}</script>{% endif %}
 {% endif %}
