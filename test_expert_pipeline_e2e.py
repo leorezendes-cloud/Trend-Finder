@@ -21,7 +21,7 @@ class ExpertPipelineTests(unittest.TestCase):
   self.stack=ExitStack();self.addCleanup(self.stack.close)
   for mod in ['expert_beta','expert_beta_cli','expert_auto_queue','expert_review_publication','expert_provider','plug_publication']:
    self.stack.enter_context(patch(mod+'.clock',side_effect=lambda:self.now))
-  self.stack.enter_context(patch.dict(os.environ,{'TREND_FINDAH_EXPERT_AUTO_DRAFT':'1','EXPERT_GEMINI_FREE_TIER_CONFIRMED':'1','TREND_FINDAH_EXPERT_AUTO_PUBLISH':'1','TREND_FINDAH_EXPERT_DAILY_LIMIT':'16','TREND_FINDAH_EXPERT_RUN_LIMIT':'4','TREND_FINDAH_EXPERT_GEMINI_MODEL':'gemini-2.5-flash','GEMINI_API_KEY':'OFFLINE-FAKE-KEY'},clear=True))
+  self.stack.enter_context(patch.dict(os.environ,{'TREND_FINDAH_EXPERT_AUTO_PROVIDER':'gemini','TREND_FINDAH_EXPERT_AUTO_DRAFT':'1','EXPERT_GEMINI_FREE_TIER_CONFIRMED':'1','TREND_FINDAH_EXPERT_AUTO_PUBLISH':'1','TREND_FINDAH_EXPERT_DAILY_LIMIT':'16','TREND_FINDAH_EXPERT_RUN_LIMIT':'4','TREND_FINDAH_EXPERT_GEMINI_MODEL':'gemini-2.5-flash','GEMINI_API_KEY':'OFFLINE-FAKE-KEY'},clear=True))
   self.stack.enter_context(patch('socket.socket.connect',side_effect=AssertionError('Real network prohibited')))
   self.stack.enter_context(patch('scout4.blend.run',side_effect=AssertionError('Forecast generation prohibited')))
   self.stack.enter_context(patch('expert_auto_queue.time.sleep',side_effect=lambda n:setattr(self,'now',self.now+timedelta(seconds=n))))

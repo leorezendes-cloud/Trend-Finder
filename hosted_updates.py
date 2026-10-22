@@ -124,7 +124,7 @@ def update_once(root, feed_lock_fd=None):
         else str(root/'expert_beta')))
     attempt('Plug publication', lambda: publish(root, expert_store,
         SOURCE/'automatic_model.json'))
-    # Gemini is explicitly opt-in and runs only after a successful production
+    # Expert drafting is explicitly opt-in and runs only after a successful production
     # import. It saves drafts for review, never auto-approves or publishes prose.
     if (stages.get('Plug publication') == 'ok'
             and os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') == '1'):
@@ -132,12 +132,12 @@ def update_once(root, feed_lock_fd=None):
         def expert_drafts():
             result = bounded_run(
                 expert_store,
-                os.environ.get('TREND_FINDAH_EXPERT_GEMINI_MODEL', 'gemini-2.5-flash'),
-                daily_limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT', '2')),
+                None,
+                daily_limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT', '16')),
                 run_limit=int(os.environ.get('TREND_FINDAH_EXPERT_RUN_LIMIT', '1')),
                 execute=True)
             if result['state'] == 'operator_review_required':
-                raise RuntimeError('Gemini draft requires operator review; will not retry')
+                raise RuntimeError('Expert draft requires operator review; will not retry')
         attempt('Expert draft queue', expert_drafts)
     def grade():
         from fan_views import prediction_performance
@@ -325,7 +325,7 @@ def run_leader(root, stop):
         return run_worker('hosted_updates.py', ['--once'], timeout=600)
 
     jobs = (
-        ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 3600),
+        ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
         ('automatic-weekly-lines', weekly, 30),
         ('automatic-data-updates', scout, 21600),

@@ -57,6 +57,8 @@ class AutomationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root/'drafts').mkdir()
         type(self).rows = []
+        provider = patch.dict(os.environ, {'TREND_FINDAH_EXPERT_AUTO_PROVIDER':'gemini'})
+        provider.start(); self.addCleanup(provider.stop)
 
     def test_only_future_production_imports_are_queued(self):
         type(self).rows = [rec('BUF'), rec('MIA', kind='development'), rec('NYJ', offset_days=-1)]
