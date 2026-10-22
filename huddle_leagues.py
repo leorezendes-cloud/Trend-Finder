@@ -130,12 +130,26 @@ def standings(connection, league, season, week_id=None, now=None):
     return result
 
 
+def league_seasons(connection, league):
+    return [r[0] for r in connection.execute('''SELECT DISTINCT w.season FROM pick_weeks w
+        JOIN pick_games game ON game.week_id=w.id WHERE w.published_at IS NOT NULL
+        AND julianday(game.lock_at)>julianday(?) ORDER BY w.season DESC''', (league['created_at'],))]
+
+
 @bp.get('/')
 def mine():
     leagues = db().execute('''SELECT l.* FROM huddle_leagues l JOIN huddle_league_members m
         ON m.league_id=l.id WHERE m.member_id=? ORDER BY l.created_at DESC,l.id DESC''',
         (g.member['id'],)).fetchall()
-    return render_template('huddle_leagues.html', mode='mine',leagues=leagues,categories=CATEGORIES)
+    summaries = {}
+    now = now_utc()
+    for league in leagues:
+        seasons = league_seasons(db(), league)
+        season = seasons[0] if seasons else now.year-int(now.month<7)
+        summaries[league['id']] = next(row for row in standings(db(), league, season)
+                                      if row['member_id'] == g.member['id'])
+    return render_template('huddle_leagues.html', mode='mine',leagues=leagues,
+                           categories=CATEGORIES,summaries=summaries)
 
 
 @bp.route('/create', methods=['GET','POST'])
@@ -239,9 +253,7 @@ def view(league_id):
     connection = db()
     connection.execute('BEGIN')  # Both standings tables see one consistent read snapshot.
     try:
-        seasons = [r[0] for r in connection.execute('''SELECT DISTINCT w.season FROM pick_weeks w
-            JOIN pick_games game ON game.week_id=w.id WHERE w.published_at IS NOT NULL
-            AND julianday(game.lock_at)>julianday(?) ORDER BY w.season DESC''',(league['created_at'],))]
+        seasons = league_seasons(connection, league)
         default = seasons[0] if seasons else now_utc().year-int(now_utc().month<7)
         text = request.args.get('season',str(default))
         if not text.isdecimal() or not 2000 <= int(text) <= 2100:

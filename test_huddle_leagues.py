@@ -286,6 +286,32 @@ class LeagueTests(unittest.TestCase):
         self.assertEqual(response.text.count('class="league-category"'), 3)
         self.assertIn("url_for('huddle_leagues.mine')", Path('templates/community.html').read_text())
 
+    def test_mine_shows_own_verified_record_without_changing_picks(self):
+        league = self.create()
+        self.join(league)
+        self.seed(league, results=('Win', 'Loss', 'Push'))
+        with self.connection() as c:
+            c.execute("UPDATE member_picks SET su_result='Loss' WHERE member_id=2")
+            before = list(c.iterdump())
+        with patch('huddle_leagues.now_utc', return_value=datetime(2026,11,1,tzinfo=timezone.utc)):
+            response = self.client.get('/huddle/leagues/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('<dt>Points</dt><dd>0</dd>', response.text)
+        self.assertIn('<dt>Wins</dt><dd>0</dd>', response.text)
+        self.assertIn('<dt>Losses</dt><dd>2</dd>', response.text)
+        with self.connection() as c:
+            self.assertEqual(before, list(c.iterdump()))
+        self.assertEqual(self.client.get(f'/huddle/leagues/{league["id"]}').status_code, 200)
+        self.assertNotIn('View season', self.client.get(f'/huddle/leagues/{league["id"]}').text)
+        self.assertNotIn('id="league-season"', self.client.get(f'/huddle/leagues/{league["id"]}').text)
+
+    def test_empty_league_card_starts_with_zero_points(self):
+        self.create()
+        response = self.client.get('/huddle/leagues/')
+        self.assertEqual(response.status_code, 200)
+        for label in ('Points', 'Wins', 'Losses'):
+            self.assertIn(f'<dt>{label}</dt><dd>0</dd>', response.text)
+
 
 if __name__ == '__main__':
     unittest.main()
