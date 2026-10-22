@@ -1,7 +1,8 @@
 """Lightweight Expert-only worker: import sealed production, draft, publish reviews.
 
-No NFL result refresh, statistical collection, Scout prediction run or payment calls.
-Never performs Gemini requests unless the two existing free-tier opt-ins are set.
+No NFL refresh, statistical collection or Scout prediction run. Draft requests
+require the existing automation opt-in; OpenAI is the default budgeted provider.
+Gemini requires explicit selection/fallback and its existing free-tier confirmation.
 No report approval is synthesized: only separately approved reviews can publish.
 """
 import argparse
@@ -23,12 +24,12 @@ def _execute_once(source=None, root=None, archive=None, *, publish_reports=None)
     try:
         # Idempotent, strictly provenance-checked; no forecasts computed.
         status['production_import'] = publish(root, archive, source/'automatic_model.json')
-        # Missing env flag means zero Gemini calls, not a dummy provider.
+        # Missing env flag means zero provider calls, not a dummy provider.
         if os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') == '1':
             from expert_auto_queue import bounded_run
             draft = bounded_run(archive,
-                os.environ.get('TREND_FINDAH_EXPERT_GEMINI_MODEL','gemini-2.5-flash'),
-                daily_limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT','2')),
+                None,
+                daily_limit=int(os.environ.get('TREND_FINDAH_EXPERT_DAILY_LIMIT','16')),
                 run_limit=int(os.environ.get('TREND_FINDAH_EXPERT_RUN_LIMIT','1')),
                 execute=True)
             status['drafts'] = draft

@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 from urllib.error import URLError
-from expert_provider import OpenAIProvider
+from expert_provider import OpenAIProvider, report_schema
 from expert_beta import generate_draft, Store
 from expert_beta_cli import draft, import_package
 from test_expert_beta import fixture, report
@@ -27,7 +27,7 @@ class ProviderTests(unittest.TestCase):
             network.assert_not_called()
 
     def test_bounded_request_and_pending_draft_provenance(self):
-        s=fixture();opener=self.response({'status':'completed','model':'returned-model','id':'resp-test','usage':{'total_tokens':50},'output':[{'content':[{'type':'output_text','text':json.dumps(report(s))}]}]})
+        s=fixture();opener=self.response({'status':'completed','model':'returned-model','id':'resp-test','usage':{'total_tokens':50},'output':[{'content':[{'type':'output_text','text':json.dumps({**{k:v for k,v in report(s).items() if k in report_schema()['properties']}, 'disagreement_reason':''})}]}]})
         with patch('expert_provider.build_opener',return_value=opener):
             result=generate_draft(s,OpenAIProvider(approved=True,api_key='secret',model='configured-model'))
         req=opener.open.call_args.args[0];body=json.loads(req.data)
