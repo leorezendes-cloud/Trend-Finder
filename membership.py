@@ -209,6 +209,16 @@ def init_membership(app):
     init_newsletter(app)
     from member_picks import init_picks
     init_picks(app)
+    from huddle_leagues import init_leagues
+    init_leagues(app)
+
+
+def post_auth_destination():
+    """Resume only a validated local league invite after the session is renewed."""
+    token = session.get('_league_invite')
+    if isinstance(token,str) and re.fullmatch(r'[A-Za-z0-9_-]{43}',token):
+        return url_for('huddle_leagues.join',token=token)
+    return url_for('home')
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -229,10 +239,11 @@ def register():
             try:
                 with db():
                     cursor = db().execute('INSERT INTO members(email,password_hash,newsletter_opt_in,consent_updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP)', (email, generate_password_hash(password), int(request.form.get('newsletter_opt_in') == 'yes')))
+                destination = post_auth_destination()
                 session.clear()
                 session['member_id'] = cursor.lastrowid
                 session.permanent = True
-                return redirect(url_for('home'))
+                return redirect(destination)
             except sqlite3.IntegrityError:
                 error = 'An account with that email already exists. Please log in.'
     return render_template('membership.html', mode='register', error=error), 400 if error else 200
@@ -251,11 +262,12 @@ def login():
         stored = member['password_hash'] if member else current_app.config['MEMBERSHIP_DUMMY_HASH']
         valid = check_password_hash(stored, password[:128])
         if member and valid and len(password) <= 128:
+            destination = post_auth_destination()
             session.clear()
             session['member_id'] = member['id']
             session['member_version'] = member['session_version']
             session.permanent = True
-            return redirect(url_for('home'))
+            return redirect(destination)
         # Count only failed credentials; correct passwords must never exhaust
         # the same-account login limit. IP and email limits still protect failures.
         if not allow_attempt('login', email):

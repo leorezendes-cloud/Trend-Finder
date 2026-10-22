@@ -7,6 +7,7 @@
     <p class="site-profile-panel-status">{{ 'You are signed in' if g.member else 'You are not signed in' }}</p>
     <a href="{{ url_for('membership.preferences') }}">My Profile</a>
     <a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>
+    <a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>
     {% if g.member %}
     <form method="post" action="{{ url_for('membership.logout') }}" class="site-profile-logout">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button>
