@@ -40,6 +40,15 @@
         .dungeon-card {
             min-width: 0;
         }
+        .primetime-matchup-link {
+            color: white;
+            text-decoration: none;
+        }
+
+        .primetime-matchup-link:hover {
+            color: #fbbf24;
+            text-decoration: underline;
+        }
 
         /* Tablets: three narrower, taller cards */
         @media (min-width: 651px) and (max-width: 1100px) {
@@ -433,7 +442,9 @@
         {% for game in view.games %}
         <section class="trend-card compact-card">
             <div class="compact-summary">
-                <strong class="compact-title">{{ game.matchup }}</strong>
+                <a href="/matchup/{{ game.game_id }}" class="primetime-matchup-link">
+                    <strong class="compact-title">{{ game.matchup }}</strong>
+                </a>
                 <p>Week {{ game.week }} • {{ game.gameday }}</p>
                 <span class="compact-spread primetime-underdog">
                     Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}
