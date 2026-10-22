@@ -25,7 +25,7 @@
 <label for="league-share">Share this invitation with your friends</label><input id="league-share" class="league-invitation" value="{{ invitation }}" readonly>
 {% if league.commissioner_id==g.member.id %}<form class="league-rotate" method="post" action="{{ url_for('huddle_leagues.rotate_invitation',league_id=league.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Replace invitation link</button><small>Only the commissioner can replace it. Old links will stop working.</small></form>{% endif %}
 </section>
-<div class="league-filters">{% if weeks %}<form method="get"><input type="hidden" name="season" value="{{ season }}"><label for="league-week">Week</label><select id="league-week" name="week_id">{% for week in weeks %}<option value="{{ week.id }}"{% if week.id==selected %} selected{% endif %}>Week {{ week.week }} · {{ week.stage }}</option>{% endfor %}</select><button type="submit">View week</button></form>{% endif %}</div>
+<div class="league-filters">{% if weeks %}<form method="get"><input type="hidden" name="season" value="{{ season }}"><select id="league-week" name="week_id" aria-label="Week">{% for week in weeks %}<option value="{{ week.id }}"{% if week.id==selected %} selected{% endif %}>Week {{ week.week }} · {{ week.stage }}</option>{% endfor %}</select><button type="submit">View week</button></form>{% endif %}</div>
 <section class="league-panel"><h2>Weekly Standings</h2>{{ table(weekly) }}</section><section class="league-panel"><h2>{{ season }} Season Standings</h2>{{ table(season_rows) }}</section>
 {% endif %}
 </section>
