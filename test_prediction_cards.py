@@ -101,6 +101,40 @@ class PredictionCardTests(unittest.TestCase):
                 self.assertIn('JAX -3', html)
                 self.assertIn('Expert Analysis Coming Soon', self.panel(None))
 
+    def test_member_comparison_replaces_existing_box_above_public_money(self):
+        with app.test_request_context('/'):
+            g.member = {'id': 1}
+            item = self.card()
+            game = dict(self.scout['game'], away_score='', home_score='')
+            pick = dict(id=7, game_id=game['game_id'], away='HOU', home='JAX',
+                lock_at=self.scout['game']['kickoff_utc'], locked=0, void_reason=None,
+                away_spread=3, total=45, su=None, ats=None, ou=None,
+                away_final=None, home_final=None, line_source='Fixture')
+            html = render_template('matchup.html', game=game, prediction_item=item,
+                forecast=None, teams=[], season=2026, week=1, manifest={},
+                inline_picks=[pick], is_final=False, box_score=None,
+                public_market_for_pick=lambda pick: {'markets': [], 'closed': False},
+                csrf_token=lambda: 'fixture-csrf')
+        self.assertEqual(html.count('class="prediction-columns"'), 1)
+        self.assertEqual(html.count('class="prediction-expert-panel"'), 1)
+        self.assertNotIn('matchup-panel matchup-prediction', html)
+        summary = html.index('<section class="matchup-model-summary"')
+        prediction = html.index('<div class="prediction-columns">', summary)
+        expert = html.index('<section class="prediction-expert-panel">', prediction)
+        money = html.index('<h3 class="money-headline">', expert)
+        self.assertLess(summary, prediction)
+        self.assertLess(prediction, expert)
+        self.assertLess(expert, money)
+        self.assertIn('name="csrf_token" value="fixture-csrf"', html)
+        self.assertIn('data-pick-form', html)
+        self.assertIn('name="game_ids" value="7"', html)
+        self.assertIn('Save picks', html)
+        self.assertNotIn('against the saved spread', html)
+        self.assertNotIn('Experimental model estimate', html)
+        self.assertNotIn('See predictions and details', html)
+        self.assertLess(html.index('<details class="expert-quick-analysis">'),
+                        html.index('Read Full Expert Analysis'))
+
     def test_pending_draft_is_not_rendered(self):
         from expert_beta import validate_expert
         draft = report(self.scout)

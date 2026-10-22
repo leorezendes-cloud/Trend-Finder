@@ -207,16 +207,7 @@
 {% if matchup_view %}
 <div class="matchup-insights" aria-label="Saved prediction and public betting snapshot">
   <section class="matchup-model-summary" aria-label="Scout saved prediction">
-    <h3>{{ 'Predicted Picks' if is_final else 'Prediction' }}</h3>
-    {% if forecast %}
-      {% set prediction = forecast.components['Blend'] %}
-      <p><strong>{{ prediction.pick or 'No pick recorded' }}</strong>{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }} against the saved spread{% endif %}</p>
-      <p>Projected winner: {% if prediction.away_margin > 0 %}{{ game.away_team }}{% elif prediction.away_margin < 0 %}{{ game.home_team }}{% else %}Even{% endif %}{% if prediction.away_margin %} by {{ prediction.away_margin|abs|stat }} points{% endif %}.</p>
-      {% if not is_final %}<p>Saved {{ forecast.decision_cutoff_utc|eastern_time }} · Scout 4.0 + The Plug. Experimental model estimate; no calibrated win or cover probability.</p>{% endif %}
-    {% else %}
-      <p>No saved prediction for this matchup yet.</p>
-    {% endif %}
-    <a href="{{ url_for('plug_page') }}#game-{{ game.game_id }}">See predictions and details →</a>
+    {% include '_comparison_prediction.html' %}
   </section>
   <h3 class="money-headline">Public money snapshot</h3>
   <p class="money-snapshot-note">{{ "Final saved pregame snapshot—not live odds." if is_final else "Latest saved snapshot—not live odds." }}</p>
@@ -257,4 +248,11 @@
 {% endif %}
 {% else %}<p>No shared pick sheet is available for this matchup in the current week.</p>{% endif %}
 {% else %}<p><a href="{{ url_for('membership.login') }}">Sign in</a> to make your picks here.</p>{% endif %}
+{% if matchup_view and (not g.member or not inline_picks) %}
+<div class="matchup-insights" aria-label="Saved prediction">
+  <section class="matchup-model-summary" aria-label="Scout saved prediction">
+    {% include '_comparison_prediction.html' %}
+  </section>
+</div>
+{% endif %}
 </section>
