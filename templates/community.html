@@ -20,13 +20,16 @@
         <h1>The Huddle<span class="huddle-period">.</span></h1>
         <p>Football talk, picks, fantasy and anything worth discussing. One conversation, everyone welcome.</p>
       </div>
+      <div class="huddle-header-tools">
+      <div class="huddle-shortcut huddle-soon huddle-leaderboard-compact" aria-label="Leaderboard coming soon"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>Leaderboard</b><small>Coming soon</small></span><span class="huddle-soon-pill">SOON</span></div>
       <div class="huddle-community-status"><strong>{{ total }}</strong><span>{{ ('report' if total == 1 else 'reports') if review else ('comment' if total == 1 else 'comments') }}</span></div>
+      </div>
     </header>
 
     <nav class="huddle-shortcuts" aria-label="Community areas">
       <a class="huddle-shortcut" href="{{ url_for('fans.fantasy') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◈</span><span><b>Fantasy Football</b><small>Stats &amp; PPR</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
-      <a class="huddle-shortcut" href="{{ url_for('member_picks.my_picks') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◎</span><span><b>Member Picks</b><small>Your weekly picks</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
-      <div class="huddle-shortcut huddle-soon" aria-label="Leaderboard coming soon"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>Leaderboard</b><small>Coming soon</small></span><span class="huddle-soon-pill">SOON</span></div>
+      <a class="huddle-shortcut" href="{{ url_for('member_picks.my_picks') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◎</span><span><b>My Picks</b><small>Your weekly picks</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
+      <a class="huddle-shortcut" href="{{ url_for('huddle_leagues.mine') }}"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>My Leagues</b><small>Private Pick’em standings</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
     </nav>
 
     <section class="huddle-panel" aria-labelledby="latest-heading">

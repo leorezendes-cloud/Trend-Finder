@@ -29,7 +29,7 @@ def configure_hosted_app(application):
     def protect_research_data():
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):
             # Public analysis is read-only even though it submits a POST form.
-            if request.endpoint not in ('home', 'trend_finder') and request.blueprint not in ('membership', 'newsletter', 'member_picks', 'community'):
+            if request.endpoint not in ('home', 'trend_finder') and request.blueprint not in ('membership', 'newsletter', 'member_picks', 'community', 'huddle_leagues'):
                 abort(403, description='Data refresh and research editing are available only in the local research app.')
 
     # Reject forbidden mutations before analytics admission, including under load.

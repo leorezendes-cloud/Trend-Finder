@@ -33,6 +33,7 @@ class LeagueTests(unittest.TestCase):
     def make_app(self):
         app = Flask(__name__, instance_path=self.temp.name)
         app.add_url_rule('/', 'home', lambda: 'home')
+        app.add_url_rule('/community', 'community.discussion', lambda: 'The Huddle')
         with patch.dict('os.environ', {'TREND_FINDAH_DATABASE': self.path,
                                      'TREND_FINDAH_SECRET_KEY': 'isolated-test-secret'}):
             init_membership(app)
@@ -249,6 +250,41 @@ class LeagueTests(unittest.TestCase):
             self.post('/huddle/leagues/create', name='Rollback league', categories=['su'])
         with self.connection() as c:
             self.assertEqual(c.execute('SELECT count(*) FROM huddle_leagues').fetchone()[0], 0)
+
+    def test_hosted_create_redirect_join_and_access_controls(self):
+        # Load the real hosting configuration without running module-level site setup.
+        import ast
+        import os
+        from flask import abort, jsonify, request
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        from werkzeug.middleware.shared_data import SharedDataMiddleware
+        tree = ast.parse(Path('wsgi.py').read_text())
+        function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'configure_hosted_app')
+        namespace = dict(os=os, abort=abort, jsonify=jsonify, request=request,
+                         ProxyFix=ProxyFix, SharedDataMiddleware=SharedDataMiddleware)
+        exec(compile(ast.Module(body=[function], type_ignores=[]), 'wsgi.py', 'exec'), namespace)
+        self.app.add_url_rule('/research-write', 'research_write', lambda: 'blocked', methods=['POST'])
+        namespace['configure_hosted_app'](self.app)
+        response = self.client.post('/huddle/leagues/create', data={
+            'csrf_token': 'test-token', 'name': 'Hosted League', 'categories': ['ats']}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Hosted League', response.text)
+        self.assertIn('href="/community">The Huddle</a>', response.text)
+        self.assertEqual(self.client.post('/huddle/leagues/create').status_code, 400)
+        self.assertEqual(self.post('/research-write').status_code, 403)
+        with self.connection() as c:
+            league = c.execute('SELECT * FROM huddle_leagues').fetchone()
+        self.assertEqual(self.join(league).status_code, 303)
+        self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/invitation').status_code, 403)
+
+    def test_create_form_clarity_and_huddle_navigation(self):
+        response = self.client.get('/huddle/leagues/create')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Scoring starts when you join the league.', response.text)
+        self.assertNotIn('Games locked before league creation', response.text)
+        self.assertIn('href="/community">The Huddle</a>', response.text)
+        self.assertEqual(response.text.count('class="league-category"'), 3)
+        self.assertIn("url_for('huddle_leagues.mine')", Path('templates/community.html').read_text())
 
 
 if __name__ == '__main__':
