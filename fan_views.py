@@ -340,10 +340,13 @@ def matchup(game_id):
         candidate = json.loads(path.read_text())
         if candidate.get('game_id') == game_id:
             forecast = candidate
+    from expert_beta import matchup_prediction, private_cache
+    prediction_item = matchup_prediction(game_id)
     from member_picks import comparison_picks
     inline_picks=comparison_picks(game_id=game_id)
-    return render_template('matchup.html', inline_picks=inline_picks, game=game, teams=teams, season=season, week=week,
-                           manifest=manifest, forecast=forecast, is_final=is_final, box_score=box_score)
+    from flask import make_response
+    return private_cache(make_response(render_template('matchup.html', inline_picks=inline_picks, game=game, teams=teams, season=season, week=week,
+                           manifest=manifest, forecast=forecast, prediction_item=prediction_item, is_final=is_final, box_score=box_score)))
 
 
 @bp.get('/fantasy')

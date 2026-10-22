@@ -1,0 +1,21 @@
+{% macro expert_panel(item, comparison=false) %}
+<section class="prediction-expert-panel">
+  <h3>{{ '🤓 Expert Analysis 🤓' if comparison else "🤓 The Expert's Picks 🤓" }}</h3>
+  {% if item and item.expert_picks %}
+    {% set picks = item.expert_picks %}{% set quotes = item.locked_quotes %}
+    <p><strong>ATS:</strong> {{ picks.ats_side or 'No pick' }}{% if picks.ats_side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.ats_side==q.side_a else q.line_b)|float) }}{% endif %}<br>
+    <strong>Over/Under:</strong> {{ picks.total_side or 'No pick' }}{% if picks.total_side and quotes.get('Total') %} {{ '%g'|format(quotes['Total'].line_a|float) }}{% endif %}</p>
+    {% set analysis = (item.assessment or '')|expert_prose(item.scout.sources) %}
+    {% if comparison and analysis|trim %}<p class="expert-panel-summary">{{ analysis|truncate(180) }}</p>{% endif %}
+    <details class="expert-quick-analysis">
+      <summary>The Expert's Quick Analysis</summary>
+      {% if analysis|trim %}<p>{{ analysis }}</p>{% endif %}
+      <a href="{{ item.url }}">Read Full Expert Analysis →</a>
+    </details>
+  {% elif item and item.expert_available and not item.expert_access %}
+    <p class="expert-panel-pending">Premium Expert report · <a href="{{ item.url }}">View access options →</a></p>
+  {% else %}
+    <p class="expert-panel-pending">Expert Analysis Coming Soon</p>
+  {% endif %}
+</section>
+{% endmacro %}

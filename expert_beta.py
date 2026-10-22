@@ -334,6 +334,22 @@ def records_or_fail():
         abort(503, description='Forecast archive needs operator review.')
 
 
+def matchup_prediction(game_id):
+    """Reuse the publication/access gate for the comparison card; never generate."""
+    if not enabled():
+        return None
+    records = [r for r in records_or_fail() if r['scout']['game']['game_id'] == game_id]
+    if not records:
+        return None
+    record = max(records, key=lambda r: (r['generated_at'], r['version']))
+    item = public_record(record)
+    item['locked_quotes'] = record['scout'].get('quotes', {})
+    item['saved_at'] = record['scout']['cutoff_utc']
+    game = record['scout']['game']
+    item['prediction_margin'] = record['scout']['scores'][game['away_team']] - record['scout']['scores'][game['home_team']]
+    return item
+
+
 def dashboard():
     records = records_or_fail()
     from plug_dashboard import weekly_dashboard
