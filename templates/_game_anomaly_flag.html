@@ -1,0 +1,1 @@
+{% if anomalies %}<details class="game-anomaly-flag"><summary aria-label="View saved game anomalies" title="Saved game anomalies">⚑</summary><div class="game-anomaly-links">{% for anomaly in anomalies %}<a href="{{ anomaly.url }}">{{ anomaly.title }}</a>{% endfor %}</div></details>{% endif %}

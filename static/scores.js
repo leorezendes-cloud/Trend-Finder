@@ -78,11 +78,14 @@
         } else results.textContent = 'Saved lines unavailable';
         card.append(teams, status, results);
         const fire = hotTrendControl(game.hot_matches);
-        if (fire) {
+        const flag = game.completed && game.state === 'post' ? window.gameAnomalyFlag(game.anomalies) : null;
+        if (fire || flag) {
           // Keep the flame *outside* the matchup link so taps never conflict.
           const wrapper = document.createElement('div');
           wrapper.className = 'tf-score-wrap';
-          wrapper.append(card, fire);
+          wrapper.append(card);
+          if (fire) wrapper.append(fire);
+          if (flag) wrapper.append(flag);
           list.append(wrapper);
         } else {
           list.append(card);

@@ -97,7 +97,7 @@ def scores():
     # time; waiting visitors must not tie up the health-check thread pool.
     from flask import Response
     from active_trends import qb_source_signature
-    paths = (ROOT/'nfl_games.csv', ROOT/'public_money_snapshots.csv', ROOT/'manual_spread_overrides.csv')
+    paths = (ROOT/'anomaly_events.csv', ROOT/'nfl_games.csv', ROOT/'public_money_snapshots.csv', ROOT/'manual_spread_overrides.csv')
     signature = tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else (str(p), None, None) for p in paths)
     key = (signature, qb_source_signature(ROOT/'nfl_games.csv'),
            datetime.now(ZoneInfo('America/New_York')).date().isoformat())
@@ -174,6 +174,10 @@ def _scores_uncached():
             matches = [g for g in schedule if team_code(g['away_team']) == row['away']
                        and team_code(g['home_team']) == row['home'] and g['gameday'] == datetime.fromisoformat(row['date'].replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York')).date().isoformat()]
             row['url'] = url_for('fans.matchup', game_id=matches[0]['game_id']) if len(matches) == 1 else None
+            row['anomalies'] = []
+            if len(matches) == 1 and row['state'] == 'post' and row.get('completed') is True:
+                from anomaly_badges import saved_anomaly_links
+                row['anomalies'] = saved_anomaly_links(matches[0]['game_id'], ROOT)
             row['market'] = None
             if len(matches) == 1:
                 saved = dict(matches[0])

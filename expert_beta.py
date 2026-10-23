@@ -413,6 +413,8 @@ def expert_api(season, week, matchup):
 
 
 def init_app(app):
+    from anomaly_badges import saved_anomaly_links
+    app.jinja_env.globals["saved_anomaly_links"] = saved_anomaly_links
     hosted = os.environ.get('TREND_FINDAH_ENV') == 'production' and os.environ.get('TREND_FINDAH_AUTO_UPDATE') == '1'
     enabled = os.environ.get('TREND_FINDAH_EXPERT_BETA', '1' if hosted else '0') == '1'
     app.config.setdefault('EXPERT_BETA_ENABLED', enabled)

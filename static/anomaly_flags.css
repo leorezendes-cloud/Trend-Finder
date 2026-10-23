@@ -1,0 +1,13 @@
+.game-anomaly-flag {position:relative;display:inline-block;z-index:4;text-align:left;-webkit-text-stroke:0}
+.game-anomaly-flag[open] {z-index:40}
+.game-anomaly-flag > summary {display:block;list-style:none;cursor:pointer;color:#fbbf24;background:#222c38;border:1px solid #b38a32;border-radius:6px;padding:2px 8px;font:24px/1.25 Arial,sans-serif;-webkit-text-stroke:0}
+.game-anomaly-flag > summary::-webkit-details-marker {display:none}
+.game-anomaly-flag > summary:hover,.game-anomaly-flag > summary:focus-visible {box-shadow:0 0 8px #fbbf2466;outline:1px solid #fbbf24}
+.game-anomaly-links {position:absolute;right:0;top:100%;width:min(240px,calc(100vw - 40px));box-sizing:border-box;padding:10px;background:#151e2b;border:1px solid #b38a32;border-radius:8px;box-shadow:0 8px 20px #0009}
+.game-anomaly-links a {display:block;color:#fbbf24;font:13px/1.5 Arial,sans-serif;overflow-wrap:anywhere;text-decoration:underline;-webkit-text-stroke:0}
+.game-anomaly-links a + a {margin-top:8px}
+.tf-score-wrap > .game-anomaly-flag {position:absolute;right:8px;bottom:7px}
+.tf-score-wrap:has(.game-anomaly-flag[open]) {z-index:40}
+.plug-anomaly-slot {text-align:right}
+.plug-anomaly-slot:empty {display:none}
+[id^="anomaly-"] {scroll-margin-top:24px}

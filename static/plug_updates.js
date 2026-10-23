@@ -14,6 +14,11 @@
       if (!data.stale) for (const card of document.querySelectorAll('.expert-grid > .expert-card')) {
         const day = new Date(card.dataset.kickoff).toISOString().slice(0,10);
         const game = data.games.find(g => g.away === card.dataset.away && g.home === card.dataset.home && new Date(g.date).toISOString().slice(0,10) === day);
+        const slot = card.querySelector('.plug-anomaly-slot');
+        if (slot && game && game.completed && game.state === 'post') {
+          const flag = window.gameAnomalyFlag(game.anomalies);
+          if (flag && !slot.querySelector('details[open]')) slot.replaceChildren(flag);
+        }
         if (game && game.state !== 'pre' && !card.querySelector('.plug-final-score')) {
           const score = card.querySelector('.plug-live-score');
           if (score) {

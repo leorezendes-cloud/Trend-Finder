@@ -37,3 +37,5 @@
 .plug-grade-win { color:#86efac; }
 .plug-grade-loss { color:#fca5a5; }
 .plug-grade-push { color:#fbbf24; }
+
+.expert-score.plug-completed-projection { font-size:.9rem; font-weight:400; color:#cbd5e1; margin:8px 0; }

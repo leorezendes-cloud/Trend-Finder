@@ -7,6 +7,7 @@
         {{ g.away_team }} @ {{ g.home_team }}
     </a>
 </h2>
+<div class="plug-anomaly-slot">{% if item.final_score %}{% set anomalies=saved_anomaly_links('%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)) %}{% include '_game_anomaly_flag.html' %}{% endif %}</div>
 {% if item.final_score %}
 <div class="plug-final-score" aria-label="Final score">
   <span class="plug-final-label">FINAL</span>
@@ -14,7 +15,7 @@
 </div>
 {% endif %}
 {% if item.pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
-{% if item.show_scores %}<p class="expert-score">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
+{% if item.show_scores %}<p class="expert-score{% if item.final_score %} plug-completed-projection{% endif %}">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
 <p class="{{ 'plug-upcoming-picks' if item.upcoming else '' }}">The Plug ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>The Plug total: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>
 {% endif %}
 <section class="plug-market-context">

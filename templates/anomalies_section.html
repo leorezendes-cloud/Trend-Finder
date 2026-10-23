@@ -68,7 +68,7 @@
     </section>
     {% endfor %}
     {% for event in view.anomalies.events %}
-    <section class="trend-card" data-game-anomaly="{{ event.title }}">
+    <section class="trend-card" id="anomaly-{{ event.event_id }}" data-game-anomaly="{{ event.title }}">
         <span class="anomaly-type">{{ event.title|upper }}</span>
         <strong class="compact-title">{{ event.matchup or event.title }}</strong>
         <p>{{ event.event_date }} • {{ event.status }}{% if event.matchup %} • {{ event.matchup }}{% endif %}</p>
