@@ -136,8 +136,12 @@ def _scores_uncached():
                 query=f'?dates={current[0]}&seasontype=2&week={current[1]}' if current else ''
                 req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'+query,
                               headers={'User-Agent': 'TrendFindah/1.0'})
-                with urlopen(req, timeout=2) as response:
-                    payload = json.loads(response.read(2_000_000))
+                from hosted_memory import analytics_network_wait
+                with analytics_network_wait():
+                    with urlopen(req, timeout=2) as response:
+                        raw_payload = response.read(2_000_000)
+                payload = json.loads(raw_payload)
+                del raw_payload
                 if not isinstance(payload, dict) or not isinstance(payload.get('events'), list):
                     raise ValueError('Invalid scoreboard')
                 _score_cache.update(games=parse_scores(payload),

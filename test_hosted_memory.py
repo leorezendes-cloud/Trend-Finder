@@ -202,3 +202,93 @@ class HomeCacheTests(unittest.TestCase):
             self.assertEqual(running.result(timeout=2), 200)
         self.assertEqual(app.test_client().get('/').status_code, 200)
         self.assertEqual(len(calls), 1)
+
+
+class ScoreNetworkAdmissionTests(unittest.TestCase):
+    def test_network_wait_allows_plug_but_parsing_waits_for_gate(self):
+        from hosted_memory import analytics_network_wait
+        app = Flask(__name__)
+        downloading, download_done = threading.Event(), threading.Event()
+        plug_entered, plug_done, parsed = threading.Event(), threading.Event(), threading.Event()
+        @app.get('/scores')
+        def scores():
+            with analytics_network_wait():
+                downloading.set()
+                download_done.wait(4)
+            parsed.set()
+            return 'scores'
+        @app.get('/plug')
+        def plug():
+            plug_entered.set()
+            plug_done.wait(4)
+            return 'plug'
+        install_memory_gate(app)
+        def get(path):
+            with app.test_client() as client:
+                return client.get(path).status_code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            score_request = pool.submit(get,'/scores')
+            try:
+                self.assertTrue(downloading.wait(1))
+                plug_request = pool.submit(get,'/plug')
+                self.assertTrue(plug_entered.wait(1))
+                download_done.set()
+                self.assertFalse(parsed.wait(.1))
+                plug_done.set()
+                self.assertEqual(plug_request.result(timeout=2),200)
+                self.assertEqual(score_request.result(timeout=2),200)
+                self.assertTrue(parsed.is_set())
+            finally:
+                download_done.set(); plug_done.set()
+        self.assertEqual(app.test_client().get('/plug').status_code,200)
+
+    def test_reacquisition_timeout_skips_parsing_and_does_not_overrelease(self):
+        from hosted_memory import analytics_network_wait
+        app = Flask(__name__)
+        downloading, download_done, plug_entered, plug_done = (threading.Event() for _ in range(4))
+        parsed = []
+        @app.get('/scores')
+        def scores():
+            with analytics_network_wait():
+                downloading.set(); download_done.wait(4)
+            parsed.append(True)
+            return 'scores'
+        @app.get('/plug')
+        def plug():
+            plug_entered.set(); plug_done.wait(4)
+            return 'plug'
+        install_memory_gate(app)
+        def get(path):
+            with app.test_client() as client:
+                return client.get(path).status_code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            score_request=pool.submit(get,'/scores')
+            try:
+                self.assertTrue(downloading.wait(1))
+                plug_request=pool.submit(get,'/plug')
+                self.assertTrue(plug_entered.wait(1))
+                download_done.set()
+                self.assertEqual(score_request.result(timeout=2),503)
+                self.assertEqual(parsed,[])
+            finally:
+                download_done.set(); plug_done.set()
+            self.assertEqual(plug_request.result(timeout=2),200)
+        self.assertEqual(app.test_client().get('/plug').status_code,200)
+
+    def test_network_failure_releases_gate_and_local_mode_needs_no_gate(self):
+        from hosted_memory import analytics_network_wait
+        app=Flask(__name__)
+        app.config['TESTING']=True
+        @app.get('/scores')
+        def scores():
+            with analytics_network_wait():
+                raise OSError('mock feed timeout')
+        @app.get('/fine')
+        def fine(): return 'ok'
+        install_memory_gate(app)
+        with app.test_client() as client:
+            with self.assertRaises(OSError):
+                client.get('/scores')
+            self.assertEqual(client.get('/fine').status_code,200)
+        with analytics_network_wait():
+            pass

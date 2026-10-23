@@ -1,4 +1,5 @@
 """Bound simultaneous public analytics allocations on the 512 MiB host."""
+from contextlib import contextmanager
 from threading import BoundedSemaphore
 from time import monotonic
 
@@ -15,11 +16,29 @@ def home_context(builder):
     return context
 
 
+@contextmanager
+def analytics_network_wait():
+    """Release analytics admission for bounded I/O, then reacquire before parsing."""
+    from flask import abort, current_app, g, has_request_context
+    gate = current_app.extensions.get('hosted_analytics_gate') if has_request_context() else None
+    held = gate is not None and g.pop('hosted_analytics_gate', False)
+    if held:
+        gate.release()
+    try:
+        yield
+    finally:
+        if held:
+            if not gate.acquire(timeout=1):
+                abort(503, description='Analytics are busy. Retry the score refresh shortly.')
+            g.hosted_analytics_gate = True
+
+
 def install_memory_gate(application):
     if application.config.get('HOSTED_MEMORY_GATE'):
         return
     from flask import g, request
     gate = BoundedSemaphore(1)
+    application.extensions['hosted_analytics_gate'] = gate
     application.config['HOSTED_MEMORY_GATE'] = True
 
     @application.before_request
