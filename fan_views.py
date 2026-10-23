@@ -446,9 +446,56 @@ def prediction_performance(records, schedule):
     return list(groups.values()), sorted(graded,key=lambda r:r['date'],reverse=True)[:10], excluded
 
 
+def combine_prediction_groups(groups):
+    """A weekly scoreboard is one card; preserve configuration cohorts for audit."""
+    result = {}
+    for market in ('ats', 'totals'):
+        counts = {status: sum(group[market].get(status, 0) for group in groups)
+                  for status in ('Win', 'Loss', 'Push', 'Pending', 'No Call',
+                                 'Unavailable', 'Review needed')}
+        counts['decisions'] = counts['Win'] + counts['Loss']
+        counts['rate'] = 100 * counts['Win'] / counts['decisions'] if counts['decisions'] else None
+        result[market] = counts
+    return result
+
+
 @bp.get('/predictions/results')
 def prediction_results():
+    from flask import request
+    from site_week import active_week
     records = [json.loads(p.read_text()) for p in (ROOT / 'data/scout4/blend/predictions').glob('*.json')]
-    groups, recent, excluded = prediction_performance(records, effective_rows(read_csv(ROOT / 'nfl_games.csv'),ROOT/'nfl_games.csv'))
-    return render_template('prediction_results.html', groups=groups, recent=recent,
+    path = ROOT / 'nfl_games.csv'
+    original_schedule = read_csv(path)
+    schedule = effective_rows(original_schedule, path)
+    saved_weeks = set()
+    for record in records:
+        try:
+            season, week = int(record['season']), int(record['week'])
+            if 1 <= week <= 18:
+                saved_weeks.add((season, week))
+        except (KeyError, TypeError, ValueError):
+            continue
+    current = active_week(original_schedule)
+    if saved_weeks:
+        season = current[0] if current and any(year == current[0] for year, _ in saved_weeks) else max(year for year, _ in saved_weeks)
+        weeks = sorted(week for year, week in saved_weeks if year == season)
+        default_week = current[1] if current and current[0] == season and current[1] in weeks else weeks[-1]
+    else:
+        season, weeks, default_week = (current[0] if current else None), [], None
+    selection = request.args.get('week')
+    if selection is not None:
+        try:
+            selected_week = int(selection)
+        except (TypeError, ValueError):
+            abort(400, description='Invalid week.')
+        if selected_week not in weeks:
+            abort(400, description='No saved predictions for that week.')
+    else:
+        selected_week = default_week
+    selected_records = [r for r in records if str(r.get('season')) == str(season)
+                        and str(r.get('week')) == str(selected_week)] if selected_week is not None else []
+    groups, recent, excluded = prediction_performance(selected_records, schedule)
+    return render_template('prediction_results.html', groups=groups,
+                           summary=combine_prediction_groups(groups), recent=recent,
+                           season=season, weeks=weeks, selected_week=selected_week,
                            excluded=excluded, freshness=data_freshness())

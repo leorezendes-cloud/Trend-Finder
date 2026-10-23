@@ -13,6 +13,7 @@
 </head>
 <body>
      {% include '_site_navigation.html' %}
+<main class="weekly-results-main">
 
 <h1>🏈 Weekly Game Results 🚂</h1>
 <p class="weekly-results-note">See final scores and individual matchup outcomes for the selected week, including saved Plug picks. For prediction accuracy and win–loss–push records by model, visit <a href="{{ url_for('fans.prediction_results') }}">The Plug’s Record</a>.</p>
@@ -135,5 +136,6 @@
 {% endif %}
 
 </details>
+</main>
 </body>
 </html>

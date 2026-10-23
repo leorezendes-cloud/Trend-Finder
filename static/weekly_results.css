@@ -14,3 +14,14 @@ form.weekly-results-selector { align-items:center; }
 .weekly-results-selector label { margin:0; line-height:36px; }
 
 .dog-ats-record { white-space: nowrap; }
+
+/* Match the dark, shadowed content containers used by other pages. */
+html body > main.weekly-results-main {
+    max-width: 1400px;
+    margin: 20px auto 40px;
+    background: rgba(7, 12, 20, .86);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .45);
+}
+@media (max-width: 650px) {
+    html body > main.weekly-results-main {margin: 10px auto 24px;}
+}

@@ -340,3 +340,21 @@
 /* Keep source-note links readable on the shared dark theme. */
 .stats-note a { color: #fbbf24; }
 .stats-note summary { font-weight: 700; cursor: pointer; }
+
+/* One consolidated weekly record with a compact week picker. */
+.scout4 .prediction-week-selector {
+    display: flex; align-items: end; justify-content: center; gap: 12px;
+    margin: 16px 0 20px; flex-wrap: wrap;
+}
+.scout4 .prediction-week-selector label {min-width: 0; color: #f1f5f9;}
+.scout4 .prediction-week-selector select {min-width: 130px;}
+.scout4 .prediction-week-selector button {width: auto;}
+.scout4 .prediction-week-record {padding: 18px 20px;}
+.scout4 .prediction-week-record h2 {margin: 0 0 14px;}
+.scout4 .prediction-week-description {color: #cbd5e1;}
+.scout4 .prediction-version-details {margin: 18px 0 4px; border-top: 1px solid #475569; padding-top: 12px;}
+.scout4 .prediction-version-details summary {padding: 8px 0; color: #fbbf24;}
+@media (max-width: 600px) {
+    .scout4 .prediction-week-selector {align-items: stretch;}
+    .scout4 .prediction-week-selector select {flex: 1;}
+}
