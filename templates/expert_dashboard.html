@@ -19,7 +19,12 @@
 {% endif %}
 <section class="plug-market-context">
 
-    {% include '_plug_line_movement.html' %}
+    {% if item.line_movement and item.line_movement.original_line != item.line_movement.latest_line %}
+    <details class="plug-line-update">
+        <summary>Line update</summary>
+        {% include '_plug_line_movement.html' %}
+    </details>
+    {% endif %}
 
     {% if item.market %}
     <details class="plug-public-market">
