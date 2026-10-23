@@ -90,7 +90,10 @@ def home():
     from fan_views import data_freshness
     from active_trends import load_highlights
     from emerging_alerts import home_dog_alert
-    return render_template("home.html", active_highlights=load_highlights(),freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent))
+    from hosted_memory import home_context
+    context = home_context(lambda: dict(active_highlights=load_highlights(),
+        freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent)))
+    return render_template("home.html", **context)
 
 
 @app.route('/hot-trends')

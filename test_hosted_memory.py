@@ -111,3 +111,94 @@ class HostedMemoryTests(unittest.TestCase):
             finally:
                 release.set()
             self.assertEqual(first.result(timeout=2), 200)
+
+
+class HomeCacheTests(unittest.TestCase):
+    def make_app(self):
+        from flask import request, session, redirect
+        from hosted_memory import home_context
+        app = Flask(__name__)
+        app.secret_key = 'isolated-cache-tests'
+        calls = []
+        entered, release = threading.Event(), threading.Event()
+
+        def build():
+            calls.append(True)
+            return {'title': 'Public trends'}
+
+        @app.route('/', methods=['GET', 'HEAD', 'POST'], endpoint='home')
+        def home():
+            if request.method == 'HEAD':
+                return '', 200
+            if request.method == 'POST':
+                return redirect('/research', 307)
+            context = home_context(build)
+            return context['title'] + ':' + session.get('viewer', 'guest')
+
+        @app.get('/plug', endpoint='plug_page')
+        def plug():
+            entered.set()
+            release.wait(5)
+            return 'Plug'
+
+        install_memory_gate(app)
+        return app, calls, entered, release
+
+    def test_fresh_and_stale_home_data_remain_available_during_plug(self):
+        for stale in (False, True):
+            with self.subTest(stale=stale):
+                app, calls, entered, release = self.make_app()
+                client = app.test_client()
+                self.assertEqual(client.get('/').status_code, 200)
+                if stale:
+                    app.extensions['hosted_home_context'] = (0, app.extensions['hosted_home_context'][1])
+                def plug():
+                    with app.test_client() as other:
+                        return other.get('/plug').status_code
+                with ThreadPoolExecutor(max_workers=2) as pool:
+                    running = pool.submit(plug)
+                    try:
+                        self.assertTrue(entered.wait(2))
+                        response = client.get('/')
+                        self.assertEqual(response.status_code, 200)
+                        self.assertIn(b'Public trends', response.data)
+                        self.assertEqual(len(calls), 1)
+                        self.assertEqual(client.head('/').status_code, 200)
+                        self.assertEqual(client.post('/').status_code, 307)
+                    finally:
+                        release.set()
+                    self.assertEqual(running.result(timeout=2), 200)
+
+    def test_cache_does_not_share_member_rendering_and_refreshes_when_free(self):
+        app, calls, _, _ = self.make_app()
+        first, second = app.test_client(), app.test_client()
+        with first.session_transaction() as session:
+            session['viewer'] = 'first-member'
+        with second.session_transaction() as session:
+            session['viewer'] = 'second-member'
+        self.assertEqual(first.get('/').data, b'Public trends:first-member')
+        self.assertEqual(second.get('/').data, b'Public trends:second-member')
+        self.assertEqual(app.test_client().get('/').data, b'Public trends:guest')
+        self.assertEqual(len(calls), 1)
+        app.extensions['hosted_home_context'] = (0, app.extensions['hosted_home_context'][1])
+        self.assertEqual(second.get('/').status_code, 200)
+        self.assertEqual(len(calls), 2)
+
+    def test_cold_home_does_not_bypass_memory_guard(self):
+        app, calls, entered, release = self.make_app()
+        def plug():
+            with app.test_client() as client:
+                return client.get('/plug').status_code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            running = pool.submit(plug)
+            try:
+                self.assertTrue(entered.wait(2))
+                response = app.test_client().get('/')
+                self.assertEqual(response.status_code, 503)
+                self.assertEqual(response.headers['Retry-After'], '1')
+                self.assertEqual(calls, [])
+            finally:
+                release.set()
+            self.assertEqual(running.result(timeout=2), 200)
+        self.assertEqual(app.test_client().get('/').status_code, 200)
+        self.assertEqual(len(calls), 1)
