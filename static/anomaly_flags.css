@@ -24,6 +24,8 @@
 
 /* Research badges are siblings of the game disclosure, avoiding nested toggles. */
 .tf-research-game-wrap {position:relative;min-width:0}
-html body .tf-research-game-wrap:has(> .game-anomaly-flag) > .tf-compact-game > summary {padding-right:52px}
-.tf-research-game-wrap > .game-anomaly-flag {position:absolute;top:7px;right:7px}
+html body .tf-research-game-wrap > .tf-compact-game > summary {grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr) 12px}
+html body .tf-research-game-wrap .tf-game-score {grid-column:3;justify-self:end}
+html body .tf-research-game-wrap > .tf-compact-game > summary::after {grid-column:4}
+.tf-research-game-wrap > .game-anomaly-flag {position:absolute;top:7px;left:calc(50% - 10px);right:auto;transform:translateX(-50%)}
 .tf-research-game-wrap:has(> .game-anomaly-flag[open]) {z-index:45}
