@@ -43,6 +43,18 @@ class AnomalyBadgeTests(unittest.TestCase):
             html=render_template('_game_anomaly_flag.html',anomalies=self.links())
         self.assertIn('&lt;Saved event&gt;',html);self.assertNotIn('<Saved event>',html)
         self.assertNotIn(' open',html)
+    def test_research_games_link_exact_event_without_nested_summary(self):
+        self.app.jinja_env.globals['saved_anomaly_links'] = lambda game: saved_anomaly_links(game,self.root)
+        game=dict(game_id='2026_07_NE_CHI',away_team='NE',home_team='CHI',away_score=24,home_score=30,spread=None,total=None,dog_side='',location='',game_type='REG')
+        self.app.add_url_rule('/matchup/<game_id>', 'fans.matchup', lambda game_id: '')
+        with self.app.test_request_context():
+            html=render_template('_general_games.html',games=[game],total=1,preview=True)
+            self.assertIn('#anomaly-abc',html)
+            self.assertGreater(html.index('class="game-anomaly-flag"'),html.index('</details>'))
+            game['game_id']='2026_08_NE_CHI'
+            html=render_template('_general_games.html',games=[game],total=1,preview=True)
+            self.assertNotIn('class="game-anomaly-flag"',html)
+
     def test_missing_file_safe(self):
         (self.root/'anomaly_events.csv').unlink();self.assertEqual([],self.links())
     def test_completed_guards_and_safe_dom(self):

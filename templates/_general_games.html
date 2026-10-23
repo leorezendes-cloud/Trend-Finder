@@ -1,10 +1,13 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='anomaly_flags.css') }}">
+<script src="{{ url_for('static',filename='anomaly_flags.js') }}" defer></script>
 {# Compact game disclosures shared by General Research, previews and pagination. #}
 <link rel="stylesheet" href="{{ url_for('static',filename='trend_games.css') }}">
 <p class="tf-games-context">{{ total }} matching games{% if evidence_metric %} · {{ evidence_metric }}{% endif %}</p>
 <p class="tf-games-context">{% if preview %}Showing {{ games|length }} of {{ total }} games, newest first.{% else %}Page {{ page }} of {{ pages }} · Up to 100 matchups per page.{% endif %}</p>
 <div class="tf-compact-games" aria-label="Matching NFL games">
 {% for game in games %}
-  <details class="tf-compact-game">
+  <div class="tf-research-game-wrap">
+<details class="tf-compact-game">
     <summary>
       <span class="tf-game-title">{{ game.away_team }} @ {{ game.home_team }}</span>
       <strong class="tf-game-score">{{ '%g'|format(game.away_score) }}–{{ '%g'|format(game.home_score) }}</strong>
@@ -22,6 +25,8 @@
       <p class="tf-game-full-link"><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">Full game breakdown →</a></p>
     </div>
   </details>
+{% with anomalies=saved_anomaly_links(game.game_id) %}{% include '_game_anomaly_flag.html' %}{% endwith %}
+</div>
 {% else %}<p class="tf-games-context">No completed games match these filters.</p>{% endfor %}
 </div>
 {% if preview and total>10 %}<p class="tf-games-pager"><a href="{{ all_games_url }}">All Games Involved →</a></p>{% endif %}

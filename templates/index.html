@@ -10,6 +10,8 @@
 {% include '_branding_head.html' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='underdog_research.css') }}">
 <link rel="stylesheet" href="{{ url_for('static',filename='trend_games.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='anomaly_flags.css') }}">
+<script src="{{ url_for('static',filename='anomaly_flags.js') }}" defer></script>
 </head>
 <body class="underdog-research">
 
@@ -306,7 +308,8 @@
                 <summary style="cursor: pointer; font-weight: bold;">{{ group.games|length }} {% if is_primetime is sameas true %}primetime {% elif is_primetime is sameas false %}non-primetime {% endif %}games from {{ group.year }}</summary>
 <div class="tf-compact-games" aria-label="{{ group.year }} matching underdog games">
     {% for game in group.games %}
-    <details class="tf-compact-game">
+    <div class="tf-research-game-wrap">
+<details class="tf-compact-game">
       <summary>
         <span class="tf-game-title">{{ game.away_team }} @ {{ game.home_team }}</span>
         <strong class="tf-game-score">{{ game.away_score }}–{{ game.home_score }}</strong>
@@ -324,6 +327,8 @@
         {% endif %}
       </div>
     </details>
+{% with anomalies=saved_anomaly_links(game.game_id) %}{% include '_game_anomaly_flag.html' %}{% endwith %}
+</div>
     {% endfor %}
 </div>
             </details>
