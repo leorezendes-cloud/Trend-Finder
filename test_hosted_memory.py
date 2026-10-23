@@ -292,3 +292,70 @@ class ScoreNetworkAdmissionTests(unittest.TestCase):
             self.assertEqual(client.get('/fine').status_code,200)
         with analytics_network_wait():
             pass
+
+
+class NavigationLoadingTests(unittest.TestCase):
+    def test_html_navigation_gets_private_loading_page_without_template_work(self):
+        app=Flask(__name__)
+        entered,release=threading.Event(),threading.Event()
+        @app.get('/',endpoint='home')
+        def home(): return 'home'
+        @app.get('/slow')
+        def slow():
+            entered.set(); release.wait(8)
+            return 'heavy'
+        @app.get('/research')
+        def research(): return 'results'
+        @app.context_processor
+        def expensive_context():
+            self.fail('Loading page ran expensive template processors')
+        install_memory_gate(app)
+        def heavy():
+            with app.test_client() as client:return client.get('/slow').status_code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            running=pool.submit(heavy)
+            try:
+                self.assertTrue(entered.wait(1))
+                response=app.test_client().get('/research?window=5&private=do-not-echo',headers={'Accept':'text/html'})
+                self.assertEqual(response.status_code,503)
+                self.assertEqual(response.mimetype,'text/html')
+                self.assertIn(b'Loading your page',response.data)
+                self.assertNotIn(b'This report is busy',response.data)
+                self.assertNotIn(b'do-not-echo',response.data)
+                self.assertIn(b'analytics_loading.js',response.data)
+                self.assertEqual(response.headers['Retry-After'],'2')
+                self.assertIn('no-store',response.headers['Cache-Control'])
+                self.assertIn('noindex',response.headers['X-Robots-Tag'])
+            finally:release.set()
+            self.assertEqual(running.result(timeout=2),200)
+        self.assertEqual(app.test_client().get('/research',headers={'Accept':'text/html'}).data,b'results')
+
+    def test_api_download_and_post_requests_do_not_get_navigation_retries(self):
+        app=Flask(__name__)
+        entered,release=threading.Event(),threading.Event()
+        @app.get('/slow')
+        def slow():
+            entered.set();release.wait(12)
+            return 'heavy'
+        @app.route('/research',methods=['GET','POST'])
+        def research():return 'results'
+        @app.get('/api/research')
+        def api():return 'json'
+        install_memory_gate(app)
+        def heavy():
+            with app.test_client() as client:return client.get('/slow').status_code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            running=pool.submit(heavy)
+            try:
+                self.assertTrue(entered.wait(1))
+                client=app.test_client()
+                for path,headers,method in [('/research',{'Accept':'application/json'},'GET'),
+                        ('/api/research',{'Accept':'text/html'},'GET'),
+                        ('/research?download=1',{'Accept':'text/html'},'GET'),
+                        ('/research',{'Accept':'text/html'},'POST')]:
+                    response=client.open(path,headers=headers,method=method)
+                    self.assertEqual(response.status_code,503)
+                    self.assertEqual(response.headers['Retry-After'],'1')
+                    self.assertNotIn(b'analytics_loading.js',response.data)
+            finally:release.set()
+            self.assertEqual(running.result(timeout=2),200)

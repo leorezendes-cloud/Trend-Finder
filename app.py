@@ -812,19 +812,8 @@ def trend_details():
         streak=streak
     )
 
-@app.route("/sunday")
-def sunday_page():
-    
-    window = request.args.get("window", "all")
-
-    if window not in ("1", "3", "5", "10", "all"):
-        window = "all"
-
-    start_year = (
-        1999 if window == "all"
-        else 2026 - int(window)
-    )
-
+def _build_historical_matchups(window, archive):
+    start_year = 1999 if window == 'all' else 2026 - int(window)
     current = scan_basic_trends(season="2026")
 
     historical = scan_basic_trends(
@@ -832,7 +821,6 @@ def sunday_page():
     )
 
     comparisons = compare_trends(current, historical)
-    archive=request.args.get('view')=='archive'
     from site_views import public_matchups
     if archive:
         games=scan_sunday_matchups(comparisons);pending=[]
@@ -904,6 +892,19 @@ def sunday_page():
         game['rank'] = rank
         game['tied'] = scores.count(score) > 1
         previous_score = score
+
+    return dict(games=games,pending=pending,selected_window=window,start_year=start_year,archive=archive,
+        slate_labels=sorted({f"{parts[0]} Week {int(parts[1])}" for game in games+pending
+            if game.get('game_id') and len(parts:=game['game_id'].split('_'))>=2
+            and parts[0].isdigit() and parts[1].isdigit()}))
+
+
+@app.route("/sunday")
+def sunday_page():
+    from historical_window_cache import request_key, window_context
+    window, archive = request_key()
+    context = window_context(lambda: _build_historical_matchups(window,archive))
+    games = context['games']
     if request.args.get("download") == "1":
 
         output = StringIO()
@@ -953,15 +954,7 @@ def sunday_page():
             }
         )
 
-    return render_template(
-        'sunday.html',
-        games=games,
-        selected_window=window,
-        start_year=start_year, archive=archive, pending=pending,
-        slate_labels=sorted({f"{parts[0]} Week {int(parts[1])}" for game in games+pending
-            if game.get('game_id') and len(parts:=game['game_id'].split('_'))>=2
-            and parts[0].isdigit() and parts[1].isdigit()})
-        )
+    return render_template('sunday.html', **context)
 
 @app.route("/sunday-results")
 def sunday_results_page():

@@ -50,6 +50,7 @@ class HistoricalMatchupTests(unittest.TestCase):
         cls.temp.cleanup()
 
     def setUp(self):
+        self.app.extensions.pop('historical_window_cache', None)
         self.client = self.app.test_client()
         self.history = [dict(location='Away',primetime=False,spread='0.5-3',sample=100,ci_low=51.2,ats_rate=61.0)]
         def game(gid, away, home, location='Away'):
@@ -146,6 +147,18 @@ class HistoricalMatchupTests(unittest.TestCase):
         self.assertIn("url_for('plug_page')",home)
         self.assertIn('Upcoming spreads &amp; totals',home)
         self.assertNotIn("url_for('market_page')",home)
+
+    def test_cached_html_and_csv_are_identical_without_recalculating(self):
+        with patch('historical_window_cache.time',return_value=61):
+            first=self.client.get('/sunday?window=5')
+            export=self.client.get('/sunday?window=5&download=1')
+            with patch.object(self.module,'scan_basic_trends',side_effect=AssertionError('Recomputed cached window')):
+                second=self.client.get('/sunday?window=5')
+                cached_export=self.client.get('/sunday?window=5&download=1')
+        self.assertEqual(first.data,second.data)
+        def records(response):
+            return [{k:v for k,v in row.items() if k!='recorded_at'} for row in csv.DictReader(io.StringIO(response.text))]
+        self.assertEqual(records(export),records(cached_export))
 
 
 if __name__ == '__main__':
