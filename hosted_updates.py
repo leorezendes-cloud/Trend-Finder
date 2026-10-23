@@ -325,6 +325,7 @@ def run_leader(root, stop):
         return run_worker('hosted_updates.py', ['--once'], timeout=600)
 
     jobs = (
+        ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
         ('automatic-weekly-lines', weekly, 30),
@@ -333,7 +334,7 @@ def run_leader(root, stop):
     threads = []
     try:
         for name, action, interval in jobs:
-            timeout = 900 if name == 'expert-only-updates' else 1500 if name == 'automatic-data-updates' else 180
+            timeout = 480 if name == 'game-day-stats' else 900 if name == 'expert-only-updates' else 1500 if name == 'automatic-data-updates' else 180
             def scheduled(name=name, action=action, interval=interval, timeout=timeout):
                 def execute():
                     scheduler_event(root, name, 'attempt')

@@ -91,7 +91,7 @@ class FeedMemoryTests(unittest.TestCase):
         with patch('nflreadpy.config.update_config') as config, patch('scout4.collect.collect') as collect:
             update_feed_worker.run('stats', Path('/offline'), 2026)
         config.assert_called_once_with(cache_mode=CacheMode.OFF)
-        collect.assert_called_once_with(2026, Path('/offline/data/scout4'))
+        collect.assert_called_once_with(2026, Path('/offline/data/scout4'), reuse_unchanged=True)
 
     def test_orphan_stalled_feed_deadline_releases_inherited_lock(self):
         import fcntl

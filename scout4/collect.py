@@ -13,7 +13,7 @@ from .stats import TEAM_METRICS, PLAYER_METRICS
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def collect(season, outdir):
+def collect(season, outdir, reuse_unchanged=False):
     import nflreadpy as nfl
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     folder = outdir / str(season) / stamp
@@ -51,6 +51,31 @@ def collect(season, outdir):
     manifest['retrieved_at'] = datetime.now(timezone.utc).isoformat()
     (folder / 'manifest.json').write_text(json.dumps(manifest, indent=2))
     pointer = outdir / str(season) / 'latest.json'
+    if reuse_unchanged and pointer.exists():
+        # Reuse only a verified identical snapshot; retain original provenance.
+        try:
+            previous = json.loads(pointer.read_text())
+            identical = True
+            for kind in ('team', 'player'):
+                old = previous['files'][kind]
+                new = manifest['files'][kind]
+                original = (outdir/old['path']).resolve()
+                if not original.is_relative_to(outdir.resolve()):
+                    identical = False
+                    break
+                with original.open('rb') as source:
+                    digest = hashlib.file_digest(source, 'sha256').hexdigest()
+                if (old['sha256'] != new['sha256'] or digest != new['sha256']
+                        or old['rows'] != new['rows']
+                        or old.get('missing_metrics') != new.get('missing_metrics')):
+                    identical = False
+                    break
+            if identical:
+                import shutil
+                shutil.rmtree(folder)
+                return previous
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
     temp = pointer.with_suffix('.tmp')
     temp.write_text(json.dumps(manifest, indent=2))
     temp.replace(pointer)

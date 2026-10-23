@@ -27,7 +27,7 @@ def run(kind, root, season):
             raise RuntimeError('Finals refresh failed')
     elif kind == 'stats':
         from scout4.collect import collect
-        collect(season, root/'data/scout4')
+        collect(season, root/'data/scout4', reuse_unchanged=True)
     elif kind == 'context':
         from scout4.context_model import refresh_sources
         refresh_sources(season, root)
