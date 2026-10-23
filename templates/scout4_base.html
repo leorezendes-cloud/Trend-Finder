@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% if seo and seo.title %}{{ seo.title }}{% else %}{% block title %}{% endblock %} | Gravy Train{% endif %}</title>
+<title>{% if seo and seo.title %}{{ seo.title }}{% else %}{% block title %}{% endblock %} | Trend Findah{% endif %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='scout4.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
 <link rel="stylesheet" href="{{ url_for('static',filename='member_picks.css') }}"><script src="{{ url_for('static',filename='member_picks.js') }}" defer></script></head>
 <body class="scout4"><main>
-<header><p class="eyebrow">THE PLUG · GRAVY TRAIN</p><h1>{% block heading %}{% endblock %}</h1>
+<header><p class="eyebrow">THE PLUG · TREND FINDAH</p><h1>{% block heading %}{% endblock %}</h1>
 {% include '_site_navigation.html' %}
 {% block intro %}<p>Explore what happened, compare matchups, and see how much evidence supports each number.</p>{% endblock %}</header>
 {% block filter_form %}<form method="get" class="stats-filters">
