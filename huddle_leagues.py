@@ -138,6 +138,10 @@ def league_seasons(connection, league):
 
 @bp.get('/')
 def mine():
+    # Standings are read-only, but the shared My Picks grader must first ingest
+    # newly verified finals. Otherwise leagues lag until someone opens My Picks.
+    from member_picks import sync_results
+    sync_results()
     leagues = db().execute('''SELECT l.* FROM huddle_leagues l JOIN huddle_league_members m
         ON m.league_id=l.id WHERE m.member_id=? ORDER BY l.created_at DESC,l.id DESC''',
         (g.member['id'],)).fetchall()
@@ -250,6 +254,10 @@ def rotate_invitation(league_id):
 @bp.get('/<int:league_id>')
 def view(league_id):
     league = member_league(league_id)
+    # Only synchronize after verifying league membership. The existing grader
+    # is idempotent and uses the original frozen sheet and confirmed finals.
+    from member_picks import sync_results
+    sync_results()
     connection = db()
     connection.execute('BEGIN')  # Both standings tables see one consistent read snapshot.
     try:

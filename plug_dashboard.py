@@ -1,5 +1,6 @@
 """Read-only combined forecast cards; original models and archived lines stay intact."""
 import csv
+import math
 from pathlib import Path
 from flask import url_for
 from expert_beta import instant
@@ -12,6 +13,76 @@ ROOT = Path(__file__).resolve().parent
 def legacy_records():
     from scout4.blend import view
     return view()
+
+
+def _completed_games(root):
+    """Read exact-game finals without touching frozen forecasts or grades."""
+    path = root / 'nfl_games.csv'
+    if not path.exists():
+        return {}
+    from score_finals import public_final_rows
+    with path.open(newline='', encoding='utf-8-sig') as stream:
+        rows = public_final_rows(list(csv.DictReader(stream)), path)
+    found = {}
+    for row in rows:
+        try:
+            away, home = (float(row[key]) for key in ('away_score', 'home_score'))
+            margin = float(row['result'])
+            if (not all(math.isfinite(v) and v >= 0 for v in (away, home))
+                    or not away.is_integer() or not home.is_integer()
+                    or abs(margin - (home-away)) > 1e-8):
+                continue
+            game_id = row['game_id']
+            if (game_id in found or row.get('away_team') != game_id.split('_')[-2]
+                    or row.get('home_team') != game_id.split('_')[-1]):
+                found.pop(game_id, None)
+                continue
+            found[game_id] = (int(away), int(home))
+        except (KeyError, ValueError, TypeError, IndexError):
+            continue
+    return found
+
+
+def _grade_selection(side, quote, away, home, *, spread):
+    """Results use the immutable quoted line, never the current live market."""
+    if not side or not quote:
+        return None
+    try:
+        if spread:
+            if side not in (quote['side_a'], quote['side_b']):
+                return None
+            line = float(quote['line_a'] if side == quote['side_a'] else quote['line_b'])
+            edge = (away-home if side == quote['side_a'] else home-away) + line
+        else:
+            if side not in ('Over', 'Under'):
+                return None
+            line = float(quote['line_a'])
+            edge = (away + home - line) * (1 if side == 'Over' else -1)
+        if not math.isfinite(edge):
+            return None
+    except (KeyError, TypeError, ValueError):
+        return None
+    return 'Push' if abs(edge) < 1e-8 else ('Win' if edge > 0 else 'Loss')
+
+
+def _attach_final(item, scores):
+    if scores is None:
+        return
+    away, home = scores
+    item['final_score'] = {'away': away, 'home': home}
+    quotes = item.get('locked_quotes') or {}
+    picks = item.get('saved_picks') or {}
+    expert = item.get('expert_picks') or {}
+    item['completed_grades'] = {
+        'scout_ats': _grade_selection((picks.get('spread') or {}).get('side'),
+            quotes.get('Spread'), away, home, spread=True),
+        'scout_total': _grade_selection((picks.get('total') or {}).get('side'),
+            quotes.get('Total'), away, home, spread=False),
+        'expert_ats': _grade_selection(expert.get('ats_side'),
+            quotes.get('Spread'), away, home, spread=True),
+        'expert_total': _grade_selection(expert.get('total_side'),
+            quotes.get('Total'), away, home, spread=False),
+    }
 
 
 def combined_cards(records, render_record, now):
@@ -66,8 +137,14 @@ def combined_cards(records, render_record, now):
         with path.open(newline='',encoding='utf-8-sig') as source:
             market_rows=[r for r in csv.DictReader(source) if r.get('game_id') in wanted and r.get('market') in ('Moneyline','Spread','Total')]
 
+    # Score records are imported or confirmed by the existing ESPN overlay.
+    # An unconfirmed/live score must never be graded.
+    completed = _completed_games(ROOT) if any(
+        instant(item['scout']['game']['kickoff_utc']) <= now
+        for item in items.values()) else {}
     for item in items.values():
         game = item['scout']['game']
+        _attach_final(item, completed.get(game['game_id']))
         future = instant(game['kickoff_utc']) > now
         item['upcoming'] = future
         item['market'] = None

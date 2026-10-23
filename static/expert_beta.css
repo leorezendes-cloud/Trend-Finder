@@ -22,3 +22,18 @@
     text-decoration: underline;
     -webkit-text-stroke: 1px white;
 }
+/* Completed Plug cards: visible finals, original projections, and locked grades. */
+.expert-shell .expert-card h2 { text-align:left; margin:6px 0 12px; }
+.expert-shell .expert-card h2 .matchup-comparison-link { display:inline; padding:0; border:0; outline:0; box-shadow:none; text-decoration:underline; text-underline-offset:3px; -webkit-text-stroke:0; }
+.expert-shell .expert-card h2 .matchup-comparison-link:hover { color:#fbbf24; -webkit-text-stroke:0; }
+.expert-shell .expert-card h2 .matchup-comparison-link:focus-visible { outline:2px solid #fbbf24; outline-offset:4px; }
+.plug-final-score { padding:13px 14px; background:#101c2a; border:1px solid #47637e; border-radius:10px; margin:12px 0; }
+.plug-final-label { color:#86efac; font-size:.8rem; font-weight:800; letter-spacing:.08em; }
+.plug-final-teams { display:flex; gap:16px; justify-content:space-between; flex-wrap:wrap; font-weight:700; margin-top:4px; }
+.plug-final-teams strong { font-size:1.35rem; font-variant-numeric:tabular-nums; }
+.plug-final-grades { border-top:1px solid #475569; margin:14px 0 12px; padding-top:10px; }
+.plug-final-grades p { display:flex; flex-wrap:wrap; gap:9px 12px; align-items:center; margin:8px 0; font-size:.88rem; }
+.plug-final-grades p>strong { margin-right:auto; }
+.plug-grade-win { color:#86efac; }
+.plug-grade-loss { color:#fca5a5; }
+.plug-grade-push { color:#fbbf24; }

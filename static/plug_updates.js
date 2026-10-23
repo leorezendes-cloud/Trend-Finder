@@ -14,7 +14,13 @@
       if (!data.stale) for (const card of document.querySelectorAll('.expert-grid > .expert-card')) {
         const day = new Date(card.dataset.kickoff).toISOString().slice(0,10);
         const game = data.games.find(g => g.away === card.dataset.away && g.home === card.dataset.home && new Date(g.date).toISOString().slice(0,10) === day);
-        if (game && game.state !== 'pre') card.querySelector('.plug-live-score').textContent = `${game.away} ${game.away_score ?? '—'} · ${game.home} ${game.home_score ?? '—'} · ${game.status}`;
+        if (game && game.state !== 'pre' && !card.querySelector('.plug-final-score')) {
+          const score = card.querySelector('.plug-live-score');
+          if (score) {
+            score.hidden = false;
+            score.textContent = `${game.away} ${game.away_score ?? '—'} · ${game.home} ${game.home_score ?? '—'} · ${game.completed && game.state === 'post' ? 'FINAL' : game.status}`;
+          }
+        }
       }
       if (Date.now() - marketChecked >= 60000) {
         const page = await fetch(location.href, {cache:'no-store', signal:AbortSignal.timeout(10000)});
