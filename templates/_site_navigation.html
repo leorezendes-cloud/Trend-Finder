@@ -52,7 +52,7 @@
 </nav>
 {% elif plug_section %}
 <nav class="section-navigation" aria-label="The Plug navigation">
-    <a href="{{ url_for('plug_page') }}"{% if request.endpoint in ['plug_page','sunday_scout.sunday_scout_page'] %} aria-current="page"{% endif %}>Matchup Analysis</a><a href="{{ url_for('market_page') }}"{% if request.endpoint=='market_page' %} aria-current="page"{% endif %}>Spreads &amp; Totals</a>
+    <a href="{{ url_for('plug_page') }}"{% if request.endpoint in ['plug_page','sunday_scout.sunday_scout_page'] %} aria-current="page"{% endif %}>Matchup Analysis</a><a href="{{ url_for('plug_page') }}">Spreads &amp; Totals</a>
     <a href="{{ url_for('scout4.teams_page') }}">Team Stats</a>
     <a href="{{ url_for('scout4.players_page') }}">Player Stats</a>
     <a href="{{ url_for('scout4.ratings_page') }}">Team Ratings</a>
@@ -61,7 +61,7 @@
 </nav>
 {% elif request.endpoint in ['home', 'sunday_page', 'sunday_results_page'] %}
 <nav class="section-navigation" aria-label="Home navigation">
-    <a href="{{ url_for('sunday_page') }}">Upcoming Matchups</a>
+    <a href="{{ url_for('sunday_page') }}">Historical Matchup Trends</a>
     <a href="{{ url_for('sunday_results_page') }}">Weekly Game Results</a>
 </nav>
 {% endif %}

@@ -168,3 +168,9 @@ html body .site-profile-panel .site-profile-logout {margin:0;padding:0;border:0;
 .site-header:has(> .site-profile-dropdown) {gap:12px}
 .site-header:has(> .site-profile-dropdown) > .site-brand {margin:0 auto;min-width:0;flex:1}
 @media(max-width:600px){.site-profile-dropdown > summary.site-profile {min-width:72px;padding:8px}.site-profile-panel {left:0}}
+
+/* Consistent gold feedback for both versions of The Plug's action buttons. */
+.scout-actions a{transition:border-color .18s,box-shadow .18s,background-color .18s}
+.scout-actions a:hover,.scout-actions a:focus-visible{border-color:#fbbf24;background-color:#283448;box-shadow:0 0 0 1px rgba(251,191,36,.3),0 0 16px rgba(251,191,36,.3)}
+.scout-actions a:focus-visible{outline:2px solid #fbbf24;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.scout-actions a{transition:none}}

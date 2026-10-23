@@ -836,6 +836,12 @@ def sunday_page():
     from site_views import public_matchups
     if archive:
         games=scan_sunday_matchups(comparisons);pending=[]
+        # Resolve archived cards through authoritative schedule IDs, never guessed IDs.
+        with Path(game_file).open(newline='') as source:
+            archive_ids = {(row['gameday'],row['away_team'],row['home_team']):row['game_id']
+                           for row in csv.DictReader(source)}
+        for game in games:
+            game['game_id'] = archive_ids.get((game.get('gameday'),game['away_team'],game['home_team']))
     else:
         games,pending=public_matchups(comparisons,Path(__file__).resolve().parent)
 
@@ -951,7 +957,10 @@ def sunday_page():
         'sunday.html',
         games=games,
         selected_window=window,
-        start_year=start_year, archive=archive, pending=pending
+        start_year=start_year, archive=archive, pending=pending,
+        slate_labels=sorted({f"{parts[0]} Week {int(parts[1])}" for game in games+pending
+            if game.get('game_id') and len(parts:=game['game_id'].split('_'))>=2
+            and parts[0].isdigit() and parts[1].isdigit()})
         )
 
 @app.route("/sunday-results")
@@ -1035,8 +1044,8 @@ def conspiracy_dungeon_page():
 
 @app.get('/market')
 def market_page():
-    from market_views import market_games
-    return render_template('market.html',games=market_games(Path(__file__).resolve().parent))
+    # Keep existing bookmarks working without a duplicate spreads-and-totals page.
+    return redirect(url_for('plug_page'), code=302)
 
 @app.context_processor
 def site_week_context():

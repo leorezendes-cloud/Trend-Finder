@@ -45,8 +45,8 @@ class WeeklyMatchupTests(unittest.TestCase):
                 self.assertIn('entering Week',response.text)
                 self.assertNotIn('Score / status',response.text)
 
-    def test_market_keeps_cards_in_a_dedicated_grid(self):
+    def test_market_redirects_to_the_plug(self):
         from app import app
         response=app.test_client().get('/market')
-        self.assertEqual(response.status_code,200)
-        self.assertIn('class="market-grid"',response.text)
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response.location,'/the-plug')
