@@ -2,7 +2,7 @@
 window.gameAnomalyFlag = function (events) {
   if (!Array.isArray(events)) return null;
   const links = events.filter(e => e && typeof e.title === 'string' && e.title.trim() &&
-    typeof e.url === 'string' && e.url.startsWith('/') && !e.url.startsWith('//') && !/[\\\r\n]/.test(e.url));
+    typeof e.url === 'string' && e.url.startsWith('/') && !e.url.startsWith('//') && !e.url.includes('\\') && !e.url.includes('\r') && !e.url.includes('\n'));
   if (!links.length) return null;
   const flag = document.createElement('details');
   flag.className = 'game-anomaly-flag';

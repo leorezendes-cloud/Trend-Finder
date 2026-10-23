@@ -5,8 +5,11 @@
 {% block intro %}<p>{% if is_final %}Explore what happened, compare matchups, and see how much evidence supports each number.{% else %}Compare the teams, explore key matchups, and see the statistics behind each comparison.{% endif %}</p>{% endblock %}
 {% block filter_form %}{% endblock %}
 {% block data_notes %}{% endblock %}
-{% block content %}<link rel="stylesheet" href="{{ url_for('static',filename='prediction_cards.css') }}">
+<!-- Saved anomaly flags -->
+{% block content %}{% set anomalies=saved_anomaly_links(game.game_id) if is_final else [] %}<link rel="stylesheet" href="{{ url_for('static',filename='prediction_cards.css') }}">
 {% include '_inline_picks.html' %}
+<link rel="stylesheet" href="{{ url_for('static',filename='anomaly_flags.css') }}">
+<script src="{{ url_for('static',filename='anomaly_flags.js') }}" defer></script>
 <style>
 .matchup-final-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
 .matchup-final-head h2{margin:0}
@@ -34,7 +37,7 @@
 <section class="stats-card matchup-panel matchup-final">
   <div class="matchup-final-head">
     <h2>Final Game Stats</h2>
-    <div class="matchup-final-score">{{ game.away_team }} {{ game.away_score }} – {{ game.home_team }} {{ game.home_score }} <small>FINAL</small></div>
+    <div class="matchup-final-score">{{ game.away_team }} {{ game.away_score }} – {{ game.home_team }} {{ game.home_score }} <small>FINAL</small> {% include '_game_anomaly_flag.html' %}</div>
   </div>
   <details class="matchup-boxscore">
     <summary>View game stats &amp; top performers</summary>

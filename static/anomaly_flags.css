@@ -11,3 +11,13 @@
 .plug-anomaly-slot {text-align:right}
 .plug-anomaly-slot:empty {display:none}
 [id^="anomaly-"] {scroll-margin-top:24px}
+
+/* Keep completed scores together and use the freed right edge for the flag. */
+.expert-shell .plug-final-score {display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:center}
+.expert-shell .plug-final-label {grid-column:1}
+.expert-shell .plug-final-teams {grid-column:1;justify-content:flex-start;gap:12px}
+.expert-shell .plug-final-score .plug-anomaly-slot {grid-column:2;grid-row:1 / 3}
+.expert-shell .game-anomaly-flag {margin:0}
+.expert-shell .game-anomaly-flag > summary {padding:2px 8px}
+.matchup-final-score .game-anomaly-flag {margin-left:10px;vertical-align:middle}
+.prediction-heading .game-anomaly-flag {margin-left:auto}
