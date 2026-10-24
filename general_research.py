@@ -13,10 +13,31 @@ from trend_filter_groups import GROUP_OPTIONS, matches_group
 SPREADS = {'':'All spreads', 'pickem':'Pick’em', 'short':'Up to 3 points', 'medium':'Over 3 through 7 points', 'large':'Over 7 through 10 points', 'double':'Over 10 points'}
 
 
+def normalize_spread_selection(value):
+    value = str(value).strip()
+    if value in SPREADS:
+        return value
+    for key, label in SPREADS.items():
+        if value.casefold() == label.casefold():
+            return key
+    try:
+        number = abs(float(value))
+    except (TypeError, ValueError):
+        raise ValueError('Choose a spread range or enter an exact spread.') from None
+    if not math.isfinite(number) or number % 0.5:
+        raise ValueError('Enter an exact spread in half-point steps.')
+    return f'{number:g}'
+
+
+def spread_label(value):
+    return SPREADS[value] if value in SPREADS else f'Exactly {value} points'
+
+
 def spread_matches(value, band):
     if not band:return True
     if value is None:return False
     value=abs(value)
+    if band not in SPREADS:return value==float(band)
     return {'pickem':value==0,'short':0<value<=3,'medium':3<value<=7,'large':7<value<=10,'double':value>10}[band]
 
 
@@ -57,7 +78,8 @@ def result_streak(results):
 
 def research_games(rows, *, season=None, filters=None, team='', role='all', primetime='', location='', spread_size='', primetime_nights=()):
     if role not in ROLES or primetime not in ('','yes','no'):raise ValueError('Invalid research role or time')
-    if location not in ('','home','away') or spread_size not in SPREADS:raise ValueError('Invalid location or spread band')
+    spread_size=normalize_spread_selection(spread_size)
+    if location not in ('','home','away'):raise ValueError('Invalid location')
     records={key:counter(label) for key,label in [('home','Home teams'),('away','Away teams'),('favorite','Favorites'),('underdog','Underdogs')]}
     qb=(filters or {}).get('qb_name')
     if qb:records['qb']=counter(qb+' — '+(location.title() if location else 'All games'))
@@ -229,7 +251,10 @@ def render_general(form, games_page=False):
     years=sorted({int(g['season']) for g in rows},reverse=True)
     teams=sorted({g[key] for g in rows for key in ('away_team','home_team') if g.get(key)})
     location=form.get('research_location','');spread_size=form.get('spread_size','')
-    if location not in ('','home','away') or spread_size not in SPREADS:abort(400,description='Choose a valid location and spread range.')
+    try:spread_size=normalize_spread_selection(spread_size)
+    except ValueError as error:abort(400,description=str(error))
+    form['spread_size']=spread_size
+    if location not in ('','home','away'):abort(400,description='Choose a valid location.')
     role=form.get('research_role','all');team=form.get('research_team','');prime=form.get('primetime','')
     if role not in ROLES or team and team not in teams or prime not in ('','yes','no'):abort(400,description='Choose a valid team, role and time filter.')
     mode=form.get('season_mode','single')
@@ -301,7 +326,7 @@ def render_general(form, games_page=False):
     if location:chip('Location: '+location.title(),('research_location',))
     if prime:chip('Primetime' if prime=='yes' else 'Non-primetime',('primetime','primetime_nights') if form.get('primetime_nights') else ('primetime',))
     if form.get('primetime_nights'):chip('Nights: '+', '.join(dict(NIGHT_OPTIONS)[key] for key in form['primetime_nights'].split(',')),('primetime_nights',))
-    if spread_size:chip('Spread: '+SPREADS[spread_size],('spread_size',))
+    if spread_size:chip('Spread: '+spread_label(spread_size),('spread_size',))
     labels={'game_type':'Season stage','gametime':'Kickoff','temp':'Temperature','wind':'Wind','qb_name':'QB'}
     stages={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl'}
     for field,value in filters.items():

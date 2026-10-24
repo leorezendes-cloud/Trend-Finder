@@ -112,6 +112,32 @@ class GeneralResearchTests(unittest.TestCase):
             self.assertTrue(set(trend['conditions']).issubset(CSV_FILTER_FIELDS))
         self.assertEqual(find_combinations(rows[:9]),[])
 
+    def test_typed_spread_matches_exact_size_and_preserves_ranges(self):
+        from general_research import normalize_spread_selection, SPREADS
+        rows=[game('home',spread_line='-3.5'),game('away',spread_line='3.5'),
+              game('other',spread_line='4'),game('zero',spread_line='0'),game('missing',spread_line='')]
+        for entry in ('3.5','+3.5','-3.5'):
+            self.assertEqual({g['game_id'] for g in research_games(rows,spread_size=entry)['matches']},{'home','away'})
+        self.assertEqual(research_games(rows,spread_size='0')['games'],1)
+        for key,label in SPREADS.items():
+            self.assertEqual(normalize_spread_selection(label),key)
+        for invalid in ('bad','nan','inf','3.25'):
+            with self.assertRaises(ValueError):research_games(rows,spread_size=invalid)
+
+    def test_editable_spread_field_has_only_six_range_suggestions(self):
+        client=app.test_client()
+        query='/trend-finder?research_view=general&run=analyze&season=2025&spread_size='
+        response=client.get(query+'3.5')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('Spread: Exactly 3.5 points',response.text)
+        self.assertIn('list="spread-options"',response.text)
+        choices=response.text.split('<datalist id="spread-options">',1)[1].split('</datalist>',1)[0]
+        self.assertEqual(choices.count('<option '),6)
+        self.assertIn('value="3.5"',response.text)
+        from urllib.parse import quote
+        self.assertEqual(client.get(query+quote('Over 3 through 7 points')).status_code,200)
+        self.assertEqual(client.get(query+'nan').status_code,400)
+
     def test_location_and_spread_work_independently_of_team(self):
         rows=[game('home_dog',spread_line='-3',gametime='20:15'),
               game('away_dog',spread_line='3',gametime='20:15'),
