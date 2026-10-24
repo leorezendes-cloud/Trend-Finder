@@ -357,5 +357,120 @@ class LeagueTests(unittest.TestCase):
             self.assertIn(f'<dt>{label}</dt><dd>0</dd>', response.text)
 
 
+    def test_commissioner_remove_requires_authorization_csrf_and_confirmation(self):
+        league = self.create()
+        self.join(league, 2)
+        target = f'/huddle/leagues/{league["id"]}/members/2/remove'
+        self.assertEqual(self.post(target, confirm_remove='yes').status_code, 403)
+        self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/leave', confirm_leave='yes').status_code, 303)
+        # Rejoin after voluntary departure. An invitation does not become a ban.
+        self.join(league, 2)
+        self.login(1)
+        self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/members/1/remove', confirm_remove='yes').status_code, 403)
+        self.assertEqual(self.post(target).status_code, 400)
+        self.assertEqual(self.client.post(target, data={'confirm_remove':'yes'}).status_code, 400)
+        self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/members/99/remove',confirm_remove='yes').status_code,404)
+        self.assertEqual(self.post(target,confirm_remove='yes').status_code,303)
+        self.assertEqual(self.post(target,confirm_remove='yes').status_code,404)
+        with self.connection() as c:
+            row = c.execute('''SELECT exit_reason,left_at FROM huddle_league_member_periods
+                WHERE league_id=? AND member_id=2 ORDER BY id DESC LIMIT 1''',(league['id'],)).fetchone()
+            self.assertEqual(row['exit_reason'],'removed')
+            self.assertIsNotNone(row['left_at'])
+
+    def test_departure_preserves_old_week_without_future_points_or_picks_changes(self):
+        league = self.create()
+        self.join(league,2)
+        self.login(1)
+        wid, gid = self.seed(league)
+        with self.connection() as c:
+            before = [tuple(row) for row in c.execute('SELECT * FROM member_picks ORDER BY member_id,game_id')]
+        with patch('huddle_leagues.now_utc',return_value=datetime(2026,10,4,tzinfo=timezone.utc)):
+            self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/members/2/remove',confirm_remove='yes').status_code,303)
+        self.assertEqual([row['member_id'] for row in self.scores(league)], [1])
+        older = {row['member_id']:row for row in self.scores(league,wid)}
+        self.assertEqual(older[2]['points'],3)
+        with self.connection() as c:
+            self.assertEqual(before,[tuple(row) for row in c.execute('SELECT * FROM member_picks ORDER BY member_id,game_id')])
+        self.login(2)
+        self.assertEqual(self.client.get(f'/huddle/leagues/{league["id"]}').status_code,404)
+        self.assertNotIn('Friends League',self.client.get('/huddle/leagues/').text)
+
+    def test_leave_and_rejoin_creates_new_period_without_gap_backfill(self):
+        league = self.create()
+        self.join(league,2)
+        self.login(1)
+        first_week, _ = self.seed(league)
+        self.login(2)
+        with patch('huddle_leagues.now_utc',return_value=datetime(2026,10,4,tzinfo=timezone.utc)):
+            self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/leave').status_code,400)
+            self.assertEqual(self.post(f'/huddle/leagues/{league["id"]}/leave',confirm_leave='yes').status_code,303)
+        self.assertEqual(self.client.get(f'/huddle/leagues/{league["id"]}').status_code,404)
+        # Pick a game during the gap, then again after rejoining.
+        self.login(1)
+        _, gap_id = self.seed(league,week=6,lock='2026-10-04T12:00:00+00:00')
+        _, later_id = self.seed(league,week=7,lock='2026-10-06T12:00:00+00:00')
+        with self.connection() as c:
+            c.execute('UPDATE pick_games SET result_at=? WHERE id=?',('2026-10-05T00:00:00+00:00',gap_id))
+            c.execute('UPDATE pick_games SET result_at=? WHERE id=?',('2026-10-07T00:00:00+00:00',later_id))
+        with patch('huddle_leagues.now_utc',return_value=datetime(2026,10,5,tzinfo=timezone.utc)):
+            self.join(league,2)
+        with self.connection() as c:
+            periods = c.execute('''SELECT joined_at,left_at FROM huddle_league_member_periods
+                WHERE league_id=? AND member_id=2 ORDER BY id''',(league['id'],)).fetchall()
+            self.assertEqual(len(periods),2)
+            self.assertIsNotNone(periods[0]['left_at'])
+            self.assertIsNone(periods[1]['left_at'])
+        self.assertEqual({r['member_id']:r['points'] for r in self.scores(league)}[2],6)
+        self.assertEqual({r['member_id']:r['points'] for r in self.scores(league,first_week)}[2],3)
+        self.assertEqual({r['member_id']:r['points'] for r in self.scores(league)}[1],9)
+
+    def test_member_controls_are_escaped_and_present_only_for_correct_role(self):
+        league = self.create()
+        self.join(league,2)
+        self.login(1)
+        with self.connection() as c:
+            c.execute('CREATE TABLE community_profiles(member_id INTEGER PRIMARY KEY,display_name TEXT)')
+            c.execute("INSERT INTO community_profiles VALUES(2,'<script>alert(1)</script>')")
+        response = self.client.get(f'/huddle/leagues/{league["id"]}')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('Manage league members',response.text)
+        self.assertIn('&lt;script&gt;alert(1)&lt;/script&gt;',response.text)
+        self.assertNotIn('<script>alert(1)</script>',response.text)
+        self.assertIn('confirm_remove',response.text)
+        self.login(2)
+        response = self.client.get(f'/huddle/leagues/{league["id"]}')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('Leave this league',response.text)
+        self.assertNotIn('confirm_remove',response.text)
+        self.assertNotIn('private1@example.com',response.text)
+
+    def test_member_removal_does_not_affect_other_leagues_or_account(self):
+        first, second = self.create(), self.create()
+        self.join(first,2)
+        self.join(second,2)
+        self.login(1)
+        self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/members/2/remove',
+                                   confirm_remove='yes').status_code,303)
+        with self.connection() as c:
+            self.assertEqual(c.execute('SELECT COUNT(*) FROM members WHERE id=2').fetchone()[0],1)
+            self.assertEqual(c.execute('SELECT COUNT(*) FROM huddle_league_members WHERE member_id=2').fetchone()[0],1)
+        self.login(2)
+        self.assertEqual(self.client.get(f'/huddle/leagues/{first["id"]}').status_code,404)
+        self.assertEqual(self.client.get(f'/huddle/leagues/{second["id"]}').status_code,200)
+
+    def test_period_migration_idempotent(self):
+        league = self.create()
+        self.join(league,2)
+        with self.connection() as c:
+            old = [(row['member_id'],row['joined_at'],row['left_at']) for row in c.execute('''SELECT member_id,joined_at,left_at FROM huddle_league_member_periods
+                WHERE league_id=? ORDER BY id''',(league['id'],))]
+        self.make_app()
+        with self.connection() as c:
+            new = [(row['member_id'],row['joined_at'],row['left_at']) for row in c.execute('''SELECT member_id,joined_at,left_at FROM huddle_league_member_periods
+                WHERE league_id=? ORDER BY id''',(league['id'],))]
+            self.assertEqual(old,new)
+            self.assertEqual(c.execute('PRAGMA user_version').fetchone()[0],4)
+
 if __name__ == '__main__':
     unittest.main()

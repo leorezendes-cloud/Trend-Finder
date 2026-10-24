@@ -49,6 +49,35 @@
 </section>
 <div class="league-filters">{% if weeks %}<form method="get"><input type="hidden" name="season" value="{{ season }}"><select id="league-week" name="week_id" aria-label="Week">{% for week in weeks %}<option value="{{ week.id }}"{% if week.id==selected %} selected{% endif %}>Week {{ week.week }} · {{ week.stage }}</option>{% endfor %}</select><button type="submit">View week</button></form>{% endif %}</div>
 <section class="league-panel"><h2>Weekly Standings</h2>{{ table(weekly) }}</section><section class="league-panel"><h2>{{ season }} Season Standings</h2>{{ table(season_rows) }}</section>
+<section class="league-panel league-member-management">
+{% if league.commissioner_id==g.member.id %}
+<details><summary>Manage league members ({{ season_rows|length }})</summary>
+<p>Removing a member stops their future league points. Previous weeks retain their historical results. This does not affect their account, My Picks, or other leagues.</p>
+{% for member in season_rows if member.member_id != g.member.id %}
+<div class="league-manage-member">
+<strong>{{ member.name }}</strong>
+<details><summary>Remove member</summary>
+<form method="post" action="{{ url_for('huddle_leagues.remove_member',league_id=league.id,member_id=member.member_id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label class="league-confirm"><input type="checkbox" name="confirm_remove" value="yes" required> Confirm removal of {{ member.name }}</label>
+<button type="submit">Remove {{ member.name }}</button>
+</form>
+</details>
+</div>
+{% else %}<p>There are no other active members to manage.</p>{% endfor %}
+<p>If needed, use “Replace invitation link” above to invalidate previous invitations.</p>
+</details>
+{% else %}
+<details><summary>Leave this league</summary>
+<p>You will no longer appear in active standings. Your previous graded weeks remain in league history.</p>
+<form method="post" action="{{ url_for('huddle_leagues.leave',league_id=league.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label class="league-confirm"><input type="checkbox" name="confirm_leave" value="yes" required> Confirm I want to leave {{ league.name }}</label>
+<button type="submit">Leave League</button>
+</form>
+</details>
+{% endif %}
+</section>
 {% endif %}
 </section>
 {% endblock %}

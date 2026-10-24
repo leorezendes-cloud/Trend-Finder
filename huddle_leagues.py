@@ -35,6 +35,26 @@ def init_leagues(app):
                 PRIMARY KEY(league_id,member_id))''')
             db().execute('''CREATE INDEX IF NOT EXISTS huddle_league_member_lookup
                             ON huddle_league_members(member_id,league_id)''')
+            # Append-only participation windows preserve history across departure
+            # and later rejoining. Do not alter existing membership/pick schemas.
+            db().execute('''CREATE TABLE IF NOT EXISTS huddle_league_member_periods (
+                id INTEGER PRIMARY KEY,
+                league_id INTEGER NOT NULL REFERENCES huddle_leagues(id),
+                member_id INTEGER NOT NULL REFERENCES members(id),
+                joined_at TEXT NOT NULL, left_at TEXT,
+                exit_reason TEXT CHECK(exit_reason IN ('left','removed') OR exit_reason IS NULL))''')
+            db().execute('''CREATE UNIQUE INDEX IF NOT EXISTS huddle_league_open_period
+                ON huddle_league_member_periods(league_id,member_id)
+                WHERE left_at IS NULL''')
+            # Migrate existing members once. Restart-safe; no user_version change.
+            db().execute('''INSERT INTO huddle_league_member_periods
+                (league_id,member_id,joined_at)
+                SELECT m.league_id,m.member_id,m.joined_at
+                FROM huddle_league_members m
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM huddle_league_member_periods p
+                    WHERE p.league_id=m.league_id AND p.member_id=m.member_id
+                    AND p.left_at IS NULL)''')
     app.register_blueprint(bp)
 
     @app.before_request
@@ -68,23 +88,32 @@ def member_league(league_id):
 
 
 def selections(connection, league, season, week_id=None):
-    """Phase 1 source adapter; optional Phase 2 overrides can be resolved here."""
+    """Existing shared picks, scoped to actual periods of league membership."""
     if league['pick_source'] != 'my_picks':
         raise ValueError('Unsupported league selection source')
-    query = '''SELECT p.*,game.lock_at,game.kickoff_at,game.void_reason,
+    # The active membership timestamp remains authoritative for legacy writes
+    # and timestamp-boundary tests. Closed periods retain their own timestamps.
+    joined = 'COALESCE(active_entry.joined_at,entry.joined_at)'
+    query = f'''SELECT p.*,game.lock_at,game.kickoff_at,game.void_reason,
         game.away_final,game.home_final,game.result_at
-        FROM huddle_league_members entry
+        FROM huddle_league_member_periods entry
+        LEFT JOIN huddle_league_members active_entry
+            ON active_entry.league_id=entry.league_id
+            AND active_entry.member_id=entry.member_id AND entry.left_at IS NULL
         JOIN member_picks p ON p.member_id=entry.member_id
         JOIN pick_games game ON game.id=p.game_id
         JOIN pick_weeks week ON week.id=game.week_id
         WHERE entry.league_id=? AND week.season=? AND week.published_at IS NOT NULL
-        AND julianday(game.lock_at)>julianday(entry.joined_at)
+        AND julianday(game.lock_at)>julianday({joined})
         AND julianday(game.lock_at)>julianday(?)
-        AND julianday(game.kickoff_at)>julianday(entry.joined_at)
+        AND julianday(game.kickoff_at)>julianday({joined})
         AND julianday(game.kickoff_at)>julianday(?)
         AND (game.result_at IS NULL OR
-             (julianday(game.result_at)>julianday(entry.joined_at)
-              AND julianday(game.result_at)>julianday(?)))'''
+             (julianday(game.result_at)>julianday({joined})
+              AND julianday(game.result_at)>julianday(?)))
+        AND (entry.left_at IS NULL OR (
+             julianday(game.lock_at)<julianday(entry.left_at)
+             AND julianday(game.kickoff_at)<julianday(entry.left_at)))'''
     params = [league['id'],season,league['created_at'],league['created_at'],league['created_at']]
     if week_id is not None:
         query += ' AND week.id=?'
@@ -101,9 +130,22 @@ def standings(connection, league, season, week_id=None, now=None):
     members = connection.execute(f'''SELECT entry.member_id,{name} display_name
         FROM huddle_league_members entry {profiles} WHERE entry.league_id=?
         ORDER BY entry.member_id''', (league['id'],)).fetchall()
+    active_ids = {m['member_id'] for m in members}
+    if week_id is not None:
+        # Historical weekly standings still show people who competed before
+        # leaving; current season and My Leagues list show active members only.
+        former = connection.execute(f'''SELECT DISTINCT entry.member_id,{name} display_name
+            FROM huddle_league_member_periods entry {profiles}
+            WHERE entry.league_id=? AND entry.left_at IS NOT NULL''',
+            (league['id'],)).fetchall()
+        members = list(members) + [m for m in former if m['member_id'] not in active_ids]
     rows = {m['member_id']: dict(member_id=m['member_id'],name=m['display_name'] or f"Fan #{m['member_id']}",
             points=0, **{outcome:0 for outcome in OUTCOMES}) for m in members}
+    contributed = set()
     for pick in selections(connection, league, season, week_id):
+        if pick['member_id'] not in rows:
+            continue
+        contributed.add(pick['member_id'])
         try:
             verified = (pick['away_final'] is not None and pick['home_final'] is not None
                 and pick['result_at'] is not None
@@ -120,7 +162,9 @@ def standings(connection, league, season, week_id=None, now=None):
                 outcome = 'Pending'
             row[outcome] += 1
             row['points'] += int(outcome == 'Win')
-    result = sorted(rows.values(), key=lambda row:(-row['points'],row['member_id']))
+    result = sorted((row for member_id,row in rows.items()
+        if member_id in active_ids or (week_id is not None and member_id in contributed)),
+        key=lambda row:(-row['points'],row['member_id']))
     previous = None
     for position,row in enumerate(result,1):
         if row['points'] != previous:
@@ -180,6 +224,9 @@ def create():
                 league_id = cursor.lastrowid
                 connection.execute('INSERT INTO huddle_league_members VALUES(?,?,?)',
                                    (league_id,g.member['id'],created))
+                connection.execute('''INSERT INTO huddle_league_member_periods
+                    (league_id,member_id,joined_at) VALUES(?,?,?)''',
+                    (league_id,g.member['id'],created))
                 connection.commit()
             except Exception:
                 connection.rollback()
@@ -228,9 +275,14 @@ def join(token):
             league = connection.execute('SELECT * FROM huddle_leagues WHERE invite_token=?',(token,)).fetchone()
             if league is None:
                 abort(404)
-            connection.execute('''INSERT INTO huddle_league_members VALUES(?,?,?)
+            joined = now_utc().isoformat()
+            inserted = connection.execute('''INSERT INTO huddle_league_members VALUES(?,?,?)
                 ON CONFLICT(league_id,member_id) DO NOTHING''',
-                (league['id'],g.member['id'],now_utc().isoformat()))
+                (league['id'],g.member['id'],joined))
+            if inserted.rowcount:
+                connection.execute('''INSERT INTO huddle_league_member_periods
+                    (league_id,member_id,joined_at) VALUES(?,?,?)''',
+                    (league['id'],g.member['id'],joined))
             connection.commit()
         except Exception:
             connection.rollback()
@@ -249,6 +301,71 @@ def rotate_invitation(league_id):
         db().execute('UPDATE huddle_leagues SET invite_token=? WHERE id=?',
                      (secrets.token_urlsafe(32),league_id))
     return redirect(url_for('huddle_leagues.view',league_id=league_id),303)
+
+
+def exit_membership(connection, league_id, member_id, reason):
+    """Atomically archive a stint and end only this league membership."""
+    left_at = now_utc().isoformat()
+    closed = connection.execute('''UPDATE huddle_league_member_periods
+        SET left_at=?,exit_reason=? WHERE league_id=? AND member_id=?
+        AND left_at IS NULL''', (left_at,reason,league_id,member_id))
+    if closed.rowcount != 1:
+        raise RuntimeError('Active league participation window missing')
+    removed = connection.execute('''DELETE FROM huddle_league_members
+        WHERE league_id=? AND member_id=?''', (league_id,member_id))
+    if removed.rowcount != 1:
+        raise RuntimeError('Active league member missing')
+
+
+@bp.post('/<int:league_id>/members/<int:member_id>/remove')
+def remove_member(league_id, member_id):
+    league = member_league(league_id)
+    if league['commissioner_id'] != g.member['id'] or member_id == g.member['id']:
+        abort(403)
+    if request.form.get('confirm_remove') != 'yes':
+        abort(400,description='Confirm this member removal first.')
+    connection = db()
+    connection.execute('BEGIN IMMEDIATE')
+    try:
+        # Repeat authorization under the write lock to avoid a stale roster.
+        authorized = connection.execute('''SELECT 1 FROM huddle_leagues l
+            JOIN huddle_league_members m ON m.league_id=l.id
+            WHERE l.id=? AND l.commissioner_id=? AND m.member_id=?''',
+            (league_id,g.member['id'],g.member['id'])).fetchone()
+        target = connection.execute('''SELECT 1 FROM huddle_league_members
+            WHERE league_id=? AND member_id=?''',(league_id,member_id)).fetchone()
+        if not authorized:
+            abort(403)
+        if target is None:
+            abort(404)
+        exit_membership(connection,league_id,member_id,'removed')
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    return redirect(url_for('huddle_leagues.view',league_id=league_id),303)
+
+
+@bp.post('/<int:league_id>/leave')
+def leave(league_id):
+    league = member_league(league_id)
+    if league['commissioner_id'] == g.member['id']:
+        abort(403,description='Commissioners cannot leave their own league.')
+    if request.form.get('confirm_leave') != 'yes':
+        abort(400,description='Confirm leaving this league first.')
+    connection = db()
+    connection.execute('BEGIN IMMEDIATE')
+    try:
+        current = connection.execute('''SELECT 1 FROM huddle_league_members
+            WHERE league_id=? AND member_id=?''',(league_id,g.member['id'])).fetchone()
+        if current is None:
+            abort(404)
+        exit_membership(connection,league_id,g.member['id'],'left')
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    return redirect(url_for('huddle_leagues.mine'),303)
 
 
 @bp.get('/<int:league_id>')
