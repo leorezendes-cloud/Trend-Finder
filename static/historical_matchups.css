@@ -26,3 +26,7 @@ html body .historical-matchups *{-webkit-text-stroke:0;text-shadow:none;box-sizi
 .historical-matchup-rate-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px 9px;width:100%}
 .historical-matchup-rate-row .historical-matchup-rate{flex-shrink:0}
 .historical-matchup-rate-note{flex:1 1 75px;min-width:0;color:#aebdd0;font-size:10px;line-height:1.4}
+
+.historical-matchups .historical-backtest-link { margin: 0 0 14px; font: 13px/1.5 system-ui,sans-serif; color: #b9c7db; }
+.historical-matchups .historical-backtest-link a { color: #f6cb62; font-weight: 700; text-underline-offset: 3px; }
+.historical-matchups .historical-backtest-link a:focus-visible { outline: 2px solid #f6cb62; outline-offset: 3px; }

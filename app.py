@@ -598,50 +598,6 @@ def trends_page():
     current = scan_basic_trends(season='2026')
     historical = scan_basic_trends(season=(1999, 2025))
     comparisons = compare_trends(current, historical)
-    matchup_matches = None
-    matchup_error = None
-
-    matchup_location = request.args.get('dog_location', '')
-    matchup_prime = request.args.get('matchup_prime', '')
-    matchup_spread = request.args.get('dog_spread', '')
-
-    if request.args:
-        if matchup_location not in ('Home', 'Away') or matchup_prime not in ('yes', 'no'):
-            matchup_error = 'Please select a valid matchup'
-        else:
-            try:
-                spread = float(matchup_spread)
-                if not 0.5 <= spread <= 25 or spread % 0.5 != 0:
-                    raise ValueError
-                matchup_matches = match_upcoming_game(
-                    comparisons,
-                    dog_location=matchup_location,
-                    is_primetime=(matchup_prime == 'yes'),
-                    dog_spread=spread
-                )
-                matchup_matches.sort(
-                    key=lambda trend: (
-                        trend['historical_ci_low'],
-                        trend['historical_sample']),
-                    reverse=True
-                )
-                baseline = next(
-                    (
-                        trend for trend in matchup_matches
-                        if trend["spread"] == "All Spreads"
-                    ),
-                    None
-                )
-
-                if baseline is not None:
-                    baseline_rate = baseline["historical_ats_rate"]
-
-                    for trend in matchup_matches:
-                        trend["baseline_difference"] = (
-                            trend["historical_ats_rate"] - baseline_rate
-                        )
-            except ValueError:
-                matchup_error = 'Enter a valid spread between 0.5 and 25.'
     comparisons.sort(
         key=lambda trend: (
             2 if trend['ats_difference'] > 0
@@ -690,32 +646,6 @@ def trends_page():
     
     games = load_finished_games()
 
-    if matchup_matches is not None:
-
-        for trend in matchup_matches:
-
-            filters = {
-                "location": trend["location"],
-                "is_primetime": trend["primetime"],
-                "min_spread": trend["min_spread"],
-                "max_spread": trend["max_spread"],
-                "metric": "ats"
-            }
-
-            recent = find_recent_form(
-                games,
-                window=5,
-                **filters
-            )
-
-            streak = find_active_streak(
-                games,
-                **filters
-            )
-
-            trend["recent"] = recent
-            trend["active_streak"] = len(streak)
-
     watchlist = group_early_watch(
         [trend for trend in watchlist if trend['spread'] == 'All Spreads'], games
     )
@@ -727,32 +657,14 @@ def trends_page():
     hot_groups = group_hot_trends(hot_trends)
     active_streaks = scan_active_streaks(games,broad_comparisons, min_streak=3)
     streak_groups = group_active_streaks(active_streaks)
-    with open(game_file, newline='') as source:
-        upcoming_rows = list(csv.DictReader(source))
-    upcoming_previews = []
-    from site_views import upcoming_rows as current_upcoming_rows
-    upcoming_rows=current_upcoming_rows(Path(__file__).resolve().parent)
-    for _, _, game in upcoming_combination_contexts(upcoming_rows, {}):
-        matches = match_upcoming_game(comparisons, game['dog_location'], game['is_primetime'], game['dog_spread'])
-        matches = [trend for trend in matches if trend['historical_sample'] >= 30]
-        if matches:
-            best = max(matches, key=lambda trend: (trend['historical_ci_low'], trend['historical_sample']))
-            source=next((r for r in upcoming_rows if f"{r['away_team']} at {r['home_team']}"==game['matchup']),{})
-            upcoming_previews.append(dict(game,trend=best,line_source=source.get('public_line_source'),line_time=source.get('public_line_time')))
     return render_template(
         'trends.html',active_highlights=load_highlights(),
-        upcoming_previews=upcoming_previews,
         comparisons=comparisons,
         watchlist=watchlist,
         hot_groups=hot_groups,
         hot_trends=hot_trends, 
         streak_groups=streak_groups, 
         comparison_sections=comparison_sections,
-        matchup_matches=matchup_matches,
-        matchup_error=matchup_error,
-        matchup_location=matchup_location,
-        matchup_prime=matchup_prime,
-        matchup_spread=matchup_spread,
         )
 
 @app.route("/trend-details")

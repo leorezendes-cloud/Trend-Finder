@@ -31,6 +31,7 @@
             {% if archive %}<a href="{{ url_for('sunday_page',window=selected_window) }}">Current matchups →</a>
             {% else %}<a href="{{ url_for('sunday_page',window=selected_window,view='archive') }}">October 11 archive →</a>{% endif %}
         </div>
+        <p class="historical-backtest-link">Want to see how these rankings performed in previous seasons? <a href="{{ url_for('backtest_page') }}">View Historical Backtests →</a></p>
         <div class="historical-matchups-slate">
             <span>{% if archive %}Archived October 11, 2026 snapshot{% elif slate_labels %}{{ slate_labels|join(' · ') }}{% else %}Upcoming slate{% endif %}</span>
             <small>History: {{ start_year }}–2025 · Saved spreads</small>

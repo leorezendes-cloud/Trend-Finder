@@ -14,3 +14,37 @@
 <details class="pick-source"><summary>Line details</summary><p>{{ game.line_source }}</p></details>
 </article>
 {% endmacro %}
+
+{# Read-only cards for graded, voided, and pending games; never submit picks. #}
+{% macro pick_result_card(game) %}
+<article class="pick-game pick-result-card">
+  <h2><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.away }} at {{ game.home }}</a></h2>
+  {% if game.void_reason %}
+    <p class="pick-result-score">Void</p>
+  {% elif game.away_final is not none and game.home_final is not none %}
+    <p class="pick-result-score">Final: {{ game.away }} {{ game.away_final }} – {{ game.home }} {{ game.home_final }}</p>
+  {% else %}
+    <p class="pick-result-score">Locked · Awaiting final</p>
+  {% endif %}
+  <dl class="pick-result-outcomes">
+    {% for key,label in [('su','SU'),('ats','ATS'),('ou','O/U')] %}
+      {% set choice=game[key] %}
+      {% set outcome=game[key~'_result'] if choice else 'Not picked' %}
+      <div class="pick-result-outcome">
+        <dt>{{ label }}</dt>
+        <dd>
+          <span class="pick-result-choice">{% if choice %}{{ choice }}{% if key=='ats' %} {{ '%+g'|format(game.away_spread if choice==game.away else -game.away_spread) }}{% endif %}{% else %}—{% endif %}</span>
+          <span class="pick-result-grade pick-result-grade-{{ outcome|lower|replace(' ','-') }}">{{ outcome }}</span>
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+  <details class="pick-result-details">
+    <summary>Full details &amp; saved lines</summary>
+    <p>{{ game.lock_at|pick_time }} · Locked</p>
+    <p>Shared member lines: {{ game.away }} {{ '%+g'|format(game.away_spread) }} · {{ game.home }} {{ '%+g'|format(-game.away_spread) }} · Total {{ '%g'|format(game.total) }}</p>
+    <p>Line source: {{ game.line_source }}</p>
+    {% if game.void_reason %}<p>Void reason: {{ game.void_reason }}</p>{% endif %}
+  </details>
+</article>
+{% endmacro %}

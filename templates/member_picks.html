@@ -1,4 +1,4 @@
-{% extends 'picks_base.html' %}{% from '_pick_cards.html' import pick_card with context %}{% block content %}
+{% extends 'picks_base.html' %}{% from '_pick_cards.html' import pick_card, pick_result_card with context %}{% block content %}
 <section class="huddle picks-huddle-surface" aria-label="My Picks">
   <header class="huddle-header">
     <div class="huddle-identity">
@@ -17,7 +17,34 @@
 <details class="mobile-picks-menu" open><summary><span data-pick-menu-label>Weekly picks</span><small data-pick-menu-status role="status" aria-live="polite"></small></summary>
 <form class="member-picks-form" method="post" action="{{ url_for('member_picks.save_all_picks') }}" data-pick-form>
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="{{ request.full_path.rstrip('?') }}">
-<div class="picks-grid">{% for game in games %}{{ pick_card(game,week_open) }}{% endfor %}</div>
+{% set groups=namespace(upcoming=[],pending=[],completed=[]) %}
+{% for game in games %}
+  {% if game.void_reason or (game.away_final is not none and game.home_final is not none) %}
+    {% set groups.completed=groups.completed+[game] %}
+  {% elif game.locked or not week_open %}
+    {% set groups.pending=groups.pending+[game] %}
+  {% else %}
+    {% set groups.upcoming=groups.upcoming+[game] %}
+  {% endif %}
+{% endfor %}
+{% if groups.upcoming %}
+<section id="upcoming-picks" class="pick-game-group" aria-labelledby="upcoming-picks-title">
+  <h2 id="upcoming-picks-title">Upcoming Games</h2>
+  <div class="picks-grid">{% for game in groups.upcoming %}{{ pick_card(game,week_open) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% if groups.pending %}
+<section id="pending-picks" class="pick-game-group" aria-labelledby="pending-picks-title">
+  <h2 id="pending-picks-title">Pending Games</h2>
+  <div class="picks-grid pick-results-grid">{% for game in groups.pending %}{{ pick_result_card(game) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% if groups.completed %}
+<section id="completed-picks" class="pick-game-group" aria-labelledby="completed-picks-title">
+  <h2 id="completed-picks-title">Completed Games</h2>
+  <div class="picks-grid pick-results-grid">{% for game in groups.completed %}{{ pick_result_card(game) }}{% endfor %}</div>
+</section>
+{% endif %}
 {% if week_open and games|selectattr('locked','equalto',0)|rejectattr('void_reason')|list %}<div class="pick-save-bar"><button type="submit">Save picks</button><p class="pick-save-status" role="status" aria-live="polite">You can save an incomplete week and finish later.</p></div>{% endif %}
 </form>
 </details>

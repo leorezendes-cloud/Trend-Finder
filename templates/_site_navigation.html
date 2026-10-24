@@ -55,7 +55,6 @@
 <nav class="section-navigation" aria-label="Trend Finder navigation">
     <a href="{{ url_for('trend_finder') }}" {% if request.endpoint == 'trend_finder' %}aria-current="page"{% endif %}>Trendfindah 3000</a>
     <a href="{{ url_for('trends_page') }}" {% if request.endpoint == 'trends_page' %}aria-current="page"{% endif %}>Discover Trends</a>
-    <a href="{{ url_for('backtest_page') }}" {% if request.endpoint == 'backtest_page' %}aria-current="page"{% endif %}>Backtests</a>
 </nav>
 {% elif plug_section %}
 <nav class="section-navigation" aria-label="The Plug navigation">

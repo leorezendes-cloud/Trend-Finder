@@ -337,3 +337,28 @@ html body .picks-page form:has(select[name="week_id"]) button {
   .picks-page .pick-compact h2 { margin-bottom:4px; }
   .picks-page .pick-compact p { margin:4px 0; }
 }
+
+
+/* Read-only picks follow editable matchups rather than creating uneven grid rows. */
+.picks-page .pick-game-group { margin: 14px 0 22px; min-width: 0; }
+.picks-page .pick-game-group > h2 { font: 700 18px/1.35 Arial,sans-serif; color: #f1f5f9; margin: 0 0 10px; }
+.picks-page .pick-results-grid { align-items: start; }
+.picks-page .pick-results-grid > .pick-result-card { padding: 12px 14px; margin: 0; min-width: 0; }
+.picks-page .pick-result-card h2 { margin: 0 0 6px; font: 700 17px/1.25 Arial,sans-serif; }
+.picks-page .pick-result-card .pick-result-score { color: #d1dbea; font-size: 12px; line-height: 1.35; margin: 0 0 9px; }
+.picks-page .pick-result-outcomes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 0; }
+.picks-page .pick-result-outcome { margin: 0; min-width: 0; padding: 7px 4px; border-radius: 7px; background: #233147; text-align: center; }
+.picks-page .pick-result-outcome dt { color: #bfcee0; font: 700 11px/1.3 Arial,sans-serif; }
+.picks-page .pick-result-outcome dd { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 4px 0 0; min-width: 0; }
+.picks-page .pick-result-choice { overflow-wrap: anywhere; color: #fff; font: 700 12px/1.25 Arial,sans-serif; }
+.picks-page .pick-result-grade { color: #cbd5e1; font: 700 11px/1.25 Arial,sans-serif; }
+.picks-page .pick-result-grade-win { color: #86efac; }
+.picks-page .pick-result-grade-loss { color: #fda4af; }
+.picks-page .pick-result-grade-void { color: #fbbf24; }
+.picks-page .pick-result-details { margin-top: 9px; color: #cbd5e1; font: 12px/1.4 Arial,sans-serif; }
+.picks-page .pick-result-details summary { cursor: pointer; color: #fbbf24; padding: 7px 0; min-height: 36px; }
+.picks-page .pick-result-details p { margin: 6px 0; font-size: 12px; }
+@media (max-width:650px) {
+  .picks-page .pick-results-grid > .pick-result-card { padding: 12px; }
+  .picks-page .pick-game-group { margin: 12px 0 18px; }
+}

@@ -241,6 +241,52 @@ class MemberPicksTests(unittest.TestCase):
             if 'SELECT * FROM PICK_GAMES WHERE ID=' in sql.upper()
         ])
 
+
+    def test_pick_groups_separate_open_pending_and_completed_cards(self):
+        game_id, _ = self.sheet()
+        client = self.member()
+        self.assertEqual(self.pick(client, game_id).status_code, 302)
+        self.rows[0].update(away_score='20', home_score='22', result='2')
+        self.rows.extend([
+            dict(self.rows[0], game_id='2030_06_C_D', away_team='C', home_team='D',
+                 gameday='2030-10-19', gametime='13:00',
+                 away_score='', home_score='', result=''),
+            dict(self.rows[0], game_id='2030_06_E_F', away_team='E', home_team='F',
+                 gameday='2030-10-17', gametime='13:00',
+                 away_score='', home_score='', result=''),
+        ])
+        self.write_schedule()
+        with self.app.app_context():
+            with db():
+                week_id = db().execute('SELECT week_id FROM pick_games WHERE id=?', (game_id,)).fetchone()[0]
+                db().executemany("""INSERT INTO pick_games
+                    (week_id,game_id,away,home,kickoff_at,lock_at,away_spread,total,line_source)
+                    VALUES(?,?,?,?,?,?,?,?,?)""", [
+                    (week_id,'2030_06_C_D','C','D','2030-10-19T17:00:00+00:00',
+                     '2030-10-19T17:00:00+00:00',3,40,'Frozen test line'),
+                    (week_id,'2030_06_E_F','E','F','2030-10-17T17:00:00+00:00',
+                     '2030-10-17T17:00:00+00:00',3,40,'Frozen test line'),
+                ])
+        self.clock.return_value = datetime(2030,10,18,5,tzinfo=timezone.utc)
+        response = client.get('/picks/')
+        self.assertEqual(response.status_code, 200)
+        html = response.text
+        self.assertLess(html.index('id="upcoming-picks"'), html.index('id="pending-picks"'))
+        self.assertLess(html.index('id="pending-picks"'), html.index('id="completed-picks"'))
+        upcoming = html.split('id="upcoming-picks"',1)[1].split('</section>',1)[0]
+        pending = html.split('id="pending-picks"',1)[1].split('</section>',1)[0]
+        completed = html.split('id="completed-picks"',1)[1].split('</section>',1)[0]
+        self.assertIn('C at D', upcoming)
+        self.assertIn('type="checkbox"', upcoming)
+        self.assertIn('E at F', pending)
+        self.assertNotIn('type="checkbox"', pending)
+        self.assertIn('A at B', completed)
+        self.assertIn('Final: A 20', completed)
+        self.assertIn('Loss', completed)
+        self.assertIn('Full details', completed)
+        self.assertNotIn('type="checkbox"', completed)
+        self.assertEqual(html.count('class="pick-game pick-result-card"'), 2)
+
     def test_manual_line_entry_is_unavailable(self):
         game_id,path=self.sheet(publish=False)
         before=(self.root/'nfl_games.csv').read_bytes()
