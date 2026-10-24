@@ -61,3 +61,23 @@ html body .league-page .league-share-controls button{box-sizing:border-box;width
 .league-page .league-member-management .league-confirm{display:flex;align-items:center;gap:8px;cursor:pointer;margin:8px 0;color:#f1f5f9}
 .league-page .league-member-management .league-confirm input[type=checkbox]{appearance:auto;-webkit-appearance:checkbox;width:18px;height:18px;flex-shrink:0;margin:0;accent-color:#fbbf24}
 .league-member-management button{margin:4px 0}
+
+/* League-specific selections: preserve existing league grids and mobile standings. */
+.league-page .league-picks-link{color:#fbbf24;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.league-pick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.league-pick-grid .league-panel{margin:0}
+.league-pick-card{overflow-wrap:anywhere}
+.league-pick-card h3 a{color:#fbbf24}
+.league-pick-card .league-pick-time{font-size:12px;color:#cbd5e1;margin:4px 0}
+.league-pick-card .league-pick-lines{font-size:13px;color:#fbbf24;margin:6px 0 12px}
+.league-pick-card form{background:none;border:0;box-shadow:none;padding:0;margin:0}
+.league-pick-card label{display:block;font-weight:700;margin:8px 0 4px}
+.league-pick-card label small{display:block;font-size:11px;color:#cbd5e1;font-weight:400}
+.league-pick-card select{display:block;width:100%;margin:0 0 9px;min-height:42px}
+.league-pick-card select:disabled{opacity:.7}
+.league-pick-card button{min-height:42px;margin-top:10px}
+.league-pick-card .league-pick-note{font-size:12px;color:#cbd5e1}
+.league-pick-source{font-size:12px;color:#cbd5e1;margin-top:10px}
+.league-pick-week-selector{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.league-pick-week-selector button{margin:0}
+@media(max-width:650px){.league-pick-grid{grid-template-columns:minmax(0,1fr)}}

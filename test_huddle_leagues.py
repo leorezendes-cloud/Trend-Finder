@@ -34,6 +34,7 @@ class LeagueTests(unittest.TestCase):
         app = Flask(__name__, instance_path=self.temp.name)
         app.add_url_rule('/', 'home', lambda: 'home')
         app.add_url_rule('/community', 'community.discussion', lambda: 'The Huddle')
+        app.add_url_rule('/matchup/<game_id>', 'fans.matchup', lambda game_id: game_id)
         with patch.dict('os.environ', {'TREND_FINDAH_DATABASE': self.path,
                                      'TREND_FINDAH_SECRET_KEY': 'isolated-test-secret'}):
             init_membership(app)
@@ -471,6 +472,108 @@ class LeagueTests(unittest.TestCase):
                 WHERE league_id=? ORDER BY id''',(league['id'],))]
             self.assertEqual(old,new)
             self.assertEqual(c.execute('PRAGMA user_version').fetchone()[0],4)
+
+    def league_picks_test_context(self):
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(patch('weekly_pick_lines.publish_saved_snapshot',return_value=True))
+        stack.enter_context(patch('member_picks.sync_results'))
+        stack.enter_context(patch('member_picks.schedule',return_value={
+            'sample':{'season':'2026','week':'5','gameday':'2026-10-02',
+                      'gametime':'13:00','game_type':'REG'}}))
+
+    def test_league_override_changes_only_its_standings_and_not_default_picks(self):
+        first,second = self.create(),self.create()
+        wid,gid = self.seed(first)
+        self.league_picks_test_context()
+        self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/picks',
+            game_id=str(gid),su='BUF',ats='',ou='').status_code,303)
+        with self.connection() as c:
+            override = c.execute('SELECT * FROM huddle_league_pick_overrides WHERE league_id=?',
+                                 (first['id'],)).fetchone()
+            self.assertEqual((override['su'],override['ats'],override['ou']),('BUF',None,None))
+            self.assertEqual(c.execute('SELECT su FROM member_picks WHERE member_id=1 AND game_id=?',
+                                       (gid,)).fetchone()[0],'NE')
+        self.assertEqual(self.scores(first)[0]['points'],2)
+        self.assertEqual(self.scores(second)[0]['points'],3)
+        # Selecting Use My Picks again deletes the override rather than writing to My Picks.
+        self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/picks',
+            game_id=str(gid),su='',ats='',ou='').status_code,303)
+        with self.connection() as c:
+            self.assertEqual(c.execute('SELECT COUNT(*) FROM huddle_league_pick_overrides').fetchone()[0],0)
+        self.assertEqual(self.scores(first)[0]['points'],3)
+
+    def test_league_override_scores_without_any_shared_pick_row(self):
+        league=self.create()
+        _,gid=self.seed(league)
+        with self.connection() as c:
+            c.execute('DELETE FROM member_picks WHERE member_id=1 AND game_id=?',(gid,))
+        self.league_picks_test_context()
+        response=self.post(f'/huddle/leagues/{league["id"]}/picks',
+                           game_id=str(gid),su='NE',ats='',ou='')
+        self.assertEqual(response.status_code,303)
+        rows=self.scores(league)
+        self.assertEqual(rows[0]['points'],1)
+        self.assertEqual(rows[0]['Win'],1)
+        with self.connection() as c:
+            self.assertIsNone(c.execute('SELECT * FROM member_picks WHERE member_id=1 AND game_id=?',
+                (gid,)).fetchone())
+
+    def test_league_override_guards_lock_membership_csrf_and_input(self):
+        league=self.create()
+        _,gid=self.seed(league)
+        self.league_picks_test_context()
+        route=f'/huddle/leagues/{league["id"]}/picks'
+        self.assertEqual(self.client.post(route,data={'game_id':str(gid),'su':'BUF','ats':'','ou':''}).status_code,400)
+        self.assertEqual(self.post(route,game_id=str(gid),su='INVALID',ats='',ou='').status_code,400)
+        self.assertEqual(self.post(route,game_id=str(gid),su=['BUF','NE'],ats='',ou='').status_code,400)
+        self.assertEqual(self.post(route,game_id=str(gid),su='BUF',ats='',ou='Over').status_code,303)
+        self.login(2)
+        self.assertEqual(self.client.get(route).status_code,404)
+        self.assertEqual(self.post(route,game_id=str(gid),su='BUF',ats='',ou='').status_code,404)
+        self.login(1)
+        with patch('huddle_leagues.now_utc',return_value=datetime(2026,10,3,tzinfo=timezone.utc)):
+            self.assertEqual(self.post(route,game_id=str(gid),su='NE',ats='',ou='').status_code,409)
+        with self.connection() as c:
+            self.assertEqual(c.execute('SELECT su FROM huddle_league_pick_overrides WHERE league_id=?',
+                (league['id'],)).fetchone()[0],'BUF')
+
+    def test_league_picks_page_renders_without_leaking_other_leagues(self):
+        first,second=self.create(),self.create()
+        _,gid=self.seed(first)
+        self.league_picks_test_context()
+        page=self.client.get(f'/huddle/leagues/{first["id"]}/picks')
+        self.assertEqual(page.status_code,200)
+        self.assertIn('Use My Picks',page.text)
+        self.assertIn('Save league picks',page.text)
+        self.assertIn('default My Picks',page.text)
+        self.assertIn('name="csrf_token"',page.text)
+        self.assertNotIn('private1@example.com',page.text)
+        self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/picks',
+            game_id=str(gid),su='BUF',ats='',ou='').status_code,303)
+        other=self.client.get(f'/huddle/leagues/{second["id"]}/picks')
+        self.assertEqual(other.status_code,200)
+        self.assertNotIn('selected>BUF</option>',other.text)
+
+    def test_league_overrides_preserve_closed_periods_and_other_memberships(self):
+        first,second=self.create(),self.create()
+        self.join(first,2)
+        self.login(1)
+        _,gid=self.seed(first)
+        self.league_picks_test_context()
+        self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/picks',
+            game_id=str(gid),su='BUF',ats='',ou='').status_code,303)
+        before=next(r['points'] for r in self.scores(first) if r['member_id']==1)
+        with patch('huddle_leagues.now_utc',return_value=datetime(2026,10,4,tzinfo=timezone.utc)):
+            self.assertEqual(self.post(f'/huddle/leagues/{first["id"]}/members/2/remove',
+                confirm_remove='yes').status_code,303)
+        self.assertEqual(next(r['points'] for r in self.scores(first) if r['member_id']==1),before)
+        self.assertEqual(self.scores(second)[0]['points'],3)
+        with self.connection() as c:
+            self.assertEqual(c.execute('SELECT COUNT(*) FROM huddle_league_pick_overrides').fetchone()[0],1)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -27,7 +27,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static',filename='huddle_leagues.css') }}">
 <section class="huddle league-page">
-<header class="huddle-header"><div class="huddle-identity"><span class="huddle-kicker">TREND FINDAH COMMUNITY</span><h1>My Leagues</h1><p>Free private Pick’em leagues. Your existing My Picks count across every league you join.</p></div></header>
+<header class="huddle-header"><div class="huddle-identity"><span class="huddle-kicker">TREND FINDAH COMMUNITY</span><h1>My Leagues</h1><p>Free private Pick’em leagues. My Picks are your default; make league-specific choices whenever you want.</p></div></header>
 <nav class="league-actions" aria-label="League navigation"><a href="{{ url_for('community.discussion') }}">The Huddle</a>{% if mode != 'mine' %}<a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>{% endif %}<a href="{{ url_for('huddle_leagues.create') }}">Create League</a><a href="{{ url_for('huddle_leagues.join_form') }}">Join League</a><a href="{{ url_for('member_picks.my_picks') }}">My Picks</a></nav>
 {% if mode=='mine' %}
 <h2>My Leagues</h2><div class="league-list">{% for league in leagues %}<article class="league-panel"><h3><a href="{{ url_for('huddle_leagues.view',league_id=league.id) }}">{{ league.name }}</a></h3><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% set record=summaries[league.id] %}<dl class="league-card-record" aria-label="Your league record"><div><dt>Points</dt><dd>{{ record.points }}</dd></div><div><dt>Wins</dt><dd>{{ record.Win }}</dd></div><div><dt>Losses</dt><dd>{{ record.Loss }}</dd></div></dl>{% if league.commissioner_id==g.member.id %}<small>Commissioner</small>{% endif %}</article>{% else %}<p>You haven't joined a league yet. Create one or use a friend's invitation link.</p>{% endfor %}</div>
@@ -37,10 +37,39 @@
 {% elif mode=='join_form' %}
 <section class="league-panel"><h2>Join League</h2><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label for="league-invite">Invitation link or code</label><input id="league-invite" name="invite" maxlength="2048" required><button type="submit">Find League</button></form></section>
 {% elif mode=='invite' %}
-<section class="league-panel"><h2>Join {{ league.name }}</h2><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %}</p><p>Your shared My Picks will count for eligible games after you join.</p>
+<section class="league-panel"><h2>Join {{ league.name }}</h2><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %}</p><p>Your regular My Picks count by default. You can also make different picks in this league before kickoff.</p>
 {% if g.member %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Join League</button></form>{% else %}<div class="league-actions"><a href="{{ url_for('membership.login') }}">Sign in to join</a><a href="{{ url_for('membership.register') }}">Register free</a></div>{% endif %}</section>
+{% elif mode=='picks' %}
+<section class="league-panel">
+<h2>{{ league.name }} · League Picks</h2>
+<p>Each category uses your regular My Picks selection unless you choose an override for this league. Overrides never change My Picks or selections in other leagues.</p>
+<p><a class="league-picks-link" href="{{ url_for('huddle_leagues.view',league_id=league.id) }}">← Back to league standings</a> · <a class="league-picks-link" href="{{ url_for('member_picks.my_picks') }}">Edit default My Picks</a></p>
+{% if weeks %}<form method="get" class="league-pick-week-selector"><label for="league-pick-week">Week</label><select id="league-pick-week" name="week_id">{% for week in weeks %}<option value="{{ week.id }}"{% if week.id==selected %} selected{% endif %}>{{ week.season }} · Week {{ week.week }} · {{ week.stage }}</option>{% endfor %}</select><button type="submit">View week</button></form>{% endif %}
+</section>
+<div class="league-pick-grid">
+{% for game in cards %}
+<article class="league-panel league-pick-card">
+<h3><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.away }} at {{ game.home }}</a></h3>
+<p class="league-pick-time">{{ game.lock_at|pick_time }} · {{ 'Open' if game.editable else 'Locked' if game.eligible else 'Joined after deadline' }}</p>
+<p class="league-pick-lines">{{ game.away }} {{ '%+g'|format(game.away_spread) }} · {{ game.home }} {{ '%+g'|format(-game.away_spread) }} · Total {{ '%g'|format(game.total) }}</p>
+<form method="post" action="{{ url_for('huddle_leagues.league_picks',league_id=league.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="game_id" value="{{ game.id }}">
+{% for key,label in categories.items() if league[key~'_enabled'] %}
+<label for="league-{{ league.id }}-{{ game.id }}-{{ key }}">{{ label }} <small>My Picks: {{ game['default_'~key] or 'Not selected' }}</small></label>
+<select id="league-{{ league.id }}-{{ game.id }}-{{ key }}" name="{{ key }}"{% if not game.editable %} disabled{% endif %}>
+<option value=""{% if game['override_'~key] is none %} selected{% endif %}>Use My Picks{% if game['default_'~key] %} ({{ game['default_'~key] }}){% endif %}</option>
+{% for choice in ([game.away,game.home] if key!='ou' else ['Over','Under']) %}<option value="{{ choice }}"{% if game['override_'~key]==choice %} selected{% endif %}>{{ choice }}{% if key=='ats' %} {{ '%+g'|format(game.away_spread if choice==game.away else -game.away_spread) }}{% endif %}</option>{% endfor %}
+</select>
+{% endfor %}
+{% if game.editable %}<button type="submit">Save league picks</button>{% else %}<p class="league-pick-note">Saved selections are read-only after kickoff. {% if game.away_final is not none %}Final: {{ game.away }} {{ game.away_final }} – {{ game.home }} {{ game.home_final }}.{% endif %}</p>{% endif %}
+</form>
+<details class="league-pick-source"><summary>Frozen line details</summary><p>{{ game.line_source }}</p></details>
+</article>
+{% else %}<p>No published games are available for this week.</p>{% endfor %}
+</div>
 {% elif mode=='standings' %}
-<section class="league-panel"><h2>{{ league.name }}</h2><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %} · 1 point per win</p><p>Pushes, ties, voids and pending picks earn no points. Standings use verified My Picks grades.</p>
+<section class="league-panel"><h2>{{ league.name }}</h2><p><a class="league-picks-link" href="{{ url_for('huddle_leagues.league_picks',league_id=league.id) }}">Customize picks for this league →</a></p><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %} · 1 point per win</p><p>Pushes, ties, voids and pending picks earn no points. Standings use verified My Picks grades.</p>
 <label for="league-share">Share this invitation with your friends</label>
 <div class="league-share-controls"><input id="league-share" class="league-invitation" value="{{ invitation }}" readonly><button id="league-copy" type="button" hidden>Copy Link</button></div>
 <p id="league-copy-status" class="league-copy-status" role="status" aria-live="polite"></p>

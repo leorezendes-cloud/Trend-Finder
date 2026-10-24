@@ -46,6 +46,18 @@ def init_leagues(app):
             db().execute('''CREATE UNIQUE INDEX IF NOT EXISTS huddle_league_open_period
                 ON huddle_league_member_periods(league_id,member_id)
                 WHERE left_at IS NULL''')
+            # League-only per-category choices. NULL inherits regular My Picks.
+            # This does not change the published lines or shared selections.
+            db().execute('''CREATE TABLE IF NOT EXISTS huddle_league_pick_overrides (
+                league_id INTEGER NOT NULL REFERENCES huddle_leagues(id),
+                member_id INTEGER NOT NULL REFERENCES members(id),
+                game_id INTEGER NOT NULL REFERENCES pick_games(id),
+                su TEXT, ats TEXT, ou TEXT,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (league_id,member_id,game_id),
+                CHECK (su IS NOT NULL OR ats IS NOT NULL OR ou IS NOT NULL))''')
+            db().execute('''CREATE INDEX IF NOT EXISTS huddle_league_override_member
+                ON huddle_league_pick_overrides(member_id,league_id)''')
             # Migrate existing members once. Restart-safe; no user_version change.
             db().execute('''INSERT INTO huddle_league_member_periods
                 (league_id,member_id,joined_at)
@@ -88,22 +100,34 @@ def member_league(league_id):
 
 
 def selections(connection, league, season, week_id=None):
-    """Existing shared picks, scoped to actual periods of league membership."""
+    """Published games with shared picks plus optional per-league category overrides.
+
+    Membership periods enforce the original entry/exit eligibility windows.
+    Include an override even if a user has never submitted a regular My Picks row.
+    """
     if league['pick_source'] != 'my_picks':
         raise ValueError('Unsupported league selection source')
-    # The active membership timestamp remains authoritative for legacy writes
-    # and timestamp-boundary tests. Closed periods retain their own timestamps.
     joined = 'COALESCE(active_entry.joined_at,entry.joined_at)'
-    query = f'''SELECT p.*,game.lock_at,game.kickoff_at,game.void_reason,
+    query = f'''SELECT entry.member_id,game.id AS game_id,
+        p.su AS default_su,p.ats AS default_ats,p.ou AS default_ou,
+        p.su_result AS default_su_result,p.ats_result AS default_ats_result,
+        p.ou_result AS default_ou_result,
+        o.su AS override_su,o.ats AS override_ats,o.ou AS override_ou,
+        game.away,game.home,game.away_spread,game.total,
+        game.lock_at,game.kickoff_at,game.void_reason,
         game.away_final,game.home_final,game.result_at
         FROM huddle_league_member_periods entry
         LEFT JOIN huddle_league_members active_entry
             ON active_entry.league_id=entry.league_id
             AND active_entry.member_id=entry.member_id AND entry.left_at IS NULL
-        JOIN member_picks p ON p.member_id=entry.member_id
-        JOIN pick_games game ON game.id=p.game_id
-        JOIN pick_weeks week ON week.id=game.week_id
-        WHERE entry.league_id=? AND week.season=? AND week.published_at IS NOT NULL
+        JOIN pick_weeks week ON week.season=? AND week.published_at IS NOT NULL
+        JOIN pick_games game ON game.week_id=week.id
+        LEFT JOIN member_picks p ON p.member_id=entry.member_id AND p.game_id=game.id
+        LEFT JOIN huddle_league_pick_overrides o
+            ON o.league_id=entry.league_id AND o.member_id=entry.member_id
+            AND o.game_id=game.id
+        WHERE entry.league_id=?
+        AND (p.game_id IS NOT NULL OR o.game_id IS NOT NULL)
         AND julianday(game.lock_at)>julianday({joined})
         AND julianday(game.lock_at)>julianday(?)
         AND julianday(game.kickoff_at)>julianday({joined})
@@ -114,7 +138,7 @@ def selections(connection, league, season, week_id=None):
         AND (entry.left_at IS NULL OR (
              julianday(game.lock_at)<julianday(entry.left_at)
              AND julianday(game.kickoff_at)<julianday(entry.left_at)))'''
-    params = [league['id'],season,league['created_at'],league['created_at'],league['created_at']]
+    params = [season,league['id'],league['created_at'],league['created_at'],league['created_at']]
     if week_id is not None:
         query += ' AND week.id=?'
         params.append(week_id)
@@ -154,10 +178,26 @@ def standings(connection, league, season, week_id=None, now=None):
         except (ValueError, TypeError):
             verified = False
         row = rows[pick['member_id']]
+        effective = {category: (pick['override_'+category] if pick['override_'+category] is not None
+                               else pick['default_'+category]) for category in CATEGORIES}
+        # Reuse the shared grade function on the same verified, frozen game data.
+        # Regular My Picks results stay authoritative for inherited categories.
+        overridden_results = None
+        if verified and any(pick['override_'+key] is not None for key in CATEGORIES):
+            from member_picks import grade
+            overridden_results = dict(zip(CATEGORIES,grade(
+                pick,effective['su'],effective['ats'],effective['ou'])))
         for category in CATEGORIES:
-            if not league[category+'_enabled'] or not pick[category]:
+            if not league[category+'_enabled'] or not effective[category]:
                 continue
-            outcome = 'Void' if pick['void_reason'] else pick[category+'_result'] if verified else 'Pending'
+            if pick['void_reason']:
+                outcome = 'Void'
+            elif not verified:
+                outcome = 'Pending'
+            elif pick['override_'+category] is not None:
+                outcome = overridden_results[category]
+            else:
+                outcome = pick['default_'+category+'_result']
             if outcome not in OUTCOMES:
                 outcome = 'Pending'
             row[outcome] += 1
@@ -366,6 +406,140 @@ def leave(league_id):
         connection.rollback()
         raise
     return redirect(url_for('huddle_leagues.mine'),303)
+
+
+@bp.route('/<int:league_id>/picks', methods=['GET', 'POST'])
+def league_picks(league_id):
+    """Per-league optional overrides; inherited My Picks are never modified."""
+    league = member_league(league_id)
+    from member_picks import schedule, sync_results
+    from weekly_pick_lines import publish_saved_snapshot
+    from site_week import active_week
+    from pathlib import Path
+
+    now = now_utc()
+    connection = db()
+    # Reuse the existing official frozen weekly sheet; never capture new lines.
+    publish_saved_snapshot(connection, Path(current_app.config['PICKS_SOURCE_ROOT']), now)
+    sync_results()
+    active = active_week(list(schedule().values()), now)
+
+    if request.method == 'POST':
+        raw_id = request.form.get('game_id', '')
+        if not raw_id.isdecimal() or int(raw_id) <= 0:
+            abort(400, description='Choose a valid game.')
+        values = {}
+        for category in CATEGORIES:
+            submitted = request.form.getlist(category)
+            if not league[category+'_enabled']:
+                if submitted:
+                    abort(400, description='Category is not enabled in this league.')
+                values[category] = None
+                continue
+            if len(submitted) != 1:
+                abort(400, description='Select one choice or Use My Picks per category.')
+            values[category] = submitted[0] or None
+
+        connection.execute('BEGIN IMMEDIATE')
+        try:
+            # Resolve membership and frozen line state after acquiring write lock.
+            game = connection.execute('''SELECT game.*,week.season,week.week,
+                week.published_at,entry.joined_at
+                FROM pick_games game JOIN pick_weeks week ON week.id=game.week_id
+                JOIN huddle_league_members entry ON entry.league_id=?
+                    AND entry.member_id=?
+                WHERE game.id=?''',
+                (league_id,g.member['id'],int(raw_id))).fetchone()
+            if game is None or game['published_at'] is None:
+                abort(404)
+            if active != (game['season'],game['week']):
+                abort(409, description='This NFL week is closed for league picks.')
+            if (game['locked'] or game['void_reason'] or
+                now >= datetime.fromisoformat(game['lock_at']) or
+                now >= datetime.fromisoformat(game['kickoff_at']) or
+                now < datetime.fromisoformat(game['joined_at']) or
+                now < datetime.fromisoformat(league['created_at']) or
+                datetime.fromisoformat(game['lock_at']) <= datetime.fromisoformat(game['joined_at']) or
+                datetime.fromisoformat(game['kickoff_at']) <= datetime.fromisoformat(game['joined_at']) or
+                datetime.fromisoformat(game['lock_at']) <= datetime.fromisoformat(league['created_at']) or
+                datetime.fromisoformat(game['kickoff_at']) <= datetime.fromisoformat(league['created_at'])):
+                abort(409, description='This game is locked or predates your league membership.')
+            for category in CATEGORIES:
+                allowed = (game['away'],game['home']) if category in ('su','ats') else ('Over','Under')
+                if values[category] is not None and values[category] not in allowed:
+                    abort(400, description='Invalid league pick selection.')
+            if all(value is None for value in values.values()):
+                connection.execute('''DELETE FROM huddle_league_pick_overrides
+                    WHERE league_id=? AND member_id=? AND game_id=?''',
+                    (league_id,g.member['id'],game['id']))
+            else:
+                connection.execute('''INSERT INTO huddle_league_pick_overrides
+                    (league_id,member_id,game_id,su,ats,ou,updated_at)
+                    VALUES(?,?,?,?,?,?,?)
+                    ON CONFLICT(league_id,member_id,game_id) DO UPDATE SET
+                    su=excluded.su,ats=excluded.ats,ou=excluded.ou,
+                    updated_at=excluded.updated_at''',
+                    (league_id,g.member['id'],game['id'],
+                     *(values[key] for key in CATEGORIES),now.isoformat()))
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+        return redirect(url_for('huddle_leagues.league_picks',
+            league_id=league_id,week_id=game['week_id']),303)
+
+    weeks = connection.execute('''SELECT DISTINCT week.* FROM pick_weeks week
+        JOIN pick_games game ON game.week_id=week.id
+        WHERE week.published_at IS NOT NULL
+        AND julianday(game.lock_at)>julianday(?)
+        AND julianday(game.kickoff_at)>julianday(?)
+        ORDER BY week.season DESC,week.week DESC,week.id DESC''',
+        (league['created_at'],league['created_at'])).fetchall()
+    requested = request.args.get('week_id')
+    if requested is not None and not requested.isdecimal():
+        abort(400)
+    current_week = next((week['id'] for week in weeks
+        if (week['season'],week['week'])==active),None)
+    selected = int(requested) if requested is not None else (
+        current_week if current_week is not None else weeks[0]['id'] if weeks else None)
+    if selected is not None and selected not in {week['id'] for week in weeks}:
+        abort(400)
+    selected_week = next((week for week in weeks if week['id']==selected),None)
+    week_open = bool(selected_week and
+        (selected_week['season'],selected_week['week'])==active)
+    raw_games = connection.execute('''SELECT game.*,
+        base.su AS default_su,base.ats AS default_ats,base.ou AS default_ou,
+        base.su_result AS default_su_result,
+        base.ats_result AS default_ats_result,
+        base.ou_result AS default_ou_result,
+        override.su AS override_su,override.ats AS override_ats,override.ou AS override_ou,
+        entry.joined_at
+        FROM pick_games game JOIN pick_weeks week ON week.id=game.week_id
+        JOIN huddle_league_members entry ON entry.league_id=? AND entry.member_id=?
+        LEFT JOIN member_picks base ON base.game_id=game.id AND base.member_id=entry.member_id
+        LEFT JOIN huddle_league_pick_overrides override
+             ON override.league_id=entry.league_id AND override.member_id=entry.member_id
+             AND override.game_id=game.id
+        WHERE game.week_id=? AND week.published_at IS NOT NULL
+        ORDER BY game.kickoff_at,game.id''',
+        (league_id,g.member['id'],selected)).fetchall() if selected else []
+    cards = []
+    for game in raw_games:
+        card = dict(game)
+        joined_at = datetime.fromisoformat(game['joined_at'])
+        eligible = (datetime.fromisoformat(game['lock_at'])>joined_at and
+            datetime.fromisoformat(game['kickoff_at'])>joined_at and
+            datetime.fromisoformat(game['lock_at'])>datetime.fromisoformat(league['created_at']) and
+            datetime.fromisoformat(game['kickoff_at'])>datetime.fromisoformat(league['created_at']))
+        card['editable'] = bool(week_open and eligible and
+            not game['locked'] and not game['void_reason'] and
+            now < datetime.fromisoformat(game['lock_at']) and
+            now < datetime.fromisoformat(game['kickoff_at']))
+        card['eligible'] = eligible
+        cards.append(card)
+    return render_template('huddle_leagues.html',mode='picks',league=league,
+        categories=CATEGORIES,weeks=weeks,selected=selected,cards=cards,
+        week_open=week_open)
 
 
 @bp.get('/<int:league_id>')
