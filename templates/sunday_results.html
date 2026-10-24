@@ -35,7 +35,7 @@
 <td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
 <td class="dog-ats-record">{{ game.dog_ats_record }}</td>
 <td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</span></td>
-<td>{{ game.scout_pick }}</td>
+<td>{{ game.scout_pick }}{% if game.forecast_digest %}<br><small><a href="{{ url_for('fans.matchup',game_id=game.game_id,forecast=game.forecast_digest) }}">Saved forecast →</a></small>{% endif %}</td>
 <td>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</td>
 <td><small>ATS</small><br><span class="result-badge result-{{ game.scout_result|lower }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</span>{% if game.total_result!='—' %}<br><small>Total</small><br><span class="result-badge result-{{ game.total_result|lower }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</span>{% endif %}</td>
 <td><details><summary>View details</summary><p>Dog straight-up: {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>{% if game.has_rankings %}<p>Historical ranks: 3Y #{{ game.rank_3y }} • 5Y #{{ game.rank_5y }} • 10Y #{{ game.rank_10y }} • All #{{ game.rank_all }}</p>{% else %}<p>No saved rankings for this game.</p>{% endif %}</details></td>

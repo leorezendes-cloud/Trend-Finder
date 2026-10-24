@@ -1,5 +1,5 @@
 """Full-week results from canonical games; saved predictions retain their lines."""
-import csv,math,json
+import csv,math,json,hashlib
 from datetime import datetime,timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -28,9 +28,8 @@ def underdog_records(rows,season,before_week):
 
 def build_results(root,week=None,score_updates=None):
  rows=confirmed_score_rows(list(load_games(root/'nfl_games.csv').values()),score_updates)
- all_frozen={}
- for path in (root/'data/scout4/blend/predictions').glob('*.json'):
-  record=json.loads(path.read_text());all_frozen[record['game_id']]=record
+ from forecast_history import official_sources
+ all_frozen=official_sources(root)
  present={g['game_id'] for g in rows}
  seasons=[int(g['season']) for g in rows if g.get('away_score') not in ('',None)] + [r['season'] for r in all_frozen.values() if r['game_id'] in present]
  season=max(seasons) if seasons else max(int(g['season']) for g in rows)
@@ -92,14 +91,16 @@ def build_results(root,week=None,score_updates=None):
    else:item['scout_pick']='No pick recorded';item['scout_result']='Not graded'
   item.update(total_pick='No saved total',total_result='—',model_name=model_label)
   if record:
-   from scout4.blend import grade_components
-   from scout4.blend_results import total_result
+   from forecast_history import grade_components,total_result,pregame_record
    try:
+    pregame_record(record)
     results=grade_components(record,g);component=record['components']['Blend'];team=component['pick']
     line=record['quote']['line'] if team==g['away_team'] else -record['quote']['line']
     item['scout_pick']=f'{team} {line:+g}' if team else 'No pick recorded'
     item['scout_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(results['Blend'],results['Blend'])
     item['scout_cushion']=f"{abs(component['ats_edge']):.1f}"
+    item['forecast_digest']=record['_history_digest']
+    item['forecast_version']=record.get('version','Unknown version')
     if record.get('totals'):
      total=record['totals'];item['total_pick']='No pick recorded' if total['prediction']['lean']=='No Call' else f"{total['prediction']['lean']} {total['quote']['line']:g}"
      tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(tr,tr)

@@ -111,6 +111,13 @@ def publish(root, destination, configuration):
             immutable(receipt,evidence)
             status['published' if not (destination/'publication_versions'/(version+'.json')).exists() else 'preserved'] += 1
             immutable(destination/'publication_versions'/(version+'.json'),canonical({'version':version}))
+            # Observed publication time is separate from the original model seal.
+            # Older imports lacking this evidence must never be backdated.
+            event = destination/'publication_events'/(version+'.json')
+            if not event.exists():
+                immutable(event,canonical({'version':version,'source_sha256':digest,
+                    'configuration_sha256':config_hash,'observed_published_at':clock().isoformat(),
+                    'original_sealed_at':record['sealed_at_utc']}))
     status['checked_at'] = clock().isoformat()
     status['state'] = 'published' if status['published'] or status['preserved'] else 'awaiting approved production seals'
     with tempfile.NamedTemporaryFile(dir=destination, prefix='.status-', delete=False) as stream:

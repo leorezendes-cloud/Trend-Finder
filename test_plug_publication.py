@@ -98,6 +98,56 @@ class PublicationTests(unittest.TestCase):
             self.assertNotIn('expert-card-picks',response.text)
             self.assertEqual(app.test_client().get('/the-plug/2026/6/HOU-JAX').status_code,200)
 
+    def test_publication_time_is_separate_and_preserved(self):
+        self.run_publish()
+        paths=list((self.dest/'publication_events').glob('*.json'))
+        self.assertEqual(len(paths),1)
+        event=json.loads(paths[0].read_text())
+        from expert_beta import instant
+        self.assertGreaterEqual(instant(event['observed_published_at']),instant(event['original_sealed_at']))
+        before=paths[0].read_bytes()
+        self.run_publish()
+        self.assertEqual(paths[0].read_bytes(),before)
+
+    def test_latest_evidenced_pregame_publication_owns_pick_and_line(self):
+        from forecast_history import official_sources
+        from expert_beta import instant
+        issued=self.cut+timedelta(minutes=2)
+        with patch('plug_publication.clock',return_value=issued):self.run_publish()
+        first=Store(self.dest).records()[0]
+        # A newer immutable approved revision, with its own source and evidence.
+        changed=copy.deepcopy(self.record)
+        changed['components']['Blend']['pick']='HOU'
+        changed['quote']['line']=4.5
+        changed['sealed_at_utc']=(self.cut+timedelta(minutes=1)).isoformat()
+        raw=canonical(changed);digest=hashlib.sha256(raw).hexdigest()
+        scout=convert(changed,self.hash);scout['production_source']['source_sha256']=digest
+        version=Store(self.dest).append(scout,kind='production_import',generated_at=changed['sealed_at_utc'])
+        immutable(self.dest/'production_sources'/(digest+'.json'),raw)
+        immutable(self.dest/'publication_versions'/(version+'.json'),canonical({'version':version}))
+        event=dict(version=version,source_sha256=digest,configuration_sha256=self.hash,
+                   original_sealed_at=changed['sealed_at_utc'],observed_published_at=(issued+timedelta(minutes=1)).isoformat())
+        event_path=self.dest/'publication_events'/(version+'.json')
+        immutable(event_path,canonical(event))
+        selected=official_sources(self.root,destination=self.dest)[self.record['game_id']]
+        self.assertEqual(selected['_archive_version'],version)
+        self.assertEqual(selected['components']['Blend']['pick'],'HOU')
+        self.assertEqual(selected['quote']['line'],4.5)
+        from forecast_history import grade_components
+        final={**{k:selected[k] for k in ('game_id','away_team','home_team')},'away_score':'19','home_score':'26'}
+        self.assertEqual(grade_components(selected,final)['Blend'],'Loss')
+        self.assertEqual(grade_components(self.record,final)['Blend'],'Win')
+        # A post-kickoff import must not replace the earlier eligible publication.
+        event['observed_published_at']=self.record['kickoff_utc']
+        event_path.write_bytes(canonical(event))
+        self.assertEqual(official_sources(self.root,destination=self.dest)[self.record['game_id']]['_archive_version'],first['version'])
+        event_path.unlink()
+        self.assertEqual(official_sources(self.root,destination=self.dest)[self.record['game_id']]['_archive_version'],first['version'])
+        # Corrupt evidence fails closed, rather than silently choosing a winner.
+        event['observed_published_at']=(issued+timedelta(minutes=1)).isoformat()
+        event['source_sha256']='0'*64;event_path.write_bytes(canonical(event))
+        with self.assertRaises(ValueError):official_sources(self.root,destination=self.dest)
+
     def test_atomic_writer_never_replaces_content(self):
         p=self.root/'atomic.json';immutable(p,b'first');immutable(p,b'first')
         with self.assertRaises(ValueError):immutable(p,b'other')
