@@ -28,20 +28,27 @@
     <a href="{{ url_for('trend_finder') }}" {% if request.endpoint in trend_endpoints %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/trend-findah-3000-nav-transparent.png') }}" alt=""><span>TrendFindah 3000</span></a>
     <a href="{{ url_for('plug_page') }}" {% if plug_section %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png') }}" alt=""><span>The Plug</span></a>
     <a href="{{ url_for('conspiracy_dungeon_page') }}" {% if request.endpoint == 'conspiracy_dungeon_page' %}aria-current="page"{% endif %}><img class="menu-logo" src="{{ url_for('static', filename='Images/Branding/gravy-train-branding/conspiracy-dungeon/conspiracy-dungeon-nav.png') }}" alt=""><span>Conspiracy Dungeon</span></a>
-    {% if config.get('METHODOLOGY_ENABLED') %}<a href="{{ url_for('methodology_page') }}">About &amp; Methodology</a>{% endif %}
-    <a href="{{ request.script_root }}/install">Install app</a>
-    <a href="{{ url_for('community.discussion') }}" {% if request.blueprint == 'community' %}aria-current="page"{% endif %}>The Huddle · Comments</a>
-    <a href="{{ url_for('membership.feedback_page',page=request.path) }}">Beta Feedback</a>
-    {% if g.is_owner %}<a href="{{ url_for('member_picks.admin') }}">Manage Weekly Picks</a><a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a><a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>{% endif %}
     {% if g.member %}
-    <a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>
-    <a href="{{ url_for('membership.preferences') }}" {% if request.blueprint == 'membership' %}aria-current="page"{% endif %}>My Profile</a>
+    <a href="{{ url_for('huddle_leagues.mine') }}" {% if request.blueprint == 'huddle_leagues' %}aria-current="page"{% endif %}>My Leagues</a>
+    <a href="{{ url_for('member_picks.my_picks') }}" {% if request.endpoint == 'member_picks.my_picks' %}aria-current="page"{% endif %}>My Picks</a>
+    <a href="{{ url_for('membership.preferences') }}" {% if request.endpoint == 'membership.preferences' %}aria-current="page"{% endif %}>My Profile</a>
+    {% endif %}
+    <a href="{{ url_for('community.discussion') }}" {% if request.blueprint == 'community' %}aria-current="page"{% endif %}>The Huddle</a>
+    {% if config.get('METHODOLOGY_ENABLED') %}<a href="{{ url_for('methodology_page') }}">About &amp; Methodology</a>{% endif %}
+    <a href="{{ url_for('membership.feedback_page',page=request.path) }}">Beta Feedback</a>
+    <a href="{{ request.script_root }}/install">Add to your Homescreen</a>
+    {% if g.member %}
     <form class="member-logout" method="post" action="{{ url_for('membership.logout') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button>
     </form>
     {% else %}
     <a href="{{ url_for('membership.login') }}">Log in</a>
     <a href="{{ url_for('membership.register') }}">Join Free</a>
+    {% endif %}
+    {% if g.is_owner %}
+    <a href="{{ url_for('member_picks.admin') }}">Manage Weekly Picks</a>
+    <a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a>
+    <a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>
     {% endif %}
 </nav>
 {% if request.endpoint in trend_endpoints %}
