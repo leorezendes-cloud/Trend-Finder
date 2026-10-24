@@ -183,6 +183,64 @@ class MemberPicksTests(unittest.TestCase):
                 if sql.lstrip().upper().startswith('UPDATE MEMBER_PICKS')
             ])
 
+
+    def test_schedule_cached_per_request_and_fresh_next_request(self):
+        from member_picks import schedule
+        with patch(
+            'score_finals.public_final_rows',
+            side_effect=lambda rows, path: rows
+        ) as finals:
+            with self.app.test_request_context('/picks/'):
+                first = schedule()
+                self.assertIs(first, schedule())
+                self.assertEqual(finals.call_count, 1)
+
+            self.rows[0]['away_team'] = 'Updated A'
+            self.write_schedule()
+
+            with self.app.test_request_context('/picks/'):
+                second = schedule()
+                self.assertIsNot(first, second)
+                self.assertEqual(
+                    second['2030_06_A_B']['away_team'],
+                    'Updated A'
+                )
+
+            self.assertEqual(finals.call_count, 2)
+
+            # Outside HTTP requests, never retain this cache.
+            with self.app.app_context():
+                self.assertIsNot(schedule(), schedule())
+
+            self.assertEqual(finals.call_count, 4)
+
+    def test_my_picks_request_reads_enriched_schedule_once(self):
+        self.sheet()
+        with patch(
+            'score_finals.public_final_rows',
+            side_effect=lambda rows, path: rows
+        ) as finals:
+            response = self.member().get('/picks/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(finals.call_count, 1)
+
+    def test_unchanged_games_do_not_require_individual_reload(self):
+        self.sheet()
+        statements = []
+
+        with self.app.app_context():
+            connection = db()
+            connection.set_trace_callback(statements.append)
+            try:
+                sync_results()
+            finally:
+                connection.set_trace_callback(None)
+
+        self.assertFalse([
+            sql for sql in statements
+            if 'SELECT * FROM PICK_GAMES WHERE ID=' in sql.upper()
+        ])
+
     def test_manual_line_entry_is_unavailable(self):
         game_id,path=self.sheet(publish=False)
         before=(self.root/'nfl_games.csv').read_bytes()

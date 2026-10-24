@@ -6,7 +6,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import secrets
 from urllib.parse import urlsplit
-from flask import Blueprint,abort,current_app,g,redirect,render_template,request,session,url_for,flash,jsonify
+from flask import Blueprint,abort,current_app,g,has_request_context,redirect,render_template,request,session,url_for,flash,jsonify
 from membership import db
 
 bp=Blueprint('member_picks',__name__,url_prefix='/picks')
@@ -24,6 +24,10 @@ def kickoff(row):
 
 def schedule():
     path=Path(current_app.config['PICKS_SOURCE_ROOT'])/'nfl_games.csv'
+    if has_request_context():
+        cached=g.get('member_pick_schedule_cache')
+        if cached is not None and cached[0]==str(path):
+            return cached[1]
     if not path.exists():return {}
     with path.open(newline='',encoding='utf-8-sig') as stream:
         rows=list(csv.DictReader(stream))
@@ -31,7 +35,10 @@ def schedule():
     rows=public_final_rows(rows,path)
     ids=[row.get('game_id') for row in rows]
     if len(ids)!=len(set(ids)):raise ValueError('Duplicate game identities in saved schedule')
-    return {row['game_id']:row for row in rows}
+    result={row['game_id']:row for row in rows}
+    if has_request_context():
+        g.member_pick_schedule_cache=(str(path),result)
+    return result
 
 
 def public_market_for_pick(pick):
@@ -120,7 +127,8 @@ def sync_results():
                 if final and (game['away_final']!=int(a) or game['home_final']!=int(h)):
                     final_changed=True
                     db().execute('UPDATE pick_games SET away_final=?,home_final=?,result_at=? WHERE id=?',(int(a),int(h),now.isoformat(),game['id']))
-            current=db().execute('SELECT * FROM pick_games WHERE id=?',(game['id'],)).fetchone()
+            current=(db().execute('SELECT * FROM pick_games WHERE id=?',
+                    (game['id'],)).fetchone() if final_changed else game)
             if current['away_final'] is None and not current['void_reason']:continue
             selection='SELECT * FROM member_picks WHERE game_id=?'
             if not final_changed:selection+=" AND ((su IS NOT NULL AND su_result='Pending') OR (ats IS NOT NULL AND ats_result='Pending') OR (ou IS NOT NULL AND ou_result='Pending'))"
