@@ -172,7 +172,7 @@
 
             <div class="newsletter-issue">
 
-              <strong>{{ issue.subject }}</strong>
+              <strong>The Weekly Plug · {{ issue|plug_period_label }}</strong>
 
               <p>
                 Issue #{{ issue.id }} · {{ issue.status|capitalize }}

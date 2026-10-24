@@ -157,35 +157,176 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
     return [text for _, text, _ in selected], [text for _, text in expert], [version for _, _, version in selected]
 
 
-def _trends_content(origin, warnings):
+
+
+# Newsletter copy is deliberately separate from the site Hot Trends data model.
+# Source outcome/streak/evidence remain untouched; this only narrates them.
+_NEWSLETTER_TEAMS = {
+    line.split(':', 1)[0]: line.split(':', 1)[1]
+    for line in """
+ARI:Arizona Cardinals
+ATL:Atlanta Falcons
+BAL:Baltimore Ravens
+BUF:Buffalo Bills
+CAR:Carolina Panthers
+CHI:Chicago Bears
+CIN:Cincinnati Bengals
+CLE:Cleveland Browns
+DAL:Dallas Cowboys
+DEN:Denver Broncos
+DET:Detroit Lions
+GB:Green Bay Packers
+HOU:Houston Texans
+IND:Indianapolis Colts
+JAX:Jacksonville Jaguars
+KC:Kansas City Chiefs
+LA:Los Angeles Rams
+LAR:Los Angeles Rams
+LAC:Los Angeles Chargers
+LV:Las Vegas Raiders
+MIA:Miami Dolphins
+MIN:Minnesota Vikings
+NE:New England Patriots
+NO:New Orleans Saints
+NYG:New York Giants
+NYJ:New York Jets
+PHI:Philadelphia Eagles
+PIT:Pittsburgh Steelers
+SEA:Seattle Seahawks
+SF:San Francisco 49ers
+TB:Tampa Bay Buccaneers
+TEN:Tennessee Titans
+WAS:Washington Commanders""".splitlines() if ':' in line
+}
+
+
+def _trend_copy(trend):
+    """Plain-language headline and description grounded in stored outcomes."""
+    title = str(trend['title'])
+    subject = title.rsplit(' — ', 1)[0]
+    kind = trend['kind']
+    outcome = trend['outcome']
+    streak = int(trend.get('streak') or 0)
+    hits = int(trend.get('wins') or 0)
+    sample = int(trend.get('sample') or 0)
+    label = 'SU' if kind == 'su' else 'ATS' if kind == 'ats' else 'O/U'
+    scope = trend.get('scope')
+    name = _NEWSLETTER_TEAMS.get(subject, subject)
+    long_streak = streak >= 5
+    count = streak if long_streak else hits
+    if kind == 'su':
+        noun = 'Wins' if outcome == 'Win' else 'Losses'
+    elif kind == 'ats':
+        noun = 'Covers' if outcome == 'Cover' else 'Non-Covers'
+    else:
+        noun = 'Overs' if outcome == 'Over' else 'Unders'
+    result = (f'{count} Straight {noun}' if long_streak
+              else f'{hits} of Last {sample} {noun}')
+    heading = f'{subject} — {label}: {result}'
+
+    if kind == 'su':
+        action = 'won' if outcome == 'Win' else 'lost'
+        verb_phrase = f'has {action} {count} consecutive games outright' if long_streak else f'has {action} {hits} of its last {sample} games outright'
+    elif kind == 'ats':
+        action = 'covered the spread' if outcome == 'Cover' else 'failed to cover the spread'
+        verb_phrase = f'has {action} in {count} consecutive games' if long_streak else f'has {action} in {hits} of its last {sample} games'
+    else:
+        action = 'gone over' if outcome == 'Over' else 'gone under'
+        verb_phrase = f'has {action} the total in {count} consecutive games' if long_streak else f'has {action} the total in {hits} of its last {sample} games'
+
+    if scope == 'team':
+        if kind == 'total':
+            subject_text = f'Games involving the {name} '
+            detail = subject_text + verb_phrase.replace('has ', 'have ', 1) + '.'
+        else:
+            detail = f'The {name} {verb_phrase.replace("has ", "have ", 1)}.'
+    elif scope == 'qb':
+        detail = (f'In games featuring {name}, the quarterback’s team {verb_phrase}.' if kind != 'total'
+                  else f'Games featuring {name} {verb_phrase.replace("has ", "have ", 1)}.')
+    else:
+        # Situational subjects can include location and favorite/underdog filters.
+        label_text = subject.lower()
+        location = 'home ' if 'home ' in label_text else 'away ' if 'away ' in label_text else ''
+        timing = 'primetime' if label_text.startswith('primetime') else ('non-primetime' if label_text.startswith('non-primetime') else '')
+        if 'underdog' in label_text or 'favorite' in label_text:
+            role = 'underdogs' if 'underdog' in label_text else 'favorites'
+            qualifier = ' '.join(x for x in (location.strip(), timing) if x)
+            subset = f'{qualifier} {role}'.strip().capitalize()
+            # Better grammar for plural situations.
+            if outcome == 'Cover':
+                action = 'have covered the spread'
+            else:
+                action = 'have failed to cover the spread'
+            detail = (f'{subset} {action} in {count} straight games.' if long_streak
+                      else f'{subset} {action} in {hits} of their last {sample} games.')
+        else:
+            games_name = (timing.capitalize() + ' games') if timing else 'These games'
+            action = 'have gone over' if outcome == 'Over' else 'have gone under'
+            detail = (f'{games_name} {action} the total in {count} straight games.' if long_streak
+                      else f'{games_name} {action} the total in {hits} of the last {sample} games.')
+    if trend.get('spans_seasons') and scope in ('team', 'qb'):
+        detail += ' The streak spans multiple seasons.' if long_streak else ''
+    return heading, detail
+
+
+def _weekly_featured_pick(picks, experts, versions, warnings):
+    """Pick one approved/public featured Expert matchup, with its matching Scout snapshot.
+
+    No claim of highest confidence is made: the existing public featured list has
+    no audited common ranking score. Deterministic ordering is kickoff order;
+    the owner can edit the draft before approval.
+    """
+    indexed = {}
+    for i, block in enumerate(picks):
+        lines = [part.strip() for part in block.splitlines() if part.strip()]
+        if len(lines) >= 3 and lines[-1].startswith(('https://', 'http://')):
+            indexed[lines[-1]] = (lines, versions[i] if i < len(versions) else None)
+    for block in experts:
+        lines = [part.strip() for part in block.splitlines() if part.strip()]
+        if len(lines) < 4 or lines[-1] not in indexed:
+            continue
+        scout, version = indexed[lines[-1]]
+        # Label the two decision sources separately (they may disagree).
+        featured = '\n'.join([
+            scout[0],
+            'Scout: ' + scout[1],
+            'Expert: ' + lines[1],
+            "Expert's take: " + ' '.join(lines[2:-1]),
+            lines[-1],
+        ])
+        return featured, [version] if version else []
+    warnings.append('No approved publicly featured Expert pick matched an eligible saved Scout pick; feature remains pending.')
+    return 'The featured Expert pick is being prepared. Check The Plug for published picks.', []
+
+
+def _trends_content(origin, warnings, limit=MAX_TRENDS):
     try:
         from active_trends import load_highlights
-        trends = load_highlights()[:MAX_TRENDS]
+        trends = load_highlights()[:limit]
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
         warnings.append('Hot Right Now highlights were unavailable; no trends were invented.')
         return [], []
-    labels = {'Cover': 'ATS covers', 'Win': 'wins', 'Loss': 'losses',
-              'Over': 'overs', 'Under': 'unders'}
     output, identities = [], []
     for trend in trends:
-        if trend.get('outcome') not in labels or not trend.get('params'):
+        if trend.get('outcome') not in ('Cover', 'Win', 'Loss', 'Over', 'Under') or not trend.get('params'):
             warnings.append('One featured trend was skipped because its evidence link was unavailable.')
             continue
-        qualification = (f"{trend['streak']} straight {labels[trend['outcome']]}" if trend['streak'] >= 5
-                         else f"{trend['wins']} of the last {trend['sample']} {labels[trend['outcome']]}")
+        heading, detail = _trend_copy(trend)
         query = urlencode(trend['params'])
         link = origin + '/trend-finder?' + query + '#matching-games'
-        detail = qualification
-        sample = number(trend.get('sample'))
-        wins = number(trend.get('wins'))
-        if sample is not None and wins is not None and sample > 0 and 0 <= wins <= sample:
-            detail += f" · {wins:g}/{sample:g} ({100 * wins / sample:.0f}%) in the recorded sample"
-        output.append(f"{trend['title']}\n{detail}\n{link}")
+        output.append(f'{heading}\n{detail}\n{link}')
         identities.append({'title': trend['title'], 'latest_id': trend.get('latest_id')})
     return output, identities
 
 
-def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True):
+def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True,
+              max_games=8, editorial=False):
+    """Select a compact, diverse viewing guide without inventing viewing figures.
+
+    Relevance is an editorial heuristic from the saved current-season standings,
+    divisional matchups, and the scheduled broadcast window. It is NOT based on
+    measured TV ratings or conjectured player availability.
+    """
     def read(path):
         raw = path.read_bytes()
         sources[str(path.relative_to(root))] = hashlib.sha256(raw).hexdigest()
@@ -196,33 +337,154 @@ def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True)
     if not rows:
         warnings.append('No saved schedule was available for the matchup roundup.')
         return []
+
+    current = None
     if active_only:
         from site_week import active_week
         current = active_week(rows, now)
-    else:
-        current = None
     has_week = any(row.get('season') and row.get('week') for row in rows)
     upcoming = []
     for row in rows:
-        if row.get('away_score') or row.get('home_score'):
+        if row.get('away_score') not in (None, '') or row.get('home_score') not in (None, ''):
             continue
         try:
-            kickoff = (datetime.fromisoformat(row['gameday']+'T'+row['gametime'])
+            kickoff = (datetime.fromisoformat(row['gameday'] + 'T' + row['gametime'])
                        .replace(tzinfo=ET).astimezone(timezone.utc))
-        except (KeyError, ValueError):
-            continue
-        if active_only and has_week and (int(row.get('season', 0)), int(row.get('week', 0))) != current:
-            continue
-        if not all(row.get(key) for key in ('game_id', 'away_team', 'home_team')):
+            if active_only and has_week and (int(row.get('season') or 0), int(row.get('week') or 0)) != current:
+                continue
+            if not all(row.get(key) for key in ('game_id', 'away_team', 'home_team')):
+                continue
+        except (KeyError, ValueError, TypeError):
             continue
         if now < kickoff <= now + timedelta(days=days):
             upcoming.append((kickoff, row))
-    lines = []
-    for kickoff, row in sorted(upcoming, key=lambda entry: entry[0])[:8]:
-        label = _event_label(row, kickoff)
-        url = origin + '/matchup/' + row['game_id']
-        lines.append(label + '\n' + url)
-    return lines
+    upcoming.sort(key=lambda item: (item[0], item[1]['game_id']))
+
+    if not editorial:
+        return [_event_label(row, kickoff) + '\n' + origin + '/matchup/' + row['game_id']
+                for kickoff, row in upcoming[:max_games]]
+
+    # Known NFL divisions; used only to recognize actual divisional pairings.
+    divisions = {
+        'BUF':'AFC East','MIA':'AFC East','NE':'AFC East','NYJ':'AFC East',
+        'BAL':'AFC North','CIN':'AFC North','CLE':'AFC North','PIT':'AFC North',
+        'HOU':'AFC South','IND':'AFC South','JAX':'AFC South','TEN':'AFC South',
+        'DEN':'AFC West','KC':'AFC West','LAC':'AFC West','LV':'AFC West',
+        'DAL':'NFC East','NYG':'NFC East','PHI':'NFC East','WAS':'NFC East',
+        'CHI':'NFC North','DET':'NFC North','GB':'NFC North','MIN':'NFC North',
+        'ATL':'NFC South','CAR':'NFC South','NO':'NFC South','TB':'NFC South',
+        'ARI':'NFC West','LA':'NFC West','LAR':'NFC West','SF':'NFC West','SEA':'NFC West',
+    }
+
+    def time_window(kickoff):
+        local = kickoff.astimezone(ET)
+        weekday, hour = local.weekday(), local.hour
+        if weekday == 3:
+            return 'Thursday night' if hour >= 17 else 'Thursday'
+        if weekday == 0:
+            return 'Monday night' if hour >= 17 else 'Monday'
+        if weekday == 6:
+            if hour < 12:
+                return 'Sunday morning'
+            if hour < 16:
+                return 'Sunday early'
+            if hour < 19:
+                return 'Sunday late'
+            return 'Sunday night'
+        if weekday == 5:
+            return 'Saturday'
+        return local.strftime('%A')
+
+    # Use only finished games from the same scheduled season that were completed
+    # before this draft was generated; no future data or in-progress scores.
+    seasons = {str(row.get('season')) for _, row in upcoming if row.get('season')}
+    results, seen = {}, set()
+    for row in rows:
+        if seasons and str(row.get('season')) not in seasons:
+            continue
+        game_id = row.get('game_id')
+        if not game_id or game_id in seen:
+            continue
+        try:
+            away, home = row['away_team'], row['home_team']
+            a, h = number(row.get('away_score')), number(row.get('home_score'))
+            played = (datetime.fromisoformat(row['gameday'] + 'T' + row['gametime'])
+                      .replace(tzinfo=ET).astimezone(timezone.utc))
+        except (KeyError, ValueError, TypeError):
+            continue
+        if None in (a, h) or min(a, h) < 0 or played + timedelta(hours=6) > now:
+            continue
+        seen.add(game_id)
+        for team, points, against in ((away, a, h), (home, h, a)):
+            stats = results.setdefault(team, {'W':0,'L':0,'T':0})
+            key = 'W' if points > against else 'L' if points < against else 'T'
+            stats[key] += 1
+
+    def record(team):
+        rec = results.get(team)
+        if not rec:
+            return None
+        n = sum(rec.values())
+        return (rec['W'], rec['L'], rec['T'], (rec['W'] + rec['T']/2) / n) if n else None
+
+    def relevance(item):
+        _kickoff, row = item
+        away, home = row['away_team'], row['home_team']
+        a, h = record(away), record(home)
+        rivalry = divisions.get(away) is not None and divisions.get(away) == divisions.get(home)
+        score = 32 if rivalry else 0
+        if a and h:
+            score += 2 * (a[0] + h[0])
+            score += 12 if a[3] > .5 and h[3] > .5 else 0
+            score += max(0, 8 - 16 * abs(a[3] - h[3]))
+        elif a or h:
+            score += 2 * (a or h)[0]
+        # Do not invent TV ratings. Ties break by earlier kickoff and game ID.
+        return score
+
+    best_by_window = {}
+    for item in upcoming:
+        window = time_window(item[0])
+        earlier = best_by_window.get(window)
+        if earlier is None or relevance(item) > relevance(earlier):
+            best_by_window[window] = item
+
+    # Guarantee diverse kickoff windows first. If >5 windows remain, prioritize
+    # national primetime and the major Sunday windows, then the strong matchups.
+    priority = {'Thursday night':7, 'Sunday night':7, 'Monday night':7,
+                'Sunday late':6, 'Sunday early':6, 'Sunday morning':5,
+                'Saturday':4, 'Thursday':3, 'Monday':3}
+    selected = sorted(best_by_window.values(), key=lambda item:
+                      (-priority.get(time_window(item[0]), 2),
+                       -relevance(item), item[0], item[1]['game_id']))[:max_games]
+    selected.sort(key=lambda item: (item[0], item[1]['game_id']))
+
+    output = []
+    for kickoff, row in selected:
+        away, home = row['away_team'], row['home_team']
+        window = time_window(kickoff)
+        local = kickoff.astimezone(ET)
+        ar, hr = record(away), record(home)
+        def short_record(rec):
+            if rec is None:
+                return ''
+            return f' ({rec[0]}–{rec[1]}' + (f'–{rec[2]}' if rec[2] else '') + ')'
+        away_name = _NEWSLETTER_TEAMS.get(away, away)
+        home_name = _NEWSLETTER_TEAMS.get(home, home)
+        rivalry = divisions.get(away) is not None and divisions.get(away) == divisions.get(home)
+        if rivalry:
+            description = (f'The {away_name}{short_record(ar)} visit the '
+                           f'{home_name}{short_record(hr)} in an {divisions[away]} matchup.')
+        else:
+            description = (f'The {away_name}{short_record(ar)} head to face the '
+                           f'{home_name}{short_record(hr)}.')
+        heading = f'{window.upper()} · {away} at {home}'
+        when = (f"{local.strftime('%a, %b')} {local.day} · "
+                f"{(local.hour % 12) or 12}:{local.minute:02d} "
+                f"{'AM' if local.hour < 12 else 'PM'} ET")
+        output.append(heading + '\n' + when + '\n' + description +
+                      '\n' + origin + '/matchup/' + row['game_id'])
+    return output
 
 
 def completed_month_games(root, now, sources=None):
@@ -304,7 +566,8 @@ def build_draft(root, now, frequency='weekly', *, premium=False):
     now = now.astimezone(timezone.utc)
     sources, warnings = {}, []
     origin = _origin()
-    trends, trend_ids = _trends_content(origin, warnings)
+    # Keep the monthly digest's eight-trend archive coverage; weekly is shorter.
+    trends, trend_ids = _trends_content(origin, warnings, limit=5 if frequency == 'weekly' else MAX_TRENDS)
 
     if frequency == 'monthly':
         recap = _monthly_recap(root, now, origin, sources, warnings)
@@ -317,16 +580,24 @@ def build_draft(root, now, frequency='weekly', *, premium=False):
                     'updates': ''}
         versions = []
     else:
-        picks, expert, versions = _plug_content(now, origin, warnings,
-                                                max_picks=None if premium else MAX_PICKS)
-        matchups = _matchups(root, now, origin, sources, warnings)
-        if not picks:
-            warnings.append('No eligible published upcoming picks; review before approving the issue.')
-        if premium and len(picks) < 13:
-            warnings.append(f'Premium preview contains {len(picks)} published games, not a full 13-game slate.')
-        sections = {'predictions': '\n\n'.join(picks) or 'No published picks available for the upcoming week.',
+        # Read all eligible pregame records, but select only one published Expert
+        # report AND its matching Scout snapshot for the free weekly newsletter.
+        picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None)
+        matchups = _matchups(root, now, origin, sources, warnings,
+                            max_games=5 if not premium else 8, editorial=not premium)
+        if premium:
+            if len(picks) < 13:
+                warnings.append(f'Premium preview contains {len(picks)} published games, not a full 13-game slate.')
+            # Existing premium preview stays a separate, unsent owner-only report.
+            featured_content = '\n\n'.join(picks) or 'No published picks available.'
+            expert_content = '\n\n'.join(expert)
+            versions = all_versions
+        else:
+            featured_content, versions = _weekly_featured_pick(picks, expert, all_versions, warnings)
+            expert_content = ''  # Expert analysis is embedded with its Scout selection.
+        sections = {'predictions': featured_content,
                     'trends': '\n\n'.join(trends) or 'No current featured trends available.',
-                    'expert': '\n\n'.join(expert),
+                    'expert': expert_content,
                     'matchups': '\n\n'.join(matchups) or 'No upcoming games in the saved schedule.',
                     'updates': ''}
     if not trends:
