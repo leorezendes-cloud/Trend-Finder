@@ -292,7 +292,9 @@ class LeagueTests(unittest.TestCase):
         self.seed(league, results=('Win', 'Loss', 'Push'))
         with self.connection() as c:
             c.execute("UPDATE member_picks SET su_result='Loss' WHERE member_id=2")
-            before = list(c.iterdump())
+            before = [tuple(row) for row in c.execute(
+                'SELECT * FROM member_picks ORDER BY member_id,game_id'
+            )]
         with patch('huddle_leagues.now_utc', return_value=datetime(2026,11,1,tzinfo=timezone.utc)):
             response = self.client.get('/huddle/leagues/')
         self.assertEqual(response.status_code, 200)
@@ -300,7 +302,11 @@ class LeagueTests(unittest.TestCase):
         self.assertIn('<dt>Wins</dt><dd>0</dd>', response.text)
         self.assertIn('<dt>Losses</dt><dd>2</dd>', response.text)
         with self.connection() as c:
-            self.assertEqual(before, list(c.iterdump()))
+            self.assertEqual(before, [
+                tuple(row) for row in c.execute(
+                    'SELECT * FROM member_picks ORDER BY member_id,game_id'
+                )
+            ])
         self.assertEqual(self.client.get(f'/huddle/leagues/{league["id"]}').status_code, 200)
         self.assertNotIn('View season', self.client.get(f'/huddle/leagues/{league["id"]}').text)
         self.assertNotIn('id="league-season"', self.client.get(f'/huddle/leagues/{league["id"]}').text)

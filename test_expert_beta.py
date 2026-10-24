@@ -157,4 +157,23 @@ class ExpertBetaTests(unittest.TestCase):
         self.assertNotIn('PREMIUM_SECRET',self.client.get('/the-plug/2026/1/BUF-NYJ?version='+r['version']).text)
         self.assertEqual(self.client.get('/the-plug/2026/1/BUF-NYJ?version=bad').status_code,404)
 
+    def test_archive_is_read_once_per_request(self):
+        original = Path.read_bytes
+        count = 0
+
+        def monitored(path):
+            nonlocal count
+            if 'forecasts' in path.parts:
+                count += 1
+            return original(path)
+
+        with patch.object(Path, 'read_bytes', monitored):
+            first = self.client.get('/api/the-plug')
+            self.assertEqual(first.status_code, 200)
+            self.assertEqual(count, len(self.games))
+
+            second = self.client.get('/api/the-plug')
+            self.assertEqual(second.status_code, 200)
+            self.assertEqual(count, 2 * len(self.games))
+
 if __name__=='__main__':unittest.main()

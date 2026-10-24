@@ -7,7 +7,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from flask import Blueprint, abort, current_app, g, jsonify, render_template, request
+from flask import Blueprint, abort, current_app, g, has_request_context, jsonify, render_template, request
 
 bp = Blueprint('expert_beta', __name__)
 
@@ -132,6 +132,12 @@ class Store:
         return digest
 
     def records(self):
+        # Cache validated forecasts only for the current HTTP request.
+        cache = g.setdefault('_expert_records', {}) if has_request_context() else None
+        key = str(self.root.resolve())
+        if cache is not None and key in cache:
+            return cache[key]
+
         records = []
         for path in sorted((self.root/'forecasts').glob('*/*/*/*.json')):
             raw = path.read_bytes()
@@ -145,16 +151,34 @@ class Store:
                 raise ValueError('Archive identity mismatch')
             record['version'] = path.stem
             records.append(record)
-        return sorted(records, key=lambda r: (r['generated_at'], r['version']))
+        result = sorted(records, key=lambda r: (r['generated_at'], r['version']))
+        if cache is not None:
+            cache[key] = result
+        return result
 
     def featured(self, season, week):
+        # Reuse featured access configuration within this request only.
+        cache = g.setdefault('_expert_featured', {}) if has_request_context() else None
+        key = (str(self.root.resolve()), season, week)
+        if cache is not None and key in cache:
+            return cache[key]
+
         path = self.root/'featured'/f'{season}-{week}.json'
         if not path.exists():
-            return []  # Fail closed until operator chooses exactly two games.
-        ids = json.loads(path.read_text())
-        available = {identity(r['scout']) for r in self.records() if int(r['scout']['game']['season']) == season and int(r['scout']['game']['week']) == week}
-        if len(ids) != 2 or len(set(ids)) != 2 or not set(ids) <= available:
-            raise ValueError('Featured configuration must name two games in this week')
+            ids = []  # Fail closed until exactly two are selected.
+        else:
+            ids = json.loads(path.read_text())
+            available = {
+                identity(r['scout']) for r in self.records()
+                if int(r['scout']['game']['season']) == season
+                and int(r['scout']['game']['week']) == week
+            }
+            if (not isinstance(ids, list) or len(ids) != 2
+                    or len(set(ids)) != 2 or not set(ids) <= available):
+                raise ValueError('Featured configuration must name two games in this week')
+
+        if cache is not None:
+            cache[key] = ids
         return ids
 
 
