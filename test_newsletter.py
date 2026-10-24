@@ -57,6 +57,43 @@ class NewsletterTests(unittest.TestCase):
         from io import BytesIO
         return BytesIO(b'{"id":"provider-123"}')
 
+
+    def test_weekly_preview_clickable_legacy_and_modern_links(self):
+        origin = self.app.config['PUBLIC_ORIGIN'].rstrip('/')
+        old_url = origin + '/matchup/2026_07_NE_CHI'
+        new_url = origin + '/matchup/2026_08_DAL_PHI'
+        trend_url = origin + '/trend-finder?research_team=MIN'
+
+        old = 'NE @ CHI · Thursday night\n' + old_url
+        modern = (
+            'SUNDAY NIGHT · DAL at PHI\n'
+            'Sun, Oct 25 · 8:20 PM ET\n'
+            'The Cowboys visit the Eagles.\n' + new_url
+        )
+        trends = 'MIN — SU: 10 Straight Wins\n' + trend_url
+
+        response = self.draft(
+            matchups=old + '\n\n' + modern,
+            trends=trends,
+        )
+        self.assertEqual(response.status_code, 302)
+
+        preview = self.client.get(response.location + '/preview')
+        self.assertEqual(preview.status_code, 200)
+
+        for url in (old_url, new_url, trend_url):
+            self.assertIn('href="' + url + '"', preview.text)
+            self.assertNotIn('>' + url + '</p>', preview.text)
+
+        headings = (
+            '01 / THE PLUG',
+            '02 / HOT RIGHT NOW',
+            '03 / AROUND THE LEAGUE',
+            '04 / THE HUDDLE',
+        )
+        positions = [preview.text.index(h) for h in headings]
+        self.assertEqual(positions, sorted(positions))
+
     def test_owner_only_and_csrf(self):
         self.assertEqual(self.client.post('/newsletter/manage',data={}).status_code,400)
         self.client=self.app.test_client()
