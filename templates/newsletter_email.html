@@ -1,3 +1,6 @@
+{% if issue.frequency == 'weekly' and 'Premium Preview' not in issue.subject %}
+{% include 'newsletter_weekly_email.html' %}
+{% else %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -151,3 +154,5 @@
 </table>
 </body>
 </html>
+
+{% endif %}

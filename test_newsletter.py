@@ -16,6 +16,7 @@ class NewsletterTests(unittest.TestCase):
             'TREND_FINDAH_SECRET_KEY':'test-secret', 'TREND_FINDAH_NEWSLETTER_ENABLED':'false'}):
             self.app=Flask(__name__,instance_path=self.temp.name)
             self.app.add_url_rule('/', 'home',lambda:'public')
+            self.app.add_url_rule('/_test/community', endpoint='community.discussion', view_func=lambda: 'public')
             for endpoint in ['trend_finder','plug_page','trends_page','sunday_page','sunday_results_page','conspiracy_dungeon_page','scout4.teams_page','scout4.players_page','scout4.ratings_page','sunday_scout.sunday_scout_page','fans.fantasy']:
                 self.app.add_url_rule('/'+endpoint,endpoint,lambda:'public')
             self.app.add_url_rule('/matchup/<game_id>','fans.matchup',lambda game_id:'public')
@@ -71,7 +72,7 @@ class NewsletterTests(unittest.TestCase):
         self.assertEqual(preview.status_code,200)
         self.assertIn('&lt;script&gt;',preview.text)
         self.assertNotIn('<script>',preview.text)
-        self.assertLess(preview.text.index('Prediction highlights'),preview.text.index('Upcoming matchups'))
+        self.assertLess(preview.text.index('&lt;script&gt;'), preview.text.index('Upcoming games'))
         self.assertEqual(preview.headers['Cache-Control'],'no-store')
 
     def test_opt_in_frequency_and_duplicate_protection(self):
