@@ -218,6 +218,11 @@ def post_auth_destination():
     token = session.get('_league_invite')
     if isinstance(token,str) and re.fullmatch(r'[A-Za-z0-9_-]{43}',token):
         return url_for('huddle_leagues.join',token=token)
+    goal = session.get('_league_after_auth')
+    if goal == 'create':
+        return url_for('huddle_leagues.create')
+    if goal == 'join':
+        return url_for('huddle_leagues.join_form')
     return url_for('home')
 
 

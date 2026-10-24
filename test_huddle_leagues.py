@@ -575,5 +575,82 @@ class LeagueTests(unittest.TestCase):
             self.assertEqual(c.execute('SELECT COUNT(*) FROM huddle_league_pick_overrides').fetchone()[0],1)
 
 
+    def test_huddle_home_growth_promotion_and_no_person_tracking(self):
+        home = Path('templates/home.html').read_text()
+        self.assertIn('huddle_leagues.start',home)
+        self.assertIn('Your league. Your friends.',home)
+        self.assertIn('huddle_promo.css',home)
+        self.assertTrue(Path('static/Images/Branding/huddle_promo_neon_right.webp').is_file())
+        self.assertTrue(Path('static/Images/Branding/TrendFindah_The_Huddle_Approved.webp').is_file())
+        league_html = Path('templates/huddle_leagues.html').read_text()
+        self.assertIn('huddle-league-hero', league_html)
+        self.assertIn('huddle-hero-hotspot', league_html)
+        self.assertIn('huddle_leagues.create', league_html)
+        self.assertIn('huddle_leagues.join_form', league_html)
+        self.create()
+        preview = self.client.get('/huddle/leagues/')
+        self.assertEqual(preview.status_code, 200)
+        self.assertIn('huddle-hero-create', preview.text)
+        self.assertIn('huddle-hero-join', preview.text)
+        with self.connection() as c:
+            fields = [row['name'] for row in c.execute('PRAGMA table_info(huddle_growth_daily)')]
+            self.assertEqual(fields,['day','action','n'])
+
+    def test_huddle_cta_signup_destination_and_aggregate_click_counts(self):
+        self.login(None)
+        response = self.client.get('/huddle/leagues/start/create')
+        self.assertEqual(response.status_code,302)
+        self.assertIn('/members/register',response.location)
+        with self.client.session_transaction() as s:
+            self.assertEqual(s['_league_after_auth'],'create')
+        response = self.post('/members/register',email='cta-new@example.com',
+                             password='long secure password',password_confirm='long secure password')
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response.location,'/huddle/leagues/create')
+        self.assertEqual(self.client.get(response.location).status_code,200)
+        with self.client.session_transaction() as s:
+            self.assertNotIn('_league_after_auth',s)
+        response=self.client.get('/huddle/leagues/start/join')
+        self.assertEqual(response.status_code,303)
+        self.assertEqual(response.location,'/huddle/leagues/join')
+        self.assertEqual(self.client.get('/huddle/leagues/start/invalid').status_code,404)
+        with self.connection() as c:
+            rows={row['action']:row['n'] for row in c.execute('SELECT action,n FROM huddle_growth_daily')}
+        self.assertEqual(rows,{'home_create':1,'home_join':1})
+
+    def test_huddle_cta_login_destination_and_invitation_precedence(self):
+        self.login(None)
+        response=self.client.get('/huddle/leagues/start/join')
+        self.assertIn('/members/register',response.location)
+        response=self.post('/members/login',email='private2@example.com',password='long secure password')
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response.location,'/huddle/leagues/join')
+        self.login(1)
+        league=self.create()
+        self.login(None)
+        self.client.get('/huddle/leagues/start/create')
+        self.client.get('/huddle/leagues/join/'+league['invite_token'])
+        response=self.post('/members/login',email='private2@example.com',password='long secure password')
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response.location,'/huddle/leagues/join/'+league['invite_token'])
+
+    def test_growth_dashboard_owner_only_and_aggregates(self):
+        self.login(1)
+        self.assertEqual(self.client.get('/huddle/leagues/growth').status_code,403)
+        with self.connection() as c:
+            c.execute('INSERT INTO site_owners(member_id) VALUES(1)')
+        self.login(1)
+        self.client.get('/huddle/leagues/start/create')
+        first=self.create()
+        self.join(first,2)
+        self.login(1)
+        response=self.client.get('/huddle/leagues/growth')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('Registered members',response.text)
+        self.assertIn('CTA = homepage link opens',response.text)
+        self.assertIn('Site signups',response.text)
+        self.assertNotIn('private1@example.com',response.text)
+        self.assertIn('Growth Stats', self.client.get('/huddle/leagues/').text)
+
 if __name__ == '__main__':
     unittest.main()

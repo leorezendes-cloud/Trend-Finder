@@ -1,7 +1,7 @@
 """Free private leagues over shared My Picks; existing grades are read-only."""
 import re
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlsplit
 from flask import Blueprint, abort, current_app, g, redirect, render_template, request, session, url_for
 from membership import db, allow_attempt
@@ -67,6 +67,12 @@ def init_leagues(app):
                     SELECT 1 FROM huddle_league_member_periods p
                     WHERE p.league_id=m.league_id AND p.member_id=m.member_id
                     AND p.left_at IS NULL)''')
+            # Aggregate promotion clicks by UTC day. No IPs, identities or browser IDs.
+            db().execute('''CREATE TABLE IF NOT EXISTS huddle_growth_daily (
+                day TEXT NOT NULL, action TEXT NOT NULL
+                CHECK(action IN ('home_create','home_join')),
+                n INTEGER NOT NULL DEFAULT 0 CHECK(n >= 0),
+                PRIMARY KEY(day,action))''')
     app.register_blueprint(bp)
 
     @app.before_request
@@ -77,7 +83,10 @@ def init_leagues(app):
             token = request.form.get('csrf_token', '')
             if not session.get('_csrf') or not secrets.compare_digest(session['_csrf'], token):
                 abort(400, description='Your form expired. Reload and try again.')
-        if not g.get('member') and request.endpoint != 'huddle_leagues.join':
+        if not g.get('member') and request.endpoint not in ('huddle_leagues.join', 'huddle_leagues.start'):
+            # Preserve a known, local league destination through sign-in/registration.
+            if request.endpoint in ('huddle_leagues.create', 'huddle_leagues.join_form'):
+                session['_league_after_auth'] = ('create' if request.endpoint == 'huddle_leagues.create' else 'join')
             return redirect(url_for('membership.login'))
 
     @app.after_request
@@ -218,6 +227,58 @@ def league_seasons(connection, league):
     return [r[0] for r in connection.execute('''SELECT DISTINCT w.season FROM pick_weeks w
         JOIN pick_games game ON game.week_id=w.id WHERE w.published_at IS NOT NULL
         AND julianday(game.lock_at)>julianday(?) ORDER BY w.season DESC''', (league['created_at'],))]
+
+
+@bp.get('/start/<intent>')
+def start(intent):
+    """Homepage CTAs use a trusted destination; counts are aggregate link opens."""
+    if intent not in ('create', 'join'):
+        abort(404)
+    with db():
+        db().execute('''INSERT INTO huddle_growth_daily(day,action,n) VALUES(?,?,1)
+            ON CONFLICT(day,action) DO UPDATE SET n=n+1''',
+            (now_utc().date().isoformat(), 'home_' + intent))
+    destination = 'huddle_leagues.create' if intent == 'create' else 'huddle_leagues.join_form'
+    if g.get('member'):
+        return redirect(url_for(destination), 303)
+    session['_league_after_auth'] = intent
+    return redirect(url_for('membership.register'), 302)
+
+
+@bp.get('/growth')
+def growth_dashboard():
+    """Owner-only aggregate snapshot. Not a person-level analytics tracker."""
+    if not g.get('is_owner'):
+        abort(403)
+    connection = db()
+    today = now_utc().date()
+    first = (today - timedelta(days=13)).isoformat()
+    days = [(today - timedelta(days=n)).isoformat() for n in range(13, -1, -1)]
+    metrics = {day:dict(day=day, home_create=0,home_join=0, registrations=0,
+                        leagues_created=0, league_joins=0) for day in days}
+    for row in connection.execute('SELECT day, action, n FROM huddle_growth_daily WHERE day>=?',(first,)):
+        if row['day'] in metrics:
+            metrics[row['day']][row['action']] = row['n']
+    queries = {
+        'registrations': 'SELECT substr(created_at,1,10) day,COUNT(*) n FROM members WHERE substr(created_at,1,10)>=? GROUP BY 1',
+        'leagues_created': 'SELECT substr(created_at,1,10) day,COUNT(*) n FROM huddle_leagues WHERE substr(created_at,1,10)>=? GROUP BY 1',
+        'league_joins': '''SELECT substr(p.joined_at,1,10) day,COUNT(*) n
+            FROM huddle_league_member_periods p
+            JOIN huddle_leagues l ON l.id=p.league_id
+            WHERE p.member_id!=l.commissioner_id AND substr(p.joined_at,1,10)>=?
+            GROUP BY 1''',
+    }
+    for key, query in queries.items():
+        for row in connection.execute(query,(first,)):
+            if row['day'] in metrics:
+                metrics[row['day']][key] = row['n']
+    totals = {
+        'registered':connection.execute('SELECT COUNT(*) FROM members').fetchone()[0],
+        'leagues':connection.execute('SELECT COUNT(*) FROM huddle_leagues').fetchone()[0],
+        'active_seats':connection.execute('SELECT COUNT(*) FROM huddle_league_members').fetchone()[0],
+    }
+    return render_template('huddle_growth.html', days=list(reversed(list(metrics.values()))),
+                           totals=totals)
 
 
 @bp.get('/')

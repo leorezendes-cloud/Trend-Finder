@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='score_hot_trends.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='huddle_promo.css') }}">
     {% include '_branding_head.html' %}
 <link rel="stylesheet" href="{{ url_for('static',filename='anomaly_flags.css') }}"><script src="{{ url_for('static',filename='anomaly_flags.js') }}" defer></script></head>
 <body class="landing-page">
@@ -35,6 +36,19 @@
                     <span>Find the fix in the Conspiracy Dungeon.</span>
                 </a>
             </nav>
+            <section class="huddle-home-promo" aria-labelledby="huddle-promo-heading">
+                <div class="huddle-promo-copy">
+                    <span class="huddle-promo-kicker">THE HUDDLE · FREE PICK’EM LEAGUES</span>
+                    <h2 id="huddle-promo-heading">Your league. Your friends. Your bragging rights.</h2>
+                    <p>Start a private NFL Pick’em league, invite friends, and compete every week. Choose Straight Up, Against the Spread, Over/Under—or all three.</p>
+                    <div class="huddle-promo-actions">
+                        <a class="huddle-promo-main-action" href="{{ url_for('huddle_leagues.start',intent='create') }}">Create a free league →</a>
+                        <a class="huddle-promo-side-action" href="{{ url_for('huddle_leagues.start',intent='join') }}">Join a league</a>
+                    </div>
+                    <small>Free leagues · Weekly standings · League-specific picks</small>
+                </div>
+                <div class="huddle-promo-picture" aria-hidden="true"></div>
+            </section>
             {% include '_active_trends.html' %}
             {% if emerging_alert and not active_highlights %}{% set alert=emerging_alert %}
             <aside class="emerging-trend-alert" aria-label="Emerging trend alert">

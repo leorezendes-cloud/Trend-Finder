@@ -1,0 +1,20 @@
+{% extends 'picks_base.html' %}
+{% block title %}Huddle Growth | TrendFindah{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static',filename='huddle_leagues.css') }}">
+<section class="huddle league-page">
+<header class="huddle-header"><div class="huddle-identity"><span class="huddle-kicker">OWNER DASHBOARD</span><h1>Huddle Growth</h1><p>Private, aggregate activity counts from the last 14 UTC days.</p></div></header>
+<nav class="league-actions"><a href="{{ url_for('huddle_leagues.mine') }}">Back to My Leagues</a><a href="{{ url_for('home') }}">Homepage</a></nav>
+<section class="league-panel" aria-label="All-time totals">
+<h2>All-time activity</h2>
+<div class="league-card-record"><div><dt>Registered members</dt><dd>{{ totals.registered }}</dd></div><div><dt>Leagues created</dt><dd>{{ totals.leagues }}</dd></div><div><dt>Active league seats</dt><dd>{{ totals.active_seats }}</dd></div></div>
+</section>
+<section class="league-panel">
+<h2>Daily activity · UTC</h2>
+<div class="league-table-scroll"><table class="league-table"><thead><tr><th scope="col">Day</th><th scope="col">Create CTA</th><th scope="col">Join CTA</th><th scope="col">Site signups</th><th scope="col">New leagues</th><th scope="col">League joins</th></tr></thead><tbody>
+{% for day in days %}<tr><th scope="row">{{ day.day }}</th><td>{{ day.home_create }}</td><td>{{ day.home_join }}</td><td>{{ day.registrations }}</td><td>{{ day.leagues_created }}</td><td>{{ day.league_joins }}</td></tr>{% endfor %}
+</tbody></table></div>
+<p>CTA = homepage link opens, not unique visitors. Signups are site-wide; no individual visitor attribution is collected. League joins exclude league creators and include rejoining members. Data is aggregated without recording IP addresses or browser identifiers.</p>
+</section>
+</section>
+{% endblock %}

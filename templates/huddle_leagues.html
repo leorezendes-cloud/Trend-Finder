@@ -28,7 +28,19 @@
 <link rel="stylesheet" href="{{ url_for('static',filename='huddle_leagues.css') }}">
 <section class="huddle league-page">
 <header class="huddle-header"><div class="huddle-identity"><span class="huddle-kicker">TREND FINDAH COMMUNITY</span><h1>My Leagues</h1><p>Free private Pick’em leagues. My Picks are your default; make league-specific choices whenever you want.</p></div></header>
-<nav class="league-actions" aria-label="League navigation"><a href="{{ url_for('community.discussion') }}">The Huddle</a>{% if mode != 'mine' %}<a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>{% endif %}<a href="{{ url_for('huddle_leagues.create') }}">Create League</a><a href="{{ url_for('huddle_leagues.join_form') }}">Join League</a><a href="{{ url_for('member_picks.my_picks') }}">My Picks</a></nav>
+<nav class="league-actions" aria-label="League navigation"><a href="{{ url_for('community.discussion') }}">The Huddle</a>{% if mode != 'mine' %}<a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>{% endif %}<a href="{{ url_for('huddle_leagues.create') }}">Create League</a><a href="{{ url_for('huddle_leagues.join_form') }}">Join League</a><a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>{% if g.is_owner %}<a href="{{ url_for('huddle_leagues.growth_dashboard') }}">Growth Stats</a>{% endif %}</nav>
+{% if mode == 'mine' %}
+<section class="huddle-league-hero" aria-label="The Huddle — free private Pick’em leagues">
+    <img src="{{ url_for('static',filename='Images/Branding/TrendFindah_The_Huddle_Approved.webp') }}"
+         alt="The Huddle: free private Pick’em leagues with friends, weekly leaderboards and your own picks."
+         width="1619" height="971" decoding="async">
+    <a class="huddle-hero-hotspot huddle-hero-create"
+       href="{{ url_for('huddle_leagues.create') }}" aria-label="Create a free Huddle league"></a>
+    <a class="huddle-hero-hotspot huddle-hero-join"
+       href="{{ url_for('huddle_leagues.join_form') }}" aria-label="Join a Huddle league"></a>
+</section>
+<p class="huddle-league-hero-note">Free private leagues. Invite friends, make your picks, and compare weekly standings.</p>
+{% endif %}
 {% if mode=='mine' %}
 <h2>My Leagues</h2><div class="league-list">{% for league in leagues %}<article class="league-panel"><h3><a href="{{ url_for('huddle_leagues.view',league_id=league.id) }}">{{ league.name }}</a></h3><p>{% for key,label in categories.items() if league[key~'_enabled'] %}{{ label }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% set record=summaries[league.id] %}<dl class="league-card-record" aria-label="Your league record"><div><dt>Points</dt><dd>{{ record.points }}</dd></div><div><dt>Wins</dt><dd>{{ record.Win }}</dd></div><div><dt>Losses</dt><dd>{{ record.Loss }}</dd></div></dl>{% if league.commissioner_id==g.member.id %}<small>Commissioner</small>{% endif %}</article>{% else %}<p>You haven't joined a league yet. Create one or use a friend's invitation link.</p>{% endfor %}</div>
 {% elif mode=='create' %}

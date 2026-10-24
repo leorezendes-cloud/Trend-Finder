@@ -1270,3 +1270,80 @@ h2 {
         padding: 14px;
     }
 }
+/* Huddle preview — compact mobile Hot Trends */
+@media (max-width: 650px) {
+    .trend-card-grid.hot-trends-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .hot-trends-grid > .hot-trend-card,
+    .hot-trends-grid > .hot-trend-card[open] {
+        min-width: 0;
+        padding: 8px 6px;
+    }
+
+    .hot-trends-grid .hot-trend-summary {
+        gap: 4px;
+    }
+
+    .hot-trends-grid .hot-trend-title {
+        font-size: .82rem;
+        line-height: 1.2;
+    }
+
+    .hot-trends-grid .hot-trend-streak {
+        font-size: .74rem;
+        line-height: 1.3;
+    }
+
+    .hot-trends-grid .hot-trend-fire {
+        font-size: 1.1rem;
+    }
+
+    .hot-trends-grid .hot-trend-toggle {
+        font-size: .68rem;
+    }
+
+    .hot-trends-grid > .hot-trend-card[open] {
+        grid-column: 1 / -1;
+    }
+
+    .hot-trends-grid .hot-trend-details {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Mobile Hot Trends — matching card heights */
+@media (max-width: 650px) {
+    .trend-card-grid.hot-trends-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .hot-trends-grid > .hot-trend-card {
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .hot-trends-grid .hot-trend-title {
+        font-size: .76rem;
+        line-height: 1.15;
+        overflow-wrap: break-word;
+    }
+
+    .hot-trends-grid .hot-trend-streak {
+        font-size: .72rem;
+        line-height: 1.2;
+    }
+
+    .hot-trends-grid .hot-trend-summary {
+        gap: 4px;
+    }
+
+    .hot-trends-grid > .hot-trend-card[open] {
+        grid-column: 1 / -1;
+        height: auto;
+    }
+}
