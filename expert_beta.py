@@ -326,7 +326,7 @@ def public_record(record, detail=False):
     result = {'scout': scout, 'version': record['version'], 'kind': record['kind'],
               'saved_picks': {key: copy.deepcopy(record['scout'][key]) for key in ('spread', 'total')},
               'market_current': fresh, 'expert_access': allowed, 'expert_available': bool(record.get('expert')),
-              'url': '/the-plug/'+identity(scout), 'generated_at': record['generated_at'],
+              'url': '/the-plug/'+identity(scout)+'?version='+record['version'], 'generated_at': record['generated_at'],
               'expert': expert if detail else None,
               'expert_picks': {key: expert.get(key) for key in ('ats_side','total_side')} if expert else None,
               'assessment': expert.get('summary') if expert else None}
@@ -358,15 +358,26 @@ def records_or_fail():
         abort(503, description='Forecast archive needs operator review.')
 
 
-def matchup_prediction(game_id):
+def matchup_prediction(game_id, version=None):
     """Reuse the publication/access gate for the comparison card; never generate."""
     if not enabled():
+        if version is not None:
+            abort(404)
         return None
     records = [r for r in records_or_fail() if r['scout']['game']['game_id'] == game_id]
+    if version is not None:
+        records = [r for r in records if r['version'] == version]
+        if not records:
+            abort(404, description='Saved forecast version not found for this game.')
     if not records:
         return None
-    record = max(records, key=lambda r: (r['generated_at'], r['version']))
+    from forecast_history import official_sources
+    source = official_sources(Path(__file__).resolve().parent).get(game_id) if version is None else None
+    approved_version = source.get('_archive_version') if source else None
+    preferred = [r for r in records if r['version'] == approved_version]
+    record = max(preferred or records, key=lambda r: (r['generated_at'], r['version']))
     item = public_record(record)
+    item['forecast_pending'] = version is None and source is None
     item['locked_quotes'] = record['scout'].get('quotes', {})
     item['saved_at'] = record['scout']['cutoff_utc']
     game = record['scout']['game']

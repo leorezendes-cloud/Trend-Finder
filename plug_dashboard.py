@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parent
 
 
 def legacy_records():
-    from scout4.blend import view
-    return view()
+    from forecast_history import official_sources
+    return list(official_sources(ROOT).values())
 
 
 def _completed_games(root):
@@ -73,40 +73,43 @@ def _attach_final(item, scores):
     quotes = item.get('locked_quotes') or {}
     picks = item.get('saved_picks') or {}
     expert = item.get('expert_picks') or {}
+    expert_quotes = item.get('expert_locked_quotes', quotes)
     item['completed_grades'] = {
         'scout_ats': _grade_selection((picks.get('spread') or {}).get('side'),
             quotes.get('Spread'), away, home, spread=True),
         'scout_total': _grade_selection((picks.get('total') or {}).get('side'),
             quotes.get('Total'), away, home, spread=False),
         'expert_ats': _grade_selection(expert.get('ats_side'),
-            quotes.get('Spread'), away, home, spread=True),
+            expert_quotes.get('Spread'), away, home, spread=True),
         'expert_total': _grade_selection(expert.get('total_side'),
-            quotes.get('Total'), away, home, spread=False),
+            expert_quotes.get('Total'), away, home, spread=False),
     }
 
 
 def combined_cards(records, render_record, now):
     items = {}
     originals = {}
+    from forecast_history import pregame_record
     for record in records:
         item = render_record(record)
         originals[record['scout']['game']['game_id']] = record['scout']
         item['locked_quotes'] = record['scout'].get('quotes', {})
         item['show_scores'] = True
         items[record['scout']['game']['game_id']] = item
+        item['expert_locked_quotes'] = item['locked_quotes']
+        item['locked_quotes'] = {}
+        item['saved_picks'] = {'spread':{'side':None},'total':{'side':None}}
+        item['show_scores'] = False
+        item['forecast_pending'] = True
     for record in legacy_records():
+        historical = instant(record['kickoff_utc']) <= now
         if record['game_id'] in items:
-            item = items[record['game_id']]
-            total = record.get('totals')
-            original = dict(ats=record['components']['Blend']['pick'],
-                line=record['quote']['line'] if record['components']['Blend']['pick']==record['away_team'] else -record['quote']['line'],
-                total_side=total['prediction']['lean'] if total else None,total_line=total['quote']['line'] if total else None)
-            saved=item['locked_quotes'].get('Spread',{})
-            side=item['saved_picks']['spread']['side']
-            line=saved.get('line_a') if side==saved.get('side_a') else saved.get('line_b')
-            if original['ats']!=side or original['line']!=line or original['total_side']!=item['saved_picks']['total']['side'] or original['total_line']!=item['locked_quotes'].get('Total',{}).get('line_a'):
-                item['earlier_forecast']=original
-            continue
+            historical = historical and instant(items[record['game_id']]['scout']['game']['kickoff_utc']) <= now
+        if historical:
+            try:
+                pregame_record(record)
+            except (KeyError, TypeError, ValueError):
+                continue
         game = {key:record[key] for key in ('game_id','away_team','home_team','season','week','kickoff_utc')}
         total = record.get('totals')
         pick = record['components']['Blend']
@@ -115,20 +118,36 @@ def combined_cards(records, render_record, now):
         if total:quotes['Total']={'line_a':total['quote']['line']}
         selections = {'spread':{'side':pick['pick'],'label':'Pick'},
                       'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
-        approved = False
+        archive_item = items.get(game['game_id'])
+        approved = next((r for r in records if r['version']==record.get('_archive_version')),None)
+        if approved:
+            originals[game['game_id']] = approved['scout']
+        else:
+            originals.pop(game['game_id'],None)
+        production_compatible = bool(approved)
         if instant(game['kickoff_utc']) > now:
             try:
                 import hashlib
                 from plug_publication import convert
                 convert(record, hashlib.sha256((ROOT/'automatic_model.json').read_bytes()).hexdigest())
-                approved = True
+                production_compatible = True
             except (OSError, ValueError, KeyError, TypeError):
                 pass  # Keep historical cohorts intact; never relabel an incompatible seal.
         items[game['game_id']] = dict(scout={'game':game,'sources':[]},saved_picks=selections,
-            locked_quotes=quotes,show_scores=False,prediction_margin=pick['away_margin'],
+            locked_quotes=quotes,show_scores=False,prediction_margin=pick.get('away_margin'),
             expert_picks=None,expert_available=False,expert_access=False,assessment=None,
             url=url_for('fans.matchup',game_id=game['game_id']),
-            legacy=True,production_compatible=approved,ats_result=record.get('results',{}).get('Blend'))
+            legacy=True,production_compatible=production_compatible,ats_result=record.get('results',{}).get('Blend'))
+        if approved:
+            items[game['game_id']]['scout'] = approved['scout']
+            items[game['game_id']]['show_scores'] = True
+        if archive_item:
+            # Expert remains tied to its own report and quotes, independently of Scout.
+            item = items[game['game_id']]
+            for key in ('expert_picks','expert_available','expert_access','assessment','url'):
+                item[key] = archive_item.get(key)
+            item['expert_locked_quotes'] = archive_item['expert_locked_quotes']
+            item['scout']['sources'] = archive_item['scout'].get('sources', [])
     upcoming, earlier = [], []
     wanted={game_id for game_id,item in items.items() if instant(item['scout']['game']['kickoff_utc'])>now}
     market_rows=[]
@@ -205,7 +224,7 @@ def weekly_dashboard(records, render_record, now):
                     expert_picks=None, assessment=None, market=None, line_movement=None,
                     pending=True, legacy=True, url=url_for('fans.matchup',game_id=game['game_id']))
             else:
-                item['pending'] = False
+                item['pending'] = bool(item.get('forecast_pending'))
         item['upcoming'] = ko > now
         observed = next((g for g in live if team_code(g.get('away')) == team_code(game['away_team'])
                         and team_code(g.get('home')) == team_code(game['home_team'])

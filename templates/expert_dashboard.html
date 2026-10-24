@@ -3,7 +3,7 @@
 {% macro cards(items) %}<div class="expert-grid">{% for item in items %}{% set s=item.scout %}{% set g=s.game %}{% set picks=item.saved_picks %}{% set quotes=item.locked_quotes %}
 <article class="expert-card" id="game-{{ '%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team) }}" data-away="{{ g.away_team }}" data-home="{{ g.home_team }}" data-kickoff="{{ g.kickoff_utc }}"><p class="plug-live-score" aria-live="polite"{% if item.final_score %} hidden{% endif %}></p><p class="expert-meta">Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><h2>
     <a class="matchup-comparison-link"
-       href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team)) }}">
+       href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team),archive=item.version|default(none)) }}">
         {{ g.away_team }} @ {{ g.home_team }}
     </a>
 </h2>
@@ -14,7 +14,7 @@
 <div class="plug-anomaly-slot">{% if item.final_score %}{% set anomalies=saved_anomaly_links('%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)) %}{% include '_game_anomaly_flag.html' %}{% endif %}</div>
 </div>
 {% else %}<div class="plug-anomaly-slot"></div>{% endif %}
-{% if item.pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
+{% if item.pending or item.forecast_pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
 {% if item.show_scores %}<p class="expert-score{% if item.final_score %} plug-completed-projection{% endif %}">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
 <p class="{{ 'plug-upcoming-picks' if item.upcoming else '' }}">The Plug ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>The Plug total: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>
 {% endif %}

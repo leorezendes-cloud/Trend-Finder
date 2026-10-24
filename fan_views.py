@@ -371,19 +371,42 @@ def matchup(game_id):
         code = team_code(game[side + '_team'])
         rows = [r for r in records if r['team'] == code]
         teams.append({'code': code, 'summary': summarize_team(rows, rows), 'leaders': leaders(players, code)})
-    forecast = None
+    from forecast_history import official_sources
+    forecast = official_sources(ROOT).get(game_id)
     path = ROOT / 'data/scout4/blend/predictions' / (game_id + '.json')
-    if path.exists():
-        candidate = json.loads(path.read_text())
-        if candidate.get('game_id') == game_id:
-            forecast = candidate
     from expert_beta import matchup_prediction, private_cache
-    prediction_item = matchup_prediction(game_id)
+    from flask import request
+    from forecast_history import pregame_record
+    history_digest = request.args.get('forecast')
+    archive_version = request.args.get('archive')
+    if history_digest is not None and archive_version is not None:
+        abort(400, description='Choose one saved forecast version.')
+    use_results_forecast = False
+    if history_digest is not None and path.exists():
+        raw = path.read_bytes()
+        import hashlib
+        if hashlib.sha256(raw).hexdigest() == history_digest:
+            forecast = json.loads(raw)
+            forecast['_history_digest'] = history_digest
+    if forecast and archive_version is None and (forecast is not None or history_digest is not None):
+        try:
+            pregame_record(forecast)
+        except (KeyError, TypeError, ValueError):
+            abort(409, description='Saved results forecast requires provenance review.')
+        import hashlib
+        digest = forecast['_history_digest']
+        if history_digest is not None and history_digest != digest:
+            abort(409, description='This link does not match the saved forecast version.')
+        use_results_forecast = True
+    elif history_digest is not None:
+        abort(404, description='Saved results forecast not found.')
+    prediction_item = matchup_prediction(game_id,version=archive_version) if archive_version is not None else matchup_prediction(game_id)
     from member_picks import comparison_picks
     inline_picks=comparison_picks(game_id=game_id)
     from flask import make_response
     return private_cache(make_response(render_template('matchup.html', inline_picks=inline_picks, game=game, teams=teams, season=season, week=week,
-                           manifest=manifest, forecast=forecast, prediction_item=prediction_item, is_final=is_final, box_score=box_score)))
+                           manifest=manifest, forecast=forecast, prediction_item=prediction_item, is_final=is_final, box_score=box_score,
+                           use_results_forecast=use_results_forecast, archive_version=archive_version)))
 
 
 @bp.get('/fantasy')
@@ -439,19 +462,17 @@ def data_freshness():
 
 def prediction_performance(records, schedule):
     """Evaluate only verifiably saved pre-kickoff picks, separated by model version."""
-    from scout4.blend import grade_components
-    from scout4.blend_results import total_result
+    from forecast_history import grade_components, total_result, pregame_record, record_digest
     groups = {}
     games = {g['game_id']:g for g in schedule}
     excluded = 0
     recent = []
+    ids = [record.get('game_id') for record in records]
     for record in records:
         try:
-            kickoff = datetime.fromisoformat(record['kickoff_utc'])
-            stamps = [datetime.fromisoformat(record[k]) for k in ('sealed_at_utc','decision_cutoff_utc')]
-            stamps.append(datetime.fromisoformat(record['quote']['captured_at_utc']))
-            if kickoff.tzinfo is None or any(stamp.tzinfo is None or stamp >= kickoff for stamp in stamps):
-                raise ValueError('Not a verified pregame pick')
+            if ids.count(record.get('game_id')) != 1:
+                raise ValueError('Conflicting forecast versions require cohort review')
+            pregame_record(record)
             game = games.get(record['game_id'])
             ats = grade_components(record, game)['Blend']
             total = total_result(record, game)
@@ -464,7 +485,10 @@ def prediction_performance(records, schedule):
             group[name][result] = group[name].get(result,0) + 1
         recent.append({'id':record['game_id'], 'away':record['away_team'], 'home':record['home_team'],
                        'date':record['kickoff_utc'], 'saved':record['sealed_at_utc'],
-                       'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total})
+                       'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total,
+                       'line':record['quote']['line'] if record['components']['Blend']['pick']==record['away_team'] else -record['quote']['line'],
+                       'model_version':record.get('version','Unknown version'),
+                       'forecast_digest':record.get('_history_digest') or record_digest(record)})
     for group in groups.values():
         for name in ('ats','totals'):
             counts = group[name]
@@ -492,7 +516,9 @@ def combine_prediction_groups(groups):
 def prediction_results():
     from flask import request
     from site_week import active_week
-    records = [json.loads(p.read_text()) for p in (ROOT / 'data/scout4/blend/predictions').glob('*.json')]
+    import hashlib
+    from forecast_history import official_sources
+    records = list(official_sources(ROOT).values())
     path = ROOT / 'nfl_games.csv'
     original_schedule = read_csv(path)
     schedule = effective_rows(original_schedule, path)

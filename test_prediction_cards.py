@@ -29,7 +29,8 @@ class PredictionCardTests(unittest.TestCase):
     def card(self, featured=True):
         if featured:
             feature(Path(self.tmp.name), 2026, 1, ['HOU-JAX', 'CHI-ATL'])
-        return matchup_prediction(self.scout['game']['game_id'])
+        record = next(r for r in Store(Path(self.tmp.name)).records() if r['scout']['game']['game_id']==self.scout['game']['game_id'])
+        return matchup_prediction(self.scout['game']['game_id'],version=record['version'])
 
     def panel(self, item):
         return render_template_string("{% from '_expert_panel.html' import expert_panel %}{{ expert_panel(item) }}", item=item)
