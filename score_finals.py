@@ -42,15 +42,8 @@ def request_finals(path):
     if not has_request_context() or not current_app.config.get('HOSTED_READ_ONLY_DATA'):return []
     if Path(path).resolve()!=(Path(__file__).resolve().parent/'nfl_games.csv').resolve():return []
     if not hasattr(g,'public_confirmed_finals'):
-        from fan_views import scores
-        response=scores()
-        if not hasattr(response, 'get_json'):
-            # Another request owns a refresh; use only already-confirmed feed rows.
-            from fan_views import _score_cache
-            snapshot={'games':list(_score_cache['games'])}
-        else:
-            snapshot=response.get_json() or {}
-        g.public_confirmed_finals=[game for game in snapshot.get('games',[]) if game.get('completed') is True and game.get('state')=='post']
+        from fan_views import confirmed_final_feed
+        g.public_confirmed_finals=confirmed_final_feed()
     return g.public_confirmed_finals
 
 

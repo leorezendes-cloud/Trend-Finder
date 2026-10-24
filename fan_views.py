@@ -124,32 +124,61 @@ def scores():
         _score_response_lock.release()
 
 
+def _refresh_score_feed(current):
+    """Update the shared ESPN feed cache; caller must hold _score_lock.
+
+    Keep the existing 15/60-second TTL, week boundary, 2-second timeout,
+    and stale-on-network-failure semantics used by the public scoreboard.
+    """
+    if _score_cache.get('week')!=current:
+        _score_cache.update(expires=0,games=[],updated=None,week=current)
+    if time.monotonic() >= _score_cache['expires']:
+        try:
+            query=f'?dates={current[0]}&seasontype=2&week={current[1]}' if current else ''
+            req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'+query,
+                          headers={'User-Agent': 'TrendFindah/1.0'})
+            from hosted_memory import analytics_network_wait
+            with analytics_network_wait():
+                with urlopen(req, timeout=2) as response:
+                    raw_payload = response.read(2_000_000)
+            payload = json.loads(raw_payload)
+            del raw_payload
+            if not isinstance(payload, dict) or not isinstance(payload.get('events'), list):
+                raise ValueError('Invalid scoreboard')
+            _score_cache.update(games=parse_scores(payload),
+                                updated=datetime.now(timezone.utc).isoformat(), stale=False)
+        except (OSError, ValueError, TypeError, AttributeError):
+            _score_cache['stale'] = True
+        interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
+        _score_cache['expires'] = time.monotonic() + interval
+
+
+def confirmed_final_feed():
+    """Read provider-confirmed finals without building scorecard trend badges.
+
+    A busy scoreboard refresh must not block member-pick pages. Fall back
+    to same-week cached finals only; never reuse another week's results.
+    """
+    from site_week import active_week
+    current=active_week(read_csv(ROOT/'nfl_games.csv'))
+    if _score_lock.acquire(blocking=False):
+        try:
+            _refresh_score_feed(current)
+            games=list(_score_cache['games'])
+        finally:
+            _score_lock.release()
+    else:
+        games=list(_score_cache.get('games',[])) if _score_cache.get('week')==current else []
+    return [dict(game) for game in games
+            if game.get('completed') is True and game.get('state')=='post']
+
+
 def _scores_uncached():
     # Separate from homepage rendering: a slow feed never delays the main menu.
     from site_week import active_week
     current=active_week(read_csv(ROOT/'nfl_games.csv'))
     with _score_lock:
-        if _score_cache.get('week')!=current:
-            _score_cache.update(expires=0,games=[],updated=None,week=current)
-        if time.monotonic() >= _score_cache['expires']:
-            try:
-                query=f'?dates={current[0]}&seasontype=2&week={current[1]}' if current else ''
-                req = Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'+query,
-                              headers={'User-Agent': 'TrendFindah/1.0'})
-                from hosted_memory import analytics_network_wait
-                with analytics_network_wait():
-                    with urlopen(req, timeout=2) as response:
-                        raw_payload = response.read(2_000_000)
-                payload = json.loads(raw_payload)
-                del raw_payload
-                if not isinstance(payload, dict) or not isinstance(payload.get('events'), list):
-                    raise ValueError('Invalid scoreboard')
-                _score_cache.update(games=parse_scores(payload),
-                                    updated=datetime.now(timezone.utc).isoformat(), stale=False)
-            except (OSError, ValueError, TypeError, AttributeError):
-                _score_cache['stale'] = True
-            interval = 15 if any(game['state']=='in' for game in _score_cache['games']) else 60
-            _score_cache['expires'] = time.monotonic() + interval
+        _refresh_score_feed(current)
         # Break scores -> highlights -> confirmed finals -> scores recursion.
         # Only provider-confirmed finals enter the read-only display overlay.
         from flask import g
