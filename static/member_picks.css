@@ -326,3 +326,14 @@ html body .picks-page form:has(select[name="week_id"]) button {
     font: 700 14px Arial, sans-serif;
     -webkit-text-stroke: 0;
 }
+
+/* Focused mobile pick-card spacing: same selections and full-size tappable labels. */
+@media (max-width:650px) {
+  .picks-page .picks-grid { gap:10px; }
+  .picks-page .picks-grid .pick-compact { padding:12px; }
+  .picks-page .pick-compact fieldset.pick-checklist { margin:6px 0; padding:7px 9px; }
+  .picks-page .pick-compact .pick-check-options { gap:6px 12px; }
+  .picks-page .pick-compact .pick-check-options label { min-height:40px; }
+  .picks-page .pick-compact h2 { margin-bottom:4px; }
+  .picks-page .pick-compact p { margin:4px 0; }
+}

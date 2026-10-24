@@ -311,6 +311,44 @@ class LeagueTests(unittest.TestCase):
         self.assertNotIn('View season', self.client.get(f'/huddle/leagues/{league["id"]}').text)
         self.assertNotIn('id="league-season"', self.client.get(f'/huddle/leagues/{league["id"]}').text)
 
+    def test_mobile_standings_expandable_desktop_table_preserved(self):
+        league = self.create()
+        self.join(league)
+        self.seed(league, results=('Win', 'Loss', 'Push'))
+        response = self.client.get(f'/huddle/leagues/{league["id"]}')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('class="league-mobile-standings"', response.text)
+        self.assertIn('class="league-table-scroll"', response.text)
+        self.assertIn('<details class="league-standing', response.text)
+        self.assertIn('<small>W–L</small>', response.text)
+        for label in ('Push', 'Tie', 'Void', 'Pending'):
+            self.assertIn(f'<dt>{label}</dt>', response.text)
+        self.assertIn('>The Huddle</a>', response.text)
+        self.assertIn('>My Picks</a>', response.text)
+        self.assertIn('>My Leagues</a>', response.text)
+
+    def test_mine_hides_redundant_navigation_button(self):
+        response = self.client.get('/huddle/leagues/')
+        self.assertEqual(response.status_code, 200)
+        from html.parser import HTMLParser
+        class NavLinks(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.in_league_nav = False
+                self.labels = []
+            def handle_starttag(self, tag, attrs):
+                if tag == 'nav' and ('class', 'league-actions') in attrs:
+                    self.in_league_nav = True
+            def handle_endtag(self, tag):
+                if tag == 'nav':
+                    self.in_league_nav = False
+            def handle_data(self, data):
+                if self.in_league_nav and data.strip():
+                    self.labels.append(data.strip())
+        nav = NavLinks()
+        nav.feed(response.text)
+        self.assertEqual(nav.labels, ['The Huddle', 'Create League', 'Join League', 'My Picks'])
+
     def test_empty_league_card_starts_with_zero_points(self):
         self.create()
         response = self.client.get('/huddle/leagues/')
