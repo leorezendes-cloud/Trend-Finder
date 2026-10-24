@@ -18,6 +18,20 @@ class MemberPicksTests(unittest.TestCase):
         self.root=Path(self.temp.name);self.app.config['PICKS_SOURCE_ROOT']=str(self.root)
         self.rows=[dict(game_id='2030_06_A_B',season='2030',week='6',game_type='REG',gameday='2030-10-17',gametime='20:15',away_team='A',home_team='B',away_score='',home_score='',result='',spread_line='3',total_line='40')]
         self.write_schedule()
+        # Shared navigation needs these routes in the isolated test app.
+        for endpoint in ('discussion', 'save_identity', 'upload_identity_photo'):
+            name = 'community.' + endpoint
+            if name not in self.app.view_functions:
+                self.app.add_url_rule(
+                    '/fixture-community/' + endpoint,
+                    name, lambda: ''
+                )
+        if 'community.avatar_image' not in self.app.view_functions:
+            self.app.add_url_rule(
+                '/fixture-avatar/<int:member_id>',
+                'community.avatar_image',
+                lambda member_id: ''
+            )
 
     def write_schedule(self):
         with (self.root/'nfl_games.csv').open('w',newline='') as stream:
@@ -124,6 +138,50 @@ class MemberPicksTests(unittest.TestCase):
         with self.app.app_context():
             self.assertEqual(db().execute('SELECT su_result FROM member_picks').fetchone()[0],'Void')
         self.assertEqual(self.pick(client,game_id).status_code,409)
+
+
+    def test_void_grades_stay_unchanged_after_repeated_sync(self):
+        game_id, review_path = self.sheet()
+        client = self.member()
+        self.assertEqual(self.pick(client, game_id).status_code, 302)
+
+        response = self.client.post(
+            f'/picks/admin/games/{game_id}/void',
+            data={
+                'csrf_token': self.token(review_path),
+                'reason': 'Game canceled and will not be played.'
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+
+        with self.app.app_context():
+            connection = db()
+            before = [
+                tuple(row) for row in connection.execute(
+                    'SELECT * FROM member_picks'
+                )
+            ]
+            writes = []
+            connection.set_trace_callback(
+                lambda statement: writes.append(statement)
+            )
+            try:
+                sync_results()
+                sync_results()
+            finally:
+                connection.set_trace_callback(None)
+
+            after = [
+                tuple(row) for row in connection.execute(
+                    'SELECT * FROM member_picks'
+                )
+            ]
+
+            self.assertEqual(before, after)
+            self.assertFalse([
+                sql for sql in writes
+                if sql.lstrip().upper().startswith('UPDATE MEMBER_PICKS')
+            ])
 
     def test_manual_line_entry_is_unavailable(self):
         game_id,path=self.sheet(publish=False)

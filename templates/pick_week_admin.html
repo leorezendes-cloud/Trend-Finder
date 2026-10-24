@@ -1,1 +1,20 @@
-{% extends 'picks_base.html' %}{% block title %}Weekly Pick Lines{% endblock %}{% block content %}<h1>Weekly Pick Lines</h1><details class="pick-game"><summary>Site health</summary>{% for check in health %}<p><strong>{{ check.label }} · {{ 'OK' if check.ok else 'Needs attention' }}</strong><br>{{ check.message }}</p>{% endfor %}</details><p>Shared spreads and totals freeze automatically from the Wednesday 8 a.m. Eastern market snapshot. Everyone uses the same lines all week. This week uses a one-time exception with the latest saved quotes available when the change was prepared.</p><p>No line entry or publication is required. If verified quotes are missing, picks wait for a valid snapshot.</p>{% for sheet in sheets %}<p><a href="{{ url_for('member_picks.review_week',week_id=sheet.id) }}">{{ sheet.season }} · Week {{ sheet.week }}</a> · {{ 'Published automatically' if sheet.published_at else 'Waiting for automatic snapshot' }}</p>{% else %}<p>No weekly snapshots are available yet.</p>{% endfor %}{% endblock %}
+{% extends 'picks_base.html' %}{% block title %}Weekly Pick Lines{% endblock %}{% block content %}<h1>Weekly Pick Lines</h1><details class="pick-game"><summary>Site health</summary>{% for check in health %}<p><strong>{{ check.label }} · {{ 'OK' if check.ok else 'Needs attention' }}</strong><br>{{ check.message }}</p>{% endfor %}</details>
+{% if weekly_status %}
+<section class="pick-game">
+  <h2>Latest weekly capture</h2>
+  {% if weekly_status.get('state') == 'ready' %}
+    <p>Verified snapshot saved. Publication status appears below.</p>
+  {% elif weekly_status.get('state') == 'pending' %}
+    <p>Waiting for a complete verified snapshot.</p>
+  {% else %}
+    <p>Capture status requires review.</p>
+  {% endif %}
+  {% if weekly_status.get('reason') %}
+    <p>{{ weekly_status['reason'] }}</p>
+  {% endif %}
+  {% if weekly_status.get('missing') %}
+    <p>{{ weekly_status['missing']|length }} game(s) missing verified lines.</p>
+  {% endif %}
+</section>
+{% endif %}
+<p>Shared spreads and totals freeze automatically from the Wednesday 8 a.m. Eastern market snapshot. Everyone uses the same lines all week. Any authorized exception is identified in the saved line details.</p><p>No line entry or publication is required. If verified quotes are missing, picks wait for a valid snapshot.</p>{% for sheet in sheets %}<p><a href="{{ url_for('member_picks.review_week',week_id=sheet.id) }}">{{ sheet.season }} · Week {{ sheet.week }}</a> · {{ 'Published automatically' if sheet.published_at else 'Waiting for automatic snapshot' }}</p>{% else %}<p>No weekly snapshots are available yet.</p>{% endfor %}{% endblock %}
