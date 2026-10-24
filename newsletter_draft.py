@@ -472,13 +472,81 @@ def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True,
         away_name = _NEWSLETTER_TEAMS.get(away, away)
         home_name = _NEWSLETTER_TEAMS.get(home, home)
         rivalry = divisions.get(away) is not None and divisions.get(away) == divisions.get(home)
+        # Broadcast-led, fact-grounded newsletter descriptions.
+        cities = {
+            'ARI':'Glendale', 'ATL':'Atlanta', 'BAL':'Baltimore',
+            'BUF':'Buffalo', 'CAR':'Charlotte', 'CHI':'Chicago',
+            'CIN':'Cincinnati', 'CLE':'Cleveland', 'DAL':'Dallas',
+            'DEN':'Denver', 'DET':'Detroit', 'GB':'Green Bay',
+            'HOU':'Houston', 'IND':'Indianapolis', 'JAX':'Jacksonville',
+            'KC':'Kansas City', 'LA':'Los Angeles', 'LAR':'Los Angeles',
+            'LAC':'Los Angeles', 'LV':'Las Vegas', 'MIA':'Miami',
+            'MIN':'Minneapolis', 'NE':'Foxborough', 'NO':'New Orleans',
+            'NYG':'New York', 'NYJ':'New York', 'PHI':'Philadelphia',
+            'PIT':'Pittsburgh', 'SEA':'Seattle', 'SF':'San Francisco',
+            'TB':'Tampa', 'TEN':'Nashville', 'WAS':'Washington'
+        }
+        neutral = any(
+            str(row.get(key) or '').strip().lower() in
+            ('yes', 'true', '1', 'neutral')
+            for key in ('neutral_site', 'is_neutral', 'neutral', 'location')
+        )
+        city = None if neutral else cities.get(home)
+
+        away_display = away_name + short_record(ar)
+        home_display = home_name + short_record(hr)
+        away_conf = (divisions.get(away) or '').split(' ')[0]
+        home_conf = (divisions.get(home) or '').split(' ')[0]
+
         if rivalry:
-            description = (f'The {away_name}{short_record(ar)} visit the '
-                           f'{home_name}{short_record(hr)} in an {divisions[away]} matchup.')
+            angle = f'an {divisions[away]} divisional showdown'
+        elif away_conf and home_conf and away_conf != home_conf:
+            angle = 'an interconference showdown'
+        elif away_conf and away_conf == home_conf:
+            angle = f'an {away_conf} matchup'
         else:
-            description = (f'The {away_name}{short_record(ar)} head to face the '
-                           f'{home_name}{short_record(hr)}.')
-        heading = f'{window.upper()} · {away} at {home}'
+            angle = 'a featured NFL matchup'
+
+        broadcast = {
+            'Thursday night': ('THURSDAY NIGHT FOOTBALL',
+                               'Thursday Night Football heads to'),
+            'Sunday night': ('SUNDAY NIGHT FOOTBALL',
+                             'Sunday Night Football takes center stage in'),
+            'Monday night': ('MONDAY NIGHT FOOTBALL',
+                             'Monday Night Football closes the week in')
+        }
+        if window in broadcast:
+            label, opening = broadcast[window]
+            if city:
+                description = (
+                    f'{opening} {city} as the {away_display} '
+                    f'visit the {home_display} for {angle}.'
+                )
+            else:
+                description = (
+                    f'{label.title()} features the {away_display} '
+                    f'against the {home_display} for {angle}.'
+                )
+        elif rivalry:
+            location = f'in {city}' if city else 'on the schedule'
+            description = (
+                f'{divisions[away]} rivals meet {location} as the '
+                f'{away_display} visit the {home_display}.'
+            )
+        elif ar and hr and ar[3] > .5 and hr[3] > .5:
+            location = f'in {city}' if city else 'this week'
+            description = (
+                f'Two teams with winning records meet {location} as the '
+                f'{away_display} face the {home_display}.'
+            )
+        else:
+            description = (
+                f'The {away_display} visit the {home_display} '
+                f'for {angle}.'
+            )
+
+        heading_label = broadcast[window][0] if window in broadcast else window.upper()
+        heading = f'{heading_label} · {away} at {home}'
         when = (f"{local.strftime('%a, %b')} {local.day} · "
                 f"{(local.hour % 12) or 12}:{local.minute:02d} "
                 f"{'AM' if local.hour < 12 else 'PM'} ET")

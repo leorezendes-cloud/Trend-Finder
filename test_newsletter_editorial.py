@@ -43,7 +43,7 @@ class WeeklyEditorialTests(unittest.TestCase):
                       'away_score','home_score','season','week']
             import csv
             fixtures = [
-                ('thursday','2030-10-17','20:20','BAL','PIT'),
+                ('thursday','2030-10-17','20:20','NE','CHI'),
                 ('early_a','2030-10-20','13:00','CAR','SEA'),
                 ('early_rivalry','2030-10-20','13:00','MIN','GB'),
                 ('late','2030-10-20','16:25','SF','LA'),
@@ -63,10 +63,17 @@ class WeeklyEditorialTests(unittest.TestCase):
             self.assertEqual(len(result),5)
             self.assertIn('MIN at GB', '\n'.join(result))
             self.assertNotIn('CAR at SEA', '\n'.join(result))
-            self.assertIn('NFC North matchup', '\n'.join(result))
+            self.assertIn('NFC North rivals', '\n'.join(result))
             self.assertTrue(all('/matchup/' in item for item in result))
             self.assertEqual(len({item.split(' · ',1)[0] for item in result}),5)
             self.assertTrue(any('MONDAY NIGHT' in x for x in result))
+
+            joined = '\n'.join(result)
+            self.assertIn('Thursday Night Football heads to Chicago', joined)
+            self.assertIn('an interconference showdown', joined)
+            self.assertIn('Sunday Night Football takes center stage in Philadelphia', joined)
+            self.assertIn('Monday Night Football closes the week in Denver', joined)
+
             self.assertNotIn('most watched', '\n'.join(result).lower())
             monthly = _matchups(root,now,'https://trendfindah.com',{},[],
                                active_only=False,max_games=8,editorial=False)
