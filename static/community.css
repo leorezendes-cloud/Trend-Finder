@@ -136,3 +136,116 @@ html body .huddle-avatar-image img{display:block;width:100%;height:100%;border-r
 .huddle-header .huddle-leaderboard-compact small{font-size:9px}
 .huddle-header .huddle-leaderboard-compact .huddle-soon-pill{font-size:8px;padding:3px 4px;margin:0}
 @media(max-width:490px){.huddle-header{gap:10px}.huddle-header .huddle-leaderboard-compact{flex-direction:row;align-items:center;padding:6px;gap:5px}.huddle-header .huddle-leaderboard-compact>span:nth-child(2){width:auto}.huddle-header .huddle-leaderboard-compact .huddle-shortcut-icon,.huddle-header .huddle-leaderboard-compact small{display:none}}
+
+/* Huddle community promo: small blended feature, not a full-page poster.
+   Uses the same approved neon art as the homepage; scoped to The Huddle only. */
+html body .huddle .huddle-community-promo {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-height: 222px;
+    margin: 15px 0 16px;
+    padding: 21px 25px;
+    overflow: hidden;
+    border: 1px solid #a733c7;
+    border-radius: 16px;
+    background: #101021;
+    box-shadow: 0 0 15px #b62dce35, 0 10px 25px #0005;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-text-stroke: 0;
+}
+html body .huddle .huddle-community-promo::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    inset: 0 0 0 36%;
+    background: url('Images/Branding/huddle_promo_neon_right.webp') right 60% / cover no-repeat;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #0001 18%, #0006 43%, #000d 76%, #000 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #0001 18%, #0006 43%, #000d 76%, #000 100%);
+}
+html body .huddle .huddle-community-promo-copy {
+    position: relative;
+    z-index: 1;
+    flex: 0 1 59%;
+    min-width: 0;
+    max-width: 540px;
+}
+html body .huddle .huddle-community-promo-kicker {
+    color: #7cff4b;
+    font: 800 11px/1.4 Arial, Helvetica, sans-serif;
+    letter-spacing: .12em;
+}
+html body .huddle .huddle-community-promo h2 {
+    margin: 8px 0 9px;
+    color: #f8eaff;
+    font: 900 clamp(21px, 3vw, 29px)/1.14 Arial, Helvetica, sans-serif;
+    letter-spacing: -.025em;
+    -webkit-text-stroke: 0;
+}
+html body .huddle .huddle-community-promo p {
+    margin: 0 0 15px;
+    color: #e2d9ed;
+    font: 400 14px/1.45 Arial, Helvetica, sans-serif;
+}
+html body .huddle .huddle-community-promo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+html body .huddle .huddle-community-promo-actions a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 12px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    text-decoration: none;
+    font: 800 13px/1.25 Arial, Helvetica, sans-serif;
+}
+html body .huddle .huddle-community-promo-create { background: #62f525; color: #081409; border: 2px solid #62f525; }
+html body .huddle .huddle-community-promo-join { background: #25072e; color: #fff; border: 2px solid #d946ef; }
+html body .huddle .huddle-community-promo-create:hover { background: #b8ffa0; }
+html body .huddle .huddle-community-promo-join:hover { background: #4c145e; }
+html body .huddle .huddle-community-promo-actions a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* At phone widths show ALL the approved square art with no distortion/cropping.
+   Fade its lower edge into the text area; HTML links remain genuine buttons. */
+@media (max-width: 620px) {
+    html body .huddle .huddle-community-promo {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        min-height: 0;
+        margin: 12px 0 14px;
+        padding: 0;
+    }
+    html body .huddle .huddle-community-promo::before {
+        position: relative;
+        inset: auto;
+        flex: 0 0 auto;
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 745 / 719;
+        background-position: center;
+        background-size: contain;
+        -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    }
+    html body .huddle .huddle-community-promo-copy {
+        flex: none;
+        max-width: none;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0 17px 19px;
+        margin-top: -8px;
+    }
+    html body .huddle .huddle-community-promo h2 { font-size: 21px; }
+    html body .huddle .huddle-community-promo p { font-size: 13px; }
+    html body .huddle .huddle-community-promo-actions a { flex: 1 1 130px; }
+}

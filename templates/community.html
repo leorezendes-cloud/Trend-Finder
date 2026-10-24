@@ -26,6 +26,20 @@
       </div>
     </header>
 
+    {% if not review %}
+    <section class="huddle-community-promo" aria-labelledby="huddle-community-promo-heading">
+      <div class="huddle-community-promo-copy">
+        <span class="huddle-community-promo-kicker">FREE PICK’EM LEAGUES</span>
+        <h2 id="huddle-community-promo-heading">Bring your friends into the game.</h2>
+        <p>Create a private NFL Pick’em league, compete on weekly picks, and follow the standings all season.</p>
+        <div class="huddle-community-promo-actions">
+          <a class="huddle-community-promo-create" href="{{ url_for('huddle_leagues.start',intent='create') }}">Create a free league →</a>
+          <a class="huddle-community-promo-join" href="{{ url_for('huddle_leagues.start',intent='join') }}">Join a league</a>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
     <nav class="huddle-shortcuts" aria-label="Community areas">
       <a class="huddle-shortcut" href="{{ url_for('fans.fantasy') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◈</span><span><b>Fantasy Football</b><small>Stats &amp; PPR</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
       <a class="huddle-shortcut" href="{{ url_for('member_picks.my_picks') }}"><span class="huddle-shortcut-icon" aria-hidden="true">◎</span><span><b>My Picks</b><small>Your weekly picks</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>
