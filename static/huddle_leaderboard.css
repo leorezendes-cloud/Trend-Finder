@@ -208,21 +208,6 @@ html body .picks-page .huddle-board .huddle-identity { min-width: 0; }
 }
 /* Center both leaderboard button rows on desktop */
 @media (min-width: 768px) {
-  html body main.huddle :is(nav, div):has(> a[href*="/picks"]),
-  html body main.huddle :is(nav, div):has(> a[href*="market="]) {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    gap: 10px;
-  }
-}
-/* Center both leaderboard button rows on desktop */
-@media (min-width: 768px) {
   html body .picks-page .huddle-board .board-navigation,
   html body .picks-page .huddle-board .board-markets {
     display: flex;

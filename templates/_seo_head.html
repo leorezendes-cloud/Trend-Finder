@@ -7,11 +7,11 @@
 <meta property="og:title" content="{{ seo.title or 'TrendFindah' }}">
 <meta property="og:description" content="{{ seo.description }}">
 {% if seo.canonical %}<meta property="og:url" content="{{ seo.canonical }}">{% endif %}
-<meta property="og:image" content="{{ url_for('static', filename='Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png', _external=True) }}">
+<meta property="og:image" content="{{ seo.image }}">
 <meta property="og:image:alt" content="Trend Findah gold graffiti logo">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ seo.title or 'TrendFindah' }}">
 <meta name="twitter:description" content="{{ seo.description }}">
-<meta name="twitter:image" content="{{ url_for('static', filename='Images/Branding/TrendFindah-Gold-Graffiti-Header-Transparent.png', _external=True) }}">
+<meta name="twitter:image" content="{{ seo.image }}">
 {% if request.endpoint=='home' %}<script type="application/ld+json">{{ {'@context':'https://schema.org','@type':'WebSite','name':'Trend Findah','alternateName':'Trend Findah','url':seo.origin+'/'}|tojson }}</script>{% endif %}
 {% endif %}

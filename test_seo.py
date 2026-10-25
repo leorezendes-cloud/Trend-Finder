@@ -28,7 +28,7 @@ class SeoTests(unittest.TestCase):
 
     def test_unique_public_descriptions_titles_and_canonical_urls(self):
         descriptions=set()
-        for path in ('/','/trend-finder','/the-plug','/market','/sunday-results'):
+        for path in ('/','/trend-finder','/the-plug','/sunday-results'):
             head,_=self.head(path)
             self.assertEqual(len(head.titles),1)
             self.assertIn('NFL',head.titles[0])
@@ -36,12 +36,25 @@ class SeoTests(unittest.TestCase):
             self.assertEqual(head.metas['robots'],'index, follow')
             self.assertEqual(head.metas['og:title'],head.titles[0])
             descriptions.add(head.metas['description'])
-        self.assertEqual(len(descriptions),5)
+        self.assertEqual(len(descriptions),4)
+
+    def test_plug_metadata_describes_current_models(self):
+        head,_ = self.head('/the-plug')
+        self.assertIn('points-based ATS', head.metas['description'])
+        self.assertIn('Scout-based total', head.metas['description'])
+
+    def test_legacy_market_redirect_is_not_an_indexable_page(self):
+        client = app.test_client()
+        response = client.get('/market')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], '/the-plug')
+        self.assertNotIn('https://trendfindah.com/market', client.get('/sitemap.xml').text)
 
     def test_host_headers_cannot_poison_links_and_alias_is_canonical(self):
         head,_=self.head('/sunday-scout',headers={'Host':'attacker.example'})
         self.assertEqual(head.canonicals,['https://trendfindah.com/the-plug'])
         self.assertTrue(head.metas['og:image'].startswith('https://trendfindah.com/static/'))
+        self.assertEqual(head.metas['twitter:image'], head.metas['og:image'])
 
     def test_private_and_filtered_pages_are_not_indexable(self):
         for path in ('/members/login','/members/register','/members/forgot-password','/trend-finder?season=2026'):
@@ -79,4 +92,4 @@ class SeoTests(unittest.TestCase):
         new=client.get('/').text
         self.assertEqual(body(old),body(new))
         structured=re.search(r'<script type="application/ld\+json">(.*?)</script>',new,re.S)
-        self.assertEqual(json.loads(structured.group(1))['name'],'Gravy Train')
+        self.assertEqual(json.loads(structured.group(1))['name'],'Trend Findah')

@@ -31,4 +31,9 @@ class NavigationConsolidationTests(unittest.TestCase):
         self.assertIn('@app.route("/backtests")',app)
         self.assertIn('@app.route("/sunday")',app)
 
+    def test_public_leaderboard_is_in_site_navigation(self):
+        nav=(ROOT/'templates/_site_navigation.html').read_text()
+        self.assertIn("url_for('huddle_leaderboard.index')", nav)
+        self.assertIn("request.blueprint == 'huddle_leaderboard'", nav)
+
 if __name__ == '__main__': unittest.main()
