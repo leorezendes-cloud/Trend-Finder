@@ -397,6 +397,41 @@ def newsletter_subject(frequency, period):
         )
 
     return f"The Weekly Plug · {dates}"
+
+def wednesday_draft_due(now):
+    """Wednesday at or after 9 AM America/New_York."""
+    from zoneinfo import ZoneInfo
+    if now.tzinfo is None:
+        raise ValueError("An aware timestamp is required")
+    eastern = now.astimezone(ZoneInfo("America/New_York"))
+    return eastern.weekday() == 2 and eastern.hour >= 9
+
+
+def prepare_wednesday_draft(application, now=None):
+    """Create at most one weekly draft. Never approve or send email."""
+    from newsletter_draft import period_key
+    now = now or datetime.now(timezone.utc)
+    if not wednesday_draft_due(now):
+        return "not_due"
+    if not application.config.get("NEWSLETTER_AUTO_DRAFT_ENABLED", True):
+        return "not_due"
+    with application.app_context():
+        owner = db().execute(
+            "SELECT member_id FROM site_owners ORDER BY member_id LIMIT 1"
+        ).fetchone()
+        if not owner:
+            raise RuntimeError("No site owner configured for newsletter drafts")
+        period = period_key("weekly", now)
+        existing = db().execute(
+            "SELECT issue_id FROM newsletter_generated "
+            "WHERE frequency=? AND period=?",
+            ("weekly", period)
+        ).fetchone()
+        if existing:
+            return "not_due"
+        return generate_draft(owner["member_id"], frequency="weekly", now=now)
+
+
 def generate_draft(owner_id, frequency='weekly', now=None, root=None):
     from newsletter_draft import period_key, build_draft
     if frequency not in ('weekly','monthly'):

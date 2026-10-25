@@ -324,18 +324,40 @@ def run_leader(root, stop):
         scout_status(root, 'running', 'scheduled update started')
         return run_worker('hosted_updates.py', ['--once'], timeout=600)
 
+
+    def newsletter_draft():
+        # Can be disabled without disabling Scout's other scheduled jobs.
+        if os.environ.get("TREND_FINDAH_NEWSLETTER_WEDNESDAY_PREP", "1") != "1":
+            return "not_due"
+        from newsletter import wednesday_draft_due, prepare_wednesday_draft
+        now = datetime.now(timezone.utc)
+        if not wednesday_draft_due(now):
+            return "not_due"
+
+        # Don't overlap Scout's memory-intensive data-update process.
+        from scheduler_runtime import exclusive
+        with exclusive(root / "logs/auto_update.lock") as acquired:
+            if not acquired:
+                return LOCK_BUSY
+            from wsgi import app
+            result = prepare_wednesday_draft(app, now=now)
+            return "prepared" if result != "not_due" else "not_due"
+
     jobs = (
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
         ('automatic-weekly-lines', weekly, 30),
         ('automatic-data-updates', scout, 21600),
+        ('weekly-newsletter-draft', newsletter_draft, 300),
     )
     threads = []
     try:
         for name, action, interval in jobs:
             timeout = 480 if name == 'game-day-stats' else 900 if name == 'expert-only-updates' else 1500 if name == 'automatic-data-updates' else 180
             def scheduled(name=name, action=action, interval=interval, timeout=timeout):
+                if name == 'weekly-newsletter-draft':
+                    return action()
                 def execute():
                     scheduler_event(root, name, 'attempt')
                     return action()
