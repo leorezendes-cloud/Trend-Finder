@@ -10,58 +10,94 @@ from newsletter_draft import build_draft, period_key
 
 class DraftEvidenceTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
-        self.now=datetime(2030,10,15,12,tzinfo=timezone.utc)
-        row=dict(game_id='2030_06_A_B',gameday='2030-10-17',gametime='20:15',away_team='A',home_team='B',away_score='',home_score='',spread_line='99',location='Home')
-        with (self.root/'nfl_games.csv').open('w',newline='') as stream:
-            writer=csv.DictWriter(stream,fieldnames=row);writer.writeheader();writer.writerow(row)
-        self.record={'game_id':row['game_id'],'away_team':'A','home_team':'B','kickoff_utc':'2030-10-18T00:15:00Z','sealed_at_utc':'2030-10-15T11:00:00Z',
-            'quote':{'line':3,'captured_at_utc':'2030-10-15T10:00:00Z'},'components':{'Blend':{'pick':'A','ats_edge':1.5,'away_margin':-1.5}}}
-        folder=self.root/'data/scout4/blend/predictions';folder.mkdir(parents=True);self.path=folder/'game.json';self.save()
+        from flask import Flask
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.now = datetime(2030, 10, 16, 13, tzinfo=timezone.utc)
+        self.app = Flask(__name__)
+        self.app.config["PUBLIC_ORIGIN"] = "https://trendfindah.com"
+        self.context = self.app.app_context()
+        self.context.push()
+        row = dict(game_id="2030_07_A_B", gameday="2030-10-17",
+                   gametime="20:15", away_team="A", home_team="B",
+                   away_score="", home_score="", spread_line="99",
+                   season="2030", week="7", game_type="REG")
+        with (self.root / "nfl_games.csv").open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=row)
+            writer.writeheader()
+            writer.writerow(row)
+        legacy = self.root / "data/scout4/blend/predictions/game.json"
+        legacy.parent.mkdir(parents=True)
+        legacy.write_text("{bad old snapshot")
 
-    def save(self):self.path.write_text(json.dumps(self.record))
-    def tearDown(self):self.temp.cleanup()
+    def tearDown(self):
+        self.context.pop()
+        self.temp.cleanup()
 
-    def test_saved_forecast_not_recomputed_and_source_files_unchanged(self):
-        before={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
-        sections,metadata=build_draft(self.root,self.now)
-        self.assertIn('A +3',sections['predictions']);self.assertNotIn('A +99',sections['predictions'])
-        self.assertIn('away scoring margin -1.5',sections['predictions'])
-        self.assertIn('A +3',sections['matchups']);self.assertNotIn('A +99',sections['matchups'])
-        self.assertEqual(len(metadata['sources']),2)
-        self.assertEqual(before,{p:p.read_bytes() for p in before})
+    def test_published_scout_snapshot_is_used_without_source_mutation(self):
+        url = "https://trendfindah.com/the-plug/2030/7/A-B"
+        picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]
+        reports = ["A @ B · Thursday\nATS: A · Total: Under\n"
+                   "Approved public analysis.\n" + url]
+        before = {p: p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
 
-    def test_future_seal_team_mismatch_and_started_forecasts_are_excluded(self):
-        self.record['sealed_at_utc']='2030-10-15T13:00:00Z';self.save()
-        self.assertIn('No eligible',build_draft(self.root,self.now)[0]['predictions'])
-        self.record['sealed_at_utc']='2030-10-15T11:00:00Z';self.record['away_team']='C';self.save()
-        self.assertIn('No eligible',build_draft(self.root,self.now)[0]['predictions'])
-        self.record['away_team']='A';self.save()
-        self.assertIn('No eligible',build_draft(self.root,self.now+timedelta(days=5))[0]['predictions'])
+        with patch("newsletter_draft._plug_content",
+                   return_value=(picks, reports, ["saved-v1"])), \
+             patch("newsletter_draft._trends_content", return_value=([], [])):
+            sections, metadata = build_draft(self.root, self.now)
 
-    def test_malformed_file_missing_data_and_stale_quotes_are_honest(self):
-        self.record['quote']['captured_at_utc']='2030-10-13T10:00:00Z';self.save()
-        self.assertIn('over 24 hours old',build_draft(self.root,self.now)[0]['predictions'])
-        self.path.write_text('{bad')
-        sections,metadata=build_draft(self.root,self.now)
-        self.assertIn('No eligible',sections['predictions']);self.assertTrue(metadata['warnings'])
-        (self.root/'nfl_games.csv').unlink()
-        self.assertIn('No upcoming',build_draft(self.root,self.now)[0]['matchups'])
+        self.assertIn("Scout: ATS: A +3", sections["predictions"])
+        self.assertIn("Expert's take:", sections["predictions"])
+        self.assertNotIn("A +99", sections["predictions"])
+        self.assertEqual(metadata["published_forecast_versions"], ["saved-v1"])
+        self.assertIn("nfl_games.csv", metadata["sources"])
+        self.assertEqual(before, {p: p.read_bytes() for p in before})
 
-    def test_historical_counts_exclude_pushes_from_rate(self):
-        with (self.root/'nfl_games.csv').open() as stream:rows=list(csv.DictReader(stream))
-        for index in range(34):
-            row=dict(rows[0],game_id=f'history{index}',gameday='2030-10-10',home_score='20',away_score='20' if index<20 else '14' if index<30 else '17',spread_line='3')
-            rows.append(row)
-        with (self.root/'nfl_games.csv').open('w',newline='') as stream:
-            writer=csv.DictWriter(stream,fieldnames=rows[0]);writer.writeheader();writer.writerows(rows)
-        sections,_=build_draft(self.root,self.now)
-        self.assertIn('20-10-4 ATS',sections['trends'])
-        self.assertIn('66.7% covers across 30 decisions',sections['trends'])
+    def test_unmatched_public_expert_cannot_be_featured(self):
+        url = "https://trendfindah.com/the-plug/2030/7/A-B"
+        picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]
+        with patch("newsletter_draft._plug_content",
+                   return_value=(picks, [], ["saved-v1"])), \
+             patch("newsletter_draft._trends_content", return_value=([], [])):
+            sections, metadata = build_draft(self.root, self.now)
+
+        self.assertIn("being prepared", sections["predictions"])
+        self.assertNotIn("A +3", sections["predictions"])
+        self.assertEqual(metadata["published_forecast_versions"], [])
+        self.assertTrue(metadata["warnings"])
+
+    def test_missing_schedule_and_legacy_files_never_invent_a_pick(self):
+        (self.root / "nfl_games.csv").unlink()
+        with patch("newsletter_draft._plug_content", return_value=([], [], [])), \
+             patch("newsletter_draft._trends_content", return_value=([], [])):
+            sections, metadata = build_draft(self.root, self.now)
+
+        self.assertIn("being prepared", sections["predictions"])
+        self.assertIn("No upcoming games", sections["matchups"])
+        self.assertTrue(metadata["warnings"])
+
+    def test_ats_trend_copy_does_not_invent_push_adjusted_rates(self):
+        from newsletter_draft import _trends_content
+        trend = dict(title="MIN — ATS", scope="team", kind="ats",
+                     outcome="Cover", streak=2, wins=5, sample=7,
+                     pushes=2, params={"research_team": "MIN"})
+        with patch("active_trends.load_highlights", return_value=[trend]):
+            blocks, identities = _trends_content("https://trendfindah.com", [])
+
+        self.assertEqual(len(blocks), 1)
+        self.assertEqual(len(identities), 1)
+        self.assertIn("5 of Last 7 Covers", blocks[0])
+        self.assertNotIn("66.7%", blocks[0])
 
     def test_eastern_week_period_boundary(self):
-        self.assertEqual(period_key('weekly',datetime(2030,10,16,11,59,tzinfo=timezone.utc)),'2030-W41')
-        self.assertEqual(period_key('weekly',datetime(2030,10,16,12,tzinfo=timezone.utc)),'2030-W42')
+        self.assertEqual(
+            period_key("weekly", datetime(2030,10,16,11,59,tzinfo=timezone.utc)),
+            "2030-W41"
+        )
+        self.assertEqual(
+            period_key("weekly", datetime(2030,10,16,12,tzinfo=timezone.utc)),
+            "2030-W42"
+        )
 
 
 class DraftWorkflowTests(unittest.TestCase):
@@ -79,7 +115,7 @@ class DraftWorkflowTests(unittest.TestCase):
             self.assertNotEqual(generate_draft(1,now=now+timedelta(days=7)),first)
             self.assertEqual(mail.call_count,0)
 
-    def test_unedited_draft_refreshes_but_approved_issue_stays_frozen(self):
+    def test_generated_draft_and_approved_issue_remain_frozen(self):
         now=datetime(2030,10,15,12,tzinfo=timezone.utc)
         old={'predictions':'Earlier published predictions','matchups':'','trends':'','updates':''}
         new=dict(old,predictions='Latest published predictions')
@@ -88,7 +124,7 @@ class DraftWorkflowTests(unittest.TestCase):
             issue_id=generate_draft(1,now=now)
         with self.app.app_context(),patch('newsletter_draft.build_draft',return_value=(new,dict(meta))):
             self.assertEqual(generate_draft(1,now=now),issue_id)
-            self.assertIn('Latest',db().execute('SELECT sections FROM newsletter_issues WHERE id=?',(issue_id,)).fetchone()[0])
+            self.assertIn('Earlier published predictions',db().execute('SELECT sections FROM newsletter_issues WHERE id=?',(issue_id,)).fetchone()[0])
             with db():db().execute("UPDATE newsletter_issues SET status='approved' WHERE id=?",(issue_id,))
         with self.app.app_context(),patch('newsletter_draft.build_draft',return_value=(old,dict(meta))) as builder:
             generate_draft(1,now=now)
@@ -105,6 +141,54 @@ class DraftWorkflowTests(unittest.TestCase):
             result=self.app.test_cli_runner().invoke(args=['newsletter-generate'])
             self.assertEqual(result.exit_code,0,result.output);self.assertIn('No email sent',result.output)
             self.assertEqual(mail.call_count,0)
+
+
+
+class WednesdayDraftScheduleTests(unittest.TestCase):
+    setUp = test_newsletter.NewsletterTests.setUp
+    tearDown = test_newsletter.NewsletterTests.tearDown
+    login_owner = test_newsletter.NewsletterTests.login_owner
+
+    def test_wednesday_window_is_idempotent_and_never_sends(self):
+        from newsletter import wednesday_draft_due, prepare_wednesday_draft
+        from datetime import timedelta
+
+        self.app.config["NEWSLETTER_AUTO_DRAFT_ENABLED"] = True
+        at_nine = datetime(2030, 10, 16, 13, tzinfo=timezone.utc)
+        before_nine = at_nine - timedelta(minutes=1)
+        next_day = at_nine + timedelta(days=1)
+
+        self.assertFalse(wednesday_draft_due(before_nine))
+        self.assertTrue(wednesday_draft_due(at_nine))
+        self.assertFalse(wednesday_draft_due(next_day))
+
+        sections = dict(predictions="Approved public evidence",
+                        trends="Trends", expert="", matchups="Games", updates="")
+        metadata = dict(generated_at=at_nine.isoformat(),
+                        warnings=[], sources={})
+        with patch("newsletter_draft.build_draft",
+                   return_value=(sections, metadata)) as builder, \
+             patch("newsletter.urlopen") as provider:
+            self.assertEqual(
+                prepare_wednesday_draft(self.app, before_nine), "not_due"
+            )
+            issue = prepare_wednesday_draft(self.app, at_nine)
+            self.assertIsInstance(issue, int)
+            self.assertEqual(
+                prepare_wednesday_draft(self.app, at_nine), "not_due"
+            )
+            self.assertEqual(
+                prepare_wednesday_draft(self.app, next_day), "not_due"
+            )
+            self.assertEqual(builder.call_count, 1)
+            self.assertEqual(provider.call_count, 0)
+
+        with self.app.app_context():
+            self.assertEqual(
+                db().execute("SELECT COUNT(*) FROM newsletter_generated").fetchone()[0],
+                1
+            )
+
 
 
 if __name__=='__main__':unittest.main()
