@@ -19,6 +19,7 @@ def init_huddle_leaderboard(app):
                           os.environ.get('HUDDLE_LEADERBOARD_PREVIEW_ENABLED', '').lower()
                           in ('1', 'true', 'yes'))
     app.register_blueprint(bp)
+    app.jinja_env.globals['huddle_leaderboard_available'] = True
 
 
 def standings(connection, *, season=None, week_id=None,
