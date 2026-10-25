@@ -139,6 +139,13 @@ class NewsletterTests(unittest.TestCase):
                     origin + '/huddle/leagues/start/join'):
             self.assertIn('href="' + url + '"', preview.text)
 
+    def test_closed_month_result_archive_links_remain_valid(self):
+        from datetime import datetime, timezone
+        at = int(datetime(2025, 11, 1, 13, tzinfo=timezone.utc).timestamp())
+        self.assertEqual(self.client.get(f'/newsletter/results/2025/10?at={at}').status_code, 200)
+        self.assertEqual(self.client.get(f'/newsletter/results/2025/11?at={at}').status_code, 200)
+        self.assertEqual(self.client.get(f'/newsletter/results/2025/09?at={at}').status_code, 400)
+
     def test_owner_only_and_csrf(self):
         self.assertEqual(self.client.post('/newsletter/manage',data={}).status_code,400)
         self.client=self.app.test_client()

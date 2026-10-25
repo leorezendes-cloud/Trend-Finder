@@ -8,7 +8,7 @@ Sign in with an existing site-owner account. Open **Menu → Manage Newsletter**
 
 Create a weekly or monthly draft, enter published prediction highlights and optional supporting sections, preview the email, and edit as needed. Content is plain text and HTML is escaped. Approve the issue when ready. Approval locks the content, but sends no email. You can cancel an issue to stop remaining delivery; previously accepted messages cannot be recalled.
 
-Weekly issues only target weekly opt-ins; monthly issues only target monthly opt-ins. Preferences remain under My Profile. The delivery command freezes the audience and exact email payload at its first sending run. New subscribers do not receive an old issue when the command is rerun. Opt-out, frequency, email address, and cancellation are checked before each queued send.
+Weekly issues target weekly opt-ins. Monthly issues target both weekly and monthly opt-ins. Preferences remain under My Profile. The delivery command freezes the audience and exact email payload at its first sending run. New subscribers do not receive an old issue when the command is rerun. Opt-out, frequency, email address, and cancellation are checked before each queued send.
 
 ## Host environment settings
 
@@ -59,11 +59,11 @@ Provider references: https://resend.com/docs/api-reference/emails/send-email and
 
 ## Automatic drafts
 
-The owner newsletter page now automatically prepares a draft from saved evidence when it is opened: one weekly draft per Eastern-time ISO week, plus one monthly draft per calendar month when monthly subscribers exist. Drafts appear before the optional manual editor. This requires no separate cron service or additional paid worker. It is lazy generation on review-page visits, not a scheduled midnight job. No email or notification is sent by generation.
+The Newsletter Manager is read-only on GET. The Weekly Plug is prepared each Wednesday after 9 AM Eastern by the existing scheduler; The Monthly Plug is prepared after the month closes, beginning at 9 AM Eastern on the first day of the following month, with retries during its first seven days. Monthly summaries use the completed reporting month, not the generation month. Both live previews remain read-only. No email or notification is sent by generation.
 
 Predictions use the saved public Blend forecasts shown in The Plug, with their original scoring margins, ATS edges, quote timestamps, and saved totals where available. Completed/started games, future-sealed forecasts, team/kickoff mismatches, and incomplete records are excluded. The supporting matchup section uses the saved schedule and gives validated public forecast lines precedence over schedule lines, labeling the source. Relevant historical location/time groups are summarized from completed schedule rows with at least 30 ATS decisions; those are descriptive history, not model predictions. Missing predictions and old quotes are labeled for review rather than invented.
 
-Each generated draft records its generation time, source hashes and review warnings. Reopening the review page returns the same issue for that period, preserving all manual edits and approvals. Unedited, unapproved automatic drafts refresh from the latest saved evidence when you reopen the owner page. Once you edit the subject/content or approve an issue, automatic refresh stops and preserves your version. Review quote times before approval. Prediction publication remains controlled by the existing research process; this module never runs a collector, fits a model, refreshes data, or changes an existing forecast.
+Each generated draft records its generation time, source hashes and review warnings. Opening the owner page never refreshes an existing issue. The saved issue stays frozen to preserve manual edits and approvals. Review quote times before approval. Prediction publication remains controlled by the existing research process; this module never runs a collector, fits a model, refreshes data, or changes an existing forecast.
 
 To prepare the same idempotent draft explicitly from the host Shell, without sending:
 
@@ -71,7 +71,7 @@ To prepare the same idempotent draft explicitly from the host Shell, without sen
 python -m flask --app wsgi newsletter-generate --frequency weekly
 ```
 
-Use `--frequency monthly` for monthly issues. The command uses an existing site-owner account. It can also be run by a scheduler that shares this web service's persistent membership database if scheduled generation is wanted later; no external scheduler has been installed. Approval and the separate explicit delivery command remain required. `TREND_FINDAH_NEWSLETTER_ENABLED=false` does not prevent drafting or review.
+Use `--frequency monthly` for the last completed calendar month; a previously generated issue is reused. The existing in-process scheduler also prepares the monthly draft automatically after month end. No additional worker is required. Approval and the separate explicit delivery command remain required. `TREND_FINDAH_NEWSLETTER_ENABLED=false` does not prevent drafting or review.
 
 Generator verification:
 

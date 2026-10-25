@@ -183,8 +183,7 @@ class DraftWorkflowTests(unittest.TestCase):
             self.assertEqual(self.client.get('/newsletter/manage').status_code,200)
             self.assertEqual(self.client.get('/newsletter/manage').status_code,200)
             with self.app.app_context():
-                self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],1)
-                self.assertEqual(db().execute("SELECT COUNT(*) FROM newsletter_generated WHERE frequency='weekly'").fetchone()[0],0)
+                self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],0)
             result=self.app.test_cli_runner().invoke(args=['newsletter-generate'])
             self.assertEqual(result.exit_code,0,result.output);self.assertIn('No email sent',result.output)
             self.assertEqual(mail.call_count,0)
@@ -236,6 +235,91 @@ class WednesdayDraftScheduleTests(unittest.TestCase):
                 1
             )
 
+
+
+
+class MonthlyDraftTimingTests(unittest.TestCase):
+    setUp = test_newsletter.NewsletterTests.setUp
+    tearDown = test_newsletter.NewsletterTests.tearDown
+    login_owner = test_newsletter.NewsletterTests.login_owner
+
+    def test_first_day_after_nine_and_seven_day_retry_window(self):
+        from zoneinfo import ZoneInfo
+        from newsletter import completed_month_draft_due
+        et = ZoneInfo('America/New_York')
+        nov_first = datetime(2030, 11, 1, 9, tzinfo=et)
+        self.assertFalse(completed_month_draft_due(nov_first - timedelta(minutes=1)))
+        self.assertTrue(completed_month_draft_due(nov_first))
+        self.assertTrue(completed_month_draft_due(datetime(2030, 11, 7, 9, tzinfo=et)))
+        self.assertFalse(completed_month_draft_due(datetime(2030, 11, 8, 9, tzinfo=et)))
+
+    def test_scheduler_saves_previous_month_once_without_sending(self):
+        from zoneinfo import ZoneInfo
+        from newsletter import prepare_completed_month_draft
+        self.app.config['NEWSLETTER_AUTO_DRAFT_ENABLED'] = True
+        now = datetime(2030, 11, 1, 9, tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
+        sections = {'predictions': 'Completed October NFL recap',
+                    'trends': 'Trends', 'expert': '', 'matchups': 'Games', 'updates': ''}
+        meta = {'generated_at': now.isoformat(), 'warnings': [], 'sources': {}}
+        with patch('newsletter_draft.build_draft', return_value=(sections, meta)) as builder, \
+             patch('newsletter.urlopen') as provider:
+            issue = prepare_completed_month_draft(self.app, now)
+            self.assertIsInstance(issue, int)
+            self.assertEqual(prepare_completed_month_draft(self.app, now), 'not_due')
+            builder.assert_called_once()
+            self.assertEqual(builder.call_args.kwargs['report_month'], '2030-10')
+            provider.assert_not_called()
+        with self.app.app_context():
+            row = db().execute('SELECT subject,frequency,status FROM newsletter_issues WHERE id=?', (issue,)).fetchone()
+            self.assertEqual(row['subject'], 'The Monthly Plug · October 2030')
+            self.assertEqual(row['status'], 'draft')
+            self.assertEqual(row['frequency'], 'monthly')
+            self.assertEqual(db().execute("SELECT period FROM newsletter_generated WHERE issue_id=?", (issue,)).fetchone()[0], '2030-10')
+
+    def test_existing_early_monthly_issue_is_not_overwritten(self):
+        from zoneinfo import ZoneInfo
+        from newsletter import prepare_completed_month_draft
+        now = datetime(2030, 11, 1, 9, tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
+        with self.app.app_context():
+            with db():
+                issue = db().execute("INSERT INTO newsletter_issues(subject,frequency,sections,owner_id) VALUES(?,?,?,?)", ('The Monthly Plug · October 2030','monthly','{}',1)).lastrowid
+                db().execute("INSERT INTO newsletter_generated VALUES(?,?,?,?)", ('monthly','2030-10',issue,'{}'))
+        with patch('newsletter_draft.build_draft') as builder:
+            self.assertEqual(prepare_completed_month_draft(self.app, now), 'not_due')
+            builder.assert_not_called()
+
+    def test_weekly_subscriber_alone_qualifies_for_monthly(self):
+        from zoneinfo import ZoneInfo
+        from newsletter import prepare_completed_month_draft
+        now = datetime(2030, 11, 1, 9, tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
+        self.app.config['NEWSLETTER_AUTO_DRAFT_ENABLED'] = True
+        with self.app.app_context(), db():
+            db().execute("UPDATE members SET newsletter_opt_in=0 WHERE newsletter_frequency='monthly'")
+        with patch('newsletter_draft.build_draft', return_value=(
+                {'predictions': 'Completed October recap'}, {'warnings': [], 'sources': {}})):
+            self.assertIsInstance(prepare_completed_month_draft(self.app, now), int)
+
+    def test_previous_month_scores_include_last_night_game(self):
+        from newsletter_draft import _monthly_recap
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            fields = ['game_id','gameday','gametime','away_team','home_team','away_score','home_score']
+            with (root/'nfl_games.csv').open('w', newline='') as fp:
+                writer = csv.DictWriter(fp, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows([
+                    dict(game_id='oct31',gameday='2030-10-31',gametime='20:20',away_team='KC',home_team='BUF',away_score='40',home_score='38'),
+                    dict(game_id='nov1',gameday='2030-11-01',gametime='01:00',away_team='NYJ',home_team='NE',away_score='7',home_score='35'),
+                ])
+            from zoneinfo import ZoneInfo
+            now = datetime(2030,11,1,9,tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
+            recap = _monthly_recap(root, now, 'https://trendfindah.com', {}, [], report_month='2030-10')
+            self.assertIn('October 2030', recap)
+            self.assertIn('KC 40', recap)
+            self.assertNotIn('NYJ 7', recap)
+            self.assertIn('/newsletter/results/2030/10?at=', recap)
+            self.assertIn('through Oct 31', recap)
 
 
 if __name__=='__main__':unittest.main()
