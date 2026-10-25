@@ -1,0 +1,113 @@
+{% extends 'picks_base.html' %}
+{% block title %}The Huddle Leaderboard{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='huddle_leaderboard.css') }}">
+<section class="huddle huddle-board" aria-labelledby="board-title">
+  <header class="huddle-header">
+    <div class="huddle-identity">
+      <span class="huddle-kicker">THE HUDDLE · PICK'EM</span>
+      <h1 id="board-title">Leaderboard<span class="huddle-period">.</span></h1>
+      <p>Find the hottest pickers in the Huddle. Overall rankings use graded My Picks, with separate standings inside each private league.</p>
+    </div>
+    <span class="board-trophy" aria-hidden="true">🏆</span>
+  </header>
+
+  <nav class="board-navigation" aria-label="Huddle navigation">
+    <a href="{{ url_for('community.discussion') }}">The Huddle</a>
+    <a href="{{ url_for('member_picks.my_picks') }}">My Picks</a>
+    <a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>
+  </nav>
+
+  <section class="board-panel" aria-labelledby="board-filters-heading">
+    <h2 id="board-filters-heading">Explore the standings</h2>
+    <form class="board-filters" method="get" action="{{ url_for('huddle_leaderboard.index') }}">
+      <label for="board-view">Period
+        <select id="board-view" name="view">
+          <option value="weekly"{% if view == 'weekly' %} selected{% endif %}>Weekly</option>
+          <option value="season"{% if view == 'season' %} selected{% endif %}>Season</option>
+          <option value="alltime"{% if view == 'alltime' %} selected{% endif %}>All-time</option>
+        </select>
+      </label>
+      {% if seasons and view != 'alltime' %}
+      <label for="board-season">Season
+        <select id="board-season" name="season">
+          {% for year in seasons %}
+          <option value="{{ year }}"{% if year == season %} selected{% endif %}>{{ year }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      {% endif %}
+      {% if view == 'weekly' and weeks %}
+      <label for="board-week">Week <small>(weekly only)</small>
+        <select id="board-week" name="week_id">
+          {% for week in weeks %}
+          <option value="{{ week.id }}"{% if week.id == selected_week %} selected{% endif %}>Week {{ week.week }}{% if week.stage != 'REG' %} · {{ week.stage }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
+      {% endif %}
+      <input type="hidden" name="market" value="{{ market }}">
+      <button type="submit">Show standings</button>
+    </form>
+    <p class="board-tip">Weekly standings require 1 graded W/L decision. Season and all-time standings require 5. Pushes and ties do not change win percentage.</p>
+  </section>
+
+  <nav class="board-markets" aria-label="Pick category">
+    {% for key, label in markets.items() %}
+    <a href="{{ url_for('huddle_leaderboard.index', view=view, season=season, week_id=selected_week if view == 'weekly' else none, market=key) }}"
+       class="{% if key == market %}board-selected{% endif %}"{% if key == market %} aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  <section class="board-panel board-standings" aria-labelledby="standings-heading">
+    <div class="board-section-header">
+      <div>
+        <span class="board-eyebrow">{{ 'WEEKLY' if view == 'weekly' else 'SEASON' if view == 'season' else 'ALL-TIME' }} RANKINGS</span>
+        <h2 id="standings-heading">{{ markets[market] }}</h2>
+      </div>
+      <span class="board-qualifier">{{ rows|length }} qualified</span>
+    </div>
+    {% if rows %}
+    <div class="board-table-scroll">
+      <table class="board-table">
+        <thead><tr><th scope="col">Rank</th><th scope="col">Member</th><th scope="col">W–L</th><th scope="col">Push / Tie</th><th scope="col">Win %</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr{% if g.member and g.member['id'] == row.member_id %} class="board-me"{% endif %}>
+            <td class="board-rank">{% if row.rank == 1 %}<span aria-label="First place">🥇</span>{% elif row.rank == 2 %}<span aria-label="Second place">🥈</span>{% elif row.rank == 3 %}<span aria-label="Third place">🥉</span>{% endif %} {{ row.rank }}</td>
+            <th scope="row">{{ row.name }}{% if g.member and g.member['id'] == row.member_id %} <span class="board-you">You</span>{% endif %}</th>
+            <td class="board-record">{{ row.wins }}–{{ row.losses }}</td>
+            <td>{{ row.pushes }} / {{ row.ties }}</td>
+            <td class="board-pct">{{ '%.1f'|format(row.win_pct) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="board-empty"><strong>No qualifying records yet.</strong><p>Once members have enough verified, graded picks in this category, their standings will appear here.</p></div>
+    {% endif %}
+    <p class="board-footnote">Ranked by win percentage, then wins. Identical W–L records share a rank. Only completed, non-void games count.</p>
+  </section>
+
+  <section class="board-panel board-leagues" aria-labelledby="leagues-heading">
+    <div class="board-section-header"><div><span class="board-eyebrow">FRIENDS &amp; RIVALS</span><h2 id="leagues-heading">Private league leaderboards</h2></div></div>
+    <p>Each league counts only its chosen SU, ATS and O/U categories. Your My Picks are the default, and league-specific choices stay in that league.</p>
+    {% if g.member and leagues %}
+    <div class="board-league-links">
+      {% for league in leagues %}
+        <a href="{{ url_for('huddle_leagues.view', league_id=league.id) }}"><span>{{ league.name }}</span><span aria-hidden="true">↗</span></a>
+      {% endfor %}
+    </div>
+    {% elif g.member %}
+    <p class="board-muted">You haven't joined a private league yet.</p>
+    {% else %}
+    <p class="board-muted">Sign in to see your own league standings.</p>
+    {% endif %}
+    <div class="board-bottom-actions">
+      <a href="{{ url_for('huddle_leagues.mine') }}">My Leagues</a>
+      <a href="{{ url_for('huddle_leagues.start', intent='create') }}">Create a free league</a>
+    </div>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+/* Public Huddle leaderboard: deliberately isolated from Scout and analysis pages. */
+.huddle-board{max-width:1040px!important}
+.huddle-board .board-trophy{font-size:54px;line-height:1.1;flex-shrink:0}
+.huddle-board .board-navigation,.huddle-board .board-markets{display:flex;flex-wrap:wrap;gap:9px;margin:15px 0}
+.huddle-board .board-navigation a,.huddle-board .board-markets a,.huddle-board .board-bottom-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid #46566a;border-radius:10px;padding:9px 15px;font-weight:750;font-size:13px;color:#eef4fd;text-decoration:none;background:#172233}
+.huddle-board .board-navigation a:hover,.huddle-board .board-markets a:hover,.huddle-board .board-bottom-actions a:hover{border-color:#ffc94a;color:#ffc94a}
+.huddle-board .board-markets a.board-selected{background:#ffc94a;border-color:#ffc94a;color:#142032}
+.huddle-board .board-panel{background:#151e2c;border:1px solid #334154;border-radius:17px;padding:21px 23px;margin:14px 0;color:#f1f5fc}
+.huddle-board .board-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end;gap:11px;margin:15px 0 8px;padding:0;background:none;border:0;box-shadow:none}
+.huddle-board .board-filters label{display:flex;flex-direction:column;gap:6px;color:#b9c8d9;font-size:12px;font-weight:700}
+.huddle-board .board-filters label small{font-weight:400}
+.huddle-board .board-filters select{min-width:0;width:100%;height:43px;padding:8px 10px;border:1px solid #64748b;border-radius:9px;background:#0f1725;color:#f3f7ff;font-size:15px}
+.huddle-board .board-filters button{min-height:43px;border:0;border-radius:9px;padding:9px 13px;background:#ffc94a;color:#152034;font-size:13px;font-weight:800;cursor:pointer}
+.huddle-board .board-tip,.huddle-board .board-footnote{font-size:12px;color:#a8b7c9;margin:12px 0 0}
+.huddle-board .board-section-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.huddle-board .board-section-header h2{font-size:23px;margin:2px 0 0}
+.huddle-board .board-eyebrow{font-size:10px;letter-spacing:.13em;color:#55e0b1;font-weight:850}
+.huddle-board .board-qualifier{white-space:nowrap;font-size:12px;color:#b4c4d7}
+.huddle-board .board-table-scroll{max-width:100%;overflow-x:auto}
+.huddle-board .board-table{width:100%;border-collapse:collapse;text-align:left;font-size:14px;font-variant-numeric:tabular-nums}
+.huddle-board .board-table th,.huddle-board .board-table td{padding:13px 10px;border-bottom:1px solid #354255;text-align:left}
+.huddle-board .board-table thead th{font-size:12px;color:#b8c9db;font-weight:800}
+.huddle-board .board-table tbody th{font-weight:750;overflow-wrap:anywhere}
+.huddle-board .board-table tbody tr:last-child th,.huddle-board .board-table tbody tr:last-child td{border-bottom:0}
+.huddle-board .board-table .board-rank{font-weight:850;white-space:nowrap;color:#ffc94a}
+.huddle-board .board-table .board-record,.huddle-board .board-table .board-pct{font-weight:800}
+.huddle-board .board-table .board-pct{color:#55e0b1}
+.huddle-board .board-table .board-me{background:#193533}
+.huddle-board .board-you{font-size:10px;color:#101b2b;background:#55e0b1;border-radius:6px;padding:2px 5px;margin-left:5px;white-space:nowrap}
+.huddle-board .board-empty{padding:28px 0;text-align:center;color:#f1f5fc}
+.huddle-board .board-empty p,.huddle-board .board-leagues p{font-size:13px;color:#b5c4d5}
+.huddle-board .board-league-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:16px 0}
+.huddle-board .board-league-links a{display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0;padding:11px 14px;border:1px solid #455469;border-radius:10px;background:#1b2a3d;font-size:13px;font-weight:750;overflow-wrap:anywhere}
+.huddle-board .board-league-links a:hover{border-color:#ffc94a}
+.huddle-board .board-league-links a span:last-child{color:#ffc94a;flex-shrink:0}
+.huddle-board .board-bottom-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.huddle-board :focus-visible{outline:2px solid #ffc94a;outline-offset:3px}
+@media(max-width:760px){.huddle-board .board-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.huddle-board .board-filters button{align-self:stretch}.huddle-board .board-panel{padding:17px 13px}.huddle-board .board-trophy{font-size:37px}}
+@media(max-width:500px){.huddle-board .board-filters{grid-template-columns:1fr 1fr}.huddle-board .board-filters button{grid-column:1/-1}.huddle-board .board-navigation a,.huddle-board .board-markets a{flex:1 1 auto;text-align:center;padding:8px 10px;font-size:12px}.huddle-board .board-table{font-size:12px}.huddle-board .board-table th,.huddle-board .board-table td{padding:11px 5px}.huddle-board .board-table .board-rank{white-space:normal}.huddle-board .board-table thead th{font-size:10px}.huddle-board .board-league-links{grid-template-columns:1fr}.huddle-board .board-section-header h2{font-size:20px}}
