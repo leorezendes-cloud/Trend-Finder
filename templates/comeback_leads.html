@@ -43,7 +43,7 @@
         </nav>
       </div>
       <nav class="cb-view" aria-label="Which teams to show">
-        <a href="{{ url_for('comeback_lead_research', sort=sort, view='events') }}" class="{{ 'is-active' if view == 'events' else '' }}" {% if view == 'events' %}aria-current="page"{% endif %}>Notable teams</a>
+        <a href="{{ url_for('comeback_lead_research', sort=sort, view='events') }}" class="{{ 'is-active' if view == 'events' else '' }}" {% if view == 'events' %}aria-current="page"{% endif %}>Teams With Events</a>
         <a href="{{ url_for('comeback_lead_research', sort=sort, view='all') }}" class="{{ 'is-active' if view == 'all' else '' }}" {% if view == 'all' %}aria-current="page"{% endif %}>All 32 teams</a>
       </nav>
 
