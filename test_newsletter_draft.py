@@ -89,6 +89,52 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertIn("5 of Last 7 Covers", blocks[0])
         self.assertNotIn("66.7%", blocks[0])
 
+    def test_monthly_features_close_and_high_scoring_finished_games(self):
+        from newsletter_draft import _monthly_recap
+
+        fields = [
+            "game_id", "gameday", "gametime", "away_team",
+            "home_team", "away_score", "home_score"
+        ]
+        fixtures = [
+            ("close", "2030-10-08", "20:15", "NE", "CHI", "31", "30"),
+            ("close", "2030-10-08", "20:15", "NE", "CHI", "80", "0"),
+            ("shootout", "2030-10-10", "20:15", "KC", "BUF", "42", "39"),
+            ("one_score", "2030-10-12", "20:15", "SF", "SEA", "24", "17"),
+            ("blowout", "2030-10-15", "01:00", "NYJ", "MIA", "7", "48"),
+            ("in_progress", "2030-10-16", "08:00", "CAR", "TB", "25", "24"),
+            ("future", "2030-10-20", "20:15", "DAL", "PHI", "28", "27"),
+        ]
+
+        with (self.root / "nfl_games.csv").open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            for fixture in fixtures:
+                writer.writerow(dict(zip(fields, fixture)))
+
+        sources, warnings = {}, []
+        recap = _monthly_recap(
+            self.root, self.now,
+            "https://trendfindah.com", sources, warnings
+        )
+
+        self.assertIn("4 completed NFL games", recap)
+        self.assertIn("GAME OF THE MONTH", recap)
+        self.assertIn("KC 42", recap)
+        self.assertIn("NE 31", recap)
+        self.assertIn("SF 24", recap)
+        self.assertLess(recap.index("KC 42"), recap.index("NE 31"))
+
+        self.assertNotIn("NYJ 7", recap)
+        self.assertNotIn("CAR 25", recap)
+        self.assertNotIn("DAL 28", recap)
+        self.assertNotIn("comeback", recap.lower())
+        self.assertNotIn("overtime", recap.lower())
+
+        self.assertEqual(recap.count("/matchup/"), 3)
+        self.assertIn("/newsletter/results/2030/10?at=", recap)
+        self.assertIn("nfl_games.csv", sources)
+
     def test_eastern_week_period_boundary(self):
         self.assertEqual(
             period_key("weekly", datetime(2030,10,16,11,59,tzinfo=timezone.utc)),
