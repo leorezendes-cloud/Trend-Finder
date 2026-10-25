@@ -166,6 +166,10 @@
 
           <p class="muted">
             Upcoming games, published picks, and current hot trends.
+            </p>
+            <p><a href="{{ url_for('newsletter.weekly_preview') }}">
+              Live weekly preview (not saved)
+            </a>
           </p>
 
           {% for issue in weekly_issues %}
@@ -215,6 +219,10 @@
 
           <p class="muted">
             Monthly highlights and recaps.
+            </p>
+            <p><a href="{{ url_for('newsletter.monthly_preview') }}">
+              Live monthly preview (not saved)
+            </a>
           </p>
 
           {% for issue in monthly_issues %}

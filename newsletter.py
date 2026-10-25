@@ -246,6 +246,30 @@ def monthly_results(year, month):
                            as_of=at.astimezone(ET), origin=current_app.config['PUBLIC_ORIGIN'])
 
 
+
+@bp.get('/weekly/preview')
+def weekly_preview():
+    """Preview currently available weekly content without freezing a draft."""
+    require_owner()
+    from newsletter_draft import build_draft, period_key
+    now = datetime.now(timezone.utc)
+    sections, _metadata = build_draft(
+        Path(current_app.root_path), now, frequency='weekly'
+    )
+    issue = {
+        'subject': newsletter_subject('weekly', period_key('weekly', now)),
+        'frequency': 'weekly'
+    }
+    return render_template(
+        'newsletter_email.html', issue=issue, sections=sections,
+        headings=SECTIONS,
+        unsubscribe_url=url_for('newsletter.manage'),
+        origin=current_app.config['PUBLIC_ORIGIN'],
+        address=current_app.config['NEWSLETTER_ADDRESS']
+                or 'Mailing address will appear here'
+    )
+
+
 @bp.get('/monthly/preview')
 def monthly_preview():
     """Owner-only look at newly generated monthly content; does not save/send."""
