@@ -37,3 +37,197 @@
 .huddle-board :focus-visible{outline:2px solid #ffc94a;outline-offset:3px}
 @media(max-width:760px){.huddle-board .board-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.huddle-board .board-filters button{align-self:stretch}.huddle-board .board-panel{padding:17px 13px}.huddle-board .board-trophy{font-size:37px}}
 @media(max-width:500px){.huddle-board .board-filters{grid-template-columns:1fr 1fr}.huddle-board .board-filters button{grid-column:1/-1}.huddle-board .board-navigation a,.huddle-board .board-markets a{flex:1 1 auto;text-align:center;padding:8px 10px;font-size:12px}.huddle-board .board-table{font-size:12px}.huddle-board .board-table th,.huddle-board .board-table td{padding:11px 5px}.huddle-board .board-table .board-rank{white-space:normal}.huddle-board .board-table thead th{font-size:10px}.huddle-board .board-league-links{grid-template-columns:1fr}.huddle-board .board-section-header h2{font-size:20px}}
+
+
+/* Huddle leaderboard: compact controls and narrow-screen alignment (v2) */
+/* My Picks has a broad form:has(select[name="week_id"]) rule.
+   Override it only on the leaderboard, without changing My Picks. */
+html body .picks-page .huddle-board form.board-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 14px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+html body .picks-page .huddle-board .board-filters > label {
+  display: flex;
+  flex: 0 1 195px;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 125px;
+  max-width: 100%;
+  margin: 0;
+  color: #b9c8d9;
+  font: 700 12px/1.3 system-ui, sans-serif;
+  -webkit-text-stroke: 0;
+}
+html body .picks-page .huddle-board .board-filters select,
+html body .picks-page .huddle-board .board-filters select[name="week_id"] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 40px;
+  min-height: 40px;
+  padding: 7px 30px 7px 10px;
+  margin: 0;
+  background: #0f1725;
+  border: 1px solid #64748b;
+  border-radius: 9px;
+  color: #f3f7ff;
+  font: 14px/1.3 system-ui, sans-serif;
+  -webkit-text-stroke: 0;
+}
+html body .picks-page .huddle-board .board-filters button,
+html body .picks-page .huddle-board .board-filters:has(select[name="week_id"]) button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  box-sizing: border-box;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  height: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 9px;
+  background: #ffc94a;
+  color: #152034;
+  font: 800 12px/1.2 system-ui, sans-serif;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+  cursor: pointer;
+}
+.huddle-board .board-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Keep trophy inside the header and allow long headings to shrink. */
+html body .picks-page .huddle-board .huddle-header { min-width: 0; }
+html body .picks-page .huddle-board .huddle-identity { min-width: 0; }
+@media (max-width: 600px) {
+  html body .picks-page .huddle-board .board-filters > label {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  html body .picks-page .huddle-board .board-filters button {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%;
+  }
+  html body .picks-page .huddle-board .huddle-header {
+    position: relative;
+    display: block;
+    padding: 18px 16px;
+  }
+  html body .picks-page .huddle-board .huddle-kicker {
+    max-width: calc(100% - 34px);
+    overflow-wrap: anywhere;
+  }
+  html body .picks-page .huddle-board .huddle-header h1 {
+    max-width: 100%;
+    margin: 8px 0 10px;
+    font-size: clamp(25px, 7vw, 37px);
+    line-height: 1.1;
+    letter-spacing: -.045em;
+    overflow-wrap: anywhere;
+  }
+  html body .picks-page .huddle-board .board-trophy {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    display: block;
+    max-width: 28px;
+    font-size: 24px;
+    line-height: 1;
+  }
+  html body .picks-page .huddle-board .board-panel {
+    padding: 15px 12px;
+  }
+  html body .picks-page .huddle-board .board-navigation,
+  html body .picks-page .huddle-board .board-markets {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 12px 0;
+  }
+  html body .picks-page .huddle-board .board-navigation a,
+  html body .picks-page .huddle-board .board-markets a {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    min-height: 40px;
+    padding: 7px 4px;
+    font-size: 11px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: normal;
+  }
+}
+@media (max-width: 350px) {
+  html body .picks-page .huddle-board .board-navigation a,
+  html body .picks-page .huddle-board .board-markets a {
+    font-size: 10px;
+    padding: 6px 3px;
+  }
+  html body .picks-page .huddle-board .board-section-header h2 { font-size: 18px; }
+  html body .picks-page .huddle-board .board-section-header { gap: 7px; }
+  html body .picks-page .huddle-board .board-qualifier { font-size: 10px; }
+}
+/* Larger standings heading on desktop only */
+@media (min-width: 900px) {
+  html body .huddle .leaderboard-explore-title {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+  }
+}
+/* Center both leaderboard button rows on desktop */
+@media (min-width: 768px) {
+  html body main.huddle :is(nav, div):has(> a[href*="/picks"]),
+  html body main.huddle :is(nav, div):has(> a[href*="market="]) {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    gap: 10px;
+  }
+}
+/* Center both leaderboard button rows on desktop */
+@media (min-width: 768px) {
+  html body .picks-page .huddle-board .board-navigation,
+  html body .picks-page .huddle-board .board-markets {
+    display: flex;
+    justify-content: center !important;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}

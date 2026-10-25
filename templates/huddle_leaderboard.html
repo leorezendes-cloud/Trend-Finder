@@ -19,9 +19,9 @@
   </nav>
 
   <section class="board-panel" aria-labelledby="board-filters-heading">
-    <h2 id="board-filters-heading">Explore the standings</h2>
+    <h2 id="board-filters-heading" class="leaderboard-explore-title">Explore the standings</h2>
     <form class="board-filters" method="get" action="{{ url_for('huddle_leaderboard.index') }}">
-      <label for="board-view">Period
+      <label for="board-view"><span class="board-sr-only">Period</span>
         <select id="board-view" name="view">
           <option value="weekly"{% if view == 'weekly' %} selected{% endif %}>Weekly</option>
           <option value="season"{% if view == 'season' %} selected{% endif %}>Season</option>
