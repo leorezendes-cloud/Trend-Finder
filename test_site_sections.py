@@ -65,7 +65,8 @@ class SiteSectionsTests(unittest.TestCase):
         self.assertIn('/sunday-results', parser.links['Home navigation'])
 
     def test_trend_finder_owns_discovery_and_form_destination(self):
-        response = self.client.get('/trend-finder')
+        self.assertEqual(self.client.get('/trend-finder').status_code, 200)
+        response = self.client.get('/trend-finder?research_view=dogs')
         self.assertEqual(response.status_code, 200)
         self.assertIn('action="/trend-finder" class="home-filter-form"', response.text)
         self.assertIn('Images/Branding/trend-findah-nav.png', response.text)
@@ -88,14 +89,17 @@ class SiteSectionsTests(unittest.TestCase):
         self.assertEqual(self.client.get('/sunday-scout').status_code, 200)
         self.assertEqual(self.client.get('/sunday').status_code, 200)
 
-    def test_market_retains_plug_navigation_and_current_page(self):
-        response=self.client.get('/market')
-        self.assertEqual(response.status_code,200)
-        parser=NavigationParser();parser.feed(response.text)
-        for path in ['/the-plug','/market','/scout4/teams','/scout4/players']:
-            self.assertIn(path,parser.links['The Plug navigation'])
-        self.assertIn('<a href="/market" aria-current="page">Spreads &amp; Totals</a>',response.text)
-        self.assertIn('aria-current="page"><img class="menu-logo" src="/static/Images/Branding/gravy-train-branding/the-plug/the-plug-nav.png"',response.text)
+    def test_market_redirects_to_the_plug(self):
+        response = self.client.get('/market')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.location, '/the-plug')
+
+        response = self.client.get('/the-plug')
+        self.assertEqual(response.status_code, 200)
+        parser = NavigationParser()
+        parser.feed(response.text)
+        for route in ('/the-plug', '/scout4/teams', '/scout4/players'):
+            self.assertIn(route, parser.links['The Plug navigation'])
 
     def test_collapsed_menu_and_page_specific_backdrops(self):
         for path, art in [('/', 'trend-findah-background.png'), ('/trend-finder', 'trend-findah-background.png'), ('/the-plug', 'the-plug-full.png'), ('/conspiracy-dungeon', 'conspiracy-dungeon-full.png')]:

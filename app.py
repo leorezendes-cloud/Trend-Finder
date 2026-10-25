@@ -956,9 +956,8 @@ def market_page():
 
 @app.context_processor
 def site_week_context():
-    from site_week import active_week
-    from market_views import read
-    return {'current_site_week':active_week(read(Path(__file__).resolve().parent/'nfl_games.csv'))}
+    from site_week import current_site_week
+    return {'current_site_week': current_site_week(Path(__file__).resolve().parent / 'nfl_games.csv')}
 
 app.config['METHODOLOGY_ENABLED']=True
 @app.get('/about')
