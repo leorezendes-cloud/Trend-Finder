@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import sys
 import threading
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parent
@@ -294,18 +294,61 @@ def leadership_loop(root=None, stop=None):
 def run_leader(root, stop):
     from scheduler_runtime import due_job
     checked = None
-    def weekly():
-        nonlocal checked
+    observed_cutoff = None
+    next_weekly_attempt = None
+
+    def weekly_due():
+        """Cheap 30-second poll; avoid a worker and disk lease for idle polls."""
+        nonlocal checked, observed_cutoff, next_weekly_attempt
         from site_week import week_window
-        cutoff = week_window(datetime.now(timezone.utc))[0].astimezone(timezone.utc)
-        if checked != cutoff:
-            if run_worker('weekly_pick_lines.py') == LOCK_BUSY:
-                return LOCK_BUSY
-            status = root/'logs/weekly_lines_status.json'
-            if status.exists():
-                result = json.loads(status.read_text())
-                if result.get('state') == 'ready' and result.get('scheduled_cutoff') == cutoff.isoformat():
-                    checked = cutoff
+        now = datetime.now(timezone.utc)
+        cutoff = week_window(now)[0].astimezone(timezone.utc)
+        if cutoff != observed_cutoff:
+            # The new Wednesday window must not inherit last week's backoff.
+            observed_cutoff, checked, next_weekly_attempt = cutoff, None, None
+        if checked == cutoff:
+            return False
+        capture_window = cutoff <= now < cutoff + timedelta(minutes=10)
+        if not capture_window and next_weekly_attempt is not None and now < next_weekly_attempt:
+            return False
+        status = root/'logs/weekly_lines_status.json'
+        try:
+            saved = json.loads(status.read_text()) if status.exists() else {}
+        except (OSError, ValueError):
+            saved = {}
+        if (isinstance(saved, dict) and saved.get('state') == 'ready'
+                and saved.get('published') is True
+                and saved.get('scheduled_cutoff') == cutoff.isoformat()):
+            checked = cutoff
+            return False
+        return True
+
+    def weekly():
+        nonlocal checked, next_weekly_attempt
+        from site_week import week_window
+        now = datetime.now(timezone.utc)
+        start, end = (part.astimezone(timezone.utc) for part in week_window(now))
+        if start <= now < start + timedelta(minutes=10):
+            next_weekly_attempt = now + timedelta(seconds=30)
+        else:
+            # Recheck pending snapshots within 15 minutes, but never sleep past
+            # Wednesday's 8 a.m. ET cutoff. Other game-day jobs are unchanged.
+            next_weekly_attempt = min(now + timedelta(minutes=15), end)
+        worker_result = run_worker('weekly_pick_lines.py')
+        if worker_result == LOCK_BUSY:
+            # Let the existing durable job lease handle 60-second lock retries.
+            next_weekly_attempt = None
+            return LOCK_BUSY
+        status = root/'logs/weekly_lines_status.json'
+        try:
+            saved = json.loads(status.read_text()) if status.exists() else {}
+        except (OSError, ValueError):
+            saved = {}
+        if (isinstance(saved, dict) and saved.get('state') == 'ready'
+                and saved.get('published') is True
+                and saved.get('scheduled_cutoff') == start.isoformat()):
+            checked = start
+        return worker_result
 
     def scout():
         from site_week import week_window
@@ -364,6 +407,8 @@ def run_leader(root, stop):
             def scheduled(name=name, action=action, interval=interval, timeout=timeout):
                 if name == 'weekly-newsletter-draft':
                     return action()
+                if name == 'automatic-weekly-lines' and not weekly_due():
+                    return 'not_due'
                 def execute():
                     scheduler_event(root, name, 'attempt')
                     return action()

@@ -115,12 +115,19 @@ def scheduled_capture(root):
                 from scheduled_ats_capture import run
                 if run(root)!=0:raise RuntimeError('Wednesday market capture failed')
             report=freeze_snapshot(root,datetime.now(timezone.utc))
-        (logs/'weekly_lines_status.json').write_text(json.dumps(report if report['state']=='pending' else
-            {k:report[k] for k in ('state','season','week','scheduled_cutoff','frozen_at')},indent=2)+'\n')
+        # Report "ready" only after publication was confirmed. An interrupted
+        # publication must not leave a success marker that suppresses retries.
         if report['state']=='ready':
             from app import app
             from membership import db
-            with app.app_context():publish_saved_snapshot(db(),root,datetime.now(timezone.utc))
+            with app.app_context():
+                if not publish_saved_snapshot(db(),root,datetime.now(timezone.utc)):
+                    raise RuntimeError('Verified weekly snapshot could not be published')
+        from scheduler_runtime import atomic_json
+        status = (report if report['state']=='pending' else
+                  {**{k:report[k] for k in ('state','season','week','scheduled_cutoff','frozen_at')},
+                   'published':True})
+        atomic_json(logs/'weekly_lines_status.json', status)
 
 
 if __name__=='__main__':
