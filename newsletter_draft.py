@@ -615,8 +615,72 @@ def _monthly_recap(root, now, origin, sources, warnings):
     archive = (f"{origin}/newsletter/results/{local.year}/{local.month}"
                f"?at={int(now.timestamp())}")
     lines = [f"{local.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {local.strftime('%b %d')}.\n{archive}"]
-    for gameday, row, away, home in completed[:8]:
-        lines.append(f"{gameday.strftime('%b %d')}: {row['away_team']} {away:g} – {row['home_team']} {home:g}\n{origin}/matchup/{row['game_id']}")
+
+    # Rank only verified completed games. Final scores establish closeness
+    # and total scoring, not overtime, comebacks, or late-game heroics.
+    def excitement(item):
+        _, _, away, home = item
+        margin = abs(away - home)
+        total = away + home
+        return max(0, 46 - 4 * margin) + 0.6 * min(total, 100)
+
+    def qualifies(item):
+        _, _, away, home = item
+        margin = abs(away - home)
+        total = away + home
+        return margin <= 8 or (total >= 70 and margin <= 17)
+
+    featured = [item for item in completed if qualifies(item)]
+    featured.sort(
+        key=lambda item: (
+            -excitement(item),
+            abs(item[2] - item[3]),
+            -(item[2] + item[3]),
+            -item[0].toordinal(),
+            item[1]['game_id']
+        )
+    )
+
+    for rank, (gameday, row, away, home) in enumerate(featured[:4], 1):
+        margin = abs(away - home)
+        total = away + home
+
+        if margin == 0:
+            detail = f"The teams finished tied with {total:g} combined points."
+        elif margin <= 3:
+            unit = "point" if margin == 1 else "points"
+            detail = (
+                f"Just {margin:g} {unit} separated these teams "
+                f"in a game featuring {total:g} combined points."
+            )
+        elif margin <= 8:
+            detail = (
+                f"A one-possession result featuring "
+                f"{total:g} combined points."
+            )
+        else:
+            detail = (
+                f"A high-scoring matchup with {total:g} combined points "
+                f"and a {margin:g}-point margin."
+            )
+
+        label = "GAME OF THE MONTH" if rank == 1 else f"FEATURED GAME {rank}"
+        heading = (
+            f"{label} · {gameday.strftime('%b %d')}: "
+            f"{row['away_team']} {away:g} – "
+            f"{row['home_team']} {home:g}"
+        )
+        lines.append(
+            heading + '\n' + detail + '\n' +
+            origin + '/matchup/' + row['game_id']
+        )
+
+    if not featured:
+        lines.append(
+            "No qualifying close or high-scoring finishes "
+            "have been recorded yet this month."
+        )
+
     return '\n\n'.join(lines)
 
 
