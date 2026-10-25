@@ -555,7 +555,7 @@ def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True,
     return output
 
 
-def completed_month_games(root, now, sources=None):
+def completed_month_games(root, now, sources=None, *, report_month=None):
     """Saved, completed month-to-date scores as of an aware UTC timestamp.
 
     Reused by the email digest and its linked public archive so the count,
@@ -570,12 +570,14 @@ def completed_month_games(root, now, sources=None):
         sources[str(schedule.relative_to(root))] = hashlib.sha256(raw).hexdigest()
     rows = csv.DictReader(raw.decode('utf-8-sig').splitlines())
     local = now.astimezone(ET)
-    first = local.date().replace(day=1)
+    first = (datetime.strptime(report_month, '%Y-%m').date() if report_month
+             else local.date().replace(day=1))
+    next_first = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
     completed, ids = [], set()
     for row in rows:
         try:
             gameday = datetime.strptime(row['gameday'], '%Y-%m-%d').date()
-            if not first <= gameday <= local.date():
+            if not (first <= gameday < next_first and gameday <= local.date()):
                 continue
             home = number(row.get('home_score'))
             away = number(row.get('away_score'))
@@ -597,7 +599,7 @@ def completed_month_games(root, now, sources=None):
     return completed
 
 
-def _monthly_recap(root, now, origin, sources, warnings):
+def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
     """Month-to-date recorded NFL scores, never fabricated Scout grading."""
     root = Path(root)
     if not (root / 'nfl_games.csv').exists():
@@ -605,16 +607,20 @@ def _monthly_recap(root, now, origin, sources, warnings):
         return 'No verified results available for this month.'
 
     local = now.astimezone(ET)
-    completed = completed_month_games(root, now, sources)
+    first = (datetime.strptime(report_month, '%Y-%m').date() if report_month
+             else local.date().replace(day=1))
+    completed = completed_month_games(root, now, sources, report_month=report_month)
     if not completed:
-        warnings.append('No verified completed games yet this month.')
-        return f"{local.strftime('%B %Y')} — no completed games in the saved results yet."
+        warnings.append('No verified completed games for the selected month.')
+        return f"{first.strftime('%B %Y')} — no completed games in the saved results yet."
 
     # Match the full-results link to the exact generated-at time, not a live
     # month view that would later contradict the number printed in this email.
-    archive = (f"{origin}/newsletter/results/{local.year}/{local.month}"
+    archive = (f"{origin}/newsletter/results/{first.year}/{first.month}"
                f"?at={int(now.timestamp())}")
-    lines = [f"{local.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {local.strftime('%b %d')}.\n{archive}"]
+    next_first = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
+    through = min(local.date(), next_first - timedelta(days=1))
+    lines = [f"{first.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {through.strftime('%b %d')}.\n{archive}"]
 
     # Rank only verified completed games. Final scores establish closeness
     # and total scoring, not overtime, comebacks, or late-game heroics.
@@ -684,7 +690,7 @@ def _monthly_recap(root, now, origin, sources, warnings):
     return '\n\n'.join(lines)
 
 
-def build_draft(root, now, frequency='weekly', *, premium=False):
+def build_draft(root, now, frequency='weekly', *, premium=False, report_month=None):
     """Compose reviewable public issues; premium=True is preview-only.
 
     Sending code calls only the default (free) edition. There are no premium
@@ -693,7 +699,9 @@ def build_draft(root, now, frequency='weekly', *, premium=False):
     root = Path(root)
     if now.tzinfo is None:
         raise ValueError('Newsletter draft generation requires an aware timestamp')
-    if frequency not in ('weekly', 'monthly') or (premium and frequency != 'weekly'):
+    if (frequency not in ('weekly', 'monthly') or
+            (premium and frequency != 'weekly') or
+            (report_month is not None and frequency != 'monthly')):
         raise ValueError('Unsupported newsletter edition')
     now = now.astimezone(timezone.utc)
     sources, warnings = {}, []
@@ -702,7 +710,8 @@ def build_draft(root, now, frequency='weekly', *, premium=False):
     trends, trend_ids = _trends_content(origin, warnings, limit=5 if frequency == 'weekly' else MAX_TRENDS)
 
     if frequency == 'monthly':
-        recap = _monthly_recap(root, now, origin, sources, warnings)
+        recap = _monthly_recap(root, now, origin, sources, warnings,
+                               report_month=report_month)
         matchups = _matchups(root, now, origin, sources, warnings,
                             days=30, active_only=False, max_games=5, editorial=True)
         sections = {'predictions': recap,

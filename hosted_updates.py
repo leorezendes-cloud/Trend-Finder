@@ -326,22 +326,28 @@ def run_leader(root, stop):
 
 
     def newsletter_draft():
-        # Can be disabled without disabling Scout's other scheduled jobs.
-        if os.environ.get("TREND_FINDAH_NEWSLETTER_WEDNESDAY_PREP", "1") != "1":
-            return "not_due"
-        from newsletter import wednesday_draft_due, prepare_wednesday_draft
+        # Both editions use the existing worker and Scout exclusion lock.
+        from newsletter import (wednesday_draft_due, prepare_wednesday_draft,
+                                completed_month_draft_due, prepare_completed_month_draft)
         now = datetime.now(timezone.utc)
-        if not wednesday_draft_due(now):
-            return "not_due"
+        weekly = (os.environ.get('TREND_FINDAH_NEWSLETTER_WEDNESDAY_PREP', '1') == '1'
+                  and wednesday_draft_due(now))
+        monthly = (os.environ.get('TREND_FINDAH_NEWSLETTER_MONTHLY_PREP', '1') == '1'
+                   and completed_month_draft_due(now))
+        if not (weekly or monthly):
+            return 'not_due'
 
-        # Don't overlap Scout's memory-intensive data-update process.
         from scheduler_runtime import exclusive
-        with exclusive(root / "logs/auto_update.lock") as acquired:
+        with exclusive(root / 'logs/auto_update.lock') as acquired:
             if not acquired:
                 return LOCK_BUSY
             from wsgi import app
-            result = prepare_wednesday_draft(app, now=now)
-            return "prepared" if result != "not_due" else "not_due"
+            results = []
+            if weekly:
+                results.append(prepare_wednesday_draft(app, now=now))
+            if monthly:
+                results.append(prepare_completed_month_draft(app, now=now))
+            return 'prepared' if any(result != 'not_due' for result in results) else 'not_due'
 
     jobs = (
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),

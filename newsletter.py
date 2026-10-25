@@ -92,7 +92,12 @@ def init_newsletter(app):
         owner = db().execute('SELECT member_id FROM site_owners ORDER BY member_id LIMIT 1').fetchone()
         if not owner:
             raise click.ClickException('Configure a site-owner account first.')
-        issue_id = generate_draft(owner['member_id'], frequency)
+        if frequency == 'monthly':
+            issue_id = prepare_completed_month_draft(app, scheduled=False)
+            if issue_id == 'not_due':
+                raise click.ClickException('No completed monthly issue is due or it already exists.')
+        else:
+            issue_id = generate_draft(owner['member_id'], frequency)
         click.echo(f'Draft #{issue_id} ready for review at /newsletter/issues/{issue_id}. No email sent.')
 
     @app.before_request
@@ -185,11 +190,7 @@ def manage(issue_id=None):
     editing = get_issue(issue_id) if issue_id is not None else None
     if editing is not None and editing['status'] != 'draft':
         abort(409, description='Approved or canceled issues cannot be edited.')
-    if editing is None and request.method == 'GET' and current_app.config['NEWSLETTER_AUTO_DRAFT_ENABLED']:
-        # Weekly drafts are prepared by the Wednesday scheduler,
-        # never just because an owner opened the manager.
-        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency='monthly' LIMIT 1").fetchone():
-            generate_draft(g.member['id'], 'monthly')
+    # GET only lists saved drafts; live previews never freeze monthly content.
     defaults = dict(json.loads(editing['sections']), subject=editing['subject'], frequency=editing['frequency']) if editing is not None else {}
     error = None
     if request.method == 'POST':
@@ -238,9 +239,14 @@ def monthly_results(year, month):
         at = datetime.fromtimestamp(int(raw_at), timezone.utc)
     except (ValueError, OSError, OverflowError):
         abort(400, description='Invalid monthly results date.')
-    if at > datetime.now(timezone.utc) or (at.astimezone(ET).year, at.astimezone(ET).month) != (year, month):
+    snapshot_date = at.astimezone(ET).date()
+    snapshot_month = snapshot_date.replace(day=1)
+    previous_month = (snapshot_month - timedelta(days=1)).replace(day=1)
+    selected_month = datetime(year, month, 1).date()
+    if at > datetime.now(timezone.utc) or selected_month not in (snapshot_month, previous_month):
         abort(400, description='Monthly results date is out of range.')
-    games = completed_month_games(Path(current_app.root_path), at)
+    games = completed_month_games(Path(current_app.root_path), at,
+                                  report_month=f'{year:04d}-{month:02d}')
     month_name = at.astimezone(ET).strftime('%B %Y')
     return render_template('newsletter_results.html', games=games, month_name=month_name,
                            as_of=at.astimezone(ET), origin=current_app.config['PUBLIC_ORIGIN'])
@@ -457,19 +463,61 @@ def prepare_wednesday_draft(application, now=None):
         return generate_draft(owner["member_id"], frequency="weekly", now=now)
 
 
-def generate_draft(owner_id, frequency='weekly', now=None, root=None):
+
+def completed_month_draft_due(now):
+    """9AM ET on day one; retry through day seven after month end."""
+    from zoneinfo import ZoneInfo
+    if now.tzinfo is None:
+        raise ValueError('An aware timestamp is required')
+    eastern = now.astimezone(ZoneInfo('America/New_York'))
+    return (eastern.day <= 7 and
+            (eastern.day > 1 or eastern.hour >= 9))
+
+
+def prepare_completed_month_draft(application, now=None, *, scheduled=True):
+    """Prepare previous calendar month's verified recap, never send email."""
+    from zoneinfo import ZoneInfo
+    now = now or datetime.now(timezone.utc)
+    if scheduled and (not completed_month_draft_due(now) or not application.config.get('NEWSLETTER_AUTO_DRAFT_ENABLED', True)):
+        return 'not_due'
+    eastern = now.astimezone(ZoneInfo('America/New_York'))
+    if eastern.day == 1 and eastern.hour < 9:
+        return 'not_due'
+    completed = eastern.date().replace(day=1) - timedelta(days=1)
+    period = completed.strftime('%Y-%m')
+    with application.app_context():
+        if not db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency IN ('weekly','monthly') LIMIT 1").fetchone():
+            return 'not_due'
+        existing = db().execute("SELECT issue_id FROM newsletter_generated WHERE frequency='monthly' AND period=?", (period,)).fetchone()
+        if existing:
+            return 'not_due' if scheduled else existing['issue_id']
+        owner = db().execute('SELECT member_id FROM site_owners ORDER BY member_id LIMIT 1').fetchone()
+        if not owner:
+            raise RuntimeError('No site owner configured for newsletter drafts')
+        return generate_draft(owner['member_id'], frequency='monthly',
+                              now=now, report_period=period)
+
+def generate_draft(owner_id, frequency='weekly', now=None, root=None, *, report_period=None):
     from newsletter_draft import period_key, build_draft
     if frequency not in ('weekly','monthly'):
         raise ValueError('Invalid newsletter frequency')
     now=now or datetime.now(timezone.utc)
-    period=period_key(frequency,now)
+    if frequency == 'monthly':
+        if (not report_period or report_period >= period_key('monthly', now)
+                or datetime.strptime(report_period, '%Y-%m').strftime('%Y-%m') != report_period):
+            raise ValueError('Monthly saved drafts require a completed prior month.')
+    elif report_period is not None:
+        raise ValueError('Weekly drafts cannot specify a report month.')
+    period=report_period or period_key(frequency,now)
     existing=db().execute('SELECT issue_id,metadata FROM newsletter_generated WHERE frequency=? AND period=?',(frequency,period)).fetchone()
     # A generated issue is a historical snapshot.  Never silently replace its
     # content on a later page view or CLI run: the games may have finished,
     # and build_draft() only selects upcoming published picks.
     if existing:
         return existing['issue_id']
-    sections,metadata=build_draft(root or Path(current_app.root_path),now,frequency=frequency)
+    extra = {'report_month': report_period} if report_period else {}
+    sections,metadata=build_draft(root or Path(current_app.root_path),now,
+                                  frequency=frequency, **extra)
     subject=newsletter_subject(frequency, period)
     metadata.update(original_sections=sections,original_subject=subject)
     connection=db();connection.execute('BEGIN IMMEDIATE')
