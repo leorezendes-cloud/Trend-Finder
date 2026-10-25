@@ -146,6 +146,33 @@ class NewsletterTests(unittest.TestCase):
         self.assertEqual(self.client.get(f'/newsletter/results/2025/11?at={at}').status_code, 200)
         self.assertEqual(self.client.get(f'/newsletter/results/2025/09?at={at}').status_code, 400)
 
+
+    def test_monthly_archive_uses_reported_month_and_dynamic_dates(self):
+        from datetime import datetime, timezone
+
+        cases = [
+            (2025, 10, datetime(2025, 11, 1, 13, tzinfo=timezone.utc),
+             "October 2025", "Oct 1 – Oct 31, 2025"),
+            (2025, 10, datetime(2025, 10, 24, 13, tzinfo=timezone.utc),
+             "October 2025", "Oct 1 – Oct 24, 2025"),
+            (2025, 12, datetime(2026, 1, 1, 14, tzinfo=timezone.utc),
+             "December 2025", "Dec 1 – Dec 31, 2025"),
+        ]
+
+        with patch('newsletter_draft.completed_month_games', return_value=[]):
+            for year, month, date, heading, coverage in cases:
+                with self.subTest(year=year, month=month, date=date):
+                    at = int(date.timestamp())
+                    response = self.client.get(
+                        f'/newsletter/results/{year}/{month}?at={at}'
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    self.assertIn(
+                        heading + " — Recorded NFL Results", response.text
+                    )
+                    self.assertIn(coverage, response.text)
+                    self.assertNotIn("Weeks 4–7", response.text)
+
     def test_owner_only_and_csrf(self):
         self.assertEqual(self.client.post('/newsletter/manage',data={}).status_code,400)
         self.client=self.app.test_client()

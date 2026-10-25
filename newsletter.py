@@ -247,9 +247,18 @@ def monthly_results(year, month):
         abort(400, description='Monthly results date is out of range.')
     games = completed_month_games(Path(current_app.root_path), at,
                                   report_month=f'{year:04d}-{month:02d}')
-    month_name = at.astimezone(ET).strftime('%B %Y')
-    return render_template('newsletter_results.html', games=games, month_name=month_name,
-                           as_of=at.astimezone(ET), origin=current_app.config['PUBLIC_ORIGIN'])
+    month_name = selected_month.strftime('%B %Y')
+    next_month = (selected_month.replace(day=28) + timedelta(days=4)).replace(day=1)
+    month_end = next_month - timedelta(days=1)
+    coverage_end = min(month_end, snapshot_date)
+    coverage_label = (
+        f"{selected_month.strftime('%b')} {selected_month.day} – "
+        f"{coverage_end.strftime('%b')} {coverage_end.day}, {year}"
+    )
+    return render_template('newsletter_results.html', games=games,
+                           month_name=month_name, coverage_label=coverage_label,
+                           as_of=at.astimezone(ET),
+                           origin=current_app.config['PUBLIC_ORIGIN'])
 
 
 
