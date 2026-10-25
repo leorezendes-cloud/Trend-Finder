@@ -34,18 +34,14 @@
       <div class="cb-toolbar">
         <div class="cb-toolbar-heading">
           <h2 id="cb-leaderboard-title">Team leaderboard</h2>
-          <p>{{ 'Teams with at least one qualifying 10+ point comeback or blown lead' if view == 'events' else 'All 32 teams, including teams with zero qualifying events' }}</p>
+          <p>All 32 teams · Teams without qualifying comebacks or blown leads appear last</p>
         </div>
         <nav class="cb-sort" aria-label="Sort team leaderboard">
-          <a href="{{ url_for('comeback_lead_research', sort='comebacks', view=view) }}" class="{{ 'is-active' if sort == 'comebacks' else '' }}" {% if sort == 'comebacks' %}aria-current="page"{% endif %}>Most comebacks</a>
-          <a href="{{ url_for('comeback_lead_research', sort='blown', view=view) }}" class="{{ 'is-active' if sort == 'blown' else '' }}" {% if sort == 'blown' %}aria-current="page"{% endif %}>Most blown leads</a>
-          <a href="{{ url_for('comeback_lead_research', sort='team', view=view) }}" class="{{ 'is-active' if sort == 'team' else '' }}" {% if sort == 'team' %}aria-current="page"{% endif %}>A–Z</a>
+          <a href="{{ url_for('comeback_lead_research', sort='comebacks') }}" class="{{ 'is-active' if sort == 'comebacks' else '' }}" {% if sort == 'comebacks' %}aria-current="page"{% endif %}>Most comebacks</a>
+          <a href="{{ url_for('comeback_lead_research', sort='blown') }}" class="{{ 'is-active' if sort == 'blown' else '' }}" {% if sort == 'blown' %}aria-current="page"{% endif %}>Most blown leads</a>
+          <a href="{{ url_for('comeback_lead_research', sort='team') }}" class="{{ 'is-active' if sort == 'team' else '' }}" {% if sort == 'team' %}aria-current="page"{% endif %}>A–Z</a>
         </nav>
       </div>
-      <nav class="cb-view" aria-label="Which teams to show">
-        <a href="{{ url_for('comeback_lead_research', sort=sort, view='events') }}" class="{{ 'is-active' if view == 'events' else '' }}" {% if view == 'events' %}aria-current="page"{% endif %}>Teams With Events</a>
-        <a href="{{ url_for('comeback_lead_research', sort=sort, view='all') }}" class="{{ 'is-active' if view == 'all' else '' }}" {% if view == 'all' %}aria-current="page"{% endif %}>All 32 teams</a>
-      </nav>
 
       <div class="cb-grid">
       {% for t in rows %}
@@ -88,9 +84,8 @@
 (() => {
   const grid = document.querySelector('.cb-grid');
   const sortNav = document.querySelector('.cb-sort');
-  const viewNav = document.querySelector('.cb-view');
 
-  if (!grid || !sortNav || !viewNav) return;
+  if (!grid || !sortNav) return;
 
   const sortLinks = Array.from(sortNav.querySelectorAll('a'));
   const alphaLink = sortLinks[2];
@@ -132,16 +127,24 @@
 
   function render() {
     cards.sort((a, b) => {
+      const aActive = Number(a.dataset.comebacks) +
+                      Number(a.dataset.blown) > 0;
+      const bActive = Number(b.dataset.comebacks) +
+                      Number(b.dataset.blown) > 0;
+
+      if (aActive !== bActive) return aActive ? -1 : 1;
+
       if (mode === 'team') {
         return compareNames(a, b) * (descending ? -1 : 1);
       }
 
       const key = mode === 'blown' ? 'blown' : 'comebacks';
-      const difference = Number(b.dataset[key]) -
-                         Number(a.dataset[key]);
+      const secondary = mode === 'blown' ? 'comebacks' : 'blown';
 
-      // Alphabetical tie-breaking.
-      return difference || compareNames(a, b);
+      return Number(b.dataset[key]) - Number(a.dataset[key]) ||
+             Number(b.dataset[secondary]) -
+             Number(a.dataset[secondary]) ||
+             compareNames(a, b);
     });
 
     cards.forEach((card, index) => {
@@ -170,20 +173,7 @@
       ? 'Click to sort A to Z'
       : 'Click to sort Z to A when alphabetical sorting is active';
 
-    // Keep alphabetical direction when changing team views.
-    viewNav.querySelectorAll('a').forEach(link => {
-      const url = new URL(link.href);
 
-      if (mode === 'team') {
-        url.searchParams.set(
-          'direction', descending ? 'desc' : 'asc'
-        );
-      } else {
-        url.searchParams.delete('direction');
-      }
-
-      link.href = url.toString();
-    });
   }
 
   // Clicking A-Z again reverses it without reloading.

@@ -160,14 +160,23 @@ def records(doc, sort='comebacks'):
                     final=f"{g['away']} {g['away_pts']} @ {g['home']} {g['home_pts']}"))
         output.append(dict(team=team, name=TEAM_NAMES.get(team, team), **t,
             evidence=sorted(evidence, key=lambda item: item['game_id'], reverse=True)))
+    def inactive(t):
+        return not (
+            t['comeback_wins_10_plus'] or t['blown_leads_10_plus']
+        )
+
     if sort == 'blown':
-        output.sort(key=lambda t: (-t['blown_leads_10_plus'],
-                                   -t['comeback_wins_10_plus'], t['team']))
+        output.sort(key=lambda t: (
+            inactive(t), -t['blown_leads_10_plus'],
+            -t['comeback_wins_10_plus'], t['name']
+        ))
     elif sort == 'team':
-        output.sort(key=lambda t: t['team'])
+        output.sort(key=lambda t: (inactive(t), t['name']))
     else:
-        output.sort(key=lambda t: (-t['comeback_wins_10_plus'],
-                                    t['blown_leads_10_plus'], t['team']))
+        output.sort(key=lambda t: (
+            inactive(t), -t['comeback_wins_10_plus'],
+            -t['blown_leads_10_plus'], t['name']
+        ))
     return output
 
 
@@ -194,14 +203,9 @@ def init_app(app):
         sort = request.args.get('sort', 'comebacks')
         if sort not in ('comebacks', 'blown', 'team'):
             sort = 'comebacks'
-        view = request.args.get('view', 'events')
-        if view not in ('events', 'all'):
-            view = 'events'
         rows = records(doc, sort=sort)
-        if view == 'events':
-            rows = [r for r in rows if r['comeback_wins_10_plus'] or r['blown_leads_10_plus']]
         return render_template('comeback_leads.html', rows=rows,
             season=doc['season'], count=doc['games_checked'],
-            teams_count=len(doc['teams']), sort=sort, view=view,
+            teams_count=len(doc['teams']), sort=sort,
             status=status, last_verified=friendly_day(status['last_verified']),
             comebacks=sum(v['comeback_wins_10_plus'] for v in doc['teams'].values()))
