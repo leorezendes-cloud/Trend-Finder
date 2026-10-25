@@ -137,7 +137,8 @@ class DraftWorkflowTests(unittest.TestCase):
             self.assertEqual(self.client.get('/newsletter/manage').status_code,200)
             self.assertEqual(self.client.get('/newsletter/manage').status_code,200)
             with self.app.app_context():
-                self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],2)
+                self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],1)
+                self.assertEqual(db().execute("SELECT COUNT(*) FROM newsletter_generated WHERE frequency='weekly'").fetchone()[0],0)
             result=self.app.test_cli_runner().invoke(args=['newsletter-generate'])
             self.assertEqual(result.exit_code,0,result.output);self.assertIn('No email sent',result.output)
             self.assertEqual(mail.call_count,0)
