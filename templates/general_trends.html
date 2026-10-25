@@ -13,6 +13,8 @@
 
     <a href="{{ url_for('trend_finder',research_view='dogs') }}">Underdog Research</a>
     <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs Preset</a>
+
+    <a href="{{ url_for('comeback_lead_research') }}">Comebacks &amp; Blown Leads</a>
 </nav>
 <form method="get" action="{{ url_for('trend_finder') }}#research-results" class="home-filter-form"><input type="hidden" name="research_view" value="general"><input type="hidden" name="run" value="analyze"><h1 class="search-panel-title"><img src="{{ url_for('static',filename='Images/Branding/TrendFindah-3000-Retro-Transparent-Small.png') }}" alt="Trendfindah 3000" width="500" height="220"></h1><p>General NFL research</p>
 <div class="form-grid">

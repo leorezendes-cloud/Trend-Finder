@@ -24,6 +24,8 @@
 
     <a href="{{ url_for('trend_finder') }}">General NFL Research</a>
     <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs Preset</a>
+
+    <a href="{{ url_for('comeback_lead_research') }}">Comebacks &amp; Blown Leads</a>
 </nav>
     <form method="POST" action="{{ url_for('trend_finder') }}" class="home-filter-form">
         <input type="hidden" name="research_view" value="dogs">

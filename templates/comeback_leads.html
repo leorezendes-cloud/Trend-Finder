@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comebacks &amp; Blown Leads | Trend Findah 3000</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+  {% include '_branding_head.html' %}
+  <style>:root { --site-art: url("{{ url_for('static', filename='Images/Branding/trend-findah-background.png') }}"); }</style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='comeback_leads.css') }}">
+</head>
+<body class="cb-page">
+  {% include '_site_navigation.html' %}
+  <main class="cb-main" id="comeback-results">
+    <header class="cb-hero">
+      <div class="cb-eyebrow">TREND FINDAH 3000 <span aria-hidden="true">/</span> 2026 RESEARCH</div>
+      <h1>Comebacks <span>&amp;</span> Blown Leads</h1>
+      <p class="cb-subtitle">{{ season }} season · games audited through {{ last_verified }} · deficits of 10+ points</p>
+      {% if status.pending %}
+        <p class="cb-freshness cb-pending" role="status">{{ status.pending }} additional completed game{{ '' if status.pending == 1 else 's' }} await{{ 's' if status.pending == 1 else '' }} scoring verification. Totals below cover the {{ count }} audited games.</p>
+      {% else %}
+        <p class="cb-freshness">Current through the latest {{ status.final_count }} saved final{{ '' if status.final_count == 1 else 's' }}. Updated after scoring data is verified, not during games.</p>
+      {% endif %}
+      <div class="cb-overview" aria-label="Season snapshot totals">
+        <div><strong>{{ count }}</strong><span>Games audited</span></div>
+        <div><strong>{{ comebacks }}</strong><span>10+ point comebacks</span></div>
+        <div><strong>{{ teams_count }}</strong><span>Teams analyzed</span></div>
+      </div>
+      <a class="cb-back" href="{{ url_for('trend_finder') }}">← Back to Trend Findah 3000</a>
+    </header>
+
+    <section aria-labelledby="cb-leaderboard-title">
+      <div class="cb-toolbar">
+        <div class="cb-toolbar-heading">
+          <h2 id="cb-leaderboard-title">Team leaderboard</h2>
+          <p>{{ 'Teams with at least one qualifying 10+ point comeback or blown lead' if view == 'events' else 'All 32 teams, including teams with zero qualifying events' }}</p>
+        </div>
+        <nav class="cb-sort" aria-label="Sort team leaderboard">
+          <a href="{{ url_for('comeback_lead_research', sort='comebacks', view=view) }}" class="{{ 'is-active' if sort == 'comebacks' else '' }}" {% if sort == 'comebacks' %}aria-current="page"{% endif %}>Most comebacks</a>
+          <a href="{{ url_for('comeback_lead_research', sort='blown', view=view) }}" class="{{ 'is-active' if sort == 'blown' else '' }}" {% if sort == 'blown' %}aria-current="page"{% endif %}>Most blown leads</a>
+          <a href="{{ url_for('comeback_lead_research', sort='team', view=view) }}" class="{{ 'is-active' if sort == 'team' else '' }}" {% if sort == 'team' %}aria-current="page"{% endif %}>A–Z</a>
+        </nav>
+      </div>
+      <nav class="cb-view" aria-label="Which teams to show">
+        <a href="{{ url_for('comeback_lead_research', sort=sort, view='events') }}" class="{{ 'is-active' if view == 'events' else '' }}" {% if view == 'events' %}aria-current="page"{% endif %}>Notable teams</a>
+        <a href="{{ url_for('comeback_lead_research', sort=sort, view='all') }}" class="{{ 'is-active' if view == 'all' else '' }}" {% if view == 'all' %}aria-current="page"{% endif %}>All 32 teams</a>
+      </nav>
+
+      <div class="cb-grid">
+      {% for t in rows %}
+        <details class="cb-team-card" id="team-{{ t.team }}">
+          <summary class="cb-card-summary">
+            <span class="cb-team-badge">{{ t.team }}</span>
+            <span class="cb-team-label"><strong>{{ t.name }}</strong><small>{{ t.games }} games analyzed</small></span>
+            <span class="cb-card-metrics">
+              <span class="cb-metric cb-positive"><strong>{{ t.comeback_wins_10_plus }}</strong><small>COMEBACKS</small></span>
+              <span class="cb-metric cb-negative"><strong>{{ t.blown_leads_10_plus }}</strong><small>BLOWN</small></span>
+            </span>
+            <span class="cb-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="cb-expanded">
+            <div class="cb-halftime">
+              <div><span>Leading at halftime</span><strong>{{ t.leading_ht_W }}–{{ t.leading_ht_L }}</strong></div>
+              <div><span>Trailing at halftime</span><strong>{{ t.trailing_ht_W }}–{{ t.trailing_ht_L }}</strong></div>
+            </div>
+            {% if t.evidence %}
+              <h3>Games behind the record</h3>
+              <ul class="cb-evidence">
+              {% for e in t.evidence %}
+                <li>
+                  <a href="{{ url_for('fans.matchup', game_id=e.game_id) }}">{{ e.final }}</a>
+                  <span class="{{ 'cb-event-win' if e.is_comeback else 'cb-event-loss' }}">{{ e.outcome }} · {{ e.points }}-point deficit</span>
+                </li>
+              {% endfor %}
+              </ul>
+            {% else %}<p class="cb-no-events">No 10+ point comeback or blown-lead games in this audited set.</p>{% endif %}
+          </div>
+        </details>
+      {% endfor %}
+      </div>
+      <p class="cb-footnote">Records reflect audited scoring sequences, not just final margins. The local reconstruction still carries a manual-review flag; newly completed games are added only after scoring verification.</p>
+    </section>
+  </main>
+
+<!-- Comeback leaderboard controls v2 -->
+<script>
+(() => {
+  const grid = document.querySelector('.cb-grid');
+  const sortNav = document.querySelector('.cb-sort');
+  const viewNav = document.querySelector('.cb-view');
+
+  if (!grid || !sortNav || !viewNav) return;
+
+  const sortLinks = Array.from(sortNav.querySelectorAll('a'));
+  const alphaLink = sortLinks[2];
+  if (!alphaLink) return;
+
+  const cards = Array.from(grid.querySelectorAll('.cb-team-card'));
+  const params = new URLSearchParams(window.location.search);
+
+  const activeLink = sortLinks.find(
+    link => link.classList.contains('is-active')
+  );
+
+  let mode = params.get('sort') || (
+    activeLink === sortLinks[1] ? 'blown' :
+    activeLink === alphaLink ? 'team' : 'comebacks'
+  );
+
+  if (!['comebacks', 'blown', 'team'].includes(mode)) {
+    mode = 'comebacks';
+  }
+
+  let descending = params.get('direction') === 'desc';
+
+  // Read statistics already rendered by Flask.
+  cards.forEach(card => {
+    const name = card.querySelector('.cb-team-label strong');
+    const comebacks = card.querySelector('.cb-positive strong');
+    const blown = card.querySelector('.cb-negative strong');
+
+    card.dataset.teamName = name?.textContent.trim() || card.id;
+    card.dataset.comebacks = Number(comebacks?.textContent || 0);
+    card.dataset.blown = Number(blown?.textContent || 0);
+  });
+
+  const compareNames = (a, b) =>
+    a.dataset.teamName.localeCompare(
+      b.dataset.teamName, 'en', { sensitivity: 'base' }
+    );
+
+  function render() {
+    cards.sort((a, b) => {
+      if (mode === 'team') {
+        return compareNames(a, b) * (descending ? -1 : 1);
+      }
+
+      const key = mode === 'blown' ? 'blown' : 'comebacks';
+      const difference = Number(b.dataset[key]) -
+                         Number(a.dataset[key]);
+
+      // Alphabetical tie-breaking.
+      return difference || compareNames(a, b);
+    });
+
+    cards.forEach((card, index) => {
+      grid.appendChild(card);
+
+      const name = card.querySelector('.cb-team-label strong');
+      if (!name) return;
+
+      let rank = name.querySelector('.cb-rank');
+
+      if (!rank) {
+        rank = document.createElement('span');
+        rank.className = 'cb-rank';
+        name.prepend(rank);
+      }
+
+      rank.textContent = `#${index + 1}`;
+      rank.setAttribute('aria-label', `Rank ${index + 1}`);
+    });
+
+    // Alphabetical button direction.
+    const isReverse = mode === 'team' && descending;
+
+    alphaLink.textContent = isReverse ? 'Z–A ↓' : 'A–Z ↑';
+    alphaLink.title = isReverse
+      ? 'Click to sort A to Z'
+      : 'Click to sort Z to A when alphabetical sorting is active';
+
+    // Keep alphabetical direction when changing team views.
+    viewNav.querySelectorAll('a').forEach(link => {
+      const url = new URL(link.href);
+
+      if (mode === 'team') {
+        url.searchParams.set(
+          'direction', descending ? 'desc' : 'asc'
+        );
+      } else {
+        url.searchParams.delete('direction');
+      }
+
+      link.href = url.toString();
+    });
+  }
+
+  // Clicking A-Z again reverses it without reloading.
+  alphaLink.addEventListener('click', event => {
+    if (mode !== 'team') return;
+
+    event.preventDefault();
+    descending = !descending;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort', 'team');
+    url.searchParams.set(
+      'direction', descending ? 'desc' : 'asc'
+    );
+
+    window.history.replaceState(null, '', url);
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

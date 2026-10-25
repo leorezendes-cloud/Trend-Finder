@@ -1,0 +1,166 @@
+/* Scoped to the optional Comebacks beta. No global Trend Finder changes. */
+html body.cb-page { padding: 12px clamp(10px, 2vw, 20px) 30px; font-family: Arial, Helvetica, sans-serif; -webkit-text-stroke: 0; }
+html body.cb-page .site-header { margin-bottom: 12px; }
+html body.cb-page main.cb-main { max-width: 1180px; margin: 0 auto; padding: clamp(16px, 2.4vw, 28px); background: rgba(8, 14, 26, .90); border: 1px solid rgba(194, 146, 56, .40); border-radius: 15px; box-sizing: border-box; }
+.cb-hero { padding: 0 2px 20px; margin-bottom: 18px; border-bottom: 1px solid #344152; }
+.cb-eyebrow { color: #fbbf24; font: 800 11px/1.4 Arial,sans-serif; letter-spacing: 2px; }
+.cb-eyebrow span { color: #64748b; margin: 0 9px; }
+html body.cb-page .cb-hero h1 { margin: 8px 0 6px; font: 900 clamp(29px, 4.6vw, 51px)/1.1 Impact, 'Arial Narrow', sans-serif; letter-spacing: .35px; text-align: left; text-shadow: 0 3px 9px #000c; -webkit-text-stroke: 0; }
+.cb-hero h1 span { color: #fbbf24; }
+.cb-subtitle { color: #e2e8f0; margin: 4px 0 6px; font: 15px/1.55 Arial,sans-serif; }
+.cb-freshness { font: 13px/1.55 Arial,sans-serif; color: #a7f3d0; margin: 7px 0 16px; }
+.cb-freshness.cb-pending { color: #fcd34d; }
+.cb-overview { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 16px; }
+.cb-overview > div { min-width: 136px; flex: 0 1 180px; padding: 10px 14px; border: 1px solid #3d4b60; background: #121c2c; border-radius: 10px; display: flex; flex-direction: column; gap: 3px; }
+.cb-overview strong { color: #fbbf24; font: 900 25px/1.1 Arial,sans-serif; }
+.cb-overview span { color: #cbd5e1; font: 12px/1.4 Arial,sans-serif; }
+html body.cb-page .cb-main a, html body.cb-page .cb-main a:visited { color: #fbbf24; -webkit-text-stroke: 0; }
+html body.cb-page .cb-main a:hover, html body.cb-page .cb-main a:focus-visible { color: #fff; }
+.cb-back { display: inline-block; font: 700 13px/1.4 Arial,sans-serif; text-underline-offset: 3px; }
+.cb-toolbar { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.cb-toolbar-heading h2 { margin: 0; text-align: left; font: 800 21px/1.2 Arial,sans-serif; color: white; }
+.cb-toolbar-heading p { margin: 5px 0 0; color: #cbd5e1; font: 13px/1.4 Arial,sans-serif; }
+.cb-sort { display: flex; flex-wrap: wrap; gap: 7px; }
+html body.cb-page .cb-sort a, html body.cb-page .cb-view a { display: inline-block; padding: 8px 11px; border: 1px solid #4b5563; border-radius: 9px; background: #172235; color: #e2e8f0; text-decoration: none; font: 700 12px/1.2 Arial,sans-serif; }
+html body.cb-page .cb-sort a.is-active, html body.cb-page .cb-view a.is-active { border-color: #fbbf24; background: #403114; color: #fbbf24; }
+html body.cb-page .cb-sort a:hover, html body.cb-page .cb-view a:hover { border-color: #fbbf24; color: #fff; }
+.cb-view { display: flex; gap: 8px; margin: 14px 0 14px; }
+.cb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); align-items: start; gap: 10px; }
+.cb-team-card { background: #152133; border: 1px solid #3c4a61; border-radius: 10px; overflow: hidden; min-width: 0; box-shadow: 0 2px 6px #0005; }
+.cb-team-card[open] { border-color: #dcae4c; background: #182538; }
+.cb-card-summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 11px; cursor: pointer; min-height: 62px; box-sizing: border-box; }
+.cb-card-summary::-webkit-details-marker { display: none; }
+.cb-card-summary:focus-visible { outline: 2px solid #fbbf24; outline-offset: -3px; border-radius: 9px; }
+.cb-team-badge { display: flex; align-items: center; justify-content: center; flex: 0 0 46px; min-height: 44px; border: 1px solid #a78543; border-radius: 8px; background: #28314a; color: #fbd77a; font: 900 16px Arial,sans-serif; }
+.cb-team-label { min-width: 0; display: flex; flex-direction: column; flex: 1 1 auto; gap: 3px; }
+.cb-team-label strong { font: 800 15px/1.1 Arial,sans-serif; color: #f1f5f9; }
+.cb-team-label small { font: 11px/1.2 Arial,sans-serif; color: #aebbd0; }
+.cb-card-metrics { display: flex; gap: 8px; flex-shrink: 0; }
+.cb-metric { display: flex; align-items: center; flex-direction: column; min-width: 45px; gap: 1px; }
+.cb-metric strong { font: 900 19px/1.1 Arial,sans-serif; }
+.cb-metric small { font: 800 8px/1.1 Arial,sans-serif; letter-spacing: .5px; }
+.cb-positive strong, .cb-positive small { color: #86efac; }
+.cb-negative strong, .cb-negative small { color: #fda4af; }
+.cb-chevron { font: 20px/1 Arial,sans-serif; color: #cbd5e1; transition: transform .1s ease; }
+.cb-team-card[open] .cb-chevron { transform: rotate(180deg); }
+.cb-expanded { border-top: 1px solid #40516b; padding: 12px; font: 13px/1.5 Arial,sans-serif; }
+.cb-halftime { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cb-halftime > div { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 7px; padding: 9px 10px; background: #0e1a2b; border: 1px solid #30405b; border-radius: 8px; }
+.cb-halftime span { color: #cbd5e1; }
+.cb-halftime strong { color: #f1f5f9; font-size: 14px; }
+.cb-expanded h3 { color: #fbd77a; font: 800 13px/1.3 Arial,sans-serif; margin: 15px 0 8px; }
+.cb-evidence { margin: 0; padding: 0; list-style: none; }
+.cb-evidence li { border-top: 1px solid #314054; padding: 10px 0; display: flex; flex-direction: column; gap: 4px; }
+.cb-evidence li:first-child { border-top: 0; }
+.cb-evidence a { font-weight: 700; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.cb-event-win { color: #86efac; }
+.cb-event-loss { color: #fda4af; }
+.cb-no-events { margin-bottom: 0; color: #cbd5e1; }
+.cb-footnote { color: #b3c3d9; margin: 18px 1px 0; font: 12px/1.6 Arial,sans-serif; }
+@media (max-width: 690px) {
+  .cb-toolbar { align-items: stretch; }
+  .cb-overview > div { min-width: 0; flex: 1 1 95px; padding: 9px; }
+  .cb-overview strong { font-size: 21px; }
+  .cb-overview span { font-size: 10px; }
+  .cb-sort a { flex: 1 1 auto; text-align: center; }
+  html body.cb-page .cb-hero h1 { font-size: clamp(28px, 8vw, 40px); }
+  .cb-team-label strong { font-size: 14px; }
+}
+@media (max-width: 370px) {
+  .cb-card-summary { gap: 7px; padding: 9px; }
+  .cb-team-badge { flex-basis: 39px; font-size: 14px; }
+  .cb-metric { min-width: 39px; }
+}
+
+
+/* Comeback leaderboard controls v2 */
+
+/* Heading above full-width controls */
+html body.cb-page .cb-toolbar {
+  display: block;
+}
+
+html body.cb-page .cb-toolbar-heading {
+  width: 100%;
+}
+
+/* Three equally sized sorting buttons */
+html body.cb-page .cb-sort {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* Two equally sized team filters */
+html body.cb-page .cb-view {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px;
+  margin: 9px 0 14px;
+}
+
+/* Uniform button dimensions */
+html body.cb-page .cb-sort a,
+html body.cb-page .cb-view a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+  padding: 9px 6px;
+}
+
+/* Visible rank beside team name */
+html body.cb-page .cb-rank {
+  display: inline-block;
+  background: #403114;
+  border: 1px solid #a78543;
+  color: #fbbf24;
+  border-radius: 5px;
+  padding: 3px 5px;
+  margin-right: 5px;
+  font: 800 11px/1.2 Arial, sans-serif;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Mobile: retain exactly three buttons in the first row */
+@media (max-width: 690px) {
+  html body.cb-page .cb-sort {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  html body.cb-page .cb-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  html body.cb-page .cb-sort a {
+    font-size: 10px;
+    padding: 8px 3px;
+    min-height: 46px;
+  }
+
+  html body.cb-page .cb-view a {
+    font-size: 11px;
+    padding: 8px 4px;
+    min-height: 43px;
+  }
+}
+
+@media (max-width: 370px) {
+  html body.cb-page .cb-rank {
+    font-size: 10px;
+    padding: 2px 3px;
+    margin-right: 3px;
+  }
+}
