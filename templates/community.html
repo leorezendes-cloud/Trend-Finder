@@ -21,7 +21,7 @@
         <p>Football talk, picks, fantasy and anything worth discussing. One conversation, everyone welcome.</p>
       </div>
       <div class="huddle-header-tools">
-      <div class="huddle-shortcut huddle-soon huddle-leaderboard-compact" aria-label="Leaderboard coming soon"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>Leaderboard</b><small>Coming soon</small></span><span class="huddle-soon-pill">SOON</span></div>
+      {% if huddle_leaderboard_available|default(false) %}<a class="huddle-shortcut huddle-leaderboard-compact" href="{{ url_for('huddle_leaderboard.index') }}"><span class="huddle-shortcut-icon" aria-hidden="true">♛</span><span><b>Leaderboard</b><small>Weekly &amp; season</small></span><span class="huddle-chevron" aria-hidden="true">↗</span></a>{% endif %}
       <div class="huddle-community-status"><strong>{{ total }}</strong><span>{{ ('report' if total == 1 else 'reports') if review else ('comment' if total == 1 else 'comments') }}</span></div>
       </div>
     </header>
