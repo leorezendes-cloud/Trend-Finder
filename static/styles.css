@@ -1383,3 +1383,18 @@ h2 {
     outline: 2px solid #fbbf24;
     outline-offset: 2px;
 }
+
+
+/* Desktop Hot Trends uniform cards v1 */
+@media (min-width: 651px) {
+    .trend-card-grid.hot-trends-grid:not(:has(> .hot-trend-card[open])) {
+        grid-auto-rows: 1fr;
+        align-items: stretch;
+    }
+
+    .trend-card-grid.hot-trends-grid:not(:has(> .hot-trend-card[open]))
+    > .hot-trend-card {
+        height: 100%;
+        box-sizing: border-box;
+    }
+}
