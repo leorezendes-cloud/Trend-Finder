@@ -94,6 +94,51 @@ class NewsletterTests(unittest.TestCase):
         positions = [preview.text.index(h) for h in headings]
         self.assertEqual(positions, sorted(positions))
 
+
+    def test_weekly_live_preview_is_read_only(self):
+        sections = {
+            'predictions': 'The featured Expert pick is being prepared.',
+            'trends': 'No current trends',
+            'matchups': 'No scheduled matchups',
+            'expert': '', 'updates': ''
+        }
+        with patch('newsletter_draft.build_draft',
+                   return_value=(sections, {'warnings': []})) as builder:
+            response = self.client.get('/newsletter/weekly/preview')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('THE WEEKLY PLUG', response.text)
+        self.assertEqual(builder.call_count, 1)
+        with self.app.app_context():
+            self.assertEqual(
+                db().execute('SELECT COUNT(*) FROM newsletter_generated')
+                    .fetchone()[0], 0
+            )
+
+    def test_monthly_editorial_layout_and_huddle_promo(self):
+        origin = self.app.config['PUBLIC_ORIGIN'].rstrip('/')
+        archive = origin + '/newsletter/results/2026/10?at=1793000000'
+        matchup = origin + '/matchup/2026_07_NE_CHI'
+        issue = self.draft(
+            frequency='monthly',
+            subject='The Monthly Plug · October 2026',
+            predictions='October 2026 · Verified results.\n'
+                        + archive + '\n\n'
+                        + 'Oct 22: NE 24 – CHI 30\n' + matchup,
+            matchups='THURSDAY NIGHT FOOTBALL · NE at CHI\n'
+                     'Thursday night in Chicago.\n' + matchup
+        )
+        self.assertEqual(issue.status_code, 302)
+        preview = self.client.get(issue.location + '/preview')
+        self.assertEqual(preview.status_code, 200)
+        for expected in ('THE MONTHLY PLUG', '01 / MONTH IN REVIEW',
+                         '02 / TREND SPOTLIGHT', '03 / LOOKING AHEAD',
+                         '04 / THE HUDDLE', 'Create a free league'):
+            self.assertIn(expected, preview.text)
+        for url in (archive, matchup,
+                    origin + '/huddle/leagues/start/create',
+                    origin + '/huddle/leagues/start/join'):
+            self.assertIn('href="' + url + '"', preview.text)
+
     def test_owner_only_and_csrf(self):
         self.assertEqual(self.client.post('/newsletter/manage',data={}).status_code,400)
         self.client=self.app.test_client()

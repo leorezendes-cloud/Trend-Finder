@@ -1,5 +1,7 @@
 {% if issue.frequency == 'weekly' and 'Premium Preview' not in issue.subject %}
 {% include 'newsletter_weekly_email.html' %}
+{% elif issue.frequency == 'monthly' %}
+{% include 'newsletter_monthly_email.html' %}
 {% else %}
 <!doctype html>
 <html lang="en">

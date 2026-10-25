@@ -640,7 +640,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False):
     if frequency == 'monthly':
         recap = _monthly_recap(root, now, origin, sources, warnings)
         matchups = _matchups(root, now, origin, sources, warnings,
-                            days=30, active_only=False)
+                            days=30, active_only=False, max_games=5, editorial=True)
         sections = {'predictions': recap,
                     'trends': '\n\n'.join(trends) or 'No featured trends are available.',
                     'expert': '',
