@@ -66,7 +66,7 @@ def install_memory_gate(application):
     @application.before_request
     def enter_analytics():
         if (request.endpoint is None or request.endpoint in ('health', 'static')
-                or request.blueprint in ('membership', 'newsletter', 'member_picks', 'community', 'huddle_leagues')):
+                or request.blueprint in ('membership', 'newsletter', 'member_picks', 'community', 'huddle_leagues', 'huddle_leaderboard')):
             return
         if request.endpoint == 'sunday_page' and request.method == 'GET':
             from historical_window_cache import cached_context

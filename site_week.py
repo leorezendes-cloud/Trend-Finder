@@ -51,3 +51,32 @@ def active_slate(rows, now=None):
         except (KeyError,ValueError,TypeError): return None
     selected = [row for row in rows if identity(row) == key]
     return key, selected
+
+
+# Keep only the current week value, not the parsed schedule, in memory.
+# File identity and the Wednesday 8 a.m. ET boundary invalidate this cache.
+from functools import lru_cache
+from pathlib import Path
+from threading import Lock
+
+_current_site_week_lock = Lock()
+
+
+@lru_cache(maxsize=2)
+def _cached_current_site_week(path, modified_ns, size, inode, device, week_start):
+    from market_views import read
+    return active_week(read(Path(path)), now=week_start)
+
+
+def current_site_week(path, now=None):
+    """Lightweight week label for shared page headers; no network or writes."""
+    path = Path(path)
+    try:
+        info = path.stat()
+    except FileNotFoundError:
+        return None
+    start, _ = week_window(now)
+    with _current_site_week_lock:
+        return _cached_current_site_week(
+            str(path), info.st_mtime_ns, info.st_size,
+            info.st_ino, info.st_dev, start)
