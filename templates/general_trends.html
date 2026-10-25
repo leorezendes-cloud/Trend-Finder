@@ -10,7 +10,7 @@
 {% set game_types={'REG':'Regular Season','WC':'Wild Card','DIV':'Divisional Playoffs','CON':'Conference Championship','SB':'Super Bowl','PRE':'Preseason','POST':'Postseason'} %}
 <!-- manual-filter-layout-v3 -->
 <nav class="research-mode-switch tf-mode-links research-navigation" aria-label="Research views and presets">
-    <a href="{{ url_for('hot_trends_page') }}">See All Hot Trends</a>
+
     <a href="{{ url_for('trend_finder',research_view='dogs') }}">Underdog Research</a>
     <a href="{{ url_for('trend_finder',research_view='dogs',primetime='yes',run='analyze') }}">Primetime Dogs Preset</a>
 </nav>

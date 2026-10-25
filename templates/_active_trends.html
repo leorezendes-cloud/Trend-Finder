@@ -1,7 +1,7 @@
 {% if active_highlights %}
 <section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title">
 <h2 id="active-trends-title">Top 8 Current Trends</h2>
-{% if not all_hot_trends|default(false) and not research_navigation|default(false) %}<p><a class="hot-trend-games" href="{{ url_for('hot_trends_page') }}">🔥 See All Hot Trends →</a></p>{% endif %}
+{% if not all_hot_trends|default(false) %}<p class="hot-trends-all-actions"><a class="hot-trend-games hot-trends-all-button" href="{{ url_for('hot_trends_page') }}">🔥 See All Hot Trends →</a></p>{% endif %}
 <div class="trend-card-grid hot-trends-grid">
 {% for trend in active_highlights %}
 <details class="trend-card compact-card hot-trend-card" id="{{ hot_trend_id(trend) }}">
@@ -60,5 +60,5 @@
 })();
 </script>
 {% elif not all_hot_trends|default(false) %}
-<section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title"><h2 id="active-trends-title">Hot Right Now</h2><p>No verified trends meet the five-straight or five-of-seven requirements right now.</p>{% if not research_navigation|default(false) %}<p><a href="{{ url_for('hot_trends_page') }}">See All Hot Trends →</a></p>{% endif %}</section>
+<section class="discovery-upcoming hot-trends" aria-labelledby="active-trends-title"><h2 id="active-trends-title">Hot Right Now</h2><p>No verified trends meet the five-straight or five-of-seven requirements right now.</p><p class="hot-trends-all-actions"><a class="hot-trends-all-button" href="{{ url_for('hot_trends_page') }}">See All Hot Trends →</a></p></section>
 {% else %}<p>No qualifying Hot Right Now trends currently.</p>{% endif %}
