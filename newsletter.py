@@ -186,8 +186,9 @@ def manage(issue_id=None):
     if editing is not None and editing['status'] != 'draft':
         abort(409, description='Approved or canceled issues cannot be edited.')
     if editing is None and request.method == 'GET' and current_app.config['NEWSLETTER_AUTO_DRAFT_ENABLED']:
-        generate_draft(g.member['id'], 'weekly')
-        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 LIMIT 1").fetchone():
+        # Weekly drafts are prepared by the Wednesday scheduler,
+        # never just because an owner opened the manager.
+        if db().execute("SELECT 1 FROM members WHERE newsletter_opt_in=1 AND newsletter_frequency='monthly' LIMIT 1").fetchone():
             generate_draft(g.member['id'], 'monthly')
     defaults = dict(json.loads(editing['sections']), subject=editing['subject'], frequency=editing['frequency']) if editing is not None else {}
     error = None
