@@ -57,8 +57,8 @@ class ExpertEditorialTests(unittest.TestCase):
         self.assertFalse(record['market_current'])
         self.assertEqual(record['scout']['quotes'],{})
         self.assertEqual(record['saved_picks']['spread']['side'],'HOU')
-        self.assertIn('The Plug ATS: HOU',html)
-        self.assertIn('The Plug total: Under',html)
+        self.assertIn('Scout ATS: HOU',html)
+        self.assertIn('The Plug O/U: Under',html)
         self.assertNotIn('Scout',html.split('<body>',1)[-1])
 
     def test_card_picks_only_for_entitled_users(self):

@@ -4,7 +4,8 @@
 {% if forecast or (prediction_item and not prediction_item.forecast_pending) %}<small>Based on the saved market line.</small>{% endif %}
 {% if prediction_item and not use_results_forecast and not prediction_item.forecast_pending %}
 {% set picks=prediction_item.saved_picks %}{% set quotes=prediction_item.locked_quotes %}{% set margin=prediction_item.prediction_margin %}
-<p><strong>ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
+<p><strong>Scout ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
+{% if prediction_item.plug_ats_status == 'selected' %}<p><strong>Plug's Top Pick</strong></p>{% elif prediction_item.plug_ats_status == 'stay_away' %}<p><strong>The Plug:</strong> Stay Away</p>{% elif prediction_item.plug_ats_status is defined %}<p><strong>The Plug:</strong> Awaiting weekly picks</p>{% endif %}
 <p><strong>Straight Up:</strong> {% if margin %}{{ game.away_team if margin>0 else game.home_team }} by {{ margin|abs|stat }} points{% else %}Even{% endif %}</p>
 <p><strong>Over/Under:</strong> {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ '%g'|format(quotes['Total'].line_a|float) }}{% endif %}</p>
 {% elif forecast %}

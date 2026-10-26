@@ -391,6 +391,10 @@ def matchup_prediction(game_id, version=None):
     item['saved_at'] = record['scout']['cutoff_utc']
     game = record['scout']['game']
     item['prediction_margin'] = record['scout']['scores'][game['away_team']] - record['scout']['scores'][game['home_team']]
+    if version is None:
+        from plug_ats_select import for_game
+        decision = for_game(game_id)
+        item['plug_ats_status'] = ('selected' if decision['selected'] else 'stay_away') if decision else 'pending'
     return item
 
 
@@ -407,6 +411,19 @@ def api_dashboard():
     from plug_dashboard import weekly_dashboard
     context = weekly_dashboard(records_or_fail(), public_record, clock())
     return jsonify(**context, label='In development')
+
+
+@bp.route('/the-plug/ats-record')
+def plug_ats_record():
+    """Independently graded, issued-before-kickoff selective ATS record."""
+    from plug_ats_select import published_history, POLICY
+    from plug_dashboard import _completed_games
+    from pathlib import Path
+    try:
+        picks, seasons = published_history(_completed_games(Path(__file__).resolve().parent))
+    except (OSError, TypeError, ValueError, KeyError):
+        abort(503, description='Plug ATS selection receipts need operator review.')
+    return render_template('plug_ats_record.html', picks=picks, seasons=seasons, policy=POLICY)
 
 
 @bp.route('/the-plug/archive')

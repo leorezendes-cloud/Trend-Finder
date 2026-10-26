@@ -15,7 +15,7 @@ class DashboardTests(ExpertBetaTests):
         self.assertLess(html.index('HOU @ JAX'),html.index('SEA @ DEN'))
         for text in ('Live market lines are unavailable','Saved picks and scores shown','premium access','Existing forecasts','No calibrated confidence'):
             self.assertNotIn(text,html)
-        self.assertIn('The Plug’s Record',html)
+        self.assertIn('Scout’s All-Game Record',html)
         self.assertEqual(self.client.get('/sunday-scout').status_code,302)
         self.assertIn('/the-plug',self.client.get('/sunday-scout').location)
 

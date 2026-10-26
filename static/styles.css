@@ -1531,3 +1531,8 @@ html body .research-mode-switch.tf-mode-links.research-navigation a:hover {
         padding: 8px 4px;
     }
 }
+
+/* Plug ATS: independent selective recommendations. */
+.plug-shortlist{font-size:.91rem;font-weight:600;margin:.45rem 0 .65rem;}
+.plug-shortlist-top{color:#36be76;}
+.plug-shortlist-pass{color:#aaa6b3;}

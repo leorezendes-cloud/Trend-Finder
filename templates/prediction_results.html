@@ -1,8 +1,8 @@
 {% extends 'scout4_base.html' %}
-{% block title %}The Plug’s Record{% endblock %}{% block heading %}The Plug’s Record{% endblock %}
+{% block title %}Scout’s All-Game Record{% endblock %}{% block heading %}Scout’s All-Game Record{% endblock %}
 {% block filter_form %}{% endblock %}
-{% block data_notes %}<aside class="stats-note"><p>Track The Plug’s saved ATS and over/under picks, win–loss–push records, and accuracy. For final scores and individual matchup outcomes, visit <a href="{{ url_for('sunday_results_page') }}">Weekly Game Results</a>.</p><p>Only predictions saved before kickoff are counted. Different model versions are combined for the selected week; the original configurations remain available below. Pushes are excluded from win percentages; pending games are not losses.</p><p>Latest prediction saved: {{ freshness.predictions|eastern_time if freshness.predictions else 'None yet' }}. Results use final scores in the saved schedule, so grading can lag the live scoreboard.</p>{% if excluded %}<p>{{ excluded }} records excluded because pregame timing or outcome identity could not be verified.</p>{% endif %}</aside>{% endblock %}
-{% block content %}
+{% block data_notes %}<aside class="stats-note"><p>Track the previous all-game ATS record (formerly labeled The Plug) and the unchanged saved over/under record, with the original model versions and lines preserved. For final scores and individual matchup outcomes, visit <a href="{{ url_for('sunday_results_page') }}">Weekly Game Results</a>.</p><p>Only predictions saved before kickoff are counted. Different model versions are combined for the selected week; the original configurations remain available below. Pushes are excluded from win percentages; pending games are not losses.</p><p>Latest prediction saved: {{ freshness.predictions|eastern_time if freshness.predictions else 'None yet' }}. Results use final scores in the saved schedule, so grading can lag the live scoreboard.</p>{% if excluded %}<p>{{ excluded }} records excluded because pregame timing or outcome identity could not be verified.</p>{% endif %}</aside>{% endblock %}
+{% block content %}<p><a href="{{ url_for('expert_beta.plug_ats_record') }}">See The Plug's separate selected ATS record →</a></p>
 {% if config.get('EXPERT_BETA_ENABLED') %}<p><a href="{{ url_for('expert_beta.archive') }}">Prediction archive →</a></p>{% endif %}
 
 {% if weeks %}
@@ -12,8 +12,8 @@
 <button type="submit">Show week</button>
 </form>
 <section class="stats-card matchup-panel prediction-week-record">
-<h2><span class="prediction-brand">The Plug</span> · Week {{ selected_week }} Record</h2>
-<p class="prediction-week-description">Scout produces the forecasts; The Plug records locked selections and their results. <a href="{{ url_for('methodology_page') }}">How it works →</a></p>
+<h2><span class="prediction-brand">Scout</span> · Week {{ selected_week }} All-Game Record</h2>
+<p class="prediction-week-description">The Plug now makes selective ATS recommendations; this table preserves the original all-game forecast history. <a href="{{ url_for('methodology_page') }}">How it works →</a></p>
 {% for name,label in [('ats','ATS'),('totals','Over/under picks')] %}{% set result=summary[name] %}<h3>{{ label }}</h3><p><strong>{{ result.get('Win',0) }}–{{ result.get('Loss',0) }}–{{ result.get('Push',0) }}</strong> · {{ result.decisions }} decisions{% if result.rate is not none %} · {{ result.rate|stat }}% wins{% else %} · No graded decisions yet{% endif %}</p><p>{{ result.get('Pending',0) }} pending · {{ result.get('No Call',0) }} entries without a pick · {{ result.get('Unavailable',0) }} unavailable · {{ result.get('Review needed',0) }} need review.</p>{% endfor %}
 <details class="prediction-version-details"><summary>Model version details</summary><p>Each saved pick is evaluated against its original captured line. Weekly totals combine saved model configurations; the predictions themselves are unchanged.</p>{% for group in groups %}<p>{{ group.version }} · Configuration {{ group.configuration[:12] }} · ATS {{ group.ats.get('Win',0) }}–{{ group.ats.get('Loss',0) }}–{{ group.ats.get('Push',0) }} · O/U {{ group.totals.get('Win',0) }}–{{ group.totals.get('Loss',0) }}–{{ group.totals.get('Push',0) }}</p>{% endfor %}</details>
 </section>

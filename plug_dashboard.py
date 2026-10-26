@@ -141,6 +141,13 @@ def combined_cards(records, render_record, now):
         if approved:
             items[game['game_id']]['scout'] = approved['scout']
             items[game['game_id']]['show_scores'] = True
+            # Only exact approved, sealed production forecasts may enter ATS selection.
+            items[game['game_id']]['plug_ats_source'] = dict(
+                model_version=record['version'], side=pick['pick'],
+                edge=pick['ats_edge'], away_line=record['quote']['line'],
+                source_sha256=record['_history_digest'],
+                captured_at_utc=record['quote']['captured_at_utc'],
+                sealed_at_utc=record['sealed_at_utc'])
         if archive_item:
             # Expert remains tied to its own report and quotes, independently of Scout.
             item = items[game['game_id']]
@@ -241,4 +248,5 @@ def weekly_dashboard(records, render_record, now):
     sections['historical_games'] = [item for item in earlier if item['scout']['game']['game_id'] not in current_ids]
     for key in ('games','underway_games','completed_games','awaiting_games'):
         sections[key].sort(key=lambda item:instant(item['scout']['game']['kickoff_utc']))
-    return sections
+    from plug_ats_select import decorate_dashboard
+    return decorate_dashboard(sections, now)
