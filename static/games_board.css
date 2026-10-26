@@ -54,7 +54,7 @@
 .tf-board-item>.tf-board-game{height:100%}
 .tf-board-item:has(>.tf-board-game[open]){grid-column:1/-1}
 .tf-board-item:has(.tf-board-marks details[open]){z-index:50}
-.tf-board-item .tf-board-marks{position:absolute;right:14px;top:103px;display:flex;align-items:center;gap:6px;z-index:9}
+.tf-board-item .tf-board-marks{position:absolute;left:50%;right:auto;top:42px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:5px;z-index:9}
 .tf-board-marks:empty{display:none}
 .tf-board-marks .tf-hot-trends,.tf-board-marks .game-anomaly-flag{position:relative;top:auto;bottom:auto;right:auto;left:auto;transform:none;margin:0}
 .tf-board-marks .tf-hot-trends>summary{font-size:20px;padding:2px 4px}
@@ -63,7 +63,15 @@
 .tf-board-home .tf-board-side{justify-content:flex-start;gap:8px}
 .tf-board-home .tf-board-side:nth-child(3){justify-content:flex-end}
 .tf-board-home .tf-board-side strong{flex:none;font-variant-numeric:tabular-nums;font-size:clamp(1.3rem,2.4vw,1.95rem)}
-.tf-board-home .tf-board-match{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:8px}
+.tf-board-home .tf-board-match{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:8px;margin-top:26px}
 .tf-board-home .tf-board-side b{white-space:nowrap}
 @media(max-width:720px){.tf-board-home .tf-board-grid{grid-template-columns:minmax(0,1fr)}.tf-board-item:has(>.tf-board-game[open]){grid-column:auto}}
-@media(max-width:420px){.tf-board-home .tf-board-summary{padding:12px 12px 16px}.tf-board-home .tf-board-match{gap:4px}.tf-board-home .tf-board-side{gap:5px}.tf-board-item .tf-board-marks{top:95px;right:8px}.tf-board-home .tf-board-game-status{font-size:.71rem}}
+@media(max-width:420px){.tf-board-home .tf-board-summary{padding:12px 12px 16px}.tf-board-home .tf-board-match{gap:4px}.tf-board-home .tf-board-side{gap:5px}.tf-board-item .tf-board-marks{top:40px;right:auto;left:50%}.tf-board-home .tf-board-game-status{font-size:.71rem}}
+
+/* Center fire/flag above the @. Dropdowns open independently of the game card. */
+.tf-board-marks .tf-hot-trends-panel,
+.tf-board-marks .game-anomaly-links{
+  left:50%;right:auto;transform:translateX(-50%);
+  width:min(240px,calc(100vw - 44px));
+}
+.tf-board-item:has(.tf-board-marks details[open]){z-index:60}

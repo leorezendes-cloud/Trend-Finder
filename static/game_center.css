@@ -68,3 +68,20 @@
 .tf-gc-pick-grid span{font-size:.76rem;color:#9edabc}
 .tf-gc-pick-link{display:inline-block;margin-top:12px;color:#172333!important;background:#fbbf24;padding:10px 14px;border-radius:9px;text-decoration:none;font-weight:850;font-size:.84rem}
 @media(max-width:520px){.tf-gc-form-grid{grid-template-columns:1fr}.tf-gc-pick-grid{grid-template-columns:1fr}}
+
+/* Matching gold actions; shorter labels keep both buttons compact on phones. */
+.tf-gc-actions .tf-gc-primary,
+.tf-gc-actions .tf-gc-secondary{
+  background:#fbbf24;border:1px solid #fbbf24;color:#121b2b!important;
+}
+.tf-gc-actions .tf-gc-primary:hover,
+.tf-gc-actions .tf-gc-secondary:hover{background:#fcd34d;border-color:#fcd34d}
+.tf-gc-label-short{display:none}
+@media(max-width:550px){
+  .tf-gc-actions{gap:8px;flex-wrap:nowrap;margin-top:16px}
+  .tf-gc-actions a{min-width:0;flex:1;display:flex;align-items:center;
+    justify-content:center;padding:9px 6px;min-height:38px;
+    font-size:.76rem;line-height:1.2}
+  .tf-gc-actions .tf-gc-label-full{display:none}
+  .tf-gc-actions .tf-gc-label-short{display:inline}
+}

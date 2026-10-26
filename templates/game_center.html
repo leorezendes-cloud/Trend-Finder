@@ -14,7 +14,7 @@
       <div class="tf-gc-center"><span id="tf-gc-clock">Game information</span><span class="tf-gc-divider">@</span><span class="tf-gc-checked" id="tf-gc-updated">Verifying…</span></div>
       <div class="tf-gc-team"><span class="tf-gc-abbr">{{ game.home_team }}</span><strong id="tf-gc-home" aria-label="Home score">—</strong><small>Home</small></div>
     </div>
-    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('home', _anchor='home-scores') }}" class="tf-gc-secondary">NFL Scores &amp; Matchups</a></div>
+    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary"><span class="tf-gc-label-full">Team Comparison &amp; My Picks</span><span class="tf-gc-label-short">Comparison &amp; Picks</span></a><a href="{{ url_for('home', _anchor='home-scores') }}" class="tf-gc-secondary"><span class="tf-gc-label-full">NFL Scores &amp; Matchups</span><span class="tf-gc-label-short">NFL Scores</span></a></div>
   </div>
   <div class="tf-gc-tabs" role="tablist" aria-label="Game details">
     <button type="button" class="is-active" role="tab" aria-selected="true" aria-controls="tf-gc-scoring" id="tf-gc-tab-scoring" data-tab="scoring">Scoring</button>
