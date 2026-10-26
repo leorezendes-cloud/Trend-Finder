@@ -43,3 +43,27 @@
 .tf-board-empty{padding:20px;border:1px solid #45566c;border-radius:10px;color:#d7e2ef}
 .tf-board-footnote{color:#94a9bd;font-size:.76rem;line-height:1.55;margin:22px 0}
 @media(max-width:670px){.tf-board-grid{grid-template-columns:minmax(0,1fr)}.tf-board-game[open]{grid-column:auto}.tf-board-summary{padding:14px;gap:7px}.tf-board-expanded{padding:12px}.tf-board-match{gap:7px}.tf-board-side{gap:6px}.tf-board-side b{font-size:.97rem}.tf-board-side strong{font-size:1.45rem}.tf-board-detail .tf-gc-play{grid-template-columns:56px minmax(0,1fr)}.tf-board-detail .tf-gc-play-score{grid-column:2;justify-self:start}.tf-board-tabs button{flex:1;min-width:0;padding:10px 5px}.tf-board-back{width:100%;text-align:center}}
+
+/* Homepage is the sole weekly game board; scores hug team names, badge rail stays separate. */
+.tf-board-home{max-width:none;margin:14px 0 30px}
+.tf-board-home-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px 13px;color:#dce7f7}
+.tf-board-home-head>strong{color:#fbbf24;font-weight:900}
+.tf-board-home-head>span:last-child{color:#afc2d6;font-size:.79rem}
+.tf-board-home .tf-board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tf-board-item{position:relative;min-width:0}
+.tf-board-item>.tf-board-game{height:100%}
+.tf-board-item:has(>.tf-board-game[open]){grid-column:1/-1}
+.tf-board-item:has(.tf-board-marks details[open]){z-index:50}
+.tf-board-item .tf-board-marks{position:absolute;right:14px;top:103px;display:flex;align-items:center;gap:6px;z-index:9}
+.tf-board-marks:empty{display:none}
+.tf-board-marks .tf-hot-trends,.tf-board-marks .game-anomaly-flag{position:relative;top:auto;bottom:auto;right:auto;left:auto;transform:none;margin:0}
+.tf-board-marks .tf-hot-trends>summary{font-size:20px;padding:2px 4px}
+.tf-board-marks .game-anomaly-flag>summary{font-size:18px;padding:2px 5px}
+.tf-board-home .tf-board-game-status{padding-right:79px;min-height:20px}
+.tf-board-home .tf-board-side{justify-content:flex-start;gap:8px}
+.tf-board-home .tf-board-side:nth-child(3){justify-content:flex-end}
+.tf-board-home .tf-board-side strong{flex:none;font-variant-numeric:tabular-nums;font-size:clamp(1.3rem,2.4vw,1.95rem)}
+.tf-board-home .tf-board-match{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:8px}
+.tf-board-home .tf-board-side b{white-space:nowrap}
+@media(max-width:720px){.tf-board-home .tf-board-grid{grid-template-columns:minmax(0,1fr)}.tf-board-item:has(>.tf-board-game[open]){grid-column:auto}}
+@media(max-width:420px){.tf-board-home .tf-board-summary{padding:12px 12px 16px}.tf-board-home .tf-board-match{gap:4px}.tf-board-home .tf-board-side{gap:5px}.tf-board-item .tf-board-marks{top:95px;right:8px}.tf-board-home .tf-board-game-status{font-size:.71rem}}

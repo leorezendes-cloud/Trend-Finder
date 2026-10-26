@@ -1,0 +1,46 @@
+<div id="tf-games-board" class="tf-board tf-board-home" data-feed="{{ url_for('fans.scores') }}">
+  <div class="tf-board-home-head">
+    <span class="tf-board-kicker">WEEKLY GAME CENTER</span>
+    <strong>{% if slate[0] %}{{ slate[0] }} · {{ 'Regular Season' if slate[1] == 'REG' else 'Playoffs' }} · Week {{ slate[2] }}{% else %}Current NFL slate{% endif %}</strong>
+    <span>Live games expand automatically · select a finished or upcoming game for details</span>
+  </div>
+  <p class="tf-board-update" id="tf-board-update" role="status" aria-live="polite">Checking live scores…</p>
+  {% for key,heading in [('in','Live now'),('pre','Upcoming'),('post','Final scores')] %}
+  <section class="tf-board-group" data-group="{{ key }}" {% if key == 'in' or not groups[key] %}hidden{% endif %}>
+    <h3>{{ heading }} <span class="tf-board-count" data-count="{{ key }}">{{ groups[key]|length }}</span></h3>
+    <div class="tf-board-grid" data-grid="{{ key }}">
+    {% for item in groups[key] %}
+      <div class="tf-board-item">
+        <details class="tf-board-game{% if key == 'in' %} is-live{% endif %}" data-url="{{ url_for('fans.game_center', game_id=item.game_id) }}" data-detail="{{ url_for('fans.game_center_data', game_id=item.game_id) }}" data-state="{{ key }}" {% if key == 'in' %}open{% endif %}>
+          <summary class="tf-board-summary">
+            <span class="tf-board-game-meta">{{ item.gameday }} · {{ item.gametime }} ET</span>
+            <span class="tf-board-livebadge">{{ 'FINAL' if key == 'post' else 'UPCOMING' }}</span>
+            <span class="tf-board-match">
+              <span class="tf-board-side"><b>{{ item.away_team }}</b><strong class="tf-board-away">{{ item.away_score if key == 'post' else '—' }}</strong></span>
+              <span class="tf-board-at">@</span>
+              <span class="tf-board-side"><b>{{ item.home_team }}</b><strong class="tf-board-home">{{ item.home_score if key == 'post' else '—' }}</strong></span>
+            </span>
+            <span class="tf-board-game-status">{{ 'Final' if key == 'post' else 'Scheduled' }} · Tap for details</span>
+          </summary>
+          <div class="tf-board-expanded">
+            <nav class="tf-board-tabs" aria-label="Game detail sections">
+              <button type="button" class="is-active" data-view="scoring" aria-pressed="true">Scoring</button>
+              <button type="button" data-view="stats" aria-pressed="false">Team Stats</button>
+              <button type="button" data-view="players" aria-pressed="false">Players</button>
+            </nav>
+            <div class="tf-board-detail"><p class="tf-gc-empty">Game details load when expanded.</p></div>
+            <div class="tf-board-links">
+              <a class="tf-board-deep" href="{{ url_for('fans.game_center', game_id=item.game_id) }}">Full Game Center</a>
+              <a href="{{ url_for('fans.matchup', game_id=item.game_id) }}">Team Comparison &amp; My Picks</a>
+            </div>
+          </div>
+        </details>
+        <div class="tf-board-marks" aria-label="Game trend and anomaly badges"></div>
+      </div>
+    {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+  {% if not games %}<p class="tf-board-empty">No saved NFL games are scheduled for the current weekly window.</p>{% endif %}
+  <p class="tf-board-footnote">ESPN game scores where available · saved scheduled games remain visible if live updates are delayed. Scout projections and member picks stay on Team Comparison.</p>
+</div>

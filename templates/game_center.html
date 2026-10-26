@@ -14,7 +14,7 @@
       <div class="tf-gc-center"><span id="tf-gc-clock">Game information</span><span class="tf-gc-divider">@</span><span class="tf-gc-checked" id="tf-gc-updated">Verifying…</span></div>
       <div class="tf-gc-team"><span class="tf-gc-abbr">{{ game.home_team }}</span><strong id="tf-gc-home" aria-label="Home score">—</strong><small>Home</small></div>
     </div>
-    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('fans.all_games_board') }}" class="tf-gc-secondary">View All Games</a></div>
+    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('home', _anchor='home-scores') }}" class="tf-gc-secondary">NFL Scores &amp; Matchups</a></div>
   </div>
   <div class="tf-gc-tabs" role="tablist" aria-label="Game details">
     <button type="button" class="is-active" role="tab" aria-selected="true" aria-controls="tf-gc-scoring" id="tf-gc-tab-scoring" data-tab="scoring">Scoring</button>
@@ -26,5 +26,37 @@
   <section class="tf-gc-panel" role="tabpanel" id="tf-gc-players" aria-labelledby="tf-gc-tab-players" hidden><h2>Player leaders</h2><div id="tf-gc-leaders" class="tf-gc-leaders"><p class="tf-gc-empty">Player stats appear as they become available.</p></div></section>
   <p class="tf-gc-source" id="tf-gc-source" role="status" aria-live="polite">Score information provided by ESPN where available. Pregame picks and analysis are on Team Comparison.</p>
 </section>
+
+<section class="tf-gc-preview" aria-label="Pregame team form and member picks">
+  <div class="tf-gc-preview-title"><h2>Matchup snapshot</h2><p>Last five completed games before this matchup · {{ game.season }} season</p></div>
+  <div class="tf-gc-form-grid">
+  {% for team in [game.away_team, game.home_team] %}
+    {% set form = recent[team] %}
+    <div class="tf-gc-form-card">
+      <strong>{{ team }}</strong>
+      <span class="tf-gc-form-record">{{ form.wins }}–{{ form.losses }}–{{ form.ties }}</span>
+      <small>{{ form.games }} games · last five</small>
+      <div class="tf-gc-form-numbers"><span><b>{{ form.points_for if form.points_for is not none else '—' }}</b><small>Points / game</small></span><span><b>{{ form.points_against if form.points_against is not none else '—' }}</b><small>Allowed / game</small></span></div>
+    </div>
+  {% endfor %}
+  </div>
+  <div class="tf-gc-my-picks">
+    <div class="tf-gc-preview-title"><h2>My Picks</h2><p>Your saved shared weekly selections</p></div>
+    {% if g.member %}
+      {% if my_picks and (my_picks.su or my_picks.ats or my_picks.ou) %}
+      <div class="tf-gc-pick-grid">
+        {% for key,label in [('su','Straight up'),('ats','Against spread'),('ou','Over / Under')] %}
+          <div><small>{{ label }}</small><strong>{{ my_picks[key] or 'Not selected' }}</strong><span>{{ my_picks[key ~ '_result'] if my_picks[key] else '—' }}</span></div>
+        {% endfor %}
+      </div>
+      {% else %}<p class="tf-gc-empty">No shared picks saved for this game yet.</p>{% endif %}
+      <a class="tf-gc-pick-link" href="{{ url_for('member_picks.my_picks', game_id=game.game_id) }}">View or edit My Picks</a>
+    {% else %}
+      <p class="tf-gc-empty">Sign in to view your saved picks for this game.</p>
+      <a class="tf-gc-pick-link" href="{{ url_for('membership.login') }}">Sign in</a>
+    {% endif %}
+  </div>
+</section>
+
 <script src="{{ url_for('static', filename='game_center.js') }}" defer></script>
 {% endblock %}

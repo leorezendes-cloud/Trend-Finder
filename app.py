@@ -95,6 +95,9 @@ def home():
     from hosted_memory import home_context
     context = home_context(lambda: dict(active_highlights=load_highlights(),
         freshness=data_freshness(),emerging_alert=home_dog_alert(Path(__file__).resolve().parent)))
+    from game_center import home_board_context
+    context = dict(context)
+    context.update(home_board_context())
     return render_template("home.html", **context)
 
 

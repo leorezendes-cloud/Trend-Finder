@@ -17,6 +17,34 @@
   const activeFetch = new WeakSet();
   const touched = new WeakSet();
   let timer, busy = false, working = 0;
+
+  // Badges are outside the parent <details> so a badge click never toggles the game.
+  function refreshMarks(card, live) {
+    if (!live) return;
+    const container = card.parentElement.querySelector('.tf-board-marks');
+    if (!container) return;
+    const fire = (live.hot_matches || []).filter(t => t && t.confirmed === true &&
+      typeof t.label === 'string' && typeof t.url === 'string' &&
+      t.url.startsWith('/') && !t.url.startsWith('//'));
+    const existing = [...container.querySelectorAll('details')];
+    if (existing.some(el => el.open)) return;
+    container.replaceChildren();
+    if (fire.length) {
+      const flag = make('details','tf-hot-trends');
+      const trigger = make('summary','', '🔥');
+      trigger.setAttribute('aria-label', `${fire.length} matched hot trends`);
+      const popup = make('div','tf-hot-trends-panel');
+      popup.append(make('strong','', 'Hot Trends'));
+      const list = make('ul','');
+      fire.forEach(t => { const li=make('li',''); const link=make('a','',t.label);
+        link.href=t.url; li.append(link); list.append(li); });
+      popup.append(list); flag.append(trigger,popup); container.append(flag);
+    }
+    const anomalies = live.state === 'post' && live.completed && window.gameAnomalyFlag
+      ? window.gameAnomalyFlag(live.anomalies) : null;
+    if (anomalies) container.append(anomalies);
+  }
+
   const queued = [];
   const startNext = () => {
     while (working < 2 && queued.length) {
@@ -109,6 +137,7 @@
   });
   function updateGame(card, live) {
     if (!live) return;
+    refreshMarks(card, live);
     const state = ['in','post'].includes(live.state) ? live.state : 'pre';
     const prior = card.dataset.state;
     card.dataset.state = state;
@@ -127,7 +156,7 @@
     cards.forEach(card => {
       let state = card.dataset.state;
       if (!(state in grids)) state = 'pre';
-      grids[state].append(card);
+      grids[state].append(card.parentElement.classList.contains('tf-board-item') ? card.parentElement : card);
       counts[state]++;
     });
     Object.keys(counts).forEach(key => {

@@ -190,27 +190,113 @@ def game_data(game_id):
 
 
 def board_page():
-    """All games in the current NFL week from saved lightweight schedule rows."""
-    from fan_views import ROOT
-    from scout4.stats import read_csv
-    from site_week import active_slate
-
-    slate, games = active_slate(read_csv(ROOT / 'nfl_games.csv'))
-    ordered = sorted(games, key=lambda row: (
-        row.get('gameday', ''), row.get('gametime', ''), row.get('game_id', '')))
-    groups = {'in':[], 'pre':[], 'post':[]}
-    for game in ordered[:24]:
-        try:
-            home, away = int(game['home_score']), int(game['away_score'])
-            finished = float(game['result']) == home - away
-        except (KeyError, TypeError, ValueError):
-            finished = False
-        groups['post' if finished else 'pre'].append(game)
-    header = (str(slate[0]), str(slate[1]), slate[2]) if slate else ('', '', '')
-    return render_template('games_board.html', groups=groups,
-                           games=ordered[:24], slate=header)
+    from flask import redirect, url_for
+    return redirect(url_for('home', _anchor='home-scores'), code=302)
 
 
 def game_page(game_id):
     game, _ = _game_context(game_id)
-    return render_template('game_center.html', game=game)
+    recent = _recent_team_context(game)
+    my_picks = _member_pick_preview(game_id)
+    from flask import g, make_response
+    response = make_response(render_template('game_center.html', game=game,
+                                             recent=recent, my_picks=my_picks))
+    if g.get('member'):
+        response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+
+# Cache only the compact current slate, not historical frames or ESPN payloads.
+from functools import lru_cache
+
+@lru_cache(maxsize=3)
+def _cached_home_slate(path, modified, size, week_start):
+    import csv
+    from datetime import timedelta
+    from site_week import active_slate
+    end_day = (week_start + timedelta(days=7)).date().isoformat()
+    begin_day = week_start.date().isoformat()
+    with open(path, newline='', encoding='utf-8-sig') as stream:
+        candidates = [row for row in csv.DictReader(stream)
+                      if begin_day <= row.get('gameday','') <= end_day]
+    key, games = active_slate(candidates, now=week_start)
+    ordered = sorted(games, key=lambda row: (
+        row.get('gameday',''), row.get('gametime',''), row.get('game_id','')))[:24]
+    groups = {'in': [], 'pre': [], 'post': []}
+    for row in ordered:
+        try:
+            home, away = int(row['home_score']), int(row['away_score'])
+            finished = float(row['result']) == home-away
+        except (KeyError, TypeError, ValueError, OverflowError):
+            finished = False
+        groups['post' if finished else 'pre'].append(row)
+    label = (str(key[0]), str(key[1]), key[2]) if key else ('','','')
+    return {'slate': label, 'games': ordered, 'groups': groups}
+
+
+def home_board_context():
+    from fan_views import ROOT
+    from site_week import week_window
+    path = ROOT / 'nfl_games.csv'
+    start, _ = week_window()
+    st = path.stat()
+    return _cached_home_slate(str(path), st.st_mtime_ns, st.st_size, start)
+
+
+def _recent_team_context(game):
+    """2026 saved final-score form before kickoff, with no forecast or network work."""
+    from fan_views import ROOT
+    import csv
+    teams = [game['away_team'], game['home_team']]
+    rows = {team: [] for team in teams}
+    cutoff = (game.get('gameday') or '', game.get('gametime') or '')
+    with (ROOT / 'nfl_games.csv').open(newline='', encoding='utf-8-sig') as stream:
+        history = [row for row in csv.DictReader(stream)
+                   if row.get('season') == game.get('season') and
+                   row.get('gameday','') <= game.get('gameday','')]
+    for row in history:
+        if row.get('season') != game.get('season') or row.get('game_id') == game['game_id']:
+            continue
+        if (row.get('gameday') or '',row.get('gametime') or '') >= cutoff:
+            continue
+        try:
+            home, away = float(row['home_score']), float(row['away_score'])
+            if (not home.is_integer() or not away.is_integer() or
+                    float(row['result']) != home-away or home<0 or away<0):
+                continue
+            home, away = int(home), int(away)
+        except (TypeError, KeyError, ValueError, OverflowError):
+            continue
+        for team in teams:
+            if row.get('home_team')==team:
+                rows[team].append((row.get('gameday',''), row.get('gametime',''), home, away))
+            elif row.get('away_team')==team:
+                rows[team].append((row.get('gameday',''), row.get('gametime',''), away, home))
+    result = {}
+    for team, games in rows.items():
+        recent = sorted(games,reverse=True)[:5]
+        result[team] = {'games':len(recent),
+                        'wins':sum(p>a for _,__,p,a in recent),
+                        'losses':sum(p<a for _,__,p,a in recent),
+                        'ties':sum(p==a for _,__,p,a in recent),
+                        'points_for':round(sum(p for _,__,p,a in recent)/len(recent),1) if recent else None,
+                        'points_against':round(sum(a for _,__,p,a in recent)/len(recent),1) if recent else None}
+    return result
+
+
+def _member_pick_preview(game_id):
+    """Read-only saved shared picks. No market capture or auto-publishing on GET."""
+    from flask import g
+    if not g.get('member'):
+        return None
+    from membership import db
+    try:
+        record = db().execute("""SELECT p.su, p.ats, p.ou,
+            p.su_result, p.ats_result, p.ou_result,
+            pg.away_spread, pg.total, pg.locked, pg.away, pg.home
+            FROM pick_games pg
+            LEFT JOIN member_picks p ON p.game_id=pg.id AND p.member_id=?
+            WHERE pg.game_id=?""", (g.member['id'],game_id)).fetchone()
+    except (KeyError, ValueError):
+        return None
+    return dict(record) if record else {}

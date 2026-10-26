@@ -46,3 +46,25 @@
 .tf-gc-leader span{color:#c6d5e5;font-size:.76rem}
 .tf-gc-source{font-size:.77rem;color:#a8b9ca;text-align:center;margin:14px 0}
 @media(max-width:550px){.tf-gc-score{padding:17px 12px}.tf-gc-teams{grid-template-columns:minmax(0,1fr) minmax(85px,.8fr) minmax(0,1fr);gap:4px}.tf-gc-actions a{flex:1;min-width:135px}.tf-gc-play{grid-template-columns:55px minmax(0,1fr);gap:6px}.tf-gc-play-score{grid-column:2;justify-self:start}.tf-gc-leaders{grid-template-columns:1fr}.tf-gc-center{font-size:.72rem}.tf-gc-team strong{font-size:clamp(2rem,12vw,3rem)}}
+
+/* Pregame/postgame snapshot: compact, read-only, and below the existing game tabs. */
+.tf-gc-preview{max-width:1000px;margin:24px auto 30px;color:#eaf3ff}
+.tf-gc-preview-title{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 18px;margin:0 0 12px}
+.tf-gc-preview-title h2{font-size:1.12rem;color:#fbbf24;margin:0}
+.tf-gc-preview-title p{font-size:.78rem;color:#b5c6da;margin:0}
+.tf-gc-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tf-gc-form-card,.tf-gc-my-picks{border:1px solid #3b5169;background:#182739;border-radius:13px;padding:16px;min-width:0}
+.tf-gc-form-card>strong{color:#fbbf24;font-size:1.2rem;margin-right:14px}
+.tf-gc-form-record{font-weight:900;font-size:1.13rem;font-variant-numeric:tabular-nums}
+.tf-gc-form-card>small{display:block;color:#a8bbce;margin:7px 0 12px}
+.tf-gc-form-numbers,.tf-gc-pick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.tf-gc-form-numbers span{background:#101e2d;padding:11px;border-radius:8px;min-width:0}
+.tf-gc-form-numbers b{display:block;font-size:1.28rem;font-variant-numeric:tabular-nums}
+.tf-gc-form-numbers small,.tf-gc-pick-grid small{display:block;color:#b9cade;font-size:.76rem}
+.tf-gc-my-picks{margin-top:12px}
+.tf-gc-pick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tf-gc-pick-grid>div{background:#101e2d;border-radius:9px;padding:12px;min-width:0;overflow-wrap:anywhere}
+.tf-gc-pick-grid strong{display:block;font-size:1.03rem;color:#f8fafc;margin:7px 0}
+.tf-gc-pick-grid span{font-size:.76rem;color:#9edabc}
+.tf-gc-pick-link{display:inline-block;margin-top:12px;color:#172333!important;background:#fbbf24;padding:10px 14px;border-radius:9px;text-decoration:none;font-weight:850;font-size:.84rem}
+@media(max-width:520px){.tf-gc-form-grid{grid-template-columns:1fr}.tf-gc-pick-grid{grid-template-columns:1fr}}

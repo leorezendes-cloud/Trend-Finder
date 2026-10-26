@@ -20,19 +20,19 @@ class WeeklyGameBoardTests(unittest.TestCase):
                 patch('site_week.active_slate',return_value=((2026,'REG',8), season_rows)), \
                 patch('game_center.urlopen') as external:
             page = app.test_client().get('/games')
-            self.assertEqual(page.status_code,200)
+            self.assertEqual(page.status_code,302)
             body=page.get_data(as_text=True)
-            self.assertIn('/game/2026_08_PHI_DAL/data',body)
-            self.assertIn('/game/2026_08_BUF_NE/data',body)
-            self.assertIn('NFL Scores',body)
-            self.assertIn('Final scores',body)
+            self.assertIn('#home-scores',page.headers['Location'])
+            self.assertTrue(page.headers['Location'].startswith('/'))
+
+
             external.assert_not_called()
 
     def test_home_scoreboard_links_to_full_slate(self):
         from pathlib import Path
         page = (Path(__file__).resolve().parent / 'templates/home.html').read_text()
-        self.assertIn('View All Games',page)
-        self.assertIn("url_for('fans.all_games_board')",page)
+        self.assertNotIn('View All Games',page)
+        self.assertIn("_home_games_board.html",page)
 
     def test_preserves_single_game_center(self):
         rules=[r.rule for r in app.url_map.iter_rules()]
