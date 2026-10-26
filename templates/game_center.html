@@ -37,6 +37,21 @@
       <span class="tf-gc-form-record">{{ form.wins }}–{{ form.losses }}–{{ form.ties }}</span>
       <small>{{ form.games }} games · last five</small>
       <div class="tf-gc-form-numbers"><span><b>{{ form.points_for if form.points_for is not none else '—' }}</b><small>Points / game</small></span><span><b>{{ form.points_against if form.points_against is not none else '—' }}</b><small>Allowed / game</small></span></div>
+      {% if form.history %}
+      <details class="tf-gc-form-history">
+        <summary>View last {{ form.history|length }} games</summary>
+        <div class="tf-gc-form-history-list">
+          {% for previous in form.history %}
+          <div class="tf-gc-form-history-row">
+            <time datetime="{{ previous.date }}">{{ previous.date[5:] }}</time>
+            <span class="tf-gc-history-opponent">{{ previous.venue }} {{ previous.opponent }}</span>
+            <strong class="tf-gc-history-{{ previous.outcome|lower }}">{{ previous.outcome }}</strong>
+            <span class="tf-gc-history-score">{{ previous.points_for }}–{{ previous.points_against }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
     </div>
   {% endfor %}
   </div>

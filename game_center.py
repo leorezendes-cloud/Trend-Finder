@@ -268,19 +268,30 @@ def _recent_team_context(game):
         except (TypeError, KeyError, ValueError, OverflowError):
             continue
         for team in teams:
-            if row.get('home_team')==team:
-                rows[team].append((row.get('gameday',''), row.get('gametime',''), home, away))
-            elif row.get('away_team')==team:
-                rows[team].append((row.get('gameday',''), row.get('gametime',''), away, home))
+            if row.get('home_team') == team:
+                own, allowed = home, away
+                opponent, venue = row.get('away_team', ''), 'vs'
+            elif row.get('away_team') == team:
+                own, allowed = away, home
+                opponent, venue = row.get('home_team', ''), '@'
+            else:
+                continue
+            rows[team].append({
+                'date': row.get('gameday', ''), 'time': row.get('gametime', ''),
+                'opponent': opponent, 'venue': venue,
+                'points_for': own, 'points_against': allowed,
+                'outcome': 'W' if own > allowed else 'L' if own < allowed else 'T',
+            })
     result = {}
     for team, games in rows.items():
-        recent = sorted(games,reverse=True)[:5]
+        recent = sorted(games, key=lambda item: (item['date'], item['time']), reverse=True)[:5]
         result[team] = {'games':len(recent),
-                        'wins':sum(p>a for _,__,p,a in recent),
-                        'losses':sum(p<a for _,__,p,a in recent),
-                        'ties':sum(p==a for _,__,p,a in recent),
-                        'points_for':round(sum(p for _,__,p,a in recent)/len(recent),1) if recent else None,
-                        'points_against':round(sum(a for _,__,p,a in recent)/len(recent),1) if recent else None}
+                        'wins':sum(item['outcome'] == 'W' for item in recent),
+                        'losses':sum(item['outcome'] == 'L' for item in recent),
+                        'ties':sum(item['outcome'] == 'T' for item in recent),
+                        'points_for':round(sum(item['points_for'] for item in recent)/len(recent),1) if recent else None,
+                        'points_against':round(sum(item['points_against'] for item in recent)/len(recent),1) if recent else None,
+                        'history': recent}
     return result
 
 

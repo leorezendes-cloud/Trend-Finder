@@ -85,3 +85,25 @@
   .tf-gc-actions .tf-gc-label-full{display:none}
   .tf-gc-actions .tf-gc-label-short{display:inline}
 }
+
+
+/* Optional last-five logs; closed by default so the game page stays compact. */
+.tf-gc-form-history{margin-top:12px;border:1px solid #40566c;border-radius:9px;overflow:hidden}
+.tf-gc-form-history>summary{list-style:none;cursor:pointer;padding:10px 12px;
+  color:#fbbf24;font-size:.83rem;font-weight:850;background:#142335}
+.tf-gc-form-history>summary::-webkit-details-marker{display:none}
+.tf-gc-form-history>summary::after{content:'⌄';float:right;color:#fbbf24}
+.tf-gc-form-history[open]>summary::after{content:'⌃'}
+.tf-gc-form-history>summary:focus-visible{outline:2px solid #86efac;outline-offset:-3px}
+.tf-gc-form-history-list{padding:3px 10px 9px;background:#101e2d}
+.tf-gc-form-history-row{display:grid;grid-template-columns:45px minmax(0,1fr) 20px 57px;
+  gap:5px;align-items:center;padding:8px 2px;border-top:1px solid #32465a;
+  font-size:.77rem;font-variant-numeric:tabular-nums}
+.tf-gc-form-history-row:first-child{border-top:0}
+.tf-gc-form-history-row time{color:#9fb6cc}
+.tf-gc-history-opponent{color:#e5eef7;font-weight:750;overflow-wrap:anywhere}
+.tf-gc-form-history-row strong{font-size:.82rem}
+.tf-gc-history-w{color:#86efac}
+.tf-gc-history-l{color:#fca5a5}
+.tf-gc-history-t{color:#fbbf24}
+.tf-gc-history-score{text-align:right;color:#e9f2fc;font-weight:750;white-space:nowrap}

@@ -135,6 +135,48 @@
       render(card);
     }));
   });
+  // Use the same saved-line grades as the existing scoreboard; never grade
+  // incomplete games, and never mistake a missing betting line for a push.
+  function showMarket(card, live) {
+    const marketRow = card.querySelector('.tf-board-market');
+    const line = card.querySelector('.tf-board-market-line');
+    const results = card.querySelector('.tf-board-market-result');
+    if (!marketRow || !line || !results) return;
+    line.textContent = '';
+    results.replaceChildren();
+    marketRow.hidden = true;
+    const market = live.market;
+    if (!market || typeof market !== 'object') return;
+    const numeric = value => typeof value === 'number' && Number.isFinite(value);
+    const lines = [];
+    if (numeric(market.spread)) {
+      const homeFavorite = market.spread > 0;
+      const awayFavorite = market.spread < 0;
+      lines.push(market.spread === 0 ? 'ATS Pick’em' :
+        `ATS ${homeFavorite ? live.home : live.away} -${Math.abs(market.spread)}`);
+    }
+    if (numeric(market.total)) lines.push(`O/U ${market.total}`);
+    line.textContent = lines.join(' · ');
+    // Confirmed final only. Saved scores and preliminary live scores do not grade.
+    if (live.state === 'post' && live.completed === true) {
+      const outcome = (value, push = false) => {
+        const el = make('span', push ? 'tf-market-push' : 'tf-market-hit', value);
+        results.append(el);
+      };
+      if (numeric(market.spread)) {
+        if (market.home_ats === 'W') outcome(`${live.home} covered`);
+        else if (market.home_ats === 'L') outcome(`${live.away} covered`);
+        else if (market.home_ats === 'P') outcome('ATS push', true);
+      }
+      if (numeric(market.total)) {
+        if (market.ou === 'O') outcome('Over');
+        else if (market.ou === 'U') outcome('Under');
+        else if (market.ou === 'P') outcome('O/U push', true);
+      }
+    }
+    marketRow.hidden = !(lines.length || results.childElementCount);
+  }
+
   function updateGame(card, live) {
     if (!live) return;
     refreshMarks(card, live);
@@ -148,6 +190,7 @@
     const badge = card.querySelector('.tf-board-livebadge');
     badge.textContent = state === 'in' ? '● LIVE' : final ? 'FINAL' : 'UPCOMING';
     card.querySelector('.tf-board-game-status').textContent = `${live.status || (final ? 'Final' : 'Scheduled')} · Tap for details`;
+    showMarket(card, live);
     if (prior !== state && !touched.has(card)) card.open = state === 'in';
     if (card.open) loadDetail(card);
   }

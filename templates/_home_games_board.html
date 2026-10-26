@@ -21,6 +21,10 @@
               <span class="tf-board-side"><b>{{ item.home_team }}</b><strong class="tf-board-home">{{ item.home_score if key == 'post' else '—' }}</strong></span>
             </span>
             <span class="tf-board-game-status">{{ 'Final' if key == 'post' else 'Scheduled' }} · Tap for details</span>
+            <span class="tf-board-market" aria-label="Saved spread and total" hidden>
+              <span class="tf-board-market-line"></span>
+              <span class="tf-board-market-result"></span>
+            </span>
           </summary>
           <div class="tf-board-expanded">
             <nav class="tf-board-tabs" aria-label="Game detail sections">
