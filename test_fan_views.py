@@ -112,13 +112,26 @@ class FanViewsTests(unittest.TestCase):
                   'version':'v1','configuration_sha256':'config1',
                   'components':{'Blend':{'pick':'BUF'}}}
         game = {'game_id':'game','away_team':'BUF','home_team':'LV','away_score':'20','home_score':'21'}
-        late = deepcopy(record);late['sealed_at_utc'] = '2026-10-19T00:00:00+00:00'
-        other = deepcopy(record);other['configuration_sha256']='config2';other['components']['Blend']['pick']='LV'
-        groups, recent, excluded = prediction_performance([record,late,other], [game])
+        late = deepcopy(record);late['game_id'] = 'game-late'
+        late['sealed_at_utc'] = '2026-10-19T00:00:00+00:00'
+        other = deepcopy(record);other['game_id'] = 'game-other'
+        other['configuration_sha256'] = 'config2'
+        other['components']['Blend']['pick'] = 'LV'
+        schedule = [
+            game,
+            dict(game, game_id='game-late'),
+            dict(game, game_id='game-other'),
+        ]
+        groups, recent, excluded = prediction_performance(
+            [record, late, other], schedule)
         self.assertEqual(excluded, 1)
         self.assertEqual(len(groups), 2)
         self.assertEqual(groups[0]['ats']['rate'], 100)
         self.assertEqual(groups[1]['ats']['rate'], 0)
+        duplicate_groups, _, duplicate_excluded = prediction_performance(
+            [record, deepcopy(record)], [game])
+        self.assertEqual(duplicate_excluded, 2)
+        self.assertEqual(duplicate_groups, [])
         game['away_score'] = ''
         groups, recent, excluded = prediction_performance([record], [game])
         self.assertIsNone(groups[0]['ats']['rate'])

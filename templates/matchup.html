@@ -8,9 +8,11 @@
 <!-- Saved anomaly flags -->
 {% block content %}{% set anomalies=saved_anomaly_links(game.game_id) if is_final else [] %}<link rel="stylesheet" href="{{ url_for('static',filename='prediction_cards.css') }}">
 {% include '_inline_picks.html' %}
+<p class="tf-gc-comparison-link"><a href="{{ url_for('fans.game_center', game_id=game.game_id) }}">{{ 'View game summary' if is_final else 'View live Game Center' }} →</a></p>
 <link rel="stylesheet" href="{{ url_for('static',filename='anomaly_flags.css') }}">
 <script src="{{ url_for('static',filename='anomaly_flags.js') }}" defer></script>
 <style>
+.tf-gc-comparison-link{margin:12px 0 16px}.tf-gc-comparison-link a{display:inline-block;border:1px solid #fbbf24;border-radius:9px;color:#fbbf24!important;padding:10px 14px;text-decoration:none;font-weight:800}.tf-gc-comparison-link a:hover{background:#342b19}
 .matchup-final-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px}
 .matchup-final-head h2{margin:0}
 .matchup-final-score{font-weight:800;font-size:1.22rem}

@@ -1,0 +1,30 @@
+{% extends 'scout4_base.html' %}
+{% block title %}{{ game.away_team }} at {{ game.home_team }} · Game Center{% endblock %}
+{% block heading %}NFL Game Center{% endblock %}
+{% block filter_form %}{% endblock %}
+{% block data_notes %}{% endblock %}
+{% block intro %}<p>Scores, scoring plays and game-day stats in one place.</p>{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='game_center.css') }}">
+<section id="tf-game-center" class="tf-gc" data-source="{{ url_for('fans.game_center_data', game_id=game.game_id) }}">
+  <div class="tf-gc-score" aria-label="Game scoreboard">
+    <div class="tf-gc-topline"><span class="tf-gc-eyebrow">NFL · {{ game.season }} · Week {{ game.week }}</span><span id="tf-gc-status" class="tf-gc-badge">Checking score…</span></div>
+    <div class="tf-gc-teams">
+      <div class="tf-gc-team"><span class="tf-gc-abbr">{{ game.away_team }}</span><strong id="tf-gc-away" aria-label="Away score">—</strong><small>Away</small></div>
+      <div class="tf-gc-center"><span id="tf-gc-clock">Game information</span><span class="tf-gc-divider">@</span><span class="tf-gc-checked" id="tf-gc-updated">Verifying…</span></div>
+      <div class="tf-gc-team"><span class="tf-gc-abbr">{{ game.home_team }}</span><strong id="tf-gc-home" aria-label="Home score">—</strong><small>Home</small></div>
+    </div>
+    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('home') }}#home-scores" class="tf-gc-secondary">All NFL scores</a></div>
+  </div>
+  <div class="tf-gc-tabs" role="tablist" aria-label="Game details">
+    <button type="button" class="is-active" role="tab" aria-selected="true" aria-controls="tf-gc-scoring" id="tf-gc-tab-scoring" data-tab="scoring">Scoring</button>
+    <button type="button" role="tab" aria-selected="false" aria-controls="tf-gc-stats" id="tf-gc-tab-stats" data-tab="stats">Team Stats</button>
+    <button type="button" role="tab" aria-selected="false" aria-controls="tf-gc-players" id="tf-gc-tab-players" data-tab="players">Players</button>
+  </div>
+  <section class="tf-gc-panel" role="tabpanel" id="tf-gc-scoring" aria-labelledby="tf-gc-tab-scoring"><h2>Scoring summary</h2><div id="tf-gc-plays" class="tf-gc-list"><p class="tf-gc-empty">Loading scoring plays…</p></div></section>
+  <section class="tf-gc-panel" role="tabpanel" id="tf-gc-stats" aria-labelledby="tf-gc-tab-stats" hidden><h2>Team statistics</h2><div id="tf-gc-metrics" class="tf-gc-list"><p class="tf-gc-empty">Game statistics appear as they become available.</p></div></section>
+  <section class="tf-gc-panel" role="tabpanel" id="tf-gc-players" aria-labelledby="tf-gc-tab-players" hidden><h2>Player leaders</h2><div id="tf-gc-leaders" class="tf-gc-leaders"><p class="tf-gc-empty">Player stats appear as they become available.</p></div></section>
+  <p class="tf-gc-source" id="tf-gc-source" role="status" aria-live="polite">Score information provided by ESPN where available. Pregame picks and analysis are on Team Comparison.</p>
+</section>
+<script src="{{ url_for('static', filename='game_center.js') }}" defer></script>
+{% endblock %}

@@ -76,7 +76,7 @@ def parse_scores(payload):
             contest = event['competitions'][0]
             sides = {r['homeAway']: r for r in contest['competitors']}
             state = contest['status']['type']
-            row = {'date': event['date'], 'status': state.get('shortDetail', state.get('description', '')),
+            row = {'provider_id': str(event.get('id') or ''), 'date': event['date'], 'status': state.get('shortDetail', state.get('description', '')),
                    'state': state['state'], 'completed': state.get('completed') is True, 'away': team_code(sides['away']['team']['abbreviation']),
                    'home': team_code(sides['home']['team']['abbreviation']),
                    'away_score': sides['away'].get('score') if state['state'] != 'pre' else None,
@@ -202,7 +202,7 @@ def _scores_uncached():
             row = dict(game)
             matches = [g for g in schedule if team_code(g['away_team']) == row['away']
                        and team_code(g['home_team']) == row['home'] and g['gameday'] == datetime.fromisoformat(row['date'].replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York')).date().isoformat()]
-            row['url'] = url_for('fans.matchup', game_id=matches[0]['game_id']) if len(matches) == 1 else None
+            row['url'] = url_for('fans.game_center', game_id=matches[0]['game_id']) if len(matches) == 1 else None
             row['anomalies'] = []
             if len(matches) == 1 and row['state'] == 'post' and row.get('completed') is True:
                 from anomaly_badges import saved_anomaly_links
@@ -356,6 +356,18 @@ def _final_box_score(game, team_data, player_data):
 
     return {'codes': codes, 'metrics': metrics, 'performers': performers,
             'has_details': bool(metrics or any(p['leaders'] for p in performers))}
+
+
+@bp.get('/game/<game_id>')
+def game_center(game_id):
+    from game_center import game_page
+    return game_page(game_id)
+
+
+@bp.get('/game/<game_id>/data')
+def game_center_data(game_id):
+    from game_center import game_data
+    return game_data(game_id)
 
 
 @bp.get('/matchup/<game_id>')
