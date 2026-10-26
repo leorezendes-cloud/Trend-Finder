@@ -1,0 +1,45 @@
+/* Weekly Game Center — purposely uses the single-game gold/navy palette. */
+.tf-board{max-width:1120px;margin:8px auto 36px;color:#edf4ff}
+.tf-board *{box-sizing:border-box}
+.tf-board-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin:6px 0 12px}
+.tf-board-toolbar h2{font-size:clamp(1.15rem,2.7vw,1.8rem);margin:5px 0;color:#f8fafc}
+.tf-board-toolbar p{margin:0;color:#b5c6d9;font-size:.86rem;line-height:1.5}
+.tf-board-kicker{color:#fbbf24;font-size:.78rem;font-weight:900;letter-spacing:.13em}
+.tf-board-back{border:1px solid #73849a;border-radius:9px;padding:10px 14px;color:#f5f7fc!important;text-decoration:none;font-size:.85rem;font-weight:800}
+.tf-board-back:hover{background:#29394b}
+.tf-board-update{margin:12px 0 16px;color:#b6c9da;font-size:.82rem}
+.tf-board-group{margin:18px 0 28px}
+.tf-board-group[hidden]{display:none!important}
+.tf-board-group h3{display:flex;align-items:center;gap:10px;font-size:1.2rem;color:#fbbf24;margin:0 0 11px}
+.tf-board-count{font-size:.76rem;color:#cbd5e1;background:#26394d;border:1px solid #455b73;padding:3px 8px;border-radius:99px}
+.tf-board-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:13px}
+.tf-board-game{min-width:0;overflow:hidden;border:1px solid #3a4b61;border-radius:14px;background:linear-gradient(145deg,#203147,#111c2a);box-shadow:0 6px 18px #0002}
+.tf-board-game[open]{grid-column:1 / -1;border-color:#7389a1}
+.tf-board-game.is-live{border-color:#28a677;box-shadow:0 0 0 1px #20795933,0 8px 22px #0003}
+.tf-board-summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:1fr auto;gap:9px 14px;padding:16px 18px;align-items:center}
+.tf-board-summary::-webkit-details-marker{display:none}
+.tf-board-summary::marker{content:''}
+.tf-board-summary:focus-visible{outline:3px solid #86efac;outline-offset:-4px}
+.tf-board-game-meta{font-size:.75rem;color:#aac0d5;font-weight:700}
+.tf-board-livebadge{justify-self:end;border:1px solid #55677d;background:#29394e;color:#dae7f7;padding:5px 9px;border-radius:999px;font-size:.67rem;font-weight:900;letter-spacing:.06em}
+.tf-board-game.is-live .tf-board-livebadge{background:#164733;border-color:#2aa978;color:#8cf4be}
+.tf-board-match{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.tf-board-side{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0;font-variant-numeric:tabular-nums}
+.tf-board-side b{font-size:clamp(1rem,2vw,1.3rem);color:#fbbf24;overflow-wrap:anywhere}
+.tf-board-side strong{font-size:clamp(1.35rem,3vw,2.1rem);color:#f1f5f9}
+.tf-board-at{font-size:.81rem;color:#889cb1;font-weight:900}
+.tf-board-game-status{grid-column:1/-1;font-size:.77rem;color:#b3c4d8}
+.tf-board-expanded{border-top:1px solid #384f64;padding:13px 18px 18px;background:#172739}
+.tf-board-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tf-board-tabs button{border:1px solid #425c75;border-radius:8px;padding:9px 14px;background:#243950;color:#cad9e7;cursor:pointer;font-size:.79rem;font-weight:800}
+.tf-board-tabs button.is-active{background:#fbbf24;border-color:#fbbf24;color:#172334}
+.tf-board-tabs button:focus-visible,.tf-board-links a:focus-visible{outline:3px solid #86efac;outline-offset:2px}
+.tf-board-detail{min-height:90px}
+.tf-board-detail .tf-gc-play{grid-template-columns:72px minmax(0,1fr) auto}
+.tf-board-detail .tf-gc-leaders{margin-top:8px}
+.tf-board-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;border-top:1px solid #34485d;padding-top:14px}
+.tf-board-links a{border:1px solid #61768d;border-radius:8px;padding:10px 13px;text-decoration:none;color:#e4edfa!important;font-weight:800;font-size:.8rem}
+.tf-board-links .tf-board-deep{background:#fbbf24;border-color:#fbbf24;color:#131e2e!important}
+.tf-board-empty{padding:20px;border:1px solid #45566c;border-radius:10px;color:#d7e2ef}
+.tf-board-footnote{color:#94a9bd;font-size:.76rem;line-height:1.55;margin:22px 0}
+@media(max-width:670px){.tf-board-grid{grid-template-columns:minmax(0,1fr)}.tf-board-game[open]{grid-column:auto}.tf-board-summary{padding:14px;gap:7px}.tf-board-expanded{padding:12px}.tf-board-match{gap:7px}.tf-board-side{gap:6px}.tf-board-side b{font-size:.97rem}.tf-board-side strong{font-size:1.45rem}.tf-board-detail .tf-gc-play{grid-template-columns:56px minmax(0,1fr)}.tf-board-detail .tf-gc-play-score{grid-column:2;justify-self:start}.tf-board-tabs button{flex:1;min-width:0;padding:10px 5px}.tf-board-back{width:100%;text-align:center}}

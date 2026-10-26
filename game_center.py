@@ -15,7 +15,7 @@ from flask import abort, jsonify, render_template, url_for
 
 _DETAIL_LOCK = Lock()
 _DETAIL_CACHE = OrderedDict()
-_MAX_DETAILS = 4
+_MAX_DETAILS = 16
 _ALLOWED_METRICS = (
     ('firstDowns', 'First downs'),
     ('totalYards', 'Total yards'),
@@ -187,6 +187,28 @@ def game_data(game_id):
     response = jsonify(body)
     response.headers['Cache-Control'] = 'no-store'
     return response
+
+
+def board_page():
+    """All games in the current NFL week from saved lightweight schedule rows."""
+    from fan_views import ROOT
+    from scout4.stats import read_csv
+    from site_week import active_slate
+
+    slate, games = active_slate(read_csv(ROOT / 'nfl_games.csv'))
+    ordered = sorted(games, key=lambda row: (
+        row.get('gameday', ''), row.get('gametime', ''), row.get('game_id', '')))
+    groups = {'in':[], 'pre':[], 'post':[]}
+    for game in ordered[:24]:
+        try:
+            home, away = int(game['home_score']), int(game['away_score'])
+            finished = float(game['result']) == home - away
+        except (KeyError, TypeError, ValueError):
+            finished = False
+        groups['post' if finished else 'pre'].append(game)
+    header = (str(slate[0]), str(slate[1]), slate[2]) if slate else ('', '', '')
+    return render_template('games_board.html', groups=groups,
+                           games=ordered[:24], slate=header)
 
 
 def game_page(game_id):

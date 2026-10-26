@@ -14,7 +14,7 @@
       <div class="tf-gc-center"><span id="tf-gc-clock">Game information</span><span class="tf-gc-divider">@</span><span class="tf-gc-checked" id="tf-gc-updated">Verifying…</span></div>
       <div class="tf-gc-team"><span class="tf-gc-abbr">{{ game.home_team }}</span><strong id="tf-gc-home" aria-label="Home score">—</strong><small>Home</small></div>
     </div>
-    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('home') }}#home-scores" class="tf-gc-secondary">All NFL scores</a></div>
+    <div class="tf-gc-actions"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}" class="tf-gc-primary">Team Comparison &amp; My Picks</a><a href="{{ url_for('fans.all_games_board') }}" class="tf-gc-secondary">View All Games</a></div>
   </div>
   <div class="tf-gc-tabs" role="tablist" aria-label="Game details">
     <button type="button" class="is-active" role="tab" aria-selected="true" aria-controls="tf-gc-scoring" id="tf-gc-tab-scoring" data-tab="scoring">Scoring</button>

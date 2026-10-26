@@ -41,3 +41,8 @@
 .tf-hot-trends-panel li { margin: 0 0 8px; }
 .tf-hot-trends-panel li:last-child { margin-bottom: 0; }
 .tf-hot-trends-panel a { color: #fbbf24; text-decoration: underline; }
+
+/* One prominent route to the week-wide Game Center; leave home scores compact. */
+#home-scores .tf-all-games-button{display:inline-flex;align-items:center;justify-content:center;max-width:100%;margin:6px 0 10px;padding:10px 17px;border:1px solid #fbbf24;border-radius:9px;background:#fbbf24;color:#172334!important;text-decoration:none;font-weight:900;font-size:.88rem;-webkit-text-stroke:0}
+#home-scores .tf-all-games-button:hover{background:#fcd34d}
+#home-scores .tf-all-games-button:focus-visible{outline:3px solid #86efac;outline-offset:3px}

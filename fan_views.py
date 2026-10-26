@@ -358,6 +358,12 @@ def _final_box_score(game, team_data, player_data):
             'has_details': bool(metrics or any(p['leaders'] for p in performers))}
 
 
+@bp.get('/games')
+def all_games_board():
+    from game_center import board_page
+    return board_page()
+
+
 @bp.get('/game/<game_id>')
 def game_center(game_id):
     from game_center import game_page
