@@ -16,16 +16,16 @@
 <span class="hot-trend-toggle"><span class="hot-trend-show">Show details</span><span class="hot-trend-hide">Hide details</span></span>
 </summary>
 <div class="hot-trend-details">
-<p>Last seven games: <strong>{{ trend.wins }} matching · {{ trend.losses }} opposite · {{ trend.pushes }} pushes/ties{% if trend.missing %} · {{ trend.missing }} missing{% endif %}</strong>{% if trend.sample < 7 %} ({{ trend.sample }} games available){% endif %}.</p>
-<p>{{ 'QB games' if trend.scope == 'qb' else 'Team games' if trend.scope == 'team' else 'Situation' }} · Last played {{ trend.latest }}{% if trend.spans_seasons %} · Includes games from earlier seasons{% endif %}.</p>
+<p>Last {{ trend.sample }} games: <strong>{{ trend.wins }} matched · {{ trend.losses }} didn't match · {{ trend.pushes }} pushes/ties{% if trend.missing %} · {{ trend.missing }} missing{% endif %}</strong>{% if trend.sample < 7 %} ({{ trend.sample }} games available){% endif %}.</p>
+
 {% set current_games = hot_current_evidence(trend) %}
 {% set earlier_games = hot_earlier_evidence(trend) %}
-<details class="hot-trend-evidence"><summary>{{ trend.season }} games behind this trend ({{ current_games|length }})</summary>
+<details class="hot-trend-evidence"><summary>{{ trend.season }} games in this trend ({{ current_games|length }})</summary>
 {% if current_games %}
-<ul>{% for game in current_games %}<li><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.date }} · {{ game.matchup }}</a> · {{ game.result }}</li>{% endfor %}</ul>
+<ul class="hot-trend-game-list">{% for game in current_games %}<li class="hot-trend-game-row"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.date }} · {{ game.matchup }}</a><span class="hot-trend-result" data-result="{{ game.result }}">{{ game.result }}</span></li>{% endfor %}</ul>
 {% else %}<p>Recent results are from an earlier season.</p>{% endif %}
-{% if earlier_games %}<details class="hot-trend-evidence"><summary>Earlier-season evidence ({{ earlier_games|length }})</summary><ul>{% for game in earlier_games %}<li>{{ game.date }} · {{ game.matchup }} · {{ game.result }}</li>{% endfor %}</ul></details>{% endif %}
 </details>
+{% if earlier_games %}<details class="hot-trend-evidence"><summary>Games from other seasons ({{ earlier_games|length }})</summary><ul class="hot-trend-game-list">{% for game in earlier_games %}<li class="hot-trend-game-row"><span class="hot-trend-game-label">{{ game.date }} · {{ game.matchup }}</span><span class="hot-trend-result" data-result="{{ game.result }}">{{ game.result }}</span></li>{% endfor %}</ul></details>{% endif %}
 {% if hot_fireworthy(trend) %}
 {% set future_games = hot_upcoming_for(trend) %}
 <details class="hot-trend-evidence hot-trend-upcoming">
