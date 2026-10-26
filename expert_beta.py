@@ -376,6 +376,15 @@ def matchup_prediction(game_id, version=None):
     approved_version = source.get('_archive_version') if source else None
     preferred = [r for r in records if r['version'] == approved_version]
     record = max(preferred or records, key=lambda r: (r['generated_at'], r['version']))
+    # Expert reviews are published as separate, immutable versions. Match only
+    # an approved Expert report belonging to the *identical* Scout snapshot;
+    # never substitute another model version or change a pinned archive URL.
+    if version is None and record.get('expert') is None:
+        reviewed = [candidate for candidate in records
+                    if candidate.get('expert') is not None
+                    and candidate['scout'] == record['scout']]
+        if reviewed:
+            record = max(reviewed, key=lambda r: (r['generated_at'], r['version']))
     item = public_record(record)
     item['forecast_pending'] = version is None and source is None
     item['locked_quotes'] = record['scout'].get('quotes', {})

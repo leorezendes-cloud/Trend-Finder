@@ -64,6 +64,57 @@ class ExpertBetaTests(unittest.TestCase):
         with self.client.session_transaction() as session:
             session['member_id']=member;session['member_version']=0
 
+    def test_comparison_uses_reviewed_exact_scout_and_respects_pinned_versions(self):
+        from expert_beta import matchup_prediction
+        from flask import g
+        scout = self.games[0]
+        game_id = scout['game']['game_id']
+        original = self.store.append(scout)
+        with patch('forecast_history.official_sources',
+                   return_value={game_id: {'_archive_version': original}}):
+            with app.test_request_context('/matchup/' + game_id):
+                g.member = None
+                selected = matchup_prediction(game_id)
+                self.assertTrue(selected['expert_access'])
+                self.assertEqual(selected['assessment'], 'PRIVATE_SUMMARY')
+                self.assertEqual(selected['expert_picks']['ats_side'], scout['game']['away_team'])
+                self.assertNotEqual(selected['version'], original)
+                pinned = matchup_prediction(game_id, version=original)
+                self.assertIsNone(pinned['expert_picks'])
+                self.assertEqual(pinned['version'], original)
+
+    def test_comparison_does_not_borrow_expert_from_different_forecast(self):
+        from expert_beta import matchup_prediction
+        from flask import g
+        other = copy.deepcopy(self.games[0])
+        other['scores'][other['game']['away_team']] += 1.0
+        game_id = other['game']['game_id']
+        original = self.store.append(other)
+        with patch('forecast_history.official_sources',
+                   return_value={game_id: {'_archive_version': original}}):
+            with app.test_request_context('/matchup/' + game_id):
+                g.member = None
+                selected = matchup_prediction(game_id)
+                self.assertEqual(selected['version'], original)
+                self.assertFalse(selected['expert_available'])
+                self.assertIsNone(selected['expert_picks'])
+
+    def test_comparison_never_leaks_unfeatured_expert_analysis(self):
+        from expert_beta import matchup_prediction
+        from flask import g
+        scout = self.games[2]  # BUF–NYJ: not one of the two free features.
+        game_id = scout['game']['game_id']
+        original = self.store.append(scout)
+        with patch('forecast_history.official_sources',
+                   return_value={game_id: {'_archive_version': original}}):
+            with app.test_request_context('/matchup/' + game_id):
+                g.member = None
+                selected = matchup_prediction(game_id)
+                self.assertTrue(selected['expert_available'])
+                self.assertFalse(selected['expert_access'])
+                self.assertIsNone(selected['expert_picks'])
+                self.assertIsNone(selected['assessment'])
+
     def test_actual_app_dashboard_dynamic_and_no_private_leak(self):
         response=self.client.get('/the-plug');self.assertEqual(response.status_code,200)
         self.assertEqual(response.text.count('class="expert-card"'),3)
