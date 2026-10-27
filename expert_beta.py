@@ -415,15 +415,9 @@ def api_dashboard():
 
 @bp.route('/the-plug/ats-record')
 def plug_ats_record():
-    """Independently graded, issued-before-kickoff selective ATS record."""
-    from plug_ats_select import published_history, POLICY
-    from plug_dashboard import _completed_games
-    from pathlib import Path
-    try:
-        picks, seasons = published_history(_completed_games(Path(__file__).resolve().parent))
-    except (OSError, TypeError, ValueError, KeyError):
-        abort(503, description='Plug ATS selection receipts need operator review.')
-    return render_template('plug_ats_record.html', picks=picks, seasons=seasons, policy=POLICY)
+    """Old bookmarks open the Plug section of the combined record."""
+    from flask import redirect, url_for
+    return redirect(url_for('fans.prediction_results', _anchor='plug-record'), code=302)
 
 
 @bp.route('/the-plug/archive')

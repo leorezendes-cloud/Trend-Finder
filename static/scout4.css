@@ -358,3 +358,44 @@
     .scout4 .prediction-week-selector {align-items: stretch;}
     .scout4 .prediction-week-selector select {flex: 1;}
 }
+
+/* Unified Scout + Plug records. Compact, mobile-first, no default blue links. */
+.scout4 .tf-record-intro {max-width:760px;margin:8px auto 16px;text-align:center;color:#cbd5e1;font-size:14px;line-height:1.5}
+.scout4 .tf-record-board {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.scout4 .tf-record-card {padding:17px 20px;border:1px solid #516177;background:#1a293d}
+.scout4 .tf-record-card-head,.scout4 .tf-record-table-heading {display:flex;align-items:center;justify-content:space-between;gap:12px}
+.scout4 .tf-record-card-head h2,.scout4 .tf-record-table-heading h2 {font-size:20px;color:#f8d575;margin:0;font-weight:800}
+.scout4 .tf-record-card-head span,.scout4 .tf-record-table-heading small {font-size:12px;color:#cbd5e1}
+.scout4 .tf-record-score {display:flex;gap:26px;flex-wrap:wrap;margin:14px 0 10px}
+.scout4 .tf-record-score > div {display:flex;flex-direction:column;gap:3px}
+.scout4 .tf-record-score small {font-size:12px;color:#cbd5e1}
+.scout4 .tf-record-score strong {font-size:clamp(22px,3vw,30px);line-height:1.15;color:#f9fafb;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.scout4 .tf-record-subline {margin:0!important;color:#aebed4;font-size:12px!important}
+.scout4 .tf-record-history-pill {margin:10px 0 0!important;color:#cbd5e1;font-size:12px!important}
+.scout4 .tf-record-history-pill strong {color:#fbbf24;font-variant-numeric:tabular-nums}
+.scout4 .tf-record-table-card {margin:16px 0;border:1px solid #516177;background:#1a293d}
+.scout4 .tf-record-table-heading {padding:15px 18px;border-bottom:1px solid #475569}
+.scout4 .tf-record-table-card table {font-size:13px}
+.scout4 .tf-record-table-card td,.scout4 .tf-record-table-card th {padding:11px 16px}
+.scout4 .tf-record-table-card tr:hover td {background:#22354b}
+.scout4 .tf-record-table-card a,.scout4 .tf-record-table-card a:visited,.scout4 .tf-record-history a {color:#fbbf24!important;text-decoration:none}
+.scout4 .tf-record-table-card a:hover,.scout4 .tf-record-table-card a:focus-visible {color:#ffe8a6!important;text-decoration:underline}
+.scout4 .tf-record-grade {font-weight:750}
+.scout4 .tf-record-grade-win,.scout4 .tf-record-grade-correct {color:#4ade80}
+.scout4 .tf-record-grade-loss,.scout4 .tf-record-grade-wrong {color:#fb7185}
+.scout4 .tf-record-grade-push {color:#fbbf24}
+.scout4 .tf-record-history {margin:16px 0 24px;border:1px solid #475569;border-radius:10px;background:#182536;color:#e2e8f0}
+.scout4 .tf-record-history summary {padding:13px 16px;color:#f8d575;font-size:13px;font-weight:750;cursor:pointer}
+.scout4 .tf-record-history-content {padding:0 16px 12px;font-size:13px}
+.scout4 .tf-record-history-content p {margin:8px 0}
+@media(max-width:620px){
+.scout4 .tf-record-board {gap:9px}
+.scout4 .tf-record-card {padding:12px}
+.scout4 .tf-record-card-head {align-items:flex-start;flex-direction:column;gap:1px}
+.scout4 .tf-record-card-head h2 {font-size:17px}
+.scout4 .tf-record-score {gap:10px;margin:9px 0 10px}
+.scout4 .tf-record-score strong {font-size:20px}
+.scout4 .tf-record-score small {font-size:11px}
+.scout4 .tf-record-table-card td,.scout4 .tf-record-table-card th {padding:9px 11px}
+.scout4 .tf-record-table-heading {padding:12px 13px}
+}

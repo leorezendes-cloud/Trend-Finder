@@ -10,11 +10,11 @@ from weekly_results import build_results
 class RecordTabsReleaseTests(unittest.TestCase):
     def test_shared_tabs_present_in_all_three_pages(self):
         root=Path(__file__).resolve().parent
-        for p in ('templates/sunday_results.html','templates/prediction_results.html','templates/plug_ats_record.html'):
+        for p in ('templates/sunday_results.html','templates/prediction_results.html'):
             s=(root/p).read_text()
             self.assertIn("'_record_navigation.html'",s,p)
         nav=(root/'templates/_record_navigation.html').read_text()
-        for s in ('Weekly Results','Scout Record','Plug Record'):
+        for s in ('Weekly Results','Scout &amp; The Plug'):
             self.assertIn(s,nav)
 
     def test_weekly_uses_only_issued_receipts(self):
@@ -46,7 +46,7 @@ class RecordTabsReleaseTests(unittest.TestCase):
     def test_template_syntax(self):
         root=Path(__file__).resolve().parent
         env=Environment()
-        for p in ('templates/_record_navigation.html','templates/sunday_results.html','templates/prediction_results.html','templates/plug_ats_record.html'):
+        for p in ('templates/_record_navigation.html','templates/sunday_results.html','templates/prediction_results.html'):
             env.parse((root/p).read_text())
 
 if __name__=='__main__':unittest.main()

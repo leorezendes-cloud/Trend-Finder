@@ -530,6 +530,15 @@ def combine_prediction_groups(groups):
     return result
 
 
+def plug_week_record(rows, season, week):
+    """An independent weekly slice of previously issued Plug ATS receipts."""
+    from collections import Counter
+    matches = [r for r in rows if str(r['season']) == str(season)
+               and str(r['week']) == str(week)]
+    counts = Counter(r['result'] for r in matches)
+    return matches, {name: counts.get(name, 0) for name in ('Win','Loss','Push','Pending')}
+
+
 @bp.get('/predictions/results')
 def prediction_results():
     from flask import request
@@ -568,7 +577,21 @@ def prediction_results():
     selected_records = [r for r in records if str(r.get('season')) == str(season)
                         and str(r.get('week')) == str(selected_week)] if selected_week is not None else []
     groups, recent, excluded = prediction_performance(selected_records, schedule)
+    # Only actually issued Plug receipts count; never reconstruct issued picks
+    # from retrospective edge rankings or current market lines.
+    from plug_ats_select import published_history
+    from plug_dashboard import _completed_games
+    try:
+        plug_picks, plug_seasons = published_history(_completed_games(ROOT))
+        plug_receipts_review = False
+    except (OSError, TypeError, ValueError, KeyError):
+        plug_picks, plug_seasons = [], {}
+        plug_receipts_review = True
+    plug_week_picks, plug_week_totals = plug_week_record(plug_picks, season, selected_week)
     return render_template('prediction_results.html', groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
                            season=season, weeks=weeks, selected_week=selected_week,
-                           excluded=excluded, freshness=data_freshness())
+                           excluded=excluded, freshness=data_freshness(),
+                           plug_week_picks=plug_week_picks, plug_week_totals=plug_week_totals,
+                           plug_season_totals=plug_seasons.get(season, {}),
+                           plug_receipts_review=plug_receipts_review)

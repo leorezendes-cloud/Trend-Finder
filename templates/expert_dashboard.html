@@ -101,6 +101,6 @@
 {% if underway_games %}<section><h2>Games Underway</h2>{{ cards(underway_games) }}</section>{% endif %}
 {% if completed_games %}<section><h2>Completed Games</h2>{{ cards(completed_games) }}</section>{% endif %}
 {% if awaiting_games %}<section><h2>Game Status Awaiting Confirmation</h2>{{ cards(awaiting_games) }}</section>{% endif %}
-<section class="plug-earlier"><p><a href="{{ url_for('expert_beta.plug_ats_record') }}">The Plug’s Selected ATS Record →</a> · <a href="{{ url_for('expert_beta.archive') }}">Prediction archive and grading →</a> · <a href="{{ url_for('fans.prediction_results') }}">Scout’s All-Game Record →</a></p>
+<section class="plug-earlier"><p><a href="{{ url_for('fans.prediction_results') }}">Scout &amp; The Plug Records →</a> · <a href="{{ url_for('expert_beta.archive') }}">Prediction archive →</a></p>
 {% if historical_games %}<details><summary>Previous saved forecasts</summary>{{ cards(historical_games) }}</details>{% endif %}</section>
 </div>{% endblock %}
