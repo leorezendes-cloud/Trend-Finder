@@ -25,3 +25,14 @@ html body > main.weekly-results-main {
 @media (max-width: 650px) {
     html body > main.weekly-results-main {margin: 10px auto 24px;}
 }
+
+.weekly-results-main a:link,
+.weekly-results-main a:visited {
+    color: #fbbf24;
+    text-decoration: none;
+}
+.weekly-results-main a:hover,
+.weekly-results-main a:focus-visible {
+    color: #fde68a;
+    text-decoration: underline;
+}
