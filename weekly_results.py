@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
+from plug_ats_select import for_game, published_history
 
 def read_csv(path):
  if not path.exists():return []
@@ -55,6 +56,23 @@ def build_results(root,week=None,score_updates=None):
  model_label='Original Plug ATS' if all_points else 'Saved ATS picks' if mixed else 'Blended ATS' if has_blend else 'Original Plug ATS' if scouts else 'Saved ATS picks'
  model_note='Original points-for/points-allowed formula · locked predictions' if all_points else 'Multiple locked model versions · each pick retains its saved formula' if mixed else 'Scout 4.0 scoring + The Plug points-only · fixed 50/50 blend' if has_blend else 'Original points-only Plug snapshot · October 11, 2026' if scouts else 'No saved model forecasts for this week.'
  dog_records=underdog_records(rows,season,selected)
+ # Plug records are independent, immutable selections; never derive hindsight
+ # picks from the current forecast rankings or the latest market quote.
+ verified_finals={}
+ for r in rows:
+  try:
+   if r.get('away_score') in ('',None) or r.get('home_score') in ('',None):continue
+   a,h=float(r['away_score']),float(r['home_score'])
+   if min(a,h)>=0 and math.isfinite(a) and math.isfinite(h) and a.is_integer() and h.is_integer():
+    verified_finals[r['game_id']]=(int(a),int(h))
+  except (KeyError,TypeError,ValueError):continue
+ try:
+  issued_rows,_=published_history(verified_finals)
+  plug_receipts_review=False
+ except (OSError,KeyError,ValueError,TypeError):
+  issued_rows=[]
+  plug_receipts_review=True
+ issued_by_id={r['game_id']:r for r in issued_rows if int(r['season'])==season and int(r['week'])==selected}
  games=[]
  for g in sorted(rows,key=lambda g:(g['gameday'],g.get('gametime',''))):
   if int(g['season'])!=season or g['game_type']!='REG' or int(g['week'])!=selected:continue
@@ -106,7 +124,23 @@ def build_results(root,week=None,score_updates=None):
      tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(tr,tr)
    except ValueError:
     item['scout_pick']='Review needed';item['scout_result']='Review needed';item['total_result']='Review needed'
+  if plug_receipts_review:
+   item.update(plug_status='review',plug_pick=None,plug_result=None)
+  else:
+   issued=issued_by_id.get(g['game_id'])
+   decision=for_game(g['game_id'])
+   if issued:
+    line=float(issued['away_line']) if issued['side']==issued['away_team'] else -float(issued['away_line'])
+    item.update(plug_status='selected',plug_pick=f"{issued['side']} {line:+g}",plug_result=issued['result'])
+   elif decision is not None and decision.get('selected') is False:
+    item.update(plug_status='stay_away',plug_pick=None,plug_result=None)
+   elif decision is not None and decision.get('selected') is True:
+    item.update(plug_status='review',plug_pick=None,plug_result=None)
+   else:
+    item.update(plug_status='not_issued',plug_pick=None,plug_result=None)
   games.append(item)
+ plug_tally={k:sum(r['plug_status']=='selected' and r['plug_result']==k for r in games) for k in ('Win','Loss','Push','Pending')}
+ plug_tally['selected']=sum(r['plug_status']=='selected' for r in games)
  tally=dict(covers=sum(g['ats_result']=='Cover' for g in games),losses=sum(g['ats_result']=='Loss' for g in games),pushes=sum(g['ats_result']=='Push' for g in games),correct=sum(g['scout_result']=='Correct' for g in games),wrong=sum(g['scout_result']=='Wrong' for g in games),pick_pushes=sum(g['scout_result']=='Push' for g in games),finals=sum(g['game_status']=='Final' for g in games),games=len(games))
  tally.update(total_correct=sum(g['total_result']=='Correct' for g in games),total_wrong=sum(g['total_result']=='Wrong' for g in games),total_pushes=sum(g['total_result']=='Push' for g in games))
- return dict(model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])

@@ -174,3 +174,10 @@ html body .site-profile-panel .site-profile-logout {margin:0;padding:0;border:0;
 .scout-actions a:hover,.scout-actions a:focus-visible{border-color:#fbbf24;background-color:#283448;box-shadow:0 0 0 1px rgba(251,191,36,.3),0 0 16px rgba(251,191,36,.3)}
 .scout-actions a:focus-visible{outline:2px solid #fbbf24;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.scout-actions a{transition:none}}
+
+/* Shared records navigation: dark gold, never browser-default blue. */
+.tf-record-tabs {display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px;margin:14px auto 22px;max-width:1000px}
+.tf-record-tabs a,.tf-record-tabs a:link,.tf-record-tabs a:visited {display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;background:#111c2b;color:#fbbf24!important;border:1px solid #665423;border-radius:9px;text-decoration:none!important;font:700 14px Arial,sans-serif;-webkit-text-stroke:0;white-space:nowrap}
+.tf-record-tabs a:hover,.tf-record-tabs a:focus-visible {border-color:#fbbf24;background:#243244;color:#fde68a!important}
+.tf-record-tabs a.active,.tf-record-tabs a.active:visited {background:#76521d;color:#fff7d6!important;border-color:#eab54c}
+@media(max-width:550px){.tf-record-tabs{gap:5px;padding:0 3px}.tf-record-tabs a,.tf-record-tabs a:link{padding:9px 8px;font-size:12px;flex:1;min-width:0}}

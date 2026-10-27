@@ -2,7 +2,7 @@
 {% block title %}Scout’s All-Game Record{% endblock %}{% block heading %}Scout’s All-Game Record{% endblock %}
 {% block filter_form %}{% endblock %}
 {% block data_notes %}<aside class="stats-note"><p>Track the previous all-game ATS record (formerly labeled The Plug) and the unchanged saved over/under record, with the original model versions and lines preserved. For final scores and individual matchup outcomes, visit <a href="{{ url_for('sunday_results_page') }}">Weekly Game Results</a>.</p><p>Only predictions saved before kickoff are counted. Different model versions are combined for the selected week; the original configurations remain available below. Pushes are excluded from win percentages; pending games are not losses.</p><p>Latest prediction saved: {{ freshness.predictions|eastern_time if freshness.predictions else 'None yet' }}. Results use final scores in the saved schedule, so grading can lag the live scoreboard.</p>{% if excluded %}<p>{{ excluded }} records excluded because pregame timing or outcome identity could not be verified.</p>{% endif %}</aside>{% endblock %}
-{% block content %}<p><a href="{{ url_for('expert_beta.plug_ats_record') }}">See The Plug's separate selected ATS record →</a></p>
+{% block content %}{% set record_page='scout' %}{% include '_record_navigation.html' %}
 {% if config.get('EXPERT_BETA_ENABLED') %}<p><a href="{{ url_for('expert_beta.archive') }}">Prediction archive →</a></p>{% endif %}
 
 {% if weeks %}

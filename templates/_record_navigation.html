@@ -1,0 +1,5 @@
+<nav class="tf-record-tabs" aria-label="Results and prediction records">
+  <a class="{{ 'active' if record_page=='weekly' else '' }}" href="{{ url_for('sunday_results_page', week=selected_week) if selected_week is defined and selected_week is not none else url_for('sunday_results_page') }}"{% if record_page=='weekly' %} aria-current="page"{% endif %}>Weekly Results</a>
+  <a class="{{ 'active' if record_page=='scout' else '' }}" href="{{ url_for('fans.prediction_results', week=selected_week) if selected_week is defined and selected_week is not none else url_for('fans.prediction_results') }}"{% if record_page=='scout' %} aria-current="page"{% endif %}>Scout Record</a>
+  <a class="{{ 'active' if record_page=='plug' else '' }}" href="{{ url_for('expert_beta.plug_ats_record') }}"{% if record_page=='plug' %} aria-current="page"{% endif %}>Plug Record</a>
+</nav>
