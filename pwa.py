@@ -1,7 +1,7 @@
 """Install metadata and a small offline shell; never caches research or account data."""
 import hashlib
 from pathlib import Path
-from flask import Blueprint, Response, current_app, jsonify, render_template
+from flask import Blueprint, Response, current_app, jsonify, render_template, send_from_directory
 
 bp = Blueprint('pwa', __name__)
 ASSETS = ('/static/pwa/offline.html', '/static/pwa/icon-192.svg', '/static/pwa/icon-512.svg')
@@ -9,6 +9,14 @@ ASSETS = ('/static/pwa/offline.html', '/static/pwa/icon-192.svg', '/static/pwa/i
 
 def init_app(app):
     app.register_blueprint(bp)
+
+
+@bp.get('/favicon.ico')
+def favicon():
+    """Explicit legacy Safari/favicon lookup, separate from the mascot PWA icon."""
+    response = send_from_directory(current_app.static_folder, 'Images/Branding/tf-graffiti-favicon.ico', mimetype='image/vnd.microsoft.icon')
+    response.headers['Cache-Control'] = 'no-cache, max-age=0'
+    return response
 
 
 @bp.get('/manifest.webmanifest')
