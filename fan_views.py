@@ -505,6 +505,7 @@ def prediction_performance(records, schedule):
                        'date':record['kickoff_utc'], 'saved':record['sealed_at_utc'],
                        'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total,
                        'line':record['quote']['line'] if record['components']['Blend']['pick']==record['away_team'] else -record['quote']['line'],
+                       'total_pick': (str(record['totals']['prediction']['lean'])+' '+format(float(record['totals']['quote']['line']),'g')) if record.get('totals') and record['totals']['prediction'].get('lean') in ('Over','Under') else None,
                        'model_version':record.get('version','Unknown version'),
                        'forecast_digest':record.get('_history_digest') or record_digest(record)})
     for group in groups.values():
@@ -588,10 +589,31 @@ def prediction_results():
         plug_picks, plug_seasons = [], {}
         plug_receipts_review = True
     plug_week_picks, plug_week_totals = plug_week_record(plug_picks, season, selected_week)
+    from plug_ou_receipts import read as read_plug_ou, grade as grade_plug_ou
+    by_game={g['game_id']:g for g in schedule}
+    plug_ou_week_picks=[]
+    plug_ou_review=False
+    for record in selected_records:
+        try:
+            receipt=read_plug_ou(ROOT,record['game_id'])
+            if not receipt or receipt['source_sha256']!=record.get('_history_digest'):
+                continue
+            game=by_game.get(record['game_id'],{})
+            plug_ou_week_picks.append({**receipt,
+                'result':grade_plug_ou(receipt,game.get('away_score'),game.get('home_score'))})
+        except (OSError,ValueError,TypeError,KeyError):
+            plug_ou_review=True
+    plug_ou_week_picks.sort(key=lambda r:(r['kickoff_utc'],r['game_id']))
+    plug_ou_week_totals={k:sum(r['result']==k for r in plug_ou_week_picks)
+                         for k in ('Win','Loss','Push','Pending')}
+    plug_ou_week_totals['selected']=len(plug_ou_week_picks)
     return render_template('prediction_results.html', groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
                            season=season, weeks=weeks, selected_week=selected_week,
                            excluded=excluded, freshness=data_freshness(),
                            plug_week_picks=plug_week_picks, plug_week_totals=plug_week_totals,
                            plug_season_totals=plug_seasons.get(season, {}),
-                           plug_receipts_review=plug_receipts_review)
+                           plug_receipts_review=plug_receipts_review,
+                           plug_ou_week_picks=plug_ou_week_picks,
+                           plug_ou_week_totals=plug_ou_week_totals,
+                           plug_ou_review=plug_ou_review)

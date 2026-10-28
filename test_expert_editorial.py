@@ -38,7 +38,7 @@ class ExpertEditorialTests(unittest.TestCase):
 
     def test_saved_technical_prose_is_simplified_without_changing_numbers(self):
         text="Scout's conditional model baseline issues an ATS lean on Atlanta (+1.5) and a total lean on Under (52.5)."
-        self.assertEqual(expert_prose(text,[]),'The Plug likes Atlanta (+1.5) and favors Under (52.5).')
+        self.assertEqual(expert_prose(text,[]),'Scout likes Atlanta (+1.5) and favors Under (52.5).')
         text='Sourced facts confirm the Atlanta Falcons host the Chicago Bears in Week 6 of the 2026 season. Atlanta can run the ball.'
         self.assertEqual(expert_prose(text,[]),'Atlanta can run the ball.')
         self.assertEqual(expert_prose('Penix has five starts; no closing totals are verified.',[]),'Penix has five starts; no closing totals are verified.')
@@ -58,8 +58,9 @@ class ExpertEditorialTests(unittest.TestCase):
         self.assertEqual(record['scout']['quotes'],{})
         self.assertEqual(record['saved_picks']['spread']['side'],'HOU')
         self.assertIn('Scout ATS: HOU',html)
-        self.assertIn('The Plug O/U: Under',html)
-        self.assertNotIn('Scout',html.split('<body>',1)[-1])
+        self.assertIn('Scout O/U: Under',html)
+        self.assertIn('The Plug O/U: —',html)
+        self.assertIn('Scout ATS: HOU',html.split('<body>',1)[-1])
 
     def test_card_picks_only_for_entitled_users(self):
         html=self.client.get('/the-plug').text
@@ -109,7 +110,7 @@ class ExpertEditorialTests(unittest.TestCase):
                     comparison=[href for href,text in parsed.links if text=='View Team Comparison']
                     self.assertEqual(comparison,['/matchup/'+record['scout']['game']['game_id']])
                     self.assertIn('HOU' if record is featured else 'BUF',html)
-                    self.assertIn('The Plug',html);self.assertIn('Spread:',html);self.assertIn('Total:',html)
+                    self.assertIn('The Plug',html);self.assertIn('Spread:',html);self.assertIn('Scout O/U:',html)
                     self.assertIn('Preserved Versions',html);self.assertIn('/the-plug',dict((text,href) for href,text in parsed.links).get('← Back to The Plug'))
                     if record is featured:
                         self.assertIn('PREMIUM_SECRET',html)

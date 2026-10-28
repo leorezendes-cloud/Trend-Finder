@@ -24,6 +24,32 @@ Starting with automatic configuration `scout4-plug-margin-blend-3-always-pick`, 
 
 `plug-points-only-4` publishes new ATS predictions from the original points-for/points-allowed margin. Existing sealed forecasts retain their old formula and original lines; they are not regenerated on deployment. The prior 50/50 recipe and fixed net-EPA Recent Form are saved and graded separately as research benchmarks on each new forecast's same cutoff and spread. Published totals retain the frozen Scout totals model. Exact-tie selection and always-pick behavior remain unchanged. No injury/weather penalty is added to published forecasts.
 
+## Independent Plug O/U selections (2026)
+
+Scout's original sealed totals forecast, quote, historical line, and grading
+remain unchanged. After forecast staging, the scheduled update worker attempts
+a separate immutable Plug O/U receipt in
+`data/scout4/blend/plug_ou/<game_id>.json` (persistent disk). The receipt
+is issued only before kickoff and tied to the saved source forecast SHA-256,
+quote and actual issue timestamp. The source cannot be changed and no old game
+receives a new official selection.
+
+Independent Vegas reconstruction **v14** is trained to previously completed
+seasons' market totals using pre-week team form and prior-known QB history.
+The current game's market quote is *not* an input into this model. For 2026
+posted total >=48: follow v14 when the projection differs by less than 1
+point; fade v14 when it differs by at least 1 point. An exact tie retains
+the original selection. For totals below 48, keep the original selection.
+If independent projection inputs are absent, do not issue a new Plug receipt.
+The Plug's graded result uses that receipt's original frozen market total,
+not a current/closing quote.
+
+The website separately shows Scout O/U, Plug O/U and Expert O/U. Expert
+drafts may include the previously issued final Plug O/U as independent
+context, without changing the immutable Scout source or forcing agreement.
+Earlier Expert reports remain archived unchanged. Any missing/corrupt
+receipt is not reconstructed from hindsight.
+
 ## Weekly page score freshness
 
 The weekly results page uses the shared cached ESPN scoreboard for provider-confirmed finals while the dual-source canonical CSV update catches up. Only completed postgame events with exact team identities and scheduled kickoff matches are eligible. Invalid or conflicting scores are rejected and existing saved finals take precedence. The overlay is read-only, clearly labeled, and all ATS/total grades continue to use the original frozen prediction lines. Refreshing the weekly page checks the shared feed cache (normally 60 seconds after games finish). The canonical update and persistent model record workflows remain unchanged.

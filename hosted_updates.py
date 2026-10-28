@@ -116,6 +116,10 @@ def update_once(root, feed_lock_fd=None):
         attempt('predictions', lambda: predictions(root, SOURCE, SOURCE/'automatic_model.json'))
     else:
         stages['predictions'] = 'skipped: upstream update failed'
+    # The Plug's totals selection is separate from immutable Scout forecasts.
+    # A failure here never blocks ATS/Scout publication or the Expert queue.
+    from plug_ou_receipts import issue_pending as issue_plug_totals
+    attempt('Plug O/U selections', lambda: issue_plug_totals(root))
     # Publication copies only sealed approved records, even if this refresh failed.
     # It never calls experimental engines or AI, and cannot publish review drafts.
     from plug_publication import publish
