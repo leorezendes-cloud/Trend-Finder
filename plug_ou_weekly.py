@@ -15,7 +15,14 @@ from pathlib import Path
 from plug_ou_receipts import archive, read as read_v1, _time
 from plug_ou_shortlist import POLICY_VERSION, shortlist
 from plug_publication import immutable
-from scout4.shadow import kickoff
+from zoneinfo import ZoneInfo
+
+def kickoff(game):
+    """Lightweight schedule timestamp; identical timezone rule to Scout."""
+    if not game.get('gameday') or not game.get('gametime'):
+        raise ValueError('Missing scheduled kickoff')
+    return datetime.fromisoformat(game['gameday']+'T'+game['gametime']).replace(
+        tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
 
 def _canonical(value):
     return json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
