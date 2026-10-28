@@ -504,6 +504,7 @@ def prediction_performance(records, schedule):
         recent.append({'id':record['game_id'], 'away':record['away_team'], 'home':record['home_team'],
                        'date':record['kickoff_utc'], 'saved':record['sealed_at_utc'],
                        'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total,
+                       'total_pick': (str(record['totals']['prediction']['lean']) + ' ' + str(record['totals']['quote']['line'])) if record.get('totals') and record['totals']['prediction'].get('lean') in ('Over','Under') else None,
                        'line':record['quote']['line'] if record['components']['Blend']['pick']==record['away_team'] else -record['quote']['line'],
                        'model_version':record.get('version','Unknown version'),
                        'forecast_digest':record.get('_history_digest') or record_digest(record)})
