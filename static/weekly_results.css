@@ -36,3 +36,13 @@ html body > main.weekly-results-main {
     color: #fde68a;
     text-decoration: underline;
 }
+
+/* Distinct Plug totals record, matching The Plug's money-green identity. */
+.weekly-results-ou{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:18px auto 24px;font:14px Arial,sans-serif}
+.weekly-results-ou>div{background:#1f2937;border:1px solid #475569;border-radius:10px;padding:12px 22px;text-align:center;min-width:142px}
+.weekly-results-ou span,.weekly-results-ou small{display:block;color:#cbd5e1}
+.weekly-results-ou strong{display:block;font-size:23px;margin-top:5px}
+.weekly-results-ou .weekly-plug-ou{border-color:#166534}
+.weekly-results-ou .weekly-plug-ou strong,.weekly-results-main .weekly-plug-ou strong{color:#4ade80}
+.weekly-results-table td.weekly-plug-ou{white-space:nowrap}
+.tf-game-card .weekly-plug-ou{color:#4ade80}
