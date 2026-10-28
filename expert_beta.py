@@ -340,10 +340,10 @@ def public_record(record, detail=False):
               'expert_picks': {key: expert.get(key) for key in ('ats_side','total_side')} if expert else None,
               'assessment': expert.get('summary') if expert else None}
     if detail:
-        from plug_ou_receipts import read as read_plug_ou
+        from plug_ou_weekly import read_effective as read_plug_ou
         try:
             issued=read_plug_ou(Path(__file__).resolve().parent,scout['game']['game_id'])
-            if issued and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
+            if issued and issued['selected'] and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
                 result['plug_ou_pick']=f"{issued['side']} {issued['market_total']:g}"
         except (OSError,ValueError,TypeError,KeyError):
             result['plug_ou_review']=True
@@ -407,10 +407,12 @@ def matchup_prediction(game_id, version=None):
     item['saved_at'] = record['scout']['cutoff_utc']
     game = record['scout']['game']
     item['prediction_margin'] = record['scout']['scores'][game['away_team']] - record['scout']['scores'][game['home_team']]
-    from plug_ou_receipts import read as plug_ou_read
+    from plug_ou_weekly import read_effective as plug_ou_read
     try:
         issued=plug_ou_read(Path(__file__).resolve().parent,game_id)
-        if issued and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
+        if issued:
+            item['plug_ou_status']=issued['selection_status']
+        if issued and issued['selected'] and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
             item['plug_ou_pick']=f"{issued['side']} {issued['market_total']:g}"
     except (OSError,ValueError,TypeError,KeyError):
         item['plug_ou_review']=True
