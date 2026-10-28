@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
-from plug_ats_select import for_game, published_history
+from plug_ats_v5_weekly import for_game, published_history
 
 def read_csv(path):
  if not path.exists():return []
