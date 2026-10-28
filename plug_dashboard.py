@@ -252,4 +252,23 @@ def weekly_dashboard(records, render_record, now):
     for key in ('games','underway_games','completed_games','awaiting_games'):
         sections[key].sort(key=lambda item:instant(item['scout']['game']['kickoff_utc']))
     from plug_ats_select import decorate_dashboard
-    return decorate_dashboard(sections, now)
+    from plug_ou_receipts import read as read_plug_ou, grade as grade_plug_ou
+    sections=decorate_dashboard(sections, now)
+    for group in ('games','underway_games','completed_games','awaiting_games','historical_games'):
+        for item in sections.get(group, []):
+            game=item['scout']['game']
+            try:
+                receipt=read_plug_ou(ROOT,game['game_id'])
+            except (OSError,ValueError,TypeError,KeyError):
+                item['plug_ou_review']=True
+                continue
+            if receipt is None:
+                continue
+            item['plug_ou_pick']=f"{receipt['side']} {receipt['market_total']:g}"
+            item['plug_ou_receipt']=receipt
+            final=item.get('final_score')
+            if final is not None:
+                result=grade_plug_ou(receipt,final['away'],final['home'])
+                item['plug_ou_result']=result
+                item.setdefault('completed_grades',{})['plug_total']=result
+    return sections
