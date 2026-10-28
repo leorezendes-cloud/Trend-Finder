@@ -26,7 +26,7 @@ def expert_prose(text, sources):
     text=text.replace('and a total lean on', 'and favors')
     text=re.sub(r'Sourced facts confirm (?:the )?[^.!?\n]{0,180} host(?:s)? (?:the )?[^.!?\n]{0,180} in Week \d+ of the \d{4} season\.\s*', '', text)
     text=re.sub(r' +([,.!?;:])',r'\1',text)
-    return re.sub(r' {2,}', ' ', re.sub(r'\bScout\b', 'The Plug', text)).strip()
+    return re.sub(r' {2,}', ' ', text).strip()
 
 EXPERT_VOICE = (
     ' Write like a knowledgeable, entertaining football analyst talking to sports fans: '
