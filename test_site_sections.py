@@ -107,9 +107,9 @@ class SiteSectionsTests(unittest.TestCase):
             self.assertIn('<details class="site-menu" id="site-menu">', html)
             self.assertNotIn('id="site-menu" open', html)
             self.assertIn(art, html)
-            self.assertIn('gravy-train-branding/favicon.ico', html)
+            self.assertIn('tf-graffiti-favicon.svg', html)
             self.assertIn('navigation.js', html)
-        with self.client.get('/static/Images/Branding/gravy-train-branding/favicon.ico') as response:
+        with self.client.get('/static/Images/Branding/tf-graffiti-favicon.svg') as response:
             self.assertEqual(response.status_code, 200)
 
     def test_brands_and_member_navigation_remain_available(self):
