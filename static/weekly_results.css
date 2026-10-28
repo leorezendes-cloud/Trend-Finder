@@ -36,3 +36,12 @@ html body > main.weekly-results-main {
     color: #fde68a;
     text-decoration: underline;
 }
+
+/* Separate, clearly graded Plug O/U record; aligned with money-green branding. */
+.weekly-ou-records{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:18px auto 24px;font:14px Arial,sans-serif}
+.weekly-ou-records>div{background:#1f2937;border:1px solid #475569;border-radius:10px;padding:12px 20px;text-align:center;min-width:140px}
+.weekly-ou-records span,.weekly-ou-records small{display:block;color:#cbd5e1}
+.weekly-ou-records strong{font-size:23px;display:block;margin-top:5px}
+.weekly-ou-records .weekly-plug-ou{border-color:#166534}
+.weekly-ou-records .weekly-plug-ou strong,.weekly-results-table .weekly-plug-ou strong,.tf-game-card .weekly-plug-ou{color:#4ade80}
+.weekly-results-table td.weekly-plug-ou{white-space:nowrap}
