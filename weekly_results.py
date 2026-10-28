@@ -157,7 +157,7 @@ def build_results(root,week=None,score_updates=None):
    except (OSError,ValueError,TypeError,KeyError):
     item['plug_ou_result']='Review needed'
   games.append(item)
- plug_ou_tally={key:sum(g['plug_ou_pick'] and g['plug_ou_result']==key for g in games)
+ plug_ou_tally={key:sum(bool(g['plug_ou_pick']) and g['plug_ou_result']==key for g in games)
                 for key in ('Win','Loss','Push','Pending')}
  plug_ou_tally['selected']=sum(bool(g['plug_ou_pick']) for g in games)
  plug_tally={k:sum(r['plug_status']=='selected' and r['plug_result']==k for r in games) for k in ('Win','Loss','Push','Pending')}
