@@ -17,11 +17,23 @@
 {% if item.pending or item.forecast_pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
 {% if item.show_scores %}<p class="expert-score{% if item.final_score %} plug-completed-projection{% endif %}">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
 <p class="scout-picks">Scout ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>Scout O/U: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>
-<p class="plug-ou-selection{{ ' plug-upcoming-picks' if item.upcoming and item.plug_ou_pick is defined and item.plug_ou_pick else '' }}"><strong>The Plug O/U:</strong>
-{% if item.plug_ou_status == 'stay_away' %}Stay Away
-{% elif item.plug_ou_pick is defined and item.plug_ou_pick %}{{ item.plug_ou_pick }}
-{% else %}Awaiting weekly shortlist{% endif %}</p>
-{% if item.plug_ats_status == 'selected' %}<p class="plug-shortlist plug-shortlist-top"><strong>Plug ATS: Top Pick</strong>{% if item.plug_ats_decision and item.plug_ats_decision.side != picks.spread.side %} · {{ item.plug_ats_decision.side }} on saved line{% endif %}</p>{% elif item.plug_ats_status == 'stay_away' %}<p class="plug-shortlist plug-shortlist-pass">Plug ATS: Stay Away</p>{% elif item.upcoming and item.plug_ats_status is defined %}<p class="plug-shortlist plug-shortlist-pass">Plug ATS: Awaiting weekly picks</p>{% endif %}
+{% set ats_decision = item.plug_ats_decision if item.plug_ats_status == 'selected' else none %}
+{% set selected_ats = ats_decision and ats_decision.side and ats_decision.away_line is defined %}
+{% set selected_ou = item.plug_ou_status == 'selected' and item.plug_ou_pick is defined and item.plug_ou_pick %}
+<div class="plug-pick-summary" aria-label="The Plug's ATS and over/under selections">
+{% if selected_ats or selected_ou %}
+<section class="plug-top-picks" aria-label="The Plug's Top Picks">
+<h3>The Plug's Top Picks:</h3>
+{% if selected_ats %}<p><strong>ATS</strong> – ({{ ats_decision.side }} {{ '%+g'|format((ats_decision.away_line if ats_decision.side == g.away_team else -ats_decision.away_line)|float) }})</p>{% endif %}
+{% if selected_ou %}<p><strong>O/U</strong> – ({{ item.plug_ou_pick }})</p>{% endif %}
+</section>
+{% endif %}
+{% if item.plug_ats_status == 'stay_away' %}<p class="plug-market-muted">Plug ATS: Stay Away</p>
+{% elif item.plug_ats_status == 'pending' %}<p class="plug-market-pending">Plug ATS: Awaiting weekly picks</p>{% endif %}
+{% if item.plug_ou_status == 'stay_away' %}<p class="plug-market-muted">Plug O/U: Stay Away</p>
+{% elif item.plug_ou_review %}<p class="plug-market-pending">Plug O/U: Review needed</p>
+{% elif item.upcoming and not selected_ou %}<p class="plug-market-pending">Plug O/U: Awaiting weekly shortlist</p>{% endif %}
+</div>
 {% endif %}
 <section class="plug-market-context">
 {% if item.backup_odds_capture %}<p class="expert-meta">DraftKings odds via ESPN · observed {{ item.backup_odds_capture|eastern_time }}. Public betting percentages unavailable for this capture.</p>{% endif %}
