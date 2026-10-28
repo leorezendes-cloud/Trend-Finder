@@ -399,3 +399,7 @@
 .scout4 .tf-record-table-card td,.scout4 .tf-record-table-card th {padding:9px 11px}
 .scout4 .tf-record-table-heading {padding:12px 13px}
 }
+
+/* The Plug retains a distinct money-green identity on record and matchup pages. */
+.tf-plug-green,.tf-record-card#plug-record .tf-record-score strong{color:#4ade80}
+.tf-record-table-card#plug-table-heading,.tf-record-card#plug-record{border-color:#166534}
