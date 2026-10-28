@@ -580,7 +580,7 @@ def prediction_results():
     groups, recent, excluded = prediction_performance(selected_records, schedule)
     # Only actually issued Plug receipts count; never reconstruct issued picks
     # from retrospective edge rankings or current market lines.
-    from plug_ats_select import published_history
+    from plug_ats_v5_weekly import published_history
     from plug_dashboard import _completed_games
     try:
         plug_picks, plug_seasons = published_history(_completed_games(ROOT))
