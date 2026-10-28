@@ -340,7 +340,7 @@ def public_record(record, detail=False):
               'expert_picks': {key: expert.get(key) for key in ('ats_side','total_side')} if expert else None,
               'assessment': expert.get('summary') if expert else None}
     if detail:
-        from plug_ou_weekly import read_effective as read_plug_ou
+        from plug_ou_weekly_v3 import read_effective as read_plug_ou
         try:
             issued=read_plug_ou(Path(__file__).resolve().parent,scout['game']['game_id'])
             if issued:
@@ -409,7 +409,7 @@ def matchup_prediction(game_id, version=None):
     item['saved_at'] = record['scout']['cutoff_utc']
     game = record['scout']['game']
     item['prediction_margin'] = record['scout']['scores'][game['away_team']] - record['scout']['scores'][game['home_team']]
-    from plug_ou_weekly import read_effective as plug_ou_read
+    from plug_ou_weekly_v3 import read_effective as plug_ou_read
     try:
         issued=plug_ou_read(Path(__file__).resolve().parent,game_id)
         if issued:

@@ -139,7 +139,7 @@ def build_results(root,week=None,score_updates=None):
    else:
     item.update(plug_status='not_issued',plug_pick=None,plug_result=None)
   # The Plug O/U has its own immutable decision and frozen line.
-  from plug_ou_weekly import read_effective as read_plug_ou
+  from plug_ou_weekly_v3 import read_effective as read_plug_ou
   from plug_ou_receipts import grade as grade_plug_ou
   item['plug_ou_pick']=None
   item['plug_ou_result']=None

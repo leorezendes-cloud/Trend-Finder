@@ -121,8 +121,8 @@ def update_once(root, feed_lock_fd=None):
     from plug_ou_receipts import issue_pending as issue_plug_totals
     attempt('Plug O/U selections', lambda: issue_plug_totals(root))
     # Versioned official shortlist: never backfill after first kickoff.
-    from plug_ou_weekly import issue_weekly as issue_plug_ou_shortlist
-    attempt('Plug O/U weekly shortlist', lambda: issue_plug_ou_shortlist(root))
+    from plug_ou_weekly_v3 import issue_weekly as issue_plug_ou_shortlist
+    attempt('Plug O/U weekly v3 shortlist', lambda: issue_plug_ou_shortlist(root))
     # Publication copies only sealed approved records, even if this refresh failed.
     # It never calls experimental engines or AI, and cannot publish review drafts.
     from plug_publication import publish
@@ -402,6 +402,7 @@ def run_leader(root, stop):
     jobs = (
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
+        ('plug-ou-qualifiers', lambda: run_worker('plug_ou_weekly_v3.py', ['--once'], 90), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
         ('automatic-weekly-lines', weekly, 30),
         ('automatic-data-updates', scout, 21600),

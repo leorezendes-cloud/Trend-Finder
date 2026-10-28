@@ -589,7 +589,7 @@ def prediction_results():
         plug_picks, plug_seasons = [], {}
         plug_receipts_review = True
     plug_week_picks, plug_week_totals = plug_week_record(plug_picks, season, selected_week)
-    from plug_ou_weekly import read_effective as read_plug_ou
+    from plug_ou_weekly_v3 import read_effective as read_plug_ou
     from plug_ou_receipts import grade as grade_plug_ou
     by_game={g['game_id']:g for g in schedule}
     plug_ou_week_picks=[]
