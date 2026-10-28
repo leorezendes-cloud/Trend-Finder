@@ -251,7 +251,7 @@ def weekly_dashboard(records, render_record, now):
     sections['historical_games'] = [item for item in earlier if item['scout']['game']['game_id'] not in current_ids]
     for key in ('games','underway_games','completed_games','awaiting_games'):
         sections[key].sort(key=lambda item:instant(item['scout']['game']['kickoff_utc']))
-    from plug_ats_select import decorate_dashboard
+    from plug_ats_v5_weekly import decorate_dashboard
     from plug_ou_weekly_v3 import read_effective as read_plug_ou
     from plug_ou_receipts import grade as grade_plug_ou
     sections=decorate_dashboard(sections, now)

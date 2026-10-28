@@ -419,7 +419,7 @@ def matchup_prediction(game_id, version=None):
     except (OSError,ValueError,TypeError,KeyError):
         item['plug_ou_review']=True
     if version is None:
-        from plug_ats_select import for_game
+        from plug_ats_v5_weekly import for_game
         decision = for_game(game_id)
         item['plug_ats_status'] = ('selected' if decision['selected'] else 'stay_away') if decision else 'pending'
     return item

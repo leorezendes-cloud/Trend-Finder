@@ -83,6 +83,52 @@ demonstrated to produce a positive betting edge: research on reconstruction
 disagreements is exploratory. Prospective outcomes must be measured before
 making any success claims or tuning the rule.
 
+## The Plug ATS independent market-model v5 (prospective v2)
+
+This is a **new independent policy**, separate from Scout 4.0's all-game
+forecast, The Plug's original points-only ATS prediction, and The Plug O/U v14.
+The original top-quarter ATS publication remains immutable under
+`/var/data/plug_ats_selections/*_plug-ats-top-quarter-v1.json` and retains its
+original results. The v5 ATS policy does **not** edit those receipts.
+
+The original independent **spread reconstruction v5**, reproduced from the
+2026-10-27 frozen market-model research, predicts *away-team spread* using
+older seasons' bookmaker spreads as regression labels; the current game's
+market spread is never a feature. Its Elo, scoring, opponent adjustment,
+prior-year team-strength and prior-known QB proxy features can only use
+games from earlier weeks. Fitting for season Y uses 2016 through Y-1.
+
+A game receives a **Plug ATS selected** recommendation exactly when:
+
+- The frozen bookmaker's **absolute away spread exceeds 7.0** (strictly).
+- The absolute independent **v5 projected away spread minus that exact
+  frozen line is strictly greater than 0 and strictly less than 1 point**.
+- The sign gives v5's ATS side: v5 away spread below the market away
+  spread selects the away team; above selects the home team.
+- Zero gap, exactly one-point gap, exactly seven-point favorites, missing
+  evidence, or nonfinite inputs are **Stay Away**. No top-quarter quota,
+  ranking or forced picks. It may select zero or many games.
+
+Before publishing, the worker requires **every** scheduled game in the
+regular-season week, a matching immutable approved points-only pregame
+forecast for each game, and the original sealed spread quote observed
+before issuance. It stops entirely for partial slates or if any game
+has already kicked off. A separate v2 weekly receipt is first-written to
+`/var/data/plug_ats_selections/YYYY_WW_plug-ats-independent-v5-favorite-near-market-v2.json`
+with immutable game IDs, original quote lines, source hashes, saved v5
+predictions, selection flags and actual publication time.
+
+The public pages read-only show the v2 policy when it exists; they do not
+create either v1 or v2 on a page request. The existing published v1 record
+is used for historical weeks without a v2 receipt, while all existing
+v1 files remain intact. Live historical grades are calculated against
+the original receipt's saved line, not a refreshed market line.
+An absent prospective v2 means **Awaiting weekly picks**, not a fictional
+Stay Away or retroactively inferred pick.
+
+The original research outcome is retrospective, was examined during
+development, and cannot establish forward-looking profitability.
+
 ## Weekly page score freshness
 
 The weekly results page uses the shared cached ESPN scoreboard for provider-confirmed finals while the dual-source canonical CSV update catches up. Only completed postgame events with exact team identities and scheduled kickoff matches are eligible. Invalid or conflicting scores are rejected and existing saved finals take precedence. The overlay is read-only, clearly labeled, and all ATS/total grades continue to use the original frozen prediction lines. Refreshing the weekly page checks the shared feed cache (normally 60 seconds after games finish). The canonical update and persistent model record workflows remain unchanged.
