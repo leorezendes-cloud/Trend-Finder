@@ -42,3 +42,12 @@
 
 /* The Plug keeps the money-green visual identity; Scout remains neutral. */
 .expert-shell .plug-ou-selection{color:#4ade80;font-weight:700}
+
+/* One clear top-picks group; muted labels never compete with active picks. */
+.expert-shell .expert-card .plug-pick-summary{margin:10px 0 14px}
+.expert-shell .expert-card .plug-top-picks{border-left:3px solid #4ade80;padding:5px 0 5px 11px;margin:8px 0}
+.expert-shell .expert-card .plug-top-picks h3{font-size:.96rem;line-height:1.3;margin:0 0 5px;color:#4ade80;font-weight:800}
+.expert-shell .expert-card .plug-top-picks p{font-size:.95rem;line-height:1.35;color:#4ade80;font-weight:700;margin:3px 0}
+.expert-shell .expert-card .plug-top-picks p strong{display:inline-block;min-width:34px}
+.expert-shell .expert-card .plug-market-muted{font-size:.79rem;line-height:1.35;color:#9ca3af;font-weight:400;margin:4px 0}
+.expert-shell .expert-card .plug-market-pending{font-size:.79rem;line-height:1.35;color:#aeb7c6;font-weight:400;margin:4px 0}
