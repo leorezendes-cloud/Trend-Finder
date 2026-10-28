@@ -170,6 +170,9 @@ def combined_cards(records, render_record, now):
         for item in items.values()) else {}
     for item in items.values():
         game = item['scout']['game']
+        backup_sources = [s for s in item['scout'].get('sources', [])
+                          if s.get('url', '').startswith('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?')]
+        item['backup_odds_capture'] = max((s['observed_at'] for s in backup_sources), default=None)
         _attach_final(item, completed.get(game['game_id']))
         future = instant(game['kickoff_utc']) > now
         item['upcoming'] = future
