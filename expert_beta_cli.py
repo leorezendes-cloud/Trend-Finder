@@ -108,10 +108,10 @@ def draft(root, version, approved=False, model=None, provider_name="openai"):
             json.dump({'version':version,'started_at':clock().isoformat(),'model':provider.model,'provider':provider_name},stream)
     # Keep Expert's analysis independent while showing the issued final Plug
     # O/U selection when it belongs to precisely this archived Scout source.
-    from plug_ou_receipts import read as read_plug_ou
+    from plug_ou_weekly import read_effective as read_plug_ou
     scout=rows[0]['scout']
     plug_ou=read_plug_ou(Path(__file__).resolve().parent,scout['game']['game_id'])
-    if plug_ou and plug_ou['source_sha256']!=scout.get('production_source',{}).get('source_sha256'):
+    if plug_ou and (not plug_ou['selected'] or plug_ou['source_sha256']!=scout.get('production_source',{}).get('source_sha256')):
         plug_ou=None
     result = generate_draft(scout,provider,plug_ou=plug_ou)
     path = folder/(version+'.json')
