@@ -14,5 +14,5 @@
 <p><strong>Straight Up:</strong> {% if prediction.away_margin %}{{ game.away_team if prediction.away_margin>0 else game.home_team }} by {{ prediction.away_margin|abs|stat }} points{% else %}Even{% endif %}</p>
 <p><strong>Over/Under:</strong> {% if forecast.totals and forecast.totals.prediction.lean %}{{ forecast.totals.prediction.lean }} {{ '%g'|format(forecast.totals.quote.line|float) }}{% else %}Forecast pending{% endif %}</p>
 {% else %}<p>Scout forecast pending</p>{% endif %}
-{% if prediction_item and prediction_item.plug_ou_pick is defined and prediction_item.plug_ou_pick %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> {{ prediction_item.plug_ou_pick }}</p>{% endif %}
+{% if prediction_item and prediction_item.plug_ou_status is defined and prediction_item.plug_ou_status == 'stay_away' %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> Stay Away</p>{% elif prediction_item and prediction_item.plug_ou_pick is defined and prediction_item.plug_ou_pick %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> {{ prediction_item.plug_ou_pick }}</p>{% endif %}
 </div>{{ expert_panel(prediction_item, comparison=true) }}</div>
