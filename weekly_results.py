@@ -138,9 +138,26 @@ def build_results(root,week=None,score_updates=None):
     item.update(plug_status='review',plug_pick=None,plug_result=None)
    else:
     item.update(plug_status='not_issued',plug_pick=None,plug_result=None)
+  # The Plug O/U has its own immutable decision and frozen line.
+  from plug_ou_receipts import read as read_plug_ou, grade as grade_plug_ou
+  item['plug_ou_pick']=None
+  item['plug_ou_result']=None
+  if record:
+   try:
+    receipt=read_plug_ou(root,g['game_id'])
+    if receipt and receipt['source_sha256']==record.get('_history_digest'):
+     item['plug_ou_pick']=f"{receipt['side']} {receipt['market_total']:g}"
+     item['plug_ou_result']=grade_plug_ou(
+      receipt,g.get('away_score') if final else None,
+      g.get('home_score') if final else None)
+   except (OSError,ValueError,TypeError,KeyError):
+    item['plug_ou_result']='Review needed'
   games.append(item)
+ plug_ou_tally={key:sum(g['plug_ou_pick'] and g['plug_ou_result']==key for g in games)
+                for key in ('Win','Loss','Push','Pending')}
+ plug_ou_tally['selected']=sum(bool(g['plug_ou_pick']) for g in games)
  plug_tally={k:sum(r['plug_status']=='selected' and r['plug_result']==k for r in games) for k in ('Win','Loss','Push','Pending')}
  plug_tally['selected']=sum(r['plug_status']=='selected' for r in games)
  tally=dict(covers=sum(g['ats_result']=='Cover' for g in games),losses=sum(g['ats_result']=='Loss' for g in games),pushes=sum(g['ats_result']=='Push' for g in games),correct=sum(g['scout_result']=='Correct' for g in games),wrong=sum(g['scout_result']=='Wrong' for g in games),pick_pushes=sum(g['scout_result']=='Push' for g in games),finals=sum(g['game_status']=='Final' for g in games),games=len(games))
  tally.update(total_correct=sum(g['total_result']=='Correct' for g in games),total_wrong=sum(g['total_result']=='Wrong' for g in games),total_pushes=sum(g['total_result']=='Push' for g in games))
- return dict(plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
