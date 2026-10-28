@@ -39,3 +39,6 @@
 .plug-grade-push { color:#fbbf24; }
 
 .expert-score.plug-completed-projection { font-size:.9rem; font-weight:400; color:#cbd5e1; margin:8px 0; }
+
+/* Plug decisions use the established money-green palette. */
+.expert-shell .plug-ou-selection{color:#4ade80;font-weight:700}
