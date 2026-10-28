@@ -143,9 +143,12 @@ def build_results(root,week=None,score_updates=None):
   from plug_ou_receipts import grade as grade_plug_ou
   item['plug_ou_pick']=None
   item['plug_ou_result']=None
+  item['plug_ou_status']=None
   if record:
    try:
     receipt=read_plug_ou(root,g['game_id'])
+    if receipt:
+     item['plug_ou_status']=receipt['selection_status']
     if receipt and receipt['selected'] and receipt['source_sha256']==record.get('_history_digest'):
      item['plug_ou_pick']=f"{receipt['side']} {receipt['market_total']:g}"
      item['plug_ou_result']=grade_plug_ou(
