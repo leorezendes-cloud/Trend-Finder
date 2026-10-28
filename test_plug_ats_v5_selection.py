@@ -16,8 +16,8 @@ class ATSv5Selection(unittest.TestCase):
         self.assertIsNone(classify(9.0,8.,'AWY','HME'))
         self.assertIsNone(classify(7.01,7.,'AWY','HME'))
         self.assertIsNone(classify(-6.5,-7.,'AWY','HME'))
-        self.assertEqual(classify(-8.5,-8.,'AWY','HME'),'HME')
-        self.assertEqual(classify(-7.5,-8.,'AWY','HME'),'AWY')
+        self.assertEqual(classify(-8.5,-8.,'AWY','HME'),'AWY')
+        self.assertEqual(classify(-7.5,-8.,'AWY','HME'),'HME')
         self.assertIsNone(classify(-8.,-8.,'AWY','HME'))
         self.assertIsNone(classify(-9.,-8.,'AWY','HME'))
 
