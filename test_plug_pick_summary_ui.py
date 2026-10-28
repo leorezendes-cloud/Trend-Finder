@@ -21,7 +21,7 @@ def render_status(*,ats='stay_away',ou='stay_away',ats_side='CIN',ats_line=-2,ou
 class PlugTopPicksPresentationTests(unittest.TestCase):
     def test_both_selected_share_one_heading_and_exact_lines(self):
         html=render_status(ats='selected',ou='selected')
-        self.assertEqual(html.count("The Plug&#39;s Top Picks:"),1)
+        self.assertEqual(html.count("The Plug\'s Top Picks:"),1)
         self.assertIn('ATS</strong> – (CIN -2)',html)
         self.assertIn('O/U</strong> – (Over 49)',html)
         self.assertNotIn('Stay Away',html)
@@ -30,7 +30,7 @@ class PlugTopPicksPresentationTests(unittest.TestCase):
         html=render_status(ats='selected',ou='stay_away',ats_side='BAL',ats_line=-2)
         self.assertIn('ATS</strong> – (BAL +2)',html)
         self.assertIn('Plug O/U: Stay Away',html)
-        self.assertEqual(html.count("The Plug&#39;s Top Picks:"),1)
+        self.assertEqual(html.count("The Plug\'s Top Picks:"),1)
 
     def test_only_total_selected(self):
         html=render_status(ats='stay_away',ou='selected')
