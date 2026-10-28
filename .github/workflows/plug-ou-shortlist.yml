@@ -31,6 +31,10 @@ jobs:
           python -m compileall -q plug_ou_shortlist.py plug_ou_weekly.py plug_ou_receipts.py plug_dashboard.py fan_views.py expert_beta.py expert_beta_cli.py weekly_results.py hosted_updates.py
       - name: Regression tests for no-hindsight selection
         run: python -m unittest test_plug_ou_weekly test_plug_ou_receipts test_plug_totals_policy test_plug_v14_model -v
+      - name: Install full application dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify dashboard, Expert, records, predictions and hosted worker integration
+        run: python -m unittest test_plug_dashboard test_expert_editorial test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates -q
       - name: Jinja2 syntax validation of all affected templates
         run: |
           python - <<'PY'
