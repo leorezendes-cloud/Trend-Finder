@@ -402,6 +402,7 @@ def run_leader(root, stop):
     jobs = (
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
+        ('plug-ou-qualifiers', lambda: run_worker('plug_ou_weekly_v3.py', ['--once'], 90), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
         ('automatic-weekly-lines', weekly, 30),
         ('automatic-data-updates', scout, 21600),
