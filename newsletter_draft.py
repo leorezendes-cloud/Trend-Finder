@@ -241,8 +241,14 @@ def _trend_copy(trend):
         else:
             detail = f'The {name} {verb_phrase.replace("has ", "have ", 1)}.'
     elif scope == 'qb':
-        detail = (f'In games featuring {name}, the quarterback’s team {verb_phrase}.' if kind != 'total'
-                  else f'Games featuring {name} {verb_phrase.replace("has ", "have ", 1)}.')
+        if kind == 'su':
+            action = 'won' if outcome == 'Win' else 'lost'
+            detail = (f'{name} has {action} {count} straight starts.' if long_streak
+                      else f'{name} has {action} {hits} of his last {sample} starts.')
+        elif kind == 'ats':
+            detail = f'{name} {verb_phrase.replace("games", "starts")}.'
+        else:
+            detail = f'{name} {verb_phrase}.'
     else:
         # Situational subjects can include location and favorite/underdog filters.
         label_text = subject.lower()
@@ -651,26 +657,28 @@ def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
         margin = abs(away - home)
         total = away + home
 
+        away_name = _NEWSLETTER_TEAMS.get(row['away_team'], row['away_team'])
+        home_name = _NEWSLETTER_TEAMS.get(row['home_team'], row['home_team'])
+        winner = away_name if away > home else home_name
+        loser = home_name if away > home else away_name
+        winner_score, loser_score = max(away, home), min(away, home)
         if margin == 0:
-            detail = f"The teams finished tied with {total:g} combined points."
+            detail = (f'Neither {away_name} nor {home_name} could break the deadlock '
+                      f'in a {away:g}–{home:g} tie.')
+        elif total >= 65 and margin <= 8:
+            detail = (f'{winner} edged {loser} {winner_score:g}–{loser_score:g} '
+                      f'in a {total:g}-point shootout.')
         elif margin <= 3:
-            unit = "point" if margin == 1 else "points"
-            detail = (
-                f"Just {margin:g} {unit} separated these teams "
-                f"in a game featuring {total:g} combined points."
-            )
+            detail = (f'{winner} narrowly beat {loser} {winner_score:g}–{loser_score:g} '
+                      f'in one of the month’s closest finishes.')
         elif margin <= 8:
-            detail = (
-                f"A one-possession result featuring "
-                f"{total:g} combined points."
-            )
+            detail = (f'{winner} got past {loser} {winner_score:g}–{loser_score:g} '
+                      f'in a one-possession game.')
         else:
-            detail = (
-                f"A high-scoring matchup with {total:g} combined points "
-                f"and a {margin:g}-point margin."
-            )
+            detail = (f'{winner} beat {loser} {winner_score:g}–{loser_score:g} '
+                      f'as the teams combined for {total:g} points.')
 
-        label = "GAME OF THE MONTH" if rank == 1 else f"FEATURED GAME {rank}"
+        label = "TOP GAME" if rank == 1 else f"ALSO FEATURED {rank - 1}"
         heading = (
             f"{label} · {gameday.strftime('%b %d')}: "
             f"{row['away_team']} {away:g} – "
