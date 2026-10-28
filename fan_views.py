@@ -593,6 +593,7 @@ def prediction_results():
     from plug_ou_receipts import grade as grade_plug_ou
     by_game={g['game_id']:g for g in schedule}
     plug_ou_week_picks=[]
+    plug_ou_legacy_picks=[]
     plug_ou_review=False
     for record in selected_records:
         try:
@@ -600,11 +601,13 @@ def prediction_results():
             if not receipt or not receipt['selected'] or receipt['source_sha256']!=record.get('_history_digest'):
                 continue
             game=by_game.get(record['game_id'],{})
-            plug_ou_week_picks.append({**receipt,
+            target = plug_ou_legacy_picks if receipt['selection_status']=='legacy_v1' else plug_ou_week_picks
+            target.append({**receipt,
                 'result':grade_plug_ou(receipt,game.get('away_score'),game.get('home_score'))})
         except (OSError,ValueError,TypeError,KeyError):
             plug_ou_review=True
     plug_ou_week_picks.sort(key=lambda r:(r['kickoff_utc'],r['game_id']))
+    plug_ou_legacy_picks.sort(key=lambda r:(r['kickoff_utc'],r['game_id']))
     plug_ou_week_totals={k:sum(r['result']==k for r in plug_ou_week_picks)
                          for k in ('Win','Loss','Push','Pending')}
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
@@ -616,5 +619,6 @@ def prediction_results():
                            plug_season_totals=plug_seasons.get(season, {}),
                            plug_receipts_review=plug_receipts_review,
                            plug_ou_week_picks=plug_ou_week_picks,
+                           plug_ou_legacy_picks=plug_ou_legacy_picks,
                            plug_ou_week_totals=plug_ou_week_totals,
                            plug_ou_review=plug_ou_review)
