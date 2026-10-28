@@ -50,6 +50,39 @@ context, without changing the immutable Scout source or forcing agreement.
 Earlier Expert reports remain archived unchanged. Any missing/corrupt
 receipt is not reconstructed from hindsight.
 
+## Plug O/U selective shortlist (v2, prospective only)
+
+Version 1 generated an independent **direction** for each eligible game, not a
+selection shortlist. Its immutable per-game receipts remain in their original
+location and are never rewritten or retroactively converted to Stay Away.
+
+Version 2 uses a *separate* immutable weekly receipt at
+`data/scout4/blend/plug_ou/weekly_v2/YYYY_WW.json`. The hosted update worker
+waits until every scheduled regular-season game in that week has its own
+verified v1 receipt, and the earliest kickoff is still in the future.
+Only then can it freeze and publish one whole-week selection:
+
+- Candidate games have an originally sealed total of at least 48 with a
+  nonzero independent v14-minus-market gap; below-48 Scout fallbacks and
+  exact ties are automatically Stay Away.
+- Rank candidates by descending **absolute** saved v14-versus-market gap;
+  tie-break using ascending game ID. Select at most
+  `ceil(number_of_candidates / 4)`. All others are **Stay Away**.
+- The v1 record fixes the selected Over/Under **direction**, frozen line and
+  quote. V2 determines shortlist **membership** only; it never reissues or
+  changes Scout, Plug v1, or Expert records.
+- The selected count and grades are official only for v2 prospective shortlists.
+  Original all-game v1 picks remain viewable as a separately labeled legacy
+  cohort, not silently added to the new selective record.
+- Partial slates, missing v14 signals, or a kickoff already underway never
+  produce a retroactive v2 shortlist. A corrupt or conflicting receipt fails
+  closed instead of regenerating it.
+
+The top-quarter budget intentionally parallels Plug ATS. It has **not** been
+demonstrated to produce a positive betting edge: research on reconstruction
+disagreements is exploratory. Prospective outcomes must be measured before
+making any success claims or tuning the rule.
+
 ## Weekly page score freshness
 
 The weekly results page uses the shared cached ESPN scoreboard for provider-confirmed finals while the dual-source canonical CSV update catches up. Only completed postgame events with exact team identities and scheduled kickoff matches are eligible. Invalid or conflicting scores are rejected and existing saved finals take precedence. The overlay is read-only, clearly labeled, and all ATS/total grades continue to use the original frozen prediction lines. Refreshing the weekly page checks the shared feed cache (normally 60 seconds after games finish). The canonical update and persistent model record workflows remain unchanged.
