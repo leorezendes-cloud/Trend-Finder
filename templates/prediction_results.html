@@ -54,7 +54,7 @@
   </tbody></table></div>
 </section>
 <section class="stats-card tf-record-table-card" aria-labelledby="plug-ou-table-heading">
-  <div class="tf-record-table-heading"><h2 id="plug-ou-table-heading" class="tf-plug-ou">The Plug O/U Picks</h2><small>Independently issued selections</small></div>
+  <div class="tf-record-table-heading"><h2 id="plug-ou-table-heading" class="tf-plug-ou">The Plug O/U Shortlist</h2><small>Only selected games · v2 policy</small></div>
   <div class="table-scroll"><table><thead><tr><th>Game</th><th>O/U Pick</th><th>Result</th><th>Issued</th></tr></thead><tbody>
   {% for r in plug_ou_week_picks %}
   <tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
@@ -64,6 +64,17 @@
   {% else %}<tr><td colspan="4">{{ 'Receipt needs review' if plug_ou_review else 'No separate O/U picks issued for this week' }}</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
+{% if plug_ou_legacy_picks %}
+<details class="tf-record-history"><summary>Previously issued O/U picks · original all-game v1 policy ({{ plug_ou_legacy_picks|length }})</summary>
+  <p>These predate the selective Plug O/U shortlist. Their original selections remain on file and are excluded from the new shortlist record.</p>
+  <div class="table-scroll"><table><thead><tr><th>Game</th><th>Original Pick</th><th>Result</th><th>Issued</th></tr></thead><tbody>
+  {% for r in plug_ou_legacy_picks %}
+  <tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
+      <td>{{ r.side }} {{ '%g'|format(r.market_total) }}</td><td>{{ r.result }}</td>
+      <td>{{ r.issued_at_utc|eastern_time }}</td></tr>
+  {% endfor %}</tbody></table></div>
+</details>
+{% endif %}
 <details class="tf-record-history"><summary>Season &amp; historical results</summary>
   <div class="tf-record-history-content">
     {% if plug_season_totals %}<p><strong>The Plug {{ season }} issued:</strong> {{ plug_season_totals.get('Win',0) }}–{{ plug_season_totals.get('Loss',0) }}–{{ plug_season_totals.get('Push',0) }}</p>{% endif %}
