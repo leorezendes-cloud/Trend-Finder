@@ -139,13 +139,14 @@ def build_results(root,week=None,score_updates=None):
    else:
     item.update(plug_status='not_issued',plug_pick=None,plug_result=None)
   # The Plug O/U has its own immutable decision and frozen line.
-  from plug_ou_receipts import read as read_plug_ou, grade as grade_plug_ou
+  from plug_ou_weekly import read_effective as read_plug_ou
+  from plug_ou_receipts import grade as grade_plug_ou
   item['plug_ou_pick']=None
   item['plug_ou_result']=None
   if record:
    try:
     receipt=read_plug_ou(root,g['game_id'])
-    if receipt and receipt['source_sha256']==record.get('_history_digest'):
+    if receipt and receipt['selected'] and receipt['source_sha256']==record.get('_history_digest'):
      item['plug_ou_pick']=f"{receipt['side']} {receipt['market_total']:g}"
      item['plug_ou_result']=grade_plug_ou(
       receipt,g.get('away_score') if final else None,
