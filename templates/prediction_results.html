@@ -2,7 +2,7 @@
 {% block title %}Scout &amp; The Plug Records{% endblock %}
 {% block heading %}Scout &amp; The Plug{% endblock %}
 {% block filter_form %}{% endblock %}
-{% block intro %}<p class="tf-record-intro">Scout predicts every game. The Plug chooses ATS picks. The Expert adds matchup analysis.</p>{% endblock %}
+{% block intro %}<p class="tf-record-intro">Scout makes its forecasts. The Plug selects its picks. The Expert provides independent matchup analysis.</p>{% endblock %}
 {% block data_notes %}{% endblock %}
 {% block content %}
 {% set record_page='records' %}{% include '_record_navigation.html' %}
@@ -23,33 +23,33 @@
     <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · All-game picks</p>
   </section>
   <section class="stats-card tf-record-card" id="plug-record" aria-labelledby="plug-heading">
-    <div class="tf-record-card-head"><h2 id="plug-heading">The Plug</h2><span>ATS picks</span></div>
+    <div class="tf-record-card-head"><h2 id="plug-heading">The Plug</h2><span>Selections</span></div>
     <div class="tf-record-score"><div><small>ATS</small><strong>{% if plug_receipts_review %}Review{% else %}{{ plug_week_totals.Win }}–{{ plug_week_totals.Loss }}–{{ plug_week_totals.Push }}{% endif %}</strong></div>
-      <div><small>Selected</small><strong>{{ plug_week_picks|length }}</strong></div></div>
+      <div><small>O/U</small><strong class="tf-plug-green">{% if plug_ou_week_totals is defined and plug_ou_week_totals.selected %}{{ plug_ou_week_totals.Win }}–{{ plug_ou_week_totals.Loss }}–{{ plug_ou_week_totals.Push }}{% else %}—{% endif %}</strong></div></div>
     <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · {% if plug_receipts_review %}Results unavailable{% elif plug_week_picks %}{{ plug_week_totals.Pending }} pending{% else %}No picks issued{% endif %}</p>
     <p class="tf-record-history-pill">2026 Weeks 4–6 · <strong>9–2–1</strong> historical</p>
   </section>
 </div>
 <section class="stats-card tf-record-table-card" aria-labelledby="scout-table-heading">
   <div class="tf-record-table-heading"><h2 id="scout-table-heading">Scout Picks</h2><small>ATS · O/U</small></div>
-  <div class="table-scroll"><table><thead><tr><th>Game</th><th>ATS Pick</th><th>ATS Result</th><th>O/U Result</th></tr></thead><tbody>
+  <div class="table-scroll"><table><thead><tr><th>Game</th><th>ATS Pick</th><th>ATS Result</th><th>Scout O/U Pick</th><th>O/U Result</th></tr></thead><tbody>
   {% for row in recent %}<tr>
     <td><a href="{{ url_for('fans.matchup',game_id=row.id,forecast=row.forecast_digest) }}">{{ row.away }} @ {{ row.home }}</a></td>
     <td>{{ row.pick or '—' }}{% if row.pick %} {{ '%+g'|format(row.line) }}{% endif %}</td>
     <td><strong class="tf-record-grade tf-record-grade-{{ row.ats|lower|replace(' ','-') }}">{{ '—' if row.ats=='No Call' else row.ats }}</strong></td>
-    <td><strong class="tf-record-grade tf-record-grade-{{ row.total|lower|replace(' ','-') }}">{{ '—' if row.total=='No Call' else row.total }}</strong></td>
-  </tr>{% else %}<tr><td colspan="4">No saved picks for this week.</td></tr>{% endfor %}
+    <td>{{ row.total_pick if row.total_pick is defined and row.total_pick else '—' }}</td><td><strong class="tf-record-grade tf-record-grade-{{ row.total|lower|replace(' ','-') }}">{{ '—' if row.total=='No Call' else row.total }}</strong></td>
+  </tr>{% else %}<tr><td colspan="5">No saved picks for this week.</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 <section class="stats-card tf-record-table-card" aria-labelledby="plug-table-heading">
-  <div class="tf-record-table-heading"><h2 id="plug-table-heading">The Plug Picks</h2><small>ATS only</small></div>
-  <div class="table-scroll"><table><thead><tr><th>Game</th><th>ATS Pick</th><th>ATS Result</th><th>Issued</th></tr></thead><tbody>
+  <div class="tf-record-table-heading"><h2 id="plug-table-heading">The Plug Picks</h2><small>ATS · O/U</small></div>
+  <div class="table-scroll"><table><thead><tr><th>Game</th><th>ATS Pick</th><th>ATS Result</th><th>Plug O/U</th><th>O/U Result</th><th>Issued</th></tr></thead><tbody>
   {% for r in plug_week_picks %}<tr>
     <td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
     <td>{{ r.side }} {{ '%+g'|format((r.away_line if r.side==r.away_team else -r.away_line)|float) }}</td>
     <td><strong class="tf-record-grade tf-record-grade-{{ r.result|lower }}">{{ r.result }}</strong></td>
-    <td>{{ r.issued_at_utc|eastern_time }}</td>
-  </tr>{% else %}<tr><td colspan="4">{{ 'Record needs review.' if plug_receipts_review else 'No picks issued for this week.' }}</td></tr>{% endfor %}
+    <td class="tf-plug-green">{{ r.ou_side if r.ou_side is defined else '—' }}</td><td>{{ r.ou_result if r.ou_result is defined else '—' }}</td><td>{{ r.issued_at_utc|eastern_time }}</td>
+  </tr>{% else %}<tr><td colspan="6">{{ 'Record needs review.' if plug_receipts_review else 'No picks issued for this week.' }}</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 <details class="tf-record-history"><summary>Season &amp; historical results</summary>
