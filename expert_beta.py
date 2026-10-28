@@ -391,6 +391,13 @@ def matchup_prediction(game_id, version=None):
     item['saved_at'] = record['scout']['cutoff_utc']
     game = record['scout']['game']
     item['prediction_margin'] = record['scout']['scores'][game['away_team']] - record['scout']['scores'][game['home_team']]
+    from plug_ou_receipts import read as plug_ou_read
+    try:
+        issued=plug_ou_read(Path(__file__).resolve().parent,game_id)
+        if issued and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
+            item['plug_ou_pick']=f"{issued['side']} {issued['market_total']:g}"
+    except (OSError,ValueError,TypeError,KeyError):
+        item['plug_ou_review']=True
     if version is None:
         from plug_ats_select import for_game
         decision = for_game(game_id)
