@@ -2,16 +2,17 @@
 {% block content %}
 {% set record_page='plug' %}{% include '_record_navigation.html' %}
 <section class="stats-card matchup-panel">
-<h2>The Plug · Selected ATS Record</h2>
-<p>Official selections are issued from the complete weekly slate before the first kickoff; saved selections and spreads remain fixed. Scout still forecasts every game, and over/under stays separate.</p>
+<h2>The Plug · Performance</h2>
+<p>Scout and The Plug keep separate records. The Plug's ATS and O/U results appear here as their picks are issued and graded.</p>
 {% for year, totals in seasons.items() %}<p><strong>{{ year }} issued picks:</strong> {{ totals.get('Win',0) }}–{{ totals.get('Loss',0) }}–{{ totals.get('Push',0) }} · {{ totals.get('Pending',0) }} pending</p>
 {% else %}<p>First prospective Plug shortlist has not been issued yet. It will be published when the complete weekly pregame Scout slate is available.</p>{% endfor %}
-<p><strong>2026 Weeks 4–6 research shortlist: 9–2–1 ATS.</strong> The same top-quarter rule was replayed against saved pregame forecasts. These games are included in historical research, not presented as originally published prospective picks.</p>
-<details><summary>Older-season research results</summary>
-<p>2024: <strong>24–32</strong> ATS; 2025: <strong>27–29</strong> ATS. Research replays only, separate from official live record.</p>
+<details><summary>Earlier ATS performance</summary><p>2026 Weeks 4–6: 9–2–1 ATS in historical replays.</p></details>
+<details><summary>Older-season comparisons</summary>
+<p>2024: <strong>24–32</strong> ATS; 2025: <strong>27–29</strong> ATS. Historical comparisons, not issued picks.</p>
 </details>
 </section>
-<section class="stats-card matchup-panel"><h2>Issued ATS picks</h2><div class="table-scroll"><table><thead><tr><th>Game</th><th>Pick</th><th>Edge</th><th>Result</th><th>Issued</th></tr></thead><tbody>
+<section class="stats-card matchup-panel"><h2>The Plug · Over/Under</h2><p class="tf-plug-green">Separate O/U selections and results will appear here once issued.</p></section>
+<section class="stats-card matchup-panel"><h2>ATS Selections</h2><div class="table-scroll"><table><thead><tr><th>Game</th><th>Pick</th><th>Edge</th><th>Result</th><th>Issued</th></tr></thead><tbody>
 {% for r in picks %}<tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
 <td>{{ r.side }} {{ '%+g'|format((r.away_line if r.side==r.away_team else -r.away_line)|float) }}</td>
 <td>{{ '%.1f'|format(r.edge|abs) }}</td><td><strong class="plug-grade-{{ r.result|lower }}">{{ r.result }}</strong></td><td>{{ r.issued_at_utc|eastern_time }}</td></tr>
