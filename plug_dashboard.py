@@ -252,7 +252,7 @@ def weekly_dashboard(records, render_record, now):
     for key in ('games','underway_games','completed_games','awaiting_games'):
         sections[key].sort(key=lambda item:instant(item['scout']['game']['kickoff_utc']))
     from plug_ats_select import decorate_dashboard
-    from plug_ou_weekly import read_effective as read_plug_ou
+    from plug_ou_weekly_v3 import read_effective as read_plug_ou
     from plug_ou_receipts import grade as grade_plug_ou
     sections=decorate_dashboard(sections, now)
     for group in ('games','underway_games','completed_games','awaiting_games','historical_games'):
@@ -266,7 +266,7 @@ def weekly_dashboard(records, render_record, now):
             if receipt is None:
                 continue
             item['plug_ou_status']=receipt['selection_status']
-            item['plug_ou_legacy']=receipt['selection_status']=='legacy_v1'
+            item['plug_ou_legacy']=False
             item['plug_ou_receipt']=receipt
             if not receipt['selected']:
                 # V14 still generated a direction; it is not an issued shortlist pick.
