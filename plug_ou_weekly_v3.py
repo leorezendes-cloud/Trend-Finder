@@ -173,3 +173,11 @@ def issue_weekly(root,*,now=None):
         report['published']+=1
         report['selected']+=len(reread['selected_ids'])
     return report
+
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description='Issue prospective immutable Plug O/U v3 shortlist, if complete')
+    parser.add_argument('--once',action='store_true')
+    parser.add_argument('--root',default=str(Path('/var/data/site-data') if Path('/var/data/site-data').exists() else Path(__file__).resolve().parent))
+    args=parser.parse_args()
+    print(json.dumps(issue_weekly(Path(args.root)),sort_keys=True))
