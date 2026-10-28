@@ -626,7 +626,7 @@ def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
                f"?at={int(now.timestamp())}")
     next_first = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
     through = min(local.date(), next_first - timedelta(days=1))
-    lines = [f"{first.strftime('%B %Y')} · {len(completed)} completed NFL games recorded through {through.strftime('%b %d')}.\n{archive}"]
+    lines = []
 
     # Rank only verified completed games. Final scores establish closeness
     # and total scoring, not overtime, comebacks, or late-game heroics.
@@ -678,9 +678,9 @@ def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
             detail = (f'{winner} beat {loser} {winner_score:g}–{loser_score:g} '
                       f'as the teams combined for {total:g} points.')
 
-        label = "TOP GAME" if rank == 1 else f"ALSO FEATURED {rank - 1}"
+        prefix = "TOP GAME · " if rank == 1 else ""
         heading = (
-            f"{label} · {gameday.strftime('%b %d')}: "
+            f"{prefix}{gameday.strftime('%b %d')}: "
             f"{row['away_team']} {away:g} – "
             f"{row['home_team']} {home:g}"
         )
@@ -694,6 +694,12 @@ def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
             "No qualifying close or high-scoring finishes "
             "have been recorded yet this month."
         )
+
+    # Place the full monthly results after the highlighted matchups.
+    lines.append(
+        f"{first.strftime('%B %Y')} · {len(completed)} completed NFL games "
+        f"recorded through {through.strftime('%b %d')}.\n{archive}"
+    )
 
     return '\n\n'.join(lines)
 
