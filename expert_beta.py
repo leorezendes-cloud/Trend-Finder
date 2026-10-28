@@ -340,6 +340,13 @@ def public_record(record, detail=False):
               'expert_picks': {key: expert.get(key) for key in ('ats_side','total_side')} if expert else None,
               'assessment': expert.get('summary') if expert else None}
     if detail:
+        from plug_ou_receipts import read as read_plug_ou
+        try:
+            issued=read_plug_ou(Path(__file__).resolve().parent,scout['game']['game_id'])
+            if issued and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
+                result['plug_ou_pick']=f"{issued['side']} {issued['market_total']:g}"
+        except (OSError,ValueError,TypeError,KeyError):
+            result['plug_ou_review']=True
         result['original_scout'] = record['scout']
         from plug_line_movement import compare_line
         result['line_movement'] = compare_line(record['scout'], Path(__file__).resolve().parent, clock())
