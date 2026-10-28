@@ -343,6 +343,8 @@ def public_record(record, detail=False):
         from plug_ou_weekly import read_effective as read_plug_ou
         try:
             issued=read_plug_ou(Path(__file__).resolve().parent,scout['game']['game_id'])
+            if issued:
+                result['plug_ou_status']=issued['selection_status']
             if issued and issued['selected'] and issued['source_sha256']==record['scout'].get('production_source',{}).get('source_sha256'):
                 result['plug_ou_pick']=f"{issued['side']} {issued['market_total']:g}"
         except (OSError,ValueError,TypeError,KeyError):
