@@ -78,16 +78,22 @@ def _scheduled(root,now):
         games=list(csv.DictReader(f))
     possible=defaultdict(list)
     for g in games:
-        if (g.get('game_type')!='REG' or not g.get('gameday') or
-            not g.get('gametime')):continue
-        try:
-            kick=datetime.fromisoformat(g['gameday']+'T'+g['gametime']).replace(
-                tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
-            year,week=int(g['season']),int(g['week'])
+        if g.get('game_type')!='REG':continue
+        try:year,week=int(g['season']),int(g['week'])
         except (ValueError,TypeError,KeyError):continue
-        if year>=2026 and now<kick<=now+timedelta(days=10):
-            possible[(year,week)].append((g,kick))
-    return possible
+        if year<2026:continue
+        kick=None
+        if g.get('gameday') and g.get('gametime'):
+            try:
+                kick=datetime.fromisoformat(g['gameday']+'T'+g['gametime']).replace(
+                    tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)
+            except (ValueError,TypeError):pass
+        # Include the ENTIRE scheduled week, including games already started
+        # or missing kickoff, so partial slates cannot be issued after kickoff.
+        possible[(year,week)].append((g,kick))
+    return {key:slate for key,slate in possible.items()
+            if any(kick is not None and now<kick<=now+timedelta(days=10)
+                   for _,kick in slate)}
 
 def issue_pending(root,*,now=None):
     """Once-only pregame weekly publication, worker only, never an HTTP request."""
@@ -98,7 +104,7 @@ def issue_pending(root,*,now=None):
         if previous is not None:
             report['preserved']+=1
             continue
-        if not slate or any(kick<=now for _,kick in slate):
+        if not slate or any(kick is None or kick<=now for _,kick in slate):
             report['started']+=1
             continue
         # Use only complete, verified, sealed production forecasts with the
