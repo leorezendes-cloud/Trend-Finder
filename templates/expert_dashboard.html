@@ -17,7 +17,10 @@
 {% if item.pending or item.forecast_pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% else %}
 {% if item.show_scores %}<p class="expert-score{% if item.final_score %} plug-completed-projection{% endif %}">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
 <p class="scout-picks">Scout ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>Scout O/U: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>
-<p class="plug-ou-selection{{ ' plug-upcoming-picks' if item.upcoming else '' }}"><strong>The Plug O/U:</strong> {{ item.plug_ou_pick if item.plug_ou_pick is defined and item.plug_ou_pick else '—' }}</p>
+<p class="plug-ou-selection{{ ' plug-upcoming-picks' if item.upcoming and item.plug_ou_pick is defined and item.plug_ou_pick else '' }}"><strong>The Plug O/U:</strong>
+{% if item.plug_ou_status == 'stay_away' %}Stay Away
+{% elif item.plug_ou_pick is defined and item.plug_ou_pick %}{{ item.plug_ou_pick }}{% if item.plug_ou_legacy %} <small>(original v1 pick)</small>{% endif %}
+{% else %}Awaiting weekly shortlist{% endif %}</p>
 {% if item.plug_ats_status == 'selected' %}<p class="plug-shortlist plug-shortlist-top"><strong>Plug's Top Pick</strong>{% if item.plug_ats_decision and item.plug_ats_decision.side != picks.spread.side %} · {{ item.plug_ats_decision.side }} on saved line{% endif %}</p>{% elif item.plug_ats_status == 'stay_away' %}<p class="plug-shortlist plug-shortlist-pass">The Plug: Stay Away</p>{% elif item.upcoming and item.plug_ats_status is defined %}<p class="plug-shortlist plug-shortlist-pass">The Plug: Awaiting weekly picks</p>{% endif %}
 {% endif %}
 <section class="plug-market-context">
