@@ -136,6 +136,16 @@ def issue_pending(root,*,now=None):
         if len(candidates)!=len(slate):
             report['pending']+=1
             continue
+        # An unfinished previous week means QB history and team-form
+        # features are incomplete. Do not silently fit from a partial season.
+        with (root/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as stream:
+            prior=[g for g in csv.DictReader(stream)
+                   if g.get('game_type')=='REG' and str(g.get('season'))==str(year)
+                   and g.get('week') and int(g['week'])<week]
+        if any((g.get('away_score') in ('',None) or
+                g.get('home_score') in ('',None)) for g in prior):
+            report['pending']+=1
+            continue
         try:
             pred=projections(root/'nfl_games.csv',year,week)
         except (OSError,ValueError,KeyError,TypeError):
@@ -177,7 +187,15 @@ def _older_week(year,week):
 
 def effective_week(year,week):
     updated=read_week(year,week)
-    return updated if updated is not None else _older_week(year,week)
+    if updated is not None:return updated
+    legacy=_older_week(year,week)
+    if legacy is None:return None
+    # Historical v1 receipts remain readable, but do not advertise the old
+    # top-quarter policy as this week's current v5 recommendations.
+    if all(_utc(r['kickoff_utc'])>datetime.now(timezone.utc)
+           for r in legacy['games']):
+        return None
+    return legacy
 
 def for_game(game_id):
     try:
