@@ -301,4 +301,8 @@ def weekly_dashboard(records, render_record, now):
                 except (OSError, ValueError, KeyError, TypeError):
                     # Invalid, tampered or missing journals never appear as picks.
                     continue
+    from scout_dynamic_public import attach as attach_current_scout
+    for group in ('games','underway_games','completed_games','awaiting_games','historical_games'):
+        for item in sections.get(group, []):
+            attach_current_scout(ROOT, item, now=now)
     return sections

@@ -17,6 +17,7 @@
 
 <h1>🏈 Weekly Game Results 🚂</h1>
 {% include '_plug_dynamic_record.html' %}
+{% include '_scout_dynamic_records.html' %}
 {% set record_page='weekly' %}{% include '_record_navigation.html' %}
 <p class="weekly-results-note">Final scores and independent Scout and Plug selections.</p>
 {% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
