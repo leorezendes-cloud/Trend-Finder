@@ -217,8 +217,10 @@
       {% for market in public_market.markets %}
       <div class="money-summary-item">
         <small>{{ market.label }}</small>
-        {% if market.sides %}
-          {% set leader = market.sides|max(attribute='money') %}
+        {# Price-only quotes may have sides but no public-money splits. #}
+        {% set sides_with_money = market.sides|selectattr('money', 'defined')|list %}
+        {% if market.sides|length == 2 and sides_with_money|length == 2 %}
+          {% set leader = sides_with_money|max(attribute='money') %}
           <strong>{{ leader.name }} {{ '%g'|format(leader.money) }}%</strong>
           <small>of public money</small>
         {% else %}
