@@ -68,94 +68,103 @@ def _side_label(side, quote, market):
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
-    """Read the same published card objects used by /the-plug.
+    """Newsletter selections come from the same immutable official receipts as The Plug.
 
-    Archive records must be published pregame records. Development and historical
-    reconstructions are deliberately excluded from subscriber content.
-    Gemini is included ONLY for publicly featured, approved reports: subscriber
-    emails must never depend on a premium viewer's access to a private report.
+    Expert analysis remains independent and must be approved and publicly
+    featured; owner-only/premium access never authorizes subscriber publication.
     """
+    from pathlib import Path
     try:
-        from expert_beta import store, validate_expert
+        from flask import current_app
+        from expert_beta import store, identity, validate_expert
+        from plug_ats_v5_weekly import for_game
+        from plug_ou_weekly_v3 import read_effective
         archive = store()
         records = archive.records()
+        root = Path(current_app.root_path)
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
-        warnings.append('The published Plug archive could not be read. No predictions were invented.')
+        warnings.append('Published Plug records are unavailable; no predictions were invented.')
         return [], [], []
 
-    # The dashboard replaces archive cards with legacy display objects that
-    # have no archive version. Match newsletter content to the actual published
-    # record instead, never to a transient display card.
-    records = sorted(records, key=lambda r: (r.get('generated_at', ''), r['version']), reverse=True)
-    picks, expert = [], []
-    seen = set()
-    featured_by_week = {}
+    by_game = {}
     for record in records:
-        # Only released pregame snapshots, never test/lab forecasts.
-        if record is None or record.get('kind') not in ('production_import', 'prospective'):
+        if record.get('kind') not in ('production_import', 'prospective'):
             continue
         game = record['scout']['game']
         kickoff = timestamp(game['kickoff_utc'])
-        if not now < kickoff <= now + timedelta(days=7):
+        if now < kickoff <= now + timedelta(days=7):
+            by_game.setdefault(game['game_id'], []).append(record)
+
+    picks, expert = [], []
+    for game_id, group in by_game.items():
+        group.sort(key=lambda r: (r.get('generated_at', ''), r['version']), reverse=True)
+        record = group[0]
+        game = record['scout']['game']
+        kickoff = timestamp(game['kickoff_utc'])
+        try:
+            ats = for_game(game_id)
+            ou = read_effective(root, game_id)
+        except (OSError, ValueError, KeyError, TypeError):
+            warnings.append('One official Plug receipt could not be validated.')
             continue
-        game_id = game['game_id']
-        if game_id in seen:
+        ats_selected = bool(ats and ats.get('selected'))
+        ou_selected = bool(ou and ou.get('selected'))
+        if not (ats_selected or ou_selected):
             continue
-        seen.add(game_id)
-        # Use immutable published pregame selections, not dashboard placeholders.
-        selections = record['scout']
-        ats = (selections.get('spread') or {}).get('side')
-        total = (selections.get('total') or {}).get('side')
-        if ats not in (None, game['away_team'], game['home_team']) or total not in (None, 'Over', 'Under'):
-            warnings.append('One Plug card was skipped because its published selections were invalid.')
+        ats_side = ats.get('side') if ats_selected else None
+        ou_side = ou.get('side') if ou_selected else None
+        if ats_side and ats_side not in (game['away_team'], game['home_team']):
+            warnings.append('One ATS receipt has an invalid team side.')
             continue
-        quotes = record['scout'].get('quotes') or {}
+        if ou_side and ou_side not in ('Over', 'Under'):
+            warnings.append('One O/U receipt has an invalid side.')
+            continue
+        spread_line = number(ats.get('away_line')) if ats_selected else None
+        if ats_selected and spread_line is None:
+            warnings.append('One ATS receipt has no valid published line.')
+            continue
+        ats_line = (spread_line if ats_side == game['away_team'] else -spread_line) if ats_selected else None
+        ou_line = number(ou.get('market_total')) if ou_selected else None
+        if ou_selected and ou_line is None:
+            warnings.append('One O/U receipt has no valid published line.')
+            continue
+        ats_text = f'{ats_side} {ats_line:+g}' if ats_selected else 'Stay Away'
+        ou_text = f'{ou_side} {ou_line:g}' if ou_selected else 'Stay Away'
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
-        if ats or total:
-            pick_text = (f"{label}\nATS: {_side_label(ats, quotes.get('Spread'), 'Spread')}"
-                         f" · Total: {_side_label(total, quotes.get('Total'), 'Total')}\n{url}")
-            picks.append((kickoff, pick_text, record['version']))
+        picks.append((kickoff, f'{label}\\nATS: {ats_text} · Total: {ou_text}\\n{url}', record['version']))
 
-        report = record.get('expert') or {}
-        if not report or report.get('review_status') != 'approved':
-            continue
-        key = (int(game['season']), int(game['week']))
-        if key not in featured_by_week:
-            try:
-                featured_by_week[key] = set(archive.featured(*key))
-            except (ValueError, OSError, TypeError):
-                warnings.append('Featured Expert configuration needs review; no Expert text was included.')
-                featured_by_week[key] = set()
-        identifier = f"{key[0]}/{key[1]}/{game['away_team']}-{game['home_team']}"
-        if identifier not in featured_by_week[key]:
-            continue
+        # Look across published versions of this same game for approved analysis.
+        # It must still belong to a publicly featured matchup, not private content.
         try:
-            validate_expert(report, record['scout'])
-        except (ValueError, KeyError, TypeError, AttributeError):
-            warnings.append('An Expert report failed published-review validation and was skipped.')
+            featured = set(archive.featured(int(game['season']), int(game['week'])))
+        except (OSError, ValueError, TypeError):
+            warnings.append('Featured Expert configuration needs review.')
             continue
-        summary = (report.get('summary') or '').strip()
-        if not summary:
-            summary = next((s['text'].strip() for s in report.get('sections', [])
-                            if s.get('heading') == 'The Expert’s Final Verdict' and s.get('text')), '')
-        # Keep drafts concise; owner can expand after reviewing.
-        summary = ' '.join(summary.split())
-        summary = summary[:350].rsplit(' ', 1)[0].rstrip(' ,;:') + '…' if len(summary) > 350 else summary
-        if not summary:
-            continue
-        expert_picks = (f"ATS: {report.get('ats_side') or 'No pick'}"
-                        f" · Total: {report.get('total_side') or 'No pick'}")
-        expert.append((kickoff, f"{label}\n{expert_picks}\n{summary}\n{url}"))
+        for candidate in group:
+            report = candidate.get('expert') or {}
+            if report.get('review_status') != 'approved' or identity(candidate['scout']) not in featured:
+                continue
+            try:
+                validate_expert(report, candidate['scout'])
+            except (ValueError, KeyError, TypeError, AttributeError):
+                warnings.append('An Expert report failed published-review validation.')
+                continue
+            summary = ' '.join((report.get('summary') or '').split())
+            if not summary:
+                continue
+            if len(summary) > 350:
+                summary = summary[:350].rsplit(' ', 1)[0].rstrip(' ,;:') + '…'
+            expert_text = (f"ATS: {report.get('ats_side') or 'No pick'}"
+                           f" · Total: {report.get('total_side') or 'No pick'}")
+            expert.append((kickoff, f'{label}\\n{expert_text}\\n{summary}\\n{url}'))
+            break
 
     picks.sort(key=lambda pair: pair[0])
     expert.sort(key=lambda pair: pair[0])
     selected = picks if max_picks is None else picks[:max_picks]
-    # Keep the audit list aligned with the selections actually shown.
     return [text for _, text, _ in selected], [text for _, text in expert], [version for _, _, version in selected]
-
-
 
 
 # Newsletter copy is deliberately separate from the site Hot Trends data model.
