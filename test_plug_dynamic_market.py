@@ -36,5 +36,28 @@ class SavedMarketAdapterTest(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     verified_decision("/tmp/not-used",**ARGS)
 
+    def test_real_backup_market_without_splits(self):
+        from datetime import datetime
+        from public_pick_market import matchup_public_market
+        base=dict(game_id=ARGS["game_id"],away_team="BAL",home_team="PIT",
+                  kickoff_utc=KICK,captured_at_utc="2026-10-28T14:00:00+00:00",
+                  sportsbook="DraftKings",
+                  source_url="https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=8",
+                  handle_a="",handle_b="",bets_a="",bets_b="",odds_a="-110",odds_b="-110")
+        spread=dict(base,market="Spread",side_a="BAL",side_b="PIT",line_a="-8.5",line_b="8.5")
+        total=dict(base,market="Total",side_a="Over",side_b="Under",line_a="49",line_b="49")
+        pick=dict(game_id=ARGS["game_id"],away="BAL",home="PIT",kickoff_at=KICK)
+        def check(rows):
+            return matchup_public_market("/tmp/not-used",pick,now=datetime.fromisoformat(NOW),rows=rows)
+        market=check([spread,total])
+        self.assertEqual(len(market["markets"][1]["sides"]),2)
+        self.assertNotIn("money",market["markets"][1]["sides"][0])
+        with patch("plug_dynamic_market.matchup_public_market",return_value=market):
+            self.assertTrue(verified_decision("/tmp/not-used",**ARGS)["ats_selected"])
+        for bad in (dict(source_url="https://example.org/odds"),dict(sportsbook="Unknown"),
+                    dict(line_b="7.5"),dict(handle_a="55")):
+            rejected=check([dict(spread,**bad),total])
+            self.assertEqual(rejected["markets"][1]["sides"],[])
+
 if __name__=="__main__":
     unittest.main()
