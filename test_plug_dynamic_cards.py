@@ -31,5 +31,14 @@ class CardTest(unittest.TestCase):
             state=card(root,"2026-10-28T14:00:00+00:00")
             self.assertEqual(state["ats"],"Stay Away")
             self.assertTrue(state["changed"])
+    def test_schedule_kickoff_mismatch_refuses_card(self):
+        with tempfile.TemporaryDirectory() as root:
+            append(root,"2026_08_BAL_PIT",BASE)
+            with self.assertRaises(ValueError):
+                card_state(root,"2026_08_BAL_PIT",
+                    as_of_utc="2026-10-28T13:00:00+00:00",
+                    away_team="BAL",home_team="PIT",
+                    kickoff_utc="2026-10-30T00:00:00+00:00")
+
 if __name__=="__main__":
     unittest.main()
