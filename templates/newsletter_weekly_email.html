@@ -16,10 +16,11 @@
   <h2 style="margin:0 0 12px;color:#1a1a20;font-size:19px">Our Featured Matchup</h2>
   {% set selected = (sections.get('predictions') or '').split('\n\n')[0].split('\n') %}
   {% if selected and selected[0]|trim %}
+  {% set has_expert_take = "Expert's take: " in (sections.get('predictions') or '').split('\n\n')[0] %}
   <p style="margin:0 0 10px;color:#24242b;font-size:16px;font-weight:800">{{ selected[0] }}</p>
   {% for line in selected[1:] %}{% set item = line|trim %}
     {% if item.startswith(origin ~ '/') %}
-      <p style="margin:13px 0 5px"><a href="{{ item }}" style="color:#a36a00;font-size:14px;font-weight:800;text-decoration:underline">Read the full breakdown &rarr;</a></p>
+      <p style="margin:13px 0 5px"><a href="{{ item }}" style="color:#a36a00;font-size:14px;font-weight:800;text-decoration:underline">{{ 'Read the full Expert analysis' if has_expert_take else 'View the matchup and Plug picks' }} &rarr;</a></p>
     {% elif item.startswith('ATS: ') and ' · Total: ' in item %}
       {% set markets = item.split(' · Total: ', 1) %}
       {% set ats_pick = markets[0].split('ATS: ', 1)[1]|trim %}
@@ -31,7 +32,7 @@
         <p style="color:#168449;font-size:20px;font-weight:800;line-height:1.35;margin:9px 0">The Plug's Pick · Total: {{ total_pick }}</p>
       {% endif %}
     {% elif item.startswith("Expert's take: ") %}
-      <p style="color:#444650;font-size:14px;line-height:1.6;margin:9px 0"><strong>Expert's take:</strong> {{ item.split("Expert's take: ",1)[1] }}</p>
+      <p style="color:#444650;font-size:14px;line-height:1.6;margin:9px 0"><strong>The Expert's quick take:</strong> {{ item.split("Expert's take: ",1)[1] }}</p>
     {% elif item %}<p style="color:#444650;font-size:14px;line-height:1.55;margin:7px 0">{{ item }}</p>{% endif %}
   {% endfor %}
   {% endif %}
