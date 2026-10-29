@@ -277,10 +277,23 @@ def weekly_dashboard(records, render_record, now):
                 result=grade_plug_ou(receipt,final['away'],final['home'])
                 item['plug_ou_result']=result
                 item.setdefault('completed_grades',{})['plug_total']=result
-    # Explicitly enabled, read-only dynamic research display. Official grades,
-    # existing selected picks and archived receipts remain untouched.
+    # Dynamic publication is isolated behind an explicit opt-in.
     import os
-    if os.environ.get('TREND_FINDAH_DYNAMIC_PREVIEW') == '1':
+    # New official policy is explicitly opt-in. Existing historical games and
+    # original sealed receipts remain untouched, and no selection is invented.
+    if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1':
+        from plug_dynamic_authoritative import attach as attach_dynamic
+        for group in ('games','underway_games','completed_games','awaiting_games'):
+            for item in sections.get(group, []):
+                try:
+                    attach_dynamic(ROOT, item, as_of_utc=now.isoformat())
+                except (OSError, ValueError, KeyError, TypeError):
+                    # A bad research journal must not become an official pick.
+                    item.pop('plug_dynamic_official', None)
+                    item.pop('plug_dynamic_card', None)
+                    item.pop('plug_dynamic_grades', None)
+    if (os.environ.get('TREND_FINDAH_DYNAMIC_PREVIEW') == '1'
+            and os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') != '1'):
         from plug_dynamic_cards import card_state
         for group in ('games','underway_games','completed_games','awaiting_games'):
             for item in sections.get(group, []):
