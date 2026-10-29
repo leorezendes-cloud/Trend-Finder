@@ -28,6 +28,14 @@ class DynamicPreviewTest(unittest.TestCase):
         self.assertEqual(result.count("Stay Away"),2)
         self.assertNotIn("Updated with Vegas line movement",result)
         self.assertIn("Final pregame selections",result)
+    def test_real_dashboard_template_keeps_preview_inactive_by_default(self):
+        dashboard=ENV.get_template("expert_dashboard.html")
+        # Inclusion is intentionally guarded: a missing dynamic card renders no
+        # research selection and cannot replace the official Plug picks.
+        source=(ROOT/"templates"/"expert_dashboard.html").read_text()
+        self.assertIn("{% include '_plug_dynamic_preview.html' %}",source)
+        self.assertIn("item.plug_dynamic_card if item.plug_dynamic_card is defined else none",source)
+
     def test_escape_untrusted_values(self):
         result=TEMPLATE.render(dynamic_card={
             "status":"pregame","ats":"<script>oops</script>","ou":"Stay Away",
