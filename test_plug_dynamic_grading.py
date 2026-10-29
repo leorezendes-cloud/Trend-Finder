@@ -27,5 +27,12 @@ class ClosingGradeTest(unittest.TestCase):
             self.assertIsNone(grade["ats"])
             self.assertIsNone(grade["ou"])
 
+    def test_reject_fractional_and_negative_scores(self):
+        with tempfile.TemporaryDirectory() as root:
+            append(root,GID,ROW)
+            for away,home in ((28.5,20),(-1,20),(28,float("nan"))):
+                with self.subTest(away=away,home=home),self.assertRaises(ValueError):
+                    closing_grade(root,GID,as_of_utc="2026-10-29T00:00:00+00:00",away_score=away,home_score=home)
+
 if __name__=="__main__":
     unittest.main()
