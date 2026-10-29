@@ -172,7 +172,11 @@ def update_once(root, feed_lock_fd=None):
         temporary.replace(target)
     if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
         from plug_dynamic_finalize_batch import finalize_due
-        attempt('dynamic Plug closing research (unpublished)', lambda: finalize_due(root))
+        def finish_dynamic():
+            report = finalize_due(root)
+            if report['errors']:
+                raise RuntimeError('Dynamic closing receipts failed validation')
+        attempt('dynamic Plug closing research (unpublished)', finish_dynamic)
     attempt('grading', grade)
     # Optional research collection is separate from the locked prediction model.
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1':
