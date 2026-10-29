@@ -71,7 +71,7 @@ def read(root,game_id):
         previous=signature
     return entries
 
-def append(root,game_id,decision):
+def append(root,game_id,decision, *, clock=None):
     """Add a changed pregame state, or return the existing latest state.
 
     Idempotent for unchanged states. This journal is deliberately not a source
@@ -81,11 +81,18 @@ def append(root,game_id,decision):
         raise ValueError("Incomplete dynamic decision")
     path=_path(root,game_id)
     with _lock(path):
+        if (Path(root)/"plug_dynamic_closing"/(game_id+".json")).exists():
+            raise ValueError("Dynamic game already closed")
         history=read(root,game_id)
         proposed={k:decision[k] for k in FIELDS}
         observed=_time(proposed["quote_observed_utc"])
         evaluated=_time(proposed["evaluated_utc"])
         kickoff=_time(proposed["kickoff_utc"])
+        if clock is not None:
+            evaluated = clock().astimezone(timezone.utc)
+            if evaluated >= kickoff:
+                raise ValueError("Kickoff passed before journal commit")
+            proposed["evaluated_utc"] = evaluated.isoformat()
         if not observed<=evaluated<kickoff:
             raise ValueError("Decision is not verified pregame")
         if proposed["ats_selected"] != (proposed["ats_side"] is not None):

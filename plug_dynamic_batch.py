@@ -1,4 +1,5 @@
 """Opt-in batch refresh for dynamic Plug research; never publishes official picks."""
+from plug_dynamic_errors import Unavailable
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -13,14 +14,15 @@ def refresh(root, *, now=None):
         raise ValueError("Timezone required")
     game_ids = sorted(set(upcoming_games(root, now)))
     result = {"eligible": len(game_ids), "refreshed": 0, "unavailable": 0,
-              "failed": 0, "reasons": {}}
+              "failed": 0, "reasons": {}, "games": {}}
     for game_id in game_ids:
         try:
-            observe_from_receipts(root, game_id=game_id, evaluation_utc=now.isoformat())
+            observe_from_receipts(root, game_id=game_id, evaluation_utc=now.isoformat(), live=True)
             result["refreshed"] += 1
-        except (ValueError, KeyError, OSError, TypeError) as exc:
+        except Unavailable as exc:
             # A missing frozen source or stale quote cannot become a pick.
             result["unavailable"] += 1
+            result["games"][game_id] = str(exc)
             name = type(exc).__name__
             result["reasons"][name] = result["reasons"].get(name, 0) + 1
         except Exception:

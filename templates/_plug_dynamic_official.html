@@ -1,0 +1,6 @@
+{% if item.plug_dynamic_official|default(false) %}
+<section class="plug-official-picks"><h3>The Plug · Dynamic</h3>
+<p><strong>ATS:</strong> {{ item.plug_dynamic_card.ats }}{% if item.plug_ats_result %} · {{ item.plug_ats_result }}{% endif %}</p>
+<p><strong>O/U:</strong> {{ item.plug_dynamic_card.ou }}{% if item.plug_ou_result %} · {{ item.plug_ou_result }}{% endif %}</p>
+<small>{{ item.plug_dynamic_card.note }}</small></section>
+{% endif %}

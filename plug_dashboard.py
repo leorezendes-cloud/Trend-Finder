@@ -282,16 +282,10 @@ def weekly_dashboard(records, render_record, now):
     # New official policy is explicitly opt-in. Existing historical games and
     # original sealed receipts remain untouched, and no selection is invented.
     if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1':
-        from plug_dynamic_authoritative import attach as attach_dynamic
-        for group in ('games','underway_games','completed_games','awaiting_games'):
+        from plug_dynamic_official import apply
+        for group in ('games','underway_games','completed_games','awaiting_games','historical_games'):
             for item in sections.get(group, []):
-                try:
-                    attach_dynamic(ROOT, item, as_of_utc=now.isoformat())
-                except (OSError, ValueError, KeyError, TypeError):
-                    # A bad research journal must not become an official pick.
-                    item.pop('plug_dynamic_official', None)
-                    item.pop('plug_dynamic_card', None)
-                    item.pop('plug_dynamic_grades', None)
+                apply(ROOT, item, as_of_utc=now.isoformat())
     if (os.environ.get('TREND_FINDAH_DYNAMIC_PREVIEW') == '1'
             and os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') != '1'):
         from plug_dynamic_cards import card_state

@@ -5,7 +5,7 @@
 {% if prediction_item and not use_results_forecast and not prediction_item.forecast_pending %}
 {% set picks=prediction_item.saved_picks %}{% set quotes=prediction_item.locked_quotes %}{% set margin=prediction_item.prediction_margin %}
 <p><strong>Scout ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
-{% if prediction_item.plug_ats_status == 'selected' %}<p><strong>Plug's Top Pick</strong></p>{% elif prediction_item.plug_ats_status == 'stay_away' %}<p><strong>The Plug:</strong> Stay Away</p>{% elif prediction_item.plug_ats_status is defined %}<p><strong>The Plug:</strong> Awaiting weekly picks</p>{% endif %}
+{% if prediction_item.plug_dynamic_official|default(false) %}{% set item=prediction_item %}{% include '_plug_dynamic_official.html' %}{% elif prediction_item.plug_ats_status == 'selected' %}<p><strong>Plug's Top Pick</strong></p>{% elif prediction_item.plug_ats_status == 'stay_away' %}<p><strong>The Plug:</strong> Stay Away</p>{% elif prediction_item.plug_ats_status is defined %}<p><strong>The Plug:</strong> Awaiting weekly picks</p>{% endif %}
 <p><strong>Straight Up:</strong> {% if margin %}{{ game.away_team if margin>0 else game.home_team }} by {{ margin|abs|stat }} points{% else %}Even{% endif %}</p>
 <p><strong>Scout O/U:</strong> {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ '%g'|format(quotes['Total'].line_a|float) }}{% endif %}</p>
 {% elif forecast %}
@@ -14,5 +14,5 @@
 <p><strong>Straight Up:</strong> {% if prediction.away_margin %}{{ game.away_team if prediction.away_margin>0 else game.home_team }} by {{ prediction.away_margin|abs|stat }} points{% else %}Even{% endif %}</p>
 <p><strong>Over/Under:</strong> {% if forecast.totals and forecast.totals.prediction.lean %}{{ forecast.totals.prediction.lean }} {{ '%g'|format(forecast.totals.quote.line|float) }}{% else %}Forecast pending{% endif %}</p>
 {% else %}<p>Scout forecast pending</p>{% endif %}
-{% if prediction_item and prediction_item.plug_ou_status is defined and prediction_item.plug_ou_status == 'stay_away' %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> Stay Away</p>{% elif prediction_item and prediction_item.plug_ou_pick is defined and prediction_item.plug_ou_pick %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> {{ prediction_item.plug_ou_pick }}</p>{% endif %}
+{% if prediction_item and not prediction_item.plug_dynamic_official|default(false) and prediction_item.plug_ou_status is defined and prediction_item.plug_ou_status == 'stay_away' %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> Stay Away</p>{% elif prediction_item and not prediction_item.plug_dynamic_official|default(false) and prediction_item.plug_ou_pick is defined and prediction_item.plug_ou_pick %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> {{ prediction_item.plug_ou_pick }}</p>{% endif %}
 </div>{{ expert_panel(prediction_item, comparison=true) }}</div>

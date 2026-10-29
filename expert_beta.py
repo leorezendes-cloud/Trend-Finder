@@ -353,6 +353,14 @@ def public_record(record, detail=False):
         from plug_line_movement import compare_line
         result['line_movement'] = compare_line(record['scout'], Path(__file__).resolve().parent, clock())
         result['grading'] = results_for(record)
+        if (os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1'
+                and (not has_request_context() or not request.args.get('version'))):
+            from plug_dynamic_official import apply
+            from plug_dashboard import _completed_games
+            final = _completed_games(Path(__file__).resolve().parent).get(scout['game']['game_id'])
+            if final:
+                result['final_score'] = {'away':final[0], 'home':final[1]}
+            apply(Path(__file__).resolve().parent, result, as_of_utc=clock().isoformat())
     return result
 
 
@@ -422,6 +430,13 @@ def matchup_prediction(game_id, version=None):
         from plug_ats_v5_weekly import for_game
         decision = for_game(game_id)
         item['plug_ats_status'] = ('selected' if decision['selected'] else 'stay_away') if decision else 'pending'
+    if version is None and os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1':
+        from plug_dynamic_official import apply
+        from plug_dashboard import _completed_games
+        final = _completed_games(Path(__file__).resolve().parent).get(game_id)
+        if final:
+            item['final_score'] = {'away':final[0], 'home':final[1]}
+        apply(Path(__file__).resolve().parent, item, as_of_utc=clock().isoformat())
     return item
 
 

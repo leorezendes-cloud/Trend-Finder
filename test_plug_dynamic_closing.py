@@ -26,12 +26,11 @@ class ClosingReceiptTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             append(root,GID,ROW)
             finalize(root,GID,as_of_utc=ROW["kickoff_utc"])
-            # The journal is normally unable to append after kickoff, but a
-            # historical pre-kickoff addition must still fail receipt integrity.
-            append(root,GID,{**ROW,"ats_away_line":-8.5,
-                "quote_observed_utc":"2026-10-28T13:00:00+00:00",
-                "evaluated_utc":"2026-10-28T13:01:00+00:00"})
+            before=read_closing(root,GID)
             with self.assertRaises(ValueError):
-                read_closing(root,GID)
+                append(root,GID,{**ROW,"ats_away_line":-8.5,
+                    "quote_observed_utc":"2026-10-28T13:00:00+00:00",
+                    "evaluated_utc":"2026-10-28T13:01:00+00:00"})
+            self.assertEqual(before,read_closing(root,GID))
 if __name__=="__main__":
     unittest.main()

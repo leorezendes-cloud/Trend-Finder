@@ -5,6 +5,7 @@
 {% block intro %}<p class="tf-record-intro">Scout forecasts the full slate. The Plug selects its own ATS and O/U picks. The Expert adds independent analysis.</p>{% endblock %}
 {% block data_notes %}{% endblock %}
 {% block content %}
+{% include '_plug_dynamic_record.html' %}
 {% set record_page='records' %}{% include '_record_navigation.html' %}
 {% if weeks %}
 <form method="get" action="{{ url_for('fans.prediction_results') }}" class="prediction-week-selector stats-filters">
@@ -23,7 +24,7 @@
     <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · All-game picks</p>
   </section>
   <section class="stats-card tf-record-card" id="plug-record" aria-labelledby="plug-heading">
-    <div class="tf-record-card-head"><h2 id="plug-heading">The Plug</h2><span>ATS · O/U</span></div>
+    <div class="tf-record-card-head"><h2 id="plug-heading">The Plug{% if dynamic_record_enabled|default(false) %} · Legacy weekly{% endif %}</h2><span>ATS · O/U</span></div>
     <div class="tf-record-score"><div><small>ATS</small><strong>{% if plug_receipts_review %}Review{% else %}{{ plug_week_totals.Win }}–{{ plug_week_totals.Loss }}–{{ plug_week_totals.Push }}{% endif %}</strong></div>
       <div><small>O/U</small><strong class="tf-plug-ou">{% if plug_ou_review %}Review{% elif plug_ou_week_totals.selected %}{{ plug_ou_week_totals.Win }}–{{ plug_ou_week_totals.Loss }}–{{ plug_ou_week_totals.Push }}{% else %}—{% endif %}</strong></div></div>
     <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · {% if plug_receipts_review or plug_ou_review %}Results unavailable{% elif plug_week_picks or plug_ou_week_picks %}ATS: {{ plug_week_totals.Pending }} pending · O/U: {{ plug_ou_week_totals.Pending }} pending{% else %}No picks issued{% endif %}</p>
