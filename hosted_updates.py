@@ -195,6 +195,9 @@ def refresh_game_day_market(root, now=None):
     if ids.intersection(upcoming_games(Path(root), now)):
         if run(Path(root), now) != 0:
             raise RuntimeError('Game-day market refresh failed')
+        if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+            from plug_dynamic_batch import refresh as refresh_dynamic
+            refresh_dynamic(Path(root), now=now)
 
 
 LOGGER = logging.getLogger(__name__)
