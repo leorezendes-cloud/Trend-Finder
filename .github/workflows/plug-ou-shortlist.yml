@@ -1,5 +1,7 @@
 name: Plug ATS and O-U shortlist checks
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
     paths:
@@ -56,7 +58,7 @@ jobs:
       # Legacy dashboard/editorial suites contain preexisting fixture assumptions
       # about pending forecasts and CSS markup; those need a separate baseline audit.
       - name: Verify weekly results, Expert pipeline, prediction cards and hosted worker
-        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_hosted_scheduler test_scheduler_runtime test_plug_dynamic_capture test_plug_dynamic_production test_newsletter_official_feature test_storage_maintenance test_prediction_staging -q
+        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_hosted_scheduler test_scheduler_runtime test_plug_dynamic_capture test_plug_dynamic_production test_plug_dynamic_pipeline_regression test_newsletter_official_feature test_storage_maintenance test_prediction_staging -q
       - name: Verify isolated feed and hosted memory guards
         run: python -m unittest test_update_feed_memory test_hosted_memory -q
       - name: Jinja2 syntax validation of all affected templates
@@ -76,3 +78,4 @@ jobs:
               Environment().parse(Path(p).read_text())
               print('validated:',p)
           PY
+

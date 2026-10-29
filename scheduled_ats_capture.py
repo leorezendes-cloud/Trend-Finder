@@ -50,18 +50,36 @@ def refresh_dynamic(root, status):
         return
     from plug_dynamic_batch import refresh
     from plug_dynamic_finalize_batch import finalize_due
+    # Closing is independent of quote availability and refresh errors. A
+    # provider outage must never prevent saved pregame decisions from locking.
+    errors = []
     try:
-        # Use completion time, never capture-start time, at the kickoff boundary.
-        completed = datetime.now(timezone.utc)
-        status['dynamic'] = refresh(root, now=completed)
-        status['dynamic_closing'] = finalize_due(root, as_of_utc=completed.isoformat())
+        status['dynamic'] = refresh(root, now=datetime.now(timezone.utc))
+    except Exception as error:
+        errors.append(type(error).__name__+': '+str(error))
+    try:
+        status['dynamic_closing'] = finalize_due(
+            root, as_of_utc=datetime.now(timezone.utc).isoformat())
         if status['dynamic_closing']['errors']:
             raise RuntimeError('Invalid dynamic closing receipt')
-        status['dynamic_finished_utc'] = datetime.now(timezone.utc).isoformat()
     except Exception as error:
-        status['dynamic_error'] = type(error).__name__+': '+str(error)
-        save_status(root, status)
-        raise
+        errors.append(type(error).__name__+': '+str(error))
+    status['dynamic_finished_utc'] = datetime.now(timezone.utc).isoformat()
+    if errors:
+        status['dynamic_error'] = '; '.join(errors)
+        raise RuntimeError(status['dynamic_error'])
+
+
+def _finish_cycle(root, status, code):
+    try:
+        # The adapter independently rejects stale or invalid per-game quotes.
+        # One unavailable market must not starve other freshly captured games.
+        refresh_dynamic(root, status)
+    except Exception as error:
+        status.update(state='error', message=str(error))
+        code = 1
+    save_status(root, status)
+    return code
 
 
 def run(root=ROOT, now=None):
@@ -73,12 +91,13 @@ def run(root=ROOT, now=None):
             print('Collection already running; skipped overlapping run.');return 0
         from plug_dynamic_official import PIPELINE
         status=dict(checked_at_utc=now.isoformat(),source='DraftKings',saved=0,pipeline=PIPELINE)
+        code = 0
         try:
             upcoming=upcoming_games(root,now)
             if not upcoming:
                 status.update(state='idle',message='No upcoming games in the next eight days.')
-                refresh_dynamic(root,status)
-                save_status(root,status);print(status['message']);return 0
+                print(status['message'])
+                return _finish_cycle(root, status, code)
             required=None
             try:
                 rows=collect(root)
@@ -101,16 +120,15 @@ def run(root=ROOT, now=None):
                 status.update(state='ok', source='ESPN / DraftKings', saved=len(prices),
                               latest_capture_utc=max(r['captured_at_utc'] for r in prices),
                               message='Backup spreads and totals saved; public betting percentages unavailable.')
-                refresh_dynamic(root,status)
-                save_status(root,status);print(status['message']);return 0
+                print(status['message'])
+                return _finish_cycle(root, status, code)
             report=analyze(root/'ats_handle_snapshots.csv',root/'nfl_games.csv')
             status.update(state='ok',splits_available=True,saved=len(rows),qualifying=report['all']['qualifying'],pending=report['all']['pending'],latest_capture_utc=max(r['captured_at_utc'] for r in rows))
-            refresh_dynamic(root,status)
-            save_status(root,status)
             print(f"Capture complete: {len(rows)} observations saved; {report['all']['qualifying']} latest qualifying games, {report['all']['pending']} pending.")
-            return 0
         except Exception as exc:
             status.update(state='error',message=str(exc))
-            save_status(root,status);print(f'Collection failed: {exc}',file=sys.stderr);return 1
+            print(f'Collection failed: {exc}',file=sys.stderr)
+            code = 1
+        return _finish_cycle(root, status, code)
 
 if __name__=='__main__':sys.exit(run())

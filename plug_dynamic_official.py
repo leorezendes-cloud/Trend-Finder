@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime, timezone
-from plug_dynamic_journal import _time, read
+from plug_dynamic_journal import _time, read, _lock, _path
 from plug_dynamic_pregame import decide
 from plug_dynamic_closing import read_closing
 from plug_dynamic_closing_grade import grade_closing
@@ -112,23 +112,41 @@ def apply(root, item, *, as_of_utc=None):
     at = as_of_utc or datetime.now(timezone.utc).isoformat()
     gid = item['scout']['game']['game_id']
     try:
-        row = official_state(root, gid, as_of_utc=at)
-        if row is None:
-            start = activation(root)
-            if start is not None and _time(item['scout']['game']['kickoff_utc']) > _time(start['activated_at_utc']):
-                raise ValueError('Awaiting verified prospective dynamic issuance')
-            return False
-        from plug_dynamic_authoritative import attach
-        return attach(root, item, as_of_utc=at)
+        with _lock(_path(root, gid)):
+            return _apply_locked(root, item, gid, at)
     except (OSError, ValueError, KeyError, TypeError):
-        # No silent fallback masquerading as a dynamic official pick.
-        item.update(plug_dynamic_official=True, plug_dynamic_review=True,
-                    plug_ats_status='review', plug_ou_status='review',
-                    plug_ats_pick=None, plug_ou_pick=None,
-                    plug_ats_result=None, plug_ou_result=None,
-                    plug_dynamic_card={'status':'unavailable', 'ats':'Awaiting verified selection',
-                                       'ou':'Awaiting verified selection', 'note':'Receipt needs review'})
+        return _review(item)
+
+
+def _apply_locked(root, item, gid, at):
+    row = official_state(root, gid, as_of_utc=at)
+    if row is None:
+        start = activation(root)
+        if start is not None and _time(item['scout']['game']['kickoff_utc']) > _time(start['activated_at_utc']):
+            raise ValueError('Awaiting verified prospective dynamic issuance')
         return False
+    from plug_dynamic_authoritative import attach
+    attached = attach(root, item, as_of_utc=at)
+    if not attached:
+        raise ValueError('Validated dynamic selection could not be displayed')
+    item.pop('plug_dynamic_review', None)
+    return True
+
+
+def _review(item):
+    # Remove every effective legacy/dynamic selection and grade. Archived
+    # saved_picks remain untouched, but cannot leak into official results.
+    for key in ('plug_dynamic_grades', 'plug_ats_decision', 'plug_ats_policy',
+                'plug_ou_receipt'):
+        item.pop(key, None)
+    item.setdefault('completed_grades', {}).update(plug_ats=None, plug_total=None)
+    item.update(plug_dynamic_official=True, plug_dynamic_review=True,
+                plug_ats_status='review', plug_ou_status='review',
+                plug_ats_pick=None, plug_ou_pick=None,
+                plug_ats_result=None, plug_ou_result=None,
+                plug_dynamic_card={'status':'unavailable', 'ats':'Awaiting verified selection',
+                                   'ou':'Awaiting verified selection', 'note':'Receipt needs review'})
+    return False
 
 
 def history(root, finals, *, as_of_utc=None):
