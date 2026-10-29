@@ -613,7 +613,9 @@ def prediction_results():
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
     from plug_dynamic_official import record_context
     dynamic_context = record_context(ROOT, _completed_games(ROOT), season, selected_week)
-    return render_template('prediction_results.html', **dynamic_context, groups=groups,
+    from scout_dynamic_public import records as scout_dynamic_records
+    scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, selected_week)
+    return render_template('prediction_results.html', **scout_context, **dynamic_context, groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
                            season=season, weeks=weeks, selected_week=selected_week,
                            excluded=excluded, freshness=data_freshness(),

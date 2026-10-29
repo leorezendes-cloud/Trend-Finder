@@ -24,11 +24,11 @@ def initialize_data(source, target):
             temporary.symlink_to(saved)
             temporary.replace(path)
     for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'logs',
-                     'plug_dynamic_research', 'plug_dynamic_closing', 'plug_dynamic_official'):
+                     'plug_dynamic_research', 'plug_dynamic_closing', 'plug_dynamic_official', 'scout_dynamic'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
             continue
-        if relative.startswith('plug_dynamic_') and original.exists() and saved.exists():
+        if (relative.startswith('plug_dynamic_') or relative == 'scout_dynamic') and original.exists() and saved.exists():
             # Preserve records made before persistence was configured. Conflicts
             # require review; never discard either immutable copy.
             files = [p for p in original.rglob('*') if p.is_file() and p.suffix != '.lock']
@@ -221,6 +221,9 @@ def update_once(root, feed_lock_fd=None):
             return report
         attempt('dynamic Plug closing research (unpublished)', finish_dynamic)
     attempt('grading', grade)
+    from scout_dynamic import enabled as scout_dynamic_enabled, cycle as scout_dynamic_cycle
+    if scout_dynamic_enabled():
+        attempt('Scout dynamic revisions', lambda: scout_dynamic_cycle(root))
     # Optional research collection is separate from the locked prediction model.
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1':
         from scout4.context_model import capture as capture_context
@@ -256,8 +259,17 @@ def dynamic_enabled():
 def refresh_scheduled_market(root, now=None):
     """All-week quotes, including Tuesday/Wednesday; no model or AI workers."""
     from scheduled_ats_capture import run
-    if run(Path(root), now) != 0:
-        raise RuntimeError('Scheduled market/dynamic refresh failed; see ats_capture_status.json')
+    try:
+        if run(Path(root), now) != 0:
+            raise RuntimeError('Scheduled market/dynamic refresh failed; see ats_capture_status.json')
+    finally:
+        # Scout is isolated: its failure cannot alter the Plug capture result.
+        from scout_dynamic import enabled as scout_dynamic_enabled, cycle as scout_dynamic_cycle
+        if scout_dynamic_enabled():
+            try:
+                scout_dynamic_cycle(Path(root))
+            except Exception:
+                LOGGER.exception('Scout dynamic refresh failed; Plug pipeline unchanged')
 
 
 LOGGER = logging.getLogger(__name__)

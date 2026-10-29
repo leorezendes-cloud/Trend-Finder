@@ -2,7 +2,10 @@
 <div class="prediction-columns"><div class="prediction-quantitative">
 <div class="prediction-heading"><h2>Prediction</h2>{% include '_game_anomaly_flag.html' %}{% if use_results_forecast and forecast %}<small>({{ (forecast.decision_cutoff_utc|eastern_time).split(',')[0] }})</small>{% elif prediction_item and not prediction_item.forecast_pending %}<small>({{ (prediction_item.saved_at|eastern_time).split(',')[0] }})</small>{% elif forecast %}<small>({{ (forecast.decision_cutoff_utc|eastern_time).split(',')[0] }})</small>{% endif %}</div>
 {% if forecast or (prediction_item and not prediction_item.forecast_pending) %}<small>Based on the saved market line.</small>{% endif %}
-{% if prediction_item and not use_results_forecast and not prediction_item.forecast_pending %}
+{% if prediction_item and not use_results_forecast and prediction_item.scout_dynamic|default(none) %}
+{% set item=prediction_item %}{% include '_scout_dynamic.html' %}
+{% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% endif %}
+{% elif prediction_item and not use_results_forecast and not prediction_item.forecast_pending %}
 {% set picks=prediction_item.saved_picks %}{% set quotes=prediction_item.locked_quotes %}{% set margin=prediction_item.prediction_margin %}
 <p><strong>Scout ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
 {% if prediction_item.plug_dynamic_official|default(false) %}{% set item=prediction_item %}{% include '_plug_dynamic_official.html' %}{% elif prediction_item.plug_ats_status == 'selected' %}<p><strong>Plug's Top Pick</strong></p>{% endif %}

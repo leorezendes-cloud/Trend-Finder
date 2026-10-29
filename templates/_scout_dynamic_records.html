@@ -1,0 +1,9 @@
+{% if scout_dynamic_counts is defined %}
+<section class="stats-card" id="scout-dynamic-record"><h2>Scout · Dynamic closing record</h2>
+<p>Separate from original first-issued Scout forecasts.</p>
+{% if scout_dynamic_review %}<p>Some Scout receipts need review; affected games are excluded.</p>{% endif %}
+<p>ATS: {{ scout_dynamic_counts.ats.Win }}–{{ scout_dynamic_counts.ats.Loss }}–{{ scout_dynamic_counts.ats.Push }} · {{ scout_dynamic_counts.ats.Pending }} pending<br>
+O/U: {{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }} · {{ scout_dynamic_counts.ou.Pending }} pending</p>
+{% for r in scout_dynamic_records %}<p><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>: {{ r.ats_side or 'No ATS pick' }}{% if r.ats_side %} {{ '%+g'|format(r.spread.line if r.ats_side==r.away_team else -r.spread.line) }}{% endif %} · {{ r.grades.ats }}; {{ r.ou_side or 'No O/U pick' }}{% if r.ou_side %} {{ '%g'|format(r.total_quote.line) }}{% endif %} · {{ r.grades.ou }}</p>{% else %}<p>No issued dynamic Scout predictions for this week.</p>{% endfor %}
+</section>
+{% endif %}

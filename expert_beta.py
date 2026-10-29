@@ -361,6 +361,9 @@ def public_record(record, detail=False):
             if final:
                 result['final_score'] = {'away':final[0], 'home':final[1]}
             apply(Path(__file__).resolve().parent, result, as_of_utc=clock().isoformat())
+        if not has_request_context() or not request.args.get('version'):
+            from scout_dynamic_public import attach as attach_current_scout
+            attach_current_scout(Path(__file__).resolve().parent, result, now=clock())
     return result
 
 
@@ -437,6 +440,9 @@ def matchup_prediction(game_id, version=None):
         if final:
             item['final_score'] = {'away':final[0], 'home':final[1]}
         apply(Path(__file__).resolve().parent, item, as_of_utc=clock().isoformat())
+    if version is None:
+        from scout_dynamic_public import attach as attach_current_scout
+        attach_current_scout(Path(__file__).resolve().parent, item, now=clock())
     return item
 
 

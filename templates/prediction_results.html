@@ -6,6 +6,7 @@
 {% block data_notes %}{% endblock %}
 {% block content %}
 {% include '_plug_dynamic_record.html' %}
+{% include '_scout_dynamic_records.html' %}
 {% set record_page='records' %}{% include '_record_navigation.html' %}
 {% if weeks %}
 <form method="get" action="{{ url_for('fans.prediction_results') }}" class="prediction-week-selector stats-filters">
