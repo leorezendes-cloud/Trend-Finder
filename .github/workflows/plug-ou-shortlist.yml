@@ -55,6 +55,7 @@ jobs:
               'templates/expert_game.html',
               'templates/expert_game_mobile.html',
               'templates/prediction_results.html',
+              'templates/_plug_dynamic_preview.html',
               'templates/sunday_results.html',
           ):
               Environment().parse(Path(p).read_text())
