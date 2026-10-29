@@ -109,6 +109,10 @@ def update_once(root, feed_lock_fd=None):
         if quotes(root) != 0:
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
+    if (os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1'
+            and stages['quotes'] == 'ok'):
+        from plug_dynamic_batch import refresh as refresh_dynamic
+        attempt('dynamic Plug research (unpublished)', lambda: refresh_dynamic(root))
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1' and stages['stats']=='ok':
         attempt('injury/weather collection', lambda: feed('context'))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
@@ -166,6 +170,13 @@ def update_once(root, feed_lock_fd=None):
         temporary = target.with_suffix('.tmp')
         temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded,'research_benchmarks':research},indent=2))
         temporary.replace(target)
+    if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+        from plug_dynamic_finalize_batch import finalize_due
+        def finish_dynamic():
+            report = finalize_due(root)
+            if report['errors']:
+                raise RuntimeError('Dynamic closing receipts failed validation')
+        attempt('dynamic Plug closing research (unpublished)', finish_dynamic)
     attempt('grading', grade)
     # Optional research collection is separate from the locked prediction model.
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1':
@@ -191,6 +202,9 @@ def refresh_game_day_market(root, now=None):
     if ids.intersection(upcoming_games(Path(root), now)):
         if run(Path(root), now) != 0:
             raise RuntimeError('Game-day market refresh failed')
+        if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+            from plug_dynamic_batch import refresh as refresh_dynamic
+            refresh_dynamic(Path(root), now=now)
 
 
 LOGGER = logging.getLogger(__name__)

@@ -21,6 +21,15 @@
 {% set selected_ats = ats_decision and ats_decision.side and ats_decision.away_line is defined %}
 {% set selected_ou = item.plug_ou_status == 'selected' and item.plug_ou_pick is defined and item.plug_ou_pick %}
 <div class="plug-pick-summary" aria-label="The Plug's ATS and over/under selections">
+{% if item.plug_dynamic_official is defined and item.plug_dynamic_official %}
+<section class="plug-top-picks"><h3>The Plug's Current Picks:</h3>
+<p><strong>ATS</strong> – {{ item.plug_dynamic_card.ats }}</p>
+<p><strong>O/U</strong> – {{ item.plug_dynamic_card.ou }}</p>
+{% if item.plug_dynamic_grades is defined %}
+<p class="expert-meta">ATS: {{ item.plug_dynamic_grades.ats or 'Stay Away' }} · O/U: {{ item.plug_dynamic_grades.ou or 'Stay Away' }}</p>
+{% endif %}
+<small>{{ item.plug_dynamic_card.note }}</small></section>
+{% else %}
 {% if selected_ats or selected_ou %}
 <section class="plug-top-picks" aria-label="The Plug's Top Picks">
 <h3>The Plug's Top Picks:</h3>
@@ -33,8 +42,12 @@
 {% if item.plug_ou_status == 'stay_away' %}<p class="plug-market-muted">Plug O/U: Stay Away</p>
 {% elif item.plug_ou_review %}<p class="plug-market-pending">Plug O/U: Review needed</p>
 {% elif item.upcoming and not selected_ou %}<p class="plug-market-pending">Plug O/U: Awaiting weekly shortlist</p>{% endif %}
+{% endif %}
 </div>
 {% endif %}
+{# Dynamic research preview stays hidden until an explicitly validated card is provided. #}
+{% set dynamic_card = item.plug_dynamic_card if item.plug_dynamic_card is defined and not item.plug_dynamic_official|default(false) else none %}
+{% include '_plug_dynamic_preview.html' %}
 <section class="plug-market-context">
 {% if item.backup_odds_capture %}<p class="expert-meta">DraftKings odds via ESPN · observed {{ item.backup_odds_capture|eastern_time }}. Public betting percentages unavailable for this capture.</p>{% endif %}
 

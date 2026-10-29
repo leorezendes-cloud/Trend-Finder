@@ -1,0 +1,11 @@
+{# Read-only dynamic Plug research preview. Do not use for official grading. #}
+{% if dynamic_card is defined and dynamic_card and dynamic_card.status != 'unavailable' %}
+<section class="plug-dynamic-preview" aria-label="Current Plug research selections">
+  <div class="plug-dynamic-preview-head"><strong>Dynamic Plug research preview</strong>{% if dynamic_card.changed %}<small>Updated with Vegas line movement</small>{% endif %}</div>
+  <div class="plug-dynamic-preview-picks">
+    <p><strong>ATS</strong> {{ dynamic_card.ats }}</p>
+    <p><strong>O/U</strong> {{ dynamic_card.ou }}</p>
+  </div>
+  <small class="plug-dynamic-preview-note">{{ dynamic_card.note }}</small>
+</section>
+{% endif %}
