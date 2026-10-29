@@ -210,6 +210,13 @@ class ProductionIntegration(unittest.TestCase):
             result=check(root,now=datetime.fromisoformat(AT),require_hosted=False)
             self.assertTrue(result['ready'],result)
             self.assertEqual(len(result['warnings']),2)
+            waiting={'2026_09_JAX_BAL':'Awaiting the upcoming weekly receipt'}
+            market['dynamic']=dict(state='ok',unavailable=0,next_week_games=waiting)
+            (logs/'ats_capture_status.json').write_text(json.dumps(market))
+            result=check(root,now=datetime.fromisoformat(AT),require_hosted=False)
+            self.assertTrue(result['ready'],result)
+            self.assertEqual(result['awaiting_next_week'],waiting)
+            self.assertEqual(len(result['warnings']),1)  # The real QB warning stays visible.
             market['dynamic_error']='corrupt stored evidence'
             (logs/'ats_capture_status.json').write_text(json.dumps(market))
             self.assertFalse(check(root,now=datetime.fromisoformat(AT),require_hosted=False)['ready'])

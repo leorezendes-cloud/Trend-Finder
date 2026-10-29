@@ -87,3 +87,24 @@ They are outside the focused workflow and were left unchanged.
 The local test process is not a Render memory benchmark. Production still uses
 one worker/four threads, bounded sequential refreshes, and no extra long-lived
 worker or model/AI task. The live disk/restart/timer checks must run on Render.
+
+
+## Look-ahead games from the following week
+
+The eight-day market collector can include next Thursday while the site is
+still showing the current NFL week. For example, on October 29, 2026 the current
+Week 8 slate has 14 games; JAX–BAL on November 5 is an additional Week 9 game.
+The v5 weekly issuer runs every five minutes, but intentionally requires the
+complete future week's sealed forecasts and verified prior-week finals before
+publishing its immutable weekly receipt. There is no manual per-game receipt
+repair for that expected wait.
+
+A missing ATS weekly receipt for a strictly later REG week is reported under
+`awaiting_next_week` / `next_week_games`, rather than as a current unavailable
+game. If it is the only reason a refresh does not cover every look-ahead game,
+current coverage remains `ok`; an all-future wait is `waiting_next_week`, never
+a claim that games were refreshed. The read-only readiness report carries this
+information separately from warnings. Current-week missing receipts, malformed
+receipts, stale/missing markets and other errors remain visible. On rollover,
+a still-missing receipt becomes an active-week unavailable game automatically.
+No odds, models, timestamps, selections or receipt issuance rules are changed.
