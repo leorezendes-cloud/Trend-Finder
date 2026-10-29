@@ -4,10 +4,10 @@
 {% if dynamic_record_review %}<p>Dynamic receipts need review. Results unavailable.</p>{% else %}
 <p>ATS: {{ dynamic_record_counts.ats.Win }}–{{ dynamic_record_counts.ats.Loss }}–{{ dynamic_record_counts.ats.Push }} · {{ dynamic_record_counts.ats.Pending }} pending</p>
 <p>O/U: {{ dynamic_record_counts.ou.Win }}–{{ dynamic_record_counts.ou.Loss }}–{{ dynamic_record_counts.ou.Push }} · {{ dynamic_record_counts.ou.Pending }} pending</p>
-<div class="table-scroll"><table><thead><tr><th>Game</th><th>ATS</th><th>ATS result</th><th>O/U</th><th>O/U result</th></tr></thead><tbody>
-{% for r in dynamic_record_rows if r.ats_selected or r.ou_selected %}<tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
-<td>{% if r.ats_selected %}{{ r.ats_side }} {{ '%+g'|format(r.ats_away_line if r.ats_side==r.away_team else -r.ats_away_line) }}{% else %}—{% endif %}</td><td>{{ r.ats_result if r.ats_selected and r.ats_result != 'Pending' else '—' }}</td>
-<td>{{ r.ou_side ~ ' ' ~ ('%g'|format(r.ou_market_total)) if r.ou_selected else '—' }}</td><td>{{ r.ou_result if r.ou_selected and r.ou_result != 'Pending' else '—' }}</td></tr>
-{% else %}<tr><td colspan="5">No official dynamic selections for this week.</td></tr>{% endfor %}
-</tbody></table></div>{% endif %}</section>
+<ul class="dynamic-plug-picks">
+{% for r in dynamic_record_rows if r.ats_selected or r.ou_selected %}
+  {% if r.ats_selected %}<li><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a> — <strong>{{ r.ats_side }} {{ '%+g'|format(r.ats_away_line if r.ats_side==r.away_team else -r.ats_away_line) }}</strong></li>{% endif %}
+  {% if r.ou_selected %}<li><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a> — <strong>{{ r.ou_side }} {{ '%g'|format(r.ou_market_total) }}</strong></li>{% endif %}
+{% else %}<li>No official dynamic selections for this week.</li>{% endfor %}
+</ul>{% endif %}</section>
 {% endif %}
