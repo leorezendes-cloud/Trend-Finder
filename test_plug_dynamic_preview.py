@@ -33,7 +33,7 @@ class DynamicPreviewTest(unittest.TestCase):
         # research selection and cannot replace the official Plug picks.
         source=(ROOT/"templates"/"expert_dashboard.html").read_text()
         self.assertIn("{% include '_plug_dynamic_preview.html' %}",source)
-        self.assertIn("item.plug_dynamic_card if item.plug_dynamic_card is defined else none",source)
+        self.assertIn("item.plug_dynamic_card if item.plug_dynamic_card is defined and not item.plug_dynamic_official|default(false) else none",source)
 
     def test_escape_untrusted_values(self):
         result=TEMPLATE.render(dynamic_card={
