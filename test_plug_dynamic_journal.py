@@ -53,5 +53,21 @@ class JournalTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 read(root,"2026_08_BAL_PIT")
 
+    def test_valid_checksum_cannot_hide_wrong_game_identity(self):
+        import hashlib
+        import json
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as root:
+            append(root,"2026_08_BAL_PIT",BASE)
+            file=Path(root)/"plug_dynamic_research"/"2026_08_BAL_PIT.jsonl"
+            item=json.loads(file.read_text())
+            item["game_id"]="2026_08_BAL_CLE"
+            item.pop("sha256")
+            raw=json.dumps(item,sort_keys=True,separators=(",",":"),allow_nan=False)
+            item["sha256"]=hashlib.sha256(raw.encode()).hexdigest()
+            file.write_text(json.dumps(item,sort_keys=True,separators=(",",":"))+"\\n")
+            with self.assertRaises(ValueError):
+                read(root,"2026_08_BAL_PIT")
+
 if __name__=="__main__":
     unittest.main()
