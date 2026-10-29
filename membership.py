@@ -506,6 +506,10 @@ def feedback_page():
         page = '/members/reset-password'
     error = None
     if request.method=='POST':
+        # Invisible form field catches simple automated submissions. Treat it as
+        # accepted without storing anything so bots receive no signal.
+        if request.form.get('website', '').strip():
+            return redirect(url_for('membership.feedback_page', sent=1))
         if not allow_attempt('feedback', str(g.member['id']) if g.member else csrf_token()):
             return render_template('feedback.html',page=page,error='Too many reports. Please try again in 15 minutes.'),429
         category = request.form.get('category','')
