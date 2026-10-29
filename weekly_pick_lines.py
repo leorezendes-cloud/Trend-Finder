@@ -114,7 +114,15 @@ def scheduled_capture(root):
             if start<=now<start+timedelta(minutes=10):
                 from scheduled_ats_capture import run
                 if run(root)!=0:raise RuntimeError('Wednesday market capture failed')
-            report=freeze_snapshot(root,datetime.now(timezone.utc))
+            checked_at=datetime.now(timezone.utc)
+            report=freeze_snapshot(root,checked_at)
+            # If the Wednesday capture window was missed, use verified quotes
+            # observed later only as an explicitly timestamped recovery. Never
+            # represent them as the original Wednesday cutoff lines.
+            if report['state']=='pending' and checked_at>=start+timedelta(hours=1):
+                recovered=freeze_snapshot(root,checked_at,exception=True)
+                if recovered['state']=='ready':
+                    report=recovered
         # Report "ready" only after publication was confirmed. An interrupted
         # publication must not leave a success marker that suppresses retries.
         if report['state']=='ready':
