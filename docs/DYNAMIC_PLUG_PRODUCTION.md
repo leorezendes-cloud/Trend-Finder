@@ -65,8 +65,8 @@ journal additions, but rejects any changed preexisting historical bytes.
 
 ## Validation
 
-Local validation: **138 tests passed**, all **83 Jinja templates parsed**, and
-the largest local test process peaked at **113.1 MiB RSS**.
+Local validation: **139 tests passed**, all **83 Jinja templates parsed**, and
+the largest local test process peaked at **111.7 MiB RSS**.
 
 The PR workflow runs the entire existing ATS v5/O-U v14/dynamic regression group
 plus full weekly-results, Expert pipeline, prediction-card, hosted updater,

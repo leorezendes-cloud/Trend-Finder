@@ -158,6 +158,18 @@ class ProductionIntegration(unittest.TestCase):
             verified=json.loads((logs/'dynamic_restart_verified.json').read_text())
             self.assertEqual(verified['boot_id'],'second')
 
+    def test_only_real_gunicorn_web_boot_records_restart_identity(self):
+        import runpy
+        with patch('hosted_updates.record_web_boot') as boot,patch('hosted_updates.start_scheduler'):
+            runpy.run_path('gunicorn.conf.py')['post_worker_init'](None)
+            boot.assert_called_once()
+        with tempfile.TemporaryDirectory() as tmp,patch.dict('os.environ',{'TREND_FINDAH_ENV':'production'}):
+            from hosted_updates import record_web_boot
+            record_web_boot(tmp)
+            first=json.loads((Path(tmp)/'logs/dynamic_boot.json').read_text())['boot_id']
+            record_web_boot(tmp)
+            self.assertNotEqual(first,json.loads((Path(tmp)/'logs/dynamic_boot.json').read_text())['boot_id'])
+
     def test_pending_qb_is_visible_nonfatal_but_real_errors_fail(self):
         for error,expected in ((ValueError('6 requested/completed games still need QB verification'),'ok'),
                                (ValueError('Corrupt verification store'),'needs attention')):

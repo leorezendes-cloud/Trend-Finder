@@ -61,10 +61,17 @@ def configure_persistent_data():
     if not Path('/var/data').is_dir():
         raise RuntimeError('Automatic updates require the persistent /var/data disk')
     initialize_data(SOURCE, target)
+
+
+def record_web_boot(root):
+    # Only Gunicorn's actual web-worker hook calls this. Importing wsgi in a
+    # short-lived command must never count as proof of a service restart.
+    if os.environ.get('TREND_FINDAH_ENV') != 'production':
+        return
     from scheduler_runtime import atomic_json
     from plug_dynamic_official import PIPELINE
     from uuid import uuid4
-    atomic_json(target/'logs/dynamic_boot.json', dict(
+    atomic_json(Path(root)/'logs/dynamic_boot.json', dict(
         boot_id=str(uuid4()), pipeline=PIPELINE,
         started_at_utc=datetime.now(timezone.utc).isoformat()))
 
