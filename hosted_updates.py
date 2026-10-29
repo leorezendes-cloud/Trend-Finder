@@ -170,6 +170,9 @@ def update_once(root, feed_lock_fd=None):
         temporary = target.with_suffix('.tmp')
         temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded,'research_benchmarks':research},indent=2))
         temporary.replace(target)
+    if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+        from plug_dynamic_finalize_batch import finalize_due
+        attempt('dynamic Plug closing research (unpublished)', lambda: finalize_due(root))
     attempt('grading', grade)
     # Optional research collection is separate from the locked prediction model.
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1':
