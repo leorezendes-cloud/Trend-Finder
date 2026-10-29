@@ -1,7 +1,8 @@
-"""Explicit, opt-in research refresh for one verified NFL game.
+"""Explicit, opt-in RESEARCH refresh for one verified NFL game.
 
-No scheduler hooks or official receipt writes. All inputs are supplied from
-independently frozen model forecasts. Prints decision summary after journaling.
+No scheduler hooks or official receipt writes. Model numbers are caller-supplied
+and NOT verified against frozen forecasts, so NEVER schedule or publish this
+command as an authoritative pick issuer. Prints research revision summary.
 """
 import argparse
 import json
@@ -10,7 +11,7 @@ from datetime import datetime, timezone
 from plug_dynamic_research import observe
 
 def main():
-    parser=argparse.ArgumentParser()
+    parser=argparse.ArgumentParser(description="Research only: does not verify supplied model predictions")
     parser.add_argument("--root",type=Path,required=True)
     parser.add_argument("--game-id",required=True)
     parser.add_argument("--away",required=True)
@@ -26,7 +27,7 @@ def main():
                      v14_total=args.v14_total,
                      original_total_side=args.original_total_side,
                      evaluation_utc=datetime.now(timezone.utc).isoformat())
-    print(json.dumps({"game_id":args.game_id,"revision":decision["revision"],
+    print(json.dumps({"research_only":True,"game_id":args.game_id,"revision":decision["revision"],
                       "ats_selected":decision["ats_selected"],
                       "ou_selected":decision["ou_selected"],
                       "evaluated_utc":decision["evaluated_utc"]},sort_keys=True))
