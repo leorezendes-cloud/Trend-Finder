@@ -35,6 +35,9 @@
 {% elif item.upcoming and not selected_ou %}<p class="plug-market-pending">Plug O/U: Awaiting weekly shortlist</p>{% endif %}
 </div>
 {% endif %}
+{# Dynamic research preview stays hidden until an explicitly validated card is provided. #}
+{% set dynamic_card = item.plug_dynamic_card if item.plug_dynamic_card is defined else none %}
+{% include '_plug_dynamic_preview.html' %}
 <section class="plug-market-context">
 {% if item.backup_odds_capture %}<p class="expert-meta">DraftKings odds via ESPN · observed {{ item.backup_odds_capture|eastern_time }}. Public betting percentages unavailable for this capture.</p>{% endif %}
 
