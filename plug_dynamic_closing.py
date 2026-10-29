@@ -60,6 +60,8 @@ def finalize(root, game_id, *, as_of_utc):
                "ou_market_total": last["ou_market_total"]}
     payload["receipt_sha256"] = hashlib.sha256(_canonical(payload)).hexdigest()
     path = _destination(root, game_id)
+    # Do not create a contradictory receipt if a concurrent caller finalized
+    # another revision; immutable() enforces the single-writer outcome.
     immutable(path, _canonical(payload))
     existing = read_closing(root, game_id)
     if existing != payload:
