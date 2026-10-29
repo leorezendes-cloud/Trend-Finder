@@ -104,7 +104,11 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
         if game_id in seen:
             continue
         seen.add(game_id)
-        selections = item.get('saved_picks') or {}
+        # combined_cards masks saved_picks on archive-only cards until a
+        # compatible legacy projection is attached. The newsletter must read
+        # the immutable, published pregame Scout snapshot instead; otherwise
+        # valid upcoming Plug and Expert features silently disappear.
+        selections = record['scout']
         ats = (selections.get('spread') or {}).get('side')
         total = (selections.get('total') or {}).get('side')
         if ats not in (None, game['away_team'], game['home_team']) or total not in (None, 'Over', 'Under'):
