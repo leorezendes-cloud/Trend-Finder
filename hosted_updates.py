@@ -102,7 +102,18 @@ def update_once(root, feed_lock_fd=None):
             collect(season, root/'data/scout4')
     attempt('finals', lambda: feed('finals'))
     from qb_verification import refresh_qbs
-    attempt('QB verification', lambda: refresh_qbs(root,season))
+    def verify_qbs_nonblocking():
+        try:
+            refresh_qbs(root, season)
+        except ValueError as error:
+            # QB research is best-effort: the verifier persists unresolved
+            # ESPN roster cases and retries them on subsequent runs. Do not
+            # block otherwise successful Scout/Plug updates for that backlog.
+            if 'requested/completed games still need QB verification' not in str(error):
+                raise
+            scheduler_event(root, 'scout-worker', 'qb_verification_pending',
+                            reason=str(error))
+    attempt('QB verification', verify_qbs_nonblocking)
     attempt('stats', lambda: feed('stats'))
     def capture():
         from scheduled_ats_capture import run as quotes
