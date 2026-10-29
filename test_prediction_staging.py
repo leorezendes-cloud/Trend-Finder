@@ -130,12 +130,17 @@ class AtomicPipelineTests(unittest.TestCase):
 
     def test_compacted_complete_stage_keeps_recovery_hashes_and_published_forecast(self):
         from storage_maintenance import compact
+        # Valid blank CSV lines make this synthetic input exceed the minimum
+        # archive size, so top-level and engine input copies really get shared.
+        schedule=self.root/'nfl_games.csv'
+        schedule.write_bytes(schedule.read_bytes()+b'\n'*4096)
         self.run_pipeline()
         original=self.target().read_bytes()
         stage=self.latest()
         journal=json.loads((stage/'journal.json').read_text())
         before={p:p.read_bytes() for p in stage.rglob('*') if p.is_file()}
-        compact(self.root,apply=True,min_age=0)
+        result=compact(self.root,apply=True,min_age=0)
+        self.assertGreater(result['shared_files'],0)
         staging.verify_snapshot(stage,journal)
         for path,raw in before.items():self.assertEqual(path.read_bytes(),raw)
         result=self.run_pipeline()
