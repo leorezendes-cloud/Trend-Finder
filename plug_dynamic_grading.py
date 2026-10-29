@@ -13,7 +13,7 @@ def closing_grade(root, game_id, *, as_of_utc, away_score, home_score):
         return {"status":state["status"],"ats":None,"ou":None}
     row=state["revision"]
     a=float(away_score); h=float(home_score)
-    if not all(math.isfinite(x) for x in (a,h)):
+    if not all(math.isfinite(x) and x >= 0 and x.is_integer() for x in (a,h)):
         raise ValueError("Invalid final scores")
     ats=None
     if row["ats_selected"]:
@@ -24,6 +24,8 @@ def closing_grade(root, game_id, *, as_of_utc, away_score, home_score):
         ats="Push" if edge==0 else ("Win" if (edge>0)==(row["ats_side"]==away_team) else "Loss")
     ou=None
     if row["ou_selected"]:
+        if row["ou_side"] not in ("Over","Under"):
+            raise ValueError("Invalid saved O/U side")
         edge=a+h-float(row["ou_market_total"])
         ou="Push" if edge==0 else ("Win" if (edge>0)==(row["ou_side"]=="Over") else "Loss")
     return {"status":"locked","ats":ats,"ou":ou,
