@@ -6,7 +6,7 @@
 <tr><td align="center" style="padding:20px 10px">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:620px;border-collapse:collapse;border:1px solid #dee2e9;background:#ffffff">
 <tr><td style="background:#121123;padding:28px 24px 25px">
-  <a href="{{ origin }}" style="color:#7cff4b;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:1.4px">TRENDFINDAH.COM</a>
+  <a href="{{ origin }}" style="color:#fbbf24;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:1.4px">TRENDFINDAH.COM</a>
   <h1 style="margin:11px 0 6px;font-size:30px;line-height:1.15;color:#fff3ff">THE WEEKLY PLUG &#128268;</h1>
   <p style="margin:0;color:#e1d8ed;font-size:14px;line-height:1.55">Picks. Trends. Football talk.</p>
   <p style="margin:9px 0 0;color:#bbb4cc;font-size:12px">{{ issue|plug_period_label }}</p>
@@ -19,7 +19,7 @@
   <p style="margin:0 0 10px;color:#24242b;font-size:16px;font-weight:800">{{ selected[0] }}</p>
   {% for line in selected[1:] %}{% set item = line|trim %}
     {% if item.startswith(origin ~ '/') %}
-      <p style="margin:13px 0 5px"><a href="{{ item }}" style="color:#168449;font-size:14px;font-weight:800;text-decoration:underline">Read the full breakdown &rarr;</a></p>
+      <p style="margin:13px 0 5px"><a href="{{ item }}" style="color:#a36a00;font-size:14px;font-weight:800;text-decoration:underline">Read the full breakdown &rarr;</a></p>
     {% elif item.startswith('ATS: ') and ' · Total: ' in item %}
       {% set markets = item.split(' · Total: ', 1) %}
       {% set ats_pick = markets[0].split('ATS: ', 1)[1]|trim %}
@@ -35,7 +35,7 @@
     {% elif item %}<p style="color:#444650;font-size:14px;line-height:1.55;margin:7px 0">{{ item }}</p>{% endif %}
   {% endfor %}
   {% endif %}
-  <p style="margin:12px 0 0"><a href="{{ origin }}/the-plug" style="color:#168449;font-size:13px;text-decoration:underline">See The Plug &rarr;</a></p>
+  <p style="margin:12px 0 0"><a href="{{ origin }}/the-plug" style="color:#a36a00;font-size:13px;text-decoration:underline">See The Plug &rarr;</a></p>
 </td></tr>
 <tr><td style="padding:24px 24px 18px;border-bottom:1px solid #e5e9ee">
   <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">02 / HOT RIGHT NOW</p>
@@ -58,7 +58,7 @@
     <tr><td style="padding:0 0 11px;border-bottom:1px solid #eceef2">
       <p style="margin:0 0 5px;color:#20222a;font-size:15px;line-height:1.4;font-weight:800">{{ lines[0] }}</p>
       {% for line in lines[1:] %}
-      {% if line.startswith(origin ~ '/') and line|length < 2000 %}<a href="{{ line }}" style="color:#168449;font-size:13px;font-weight:700;text-decoration:underline">Explore the trend &rarr;</a>
+      {% if line.startswith(origin ~ '/') and line|length < 2000 %}<a href="{{ line }}" style="color:#a36a00;font-size:13px;font-weight:700;text-decoration:underline">Explore the trend &rarr;</a>
       {% elif loop.first %}<p style="font-size:12px;color:#667085;margin:4px 0">{{ line }}</p>
       {% elif line %}<p style="margin:4px 0 9px;font-size:14px;line-height:1.55;color:#555965">{{ line }}</p>{% endif %}
       {% endfor %}
@@ -75,25 +75,25 @@
     {% if lines[0]|trim %}
     <p style="font-size:15px;font-weight:800;color:#252832;margin:12px 0 4px">{{ lines[0] }}</p>
     {% for line in lines[1:] %}
-      {% if line.startswith(origin ~ '/') and line|length < 2000 %}<p style="margin:6px 0 13px"><a href="{{ line }}" style="color:#168449;font-size:13px;font-weight:700;text-decoration:underline">Explore matchup &rarr;</a></p>
+      {% if line.startswith(origin ~ '/') and line|length < 2000 %}<p style="margin:6px 0 13px"><a href="{{ line }}" style="color:#a36a00;font-size:13px;font-weight:700;text-decoration:underline">Explore matchup &rarr;</a></p>
       {% elif loop.first %}<p style="font-size:12px;color:#667085;margin:4px 0">{{ line }}</p>
       {% elif line %}<p style="color:#555965;font-size:14px;line-height:1.55;margin:5px 0">{{ line }}</p>{% endif %}
     {% endfor %}
     {% endif %}
   {% endfor %}
-  <p style="margin:13px 0 0"><a href="{{ origin }}/the-plug" style="color:#168449;font-size:13px;font-weight:700;text-decoration:underline">See the full slate &rarr;</a></p>
+  <p style="margin:13px 0 0"><a href="{{ origin }}/the-plug" style="color:#a36a00;font-size:13px;font-weight:700;text-decoration:underline">See the full slate &rarr;</a></p>
 </td></tr>
 <tr><td style="padding:24px 24px 27px">
   <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">04 / THE HUDDLE</p>
   <h2 style="margin:0 0 9px;color:#1a1a20;font-size:19px">Think You Know Football? Prove It.</h2>
   <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#555965">Create a free Pick'em league, invite your friends, and compete for bragging rights.</p>
   <a href="{{ origin }}/huddle/leagues/start/create" style="display:inline-block;background:#67ef35;color:#112018;padding:12px 15px;font-size:13px;font-weight:800;text-decoration:none;border-radius:7px">Create a free league &rarr;</a>
-  <p style="margin:11px 0 0"><a href="{{ origin }}/huddle/leagues/start/join" style="font-size:13px;font-weight:700;color:#168449;text-decoration:underline">Already invited? Join a league &rarr;</a></p>
+  <p style="margin:11px 0 0"><a href="{{ origin }}/huddle/leagues/start/join" style="font-size:13px;font-weight:700;color:#a36a00;text-decoration:underline">Already invited? Join a league &rarr;</a></p>
 </td></tr>
 <tr><td style="padding:19px 24px 25px;border-top:1px solid #e5e9ee;background:#f6f8fa">
   <p style="margin:0 0 8px;color:#667085;font-size:12px;line-height:1.5">You're receiving this because you subscribed to Trend Findah.</p>
   <p style="margin:0 0 8px;color:#667085;font-size:12px;line-height:1.5">{{ address }}</p>
-  <p style="margin:0;font-size:12px;line-height:1.5"><a href="{{ unsubscribe_url }}" style="color:#168449;text-decoration:underline">Unsubscribe</a> &nbsp;·&nbsp; <a href="{{ origin }}/members/preferences" style="color:#168449;text-decoration:underline">Manage preferences</a></p>
+  <p style="margin:0;font-size:12px;line-height:1.5"><a href="{{ unsubscribe_url }}" style="color:#a36a00;text-decoration:underline">Unsubscribe</a> &nbsp;·&nbsp; <a href="{{ origin }}/members/preferences" style="color:#a36a00;text-decoration:underline">Manage preferences</a></p>
 </td></tr>
 </table></td></tr></table>
 </body></html>
