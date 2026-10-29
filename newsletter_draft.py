@@ -133,7 +133,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
-        picks.append((kickoff, f'{label}\\nATS: {ats_text} · Total: {ou_text}\\n{url}', record['version']))
+        picks.append((kickoff, f'{label}\nATS: {ats_text} · Total: {ou_text}\n{url}', record['version']))
 
         # Look across published versions of this same game for approved analysis.
         # It must still belong to a publicly featured matchup, not private content.
@@ -158,7 +158,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
                 summary = summary[:350].rsplit(' ', 1)[0].rstrip(' ,;:') + '…'
             expert_text = (f"ATS: {report.get('ats_side') or 'No pick'}"
                            f" · Total: {report.get('total_side') or 'No pick'}")
-            expert.append((kickoff, f'{label}\\n{expert_text}\\n{summary}\\n{url}'))
+            expert.append((kickoff, f'{label}\n{expert_text}\n{summary}\n{url}'))
             break
 
     picks.sort(key=lambda pair: pair[0])
