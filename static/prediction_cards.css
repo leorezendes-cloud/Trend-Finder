@@ -8,3 +8,11 @@
 @media(max-width:640px){.inline-matchup-picks .matchup-model-summary .prediction-columns{grid-template-columns:minmax(0,1fr)}}
 
 .prediction-quantitative .tf-plug-ou-pick{color:#4ade80;font-weight:700}
+
+/* Only issued Plug selections receive the active pick color. */
+.plug-official-picks .plug-selected-pick{color:#4ade80;font-weight:700}
+.plug-official-picks .plug-settled-grade{color:#cbd5e1;font-weight:400}
+.plug-official-picks .plug-grade-win{color:#86efac}
+.plug-official-picks .plug-grade-loss{color:#fca5a5}
+.plug-official-picks .plug-grade-push{color:#fbbf24}
+.plug-market-pending{color:#aeb7c6;font-size:.85rem}

@@ -1,0 +1,21 @@
+{% set grades = item.completed_grades|default({}, true) %}
+{% set settled = ('Win', 'Loss', 'Push', 'Tie', 'Void') %}
+{% set scout_ats = grades.get('scout_ats') %}{% set scout_total = grades.get('scout_total') %}
+{% set plug_ats = item.plug_ats_result|default(none) %}{% set plug_total = grades.get('plug_total') %}
+{% set expert_ats = grades.get('expert_ats') %}{% set expert_total = grades.get('expert_total') %}
+{% set saved = scout_ats in settled or scout_total in settled or plug_ats in settled or plug_total in settled %}
+{% set expert = item.expert_picks|default(none) and (expert_ats in settled or expert_total in settled) %}
+{% if item.final_score|default(none) and (saved or expert) %}
+<div class="plug-final-grades" aria-label="Graded selections">
+{% if saved %}<p><strong>Saved results</strong>
+{% if scout_ats in settled %}<span>Scout ATS <b class="plug-grade-{{ scout_ats|lower }}">{{ scout_ats }}</b></span>{% endif %}
+{% if scout_total in settled %}<span>Scout O/U <b class="plug-grade-{{ scout_total|lower }}">{{ scout_total }}</b></span>{% endif %}
+{% if plug_total in settled %}<span>Plug O/U <b class="plug-grade-{{ plug_total|lower }}">{{ plug_total }}</b></span>{% endif %}
+{% if plug_ats in settled %}<span>Plug ATS <b class="plug-grade-{{ plug_ats|lower }}">{{ plug_ats }}</b></span>{% endif %}
+</p>{% endif %}
+{% if expert %}<p><strong>The Expert results</strong>
+{% if expert_ats in settled %}<span>ATS <b class="plug-grade-{{ expert_ats|lower }}">{{ expert_ats }}</b></span>{% endif %}
+{% if expert_total in settled %}<span>O/U <b class="plug-grade-{{ expert_total|lower }}">{{ expert_total }}</b></span>{% endif %}
+</p>{% endif %}
+</div>
+{% endif %}
