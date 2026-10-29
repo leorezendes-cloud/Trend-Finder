@@ -109,6 +109,10 @@ def update_once(root, feed_lock_fd=None):
         if quotes(root) != 0:
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
+    if (os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1'
+            and stages['quotes'] == 'ok'):
+        from plug_dynamic_batch import refresh as refresh_dynamic
+        attempt('dynamic Plug research (unpublished)', lambda: refresh_dynamic(root))
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1' and stages['stats']=='ok':
         attempt('injury/weather collection', lambda: feed('context'))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
