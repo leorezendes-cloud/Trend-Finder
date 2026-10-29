@@ -19,7 +19,11 @@ def verified_decision(root, *, game_id, away_team, home_team, kickoff_utc,
         raise ValueError("Evaluation must precede verified kickoff")
     market=matchup_public_market(root,dict(game_id=game_id,away=away_team,
          home=home_team,kickoff_at=kickoff_utc),now=now)
-    by_key={m["key"]:m for m in market["markets"]}
+    markets=market["markets"]
+    keys=[m["key"] for m in markets]
+    if len(keys)!=len(set(keys)):
+        raise ValueError("Duplicate market entries")
+    by_key={m["key"]:m for m in markets}
     quotes=[]
     for kind,names in (("Spread",(away_team,home_team)),
                        ("Total",("Over","Under"))):
@@ -27,7 +31,7 @@ def verified_decision(root, *, game_id, away_team, home_team, kickoff_utc,
         if not item or item.get("stale") or [s["name"] for s in item["sides"]]!=list(names):
             raise ValueError("Missing, stale or mismatched "+kind+" quote")
         lines=[s.get("line") for s in item["sides"]]
-        if any(not isinstance(x,(int,float)) or not math.isfinite(x) for x in lines):
+        if any(isinstance(x,bool) or not isinstance(x,(int,float)) or not math.isfinite(x) for x in lines):
             raise ValueError("Invalid "+kind+" line")
         if kind=="Spread" and abs(lines[0]+lines[1])>1e-9:
             raise ValueError("Conflicting spread lines")
