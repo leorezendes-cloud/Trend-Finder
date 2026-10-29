@@ -76,23 +76,21 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
     emails must never depend on a premium viewer's access to a private report.
     """
     try:
-        from expert_beta import store, public_record, validate_expert
-        from plug_dashboard import combined_cards
+        from expert_beta import store, validate_expert
         archive = store()
         records = archive.records()
-        cards, _ = combined_cards(records, public_record, now)
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
         warnings.append('The published Plug archive could not be read. No predictions were invented.')
         return [], [], []
 
-    by_version = {r['version']: r for r in records}
+    # The dashboard replaces archive cards with legacy display objects that
+    # have no archive version. Match newsletter content to the actual published
+    # record instead, never to a transient display card.
+    records = sorted(records, key=lambda r: (r.get('generated_at', ''), r['version']), reverse=True)
     picks, expert = [], []
     seen = set()
     featured_by_week = {}
-    for item in cards:
-        if not item.get('upcoming'):
-            continue
-        record = by_version.get(item.get('version'))
+    for record in records:
         # Only released pregame snapshots, never test/lab forecasts.
         if record is None or record.get('kind') not in ('production_import', 'prospective'):
             continue
@@ -104,17 +102,14 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
         if game_id in seen:
             continue
         seen.add(game_id)
-        # combined_cards masks saved_picks on archive-only cards until a
-        # compatible legacy projection is attached. The newsletter must read
-        # the immutable, published pregame Scout snapshot instead; otherwise
-        # valid upcoming Plug and Expert features silently disappear.
+        # Use immutable published pregame selections, not dashboard placeholders.
         selections = record['scout']
         ats = (selections.get('spread') or {}).get('side')
         total = (selections.get('total') or {}).get('side')
         if ats not in (None, game['away_team'], game['home_team']) or total not in (None, 'Over', 'Under'):
             warnings.append('One Plug card was skipped because its published selections were invalid.')
             continue
-        quotes = item.get('locked_quotes') or record['scout'].get('quotes') or {}
+        quotes = record['scout'].get('quotes') or {}
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
