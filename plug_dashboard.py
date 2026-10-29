@@ -277,4 +277,20 @@ def weekly_dashboard(records, render_record, now):
                 result=grade_plug_ou(receipt,final['away'],final['home'])
                 item['plug_ou_result']=result
                 item.setdefault('completed_grades',{})['plug_total']=result
+    # Explicitly enabled, read-only dynamic research display. Official grades,
+    # existing selected picks and archived receipts remain untouched.
+    import os
+    if os.environ.get('TREND_FINDAH_DYNAMIC_PREVIEW') == '1':
+        from plug_dynamic_cards import card_state
+        for group in ('games','underway_games','completed_games','awaiting_games'):
+            for item in sections.get(group, []):
+                game = item['scout']['game']
+                try:
+                    card = card_state(ROOT, game['game_id'], as_of_utc=now.isoformat(),
+                                      away_team=game['away_team'], home_team=game['home_team'])
+                    if card['status'] != 'unavailable':
+                        item['plug_dynamic_card'] = card
+                except (OSError, ValueError, KeyError, TypeError):
+                    # Invalid, tampered or missing journals never appear as picks.
+                    continue
     return sections
