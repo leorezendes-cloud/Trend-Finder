@@ -36,6 +36,14 @@ class JournalTest(unittest.TestCase):
                     append(root,"2026_08_BAL_PIT",{**BASE,**change,
                         "ats_away_line":-8.5})
 
+    def test_reject_contradictory_selection_without_writing(self):
+        with tempfile.TemporaryDirectory() as root:
+            for changed in ({"ats_selected":False,"ats_side":"BAL"},
+                            {"ou_selected":True,"ou_side":None}):
+                with self.subTest(changed=changed), self.assertRaises(ValueError):
+                    append(root,"2026_08_BAL_PIT",{**BASE,**changed})
+            self.assertEqual(read(root,"2026_08_BAL_PIT"),[])
+
     def test_tamper_detection(self):
         with tempfile.TemporaryDirectory() as root:
             append(root,"2026_08_BAL_PIT",BASE)
