@@ -14,6 +14,7 @@ def check(root, *, now=None, require_hosted=True):
     root = Path(root).resolve()
     now = now or datetime.now(timezone.utc)
     errors, warnings = [], []
+    next_week_games = {}
     if require_hosted:
         if root != Path('/var/data/site-data') or not Path('/var/data').is_mount():
             errors.append('Expected Render persistent disk mounted at /var/data')
@@ -32,8 +33,9 @@ def check(root, *, now=None, require_hosted=True):
                 errors.append(name+': successful status is stale')
             if name.startswith('ats_'):
                 dynamic = status.get('dynamic', {})
-                if dynamic.get('state') not in ('ok','partial','idle'):
+                if dynamic.get('state') not in ('ok','partial','idle','waiting_next_week'):
                     errors.append('No verified dynamic market refresh')
+                next_week_games = dynamic.get('next_week_games', {})
                 if dynamic.get('unavailable'):
                     warnings.append({'unavailable_games':dynamic.get('games', {})})
                 if status.get('dynamic_closing',{}).get('errors'):
@@ -88,7 +90,7 @@ def check(root, *, now=None, require_hosted=True):
     if not journals:
         errors.append('No verified dynamic journals')
     return dict(ready=not errors, pipeline=PIPELINE, journals=journals, closed=closed,
-                errors=errors, warnings=warnings)
+                errors=errors, warnings=warnings, awaiting_next_week=next_week_games)
 
 
 def protected_files(root):

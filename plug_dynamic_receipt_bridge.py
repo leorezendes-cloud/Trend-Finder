@@ -3,7 +3,7 @@
 Never recomputes models, changes official picks or publishes this journal.
 Both sources must exist and match the exact game and kickoff.
 """
-from plug_dynamic_errors import Unavailable
+from plug_dynamic_errors import Unavailable, WeeklyReceiptPending
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -28,7 +28,7 @@ def observe_from_receipts(root, *, game_id, evaluation_utc, live=False):
     now = _utc(evaluation_utc)
     ats = read_ats_week(year, week)
     if ats is None:
-        raise Unavailable("Verified ATS v5 weekly receipt unavailable")
+        raise WeeklyReceiptPending("Verified ATS v5 weekly receipt unavailable")
     rows = [row for row in ats["games"] if row["game_id"] == game_id]
     if len(rows) != 1:
         raise Unavailable("Game absent from verified ATS slate")
