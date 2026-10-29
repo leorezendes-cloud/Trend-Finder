@@ -3,14 +3,17 @@
 Deliberately separate from official cards until publication migration is ready.
 """
 from plug_dynamic_research import snapshot
+from plug_dynamic_journal import _time
 
 
-def card_state(root, game_id, *, as_of_utc, away_team, home_team):
+def card_state(root, game_id, *, as_of_utc, away_team, home_team, kickoff_utc=None):
     state=snapshot(root,game_id,as_of_utc=as_of_utc)
     if state["status"]=="unavailable":
         return dict(status="unavailable",ats="Awaiting verified line",
                     ou="Awaiting verified line",note=None,changed=False)
     row=state["revision"]
+    if kickoff_utc is not None and _time(row["kickoff_utc"]) != _time(kickoff_utc):
+        raise ValueError("Research kickoff differs from current schedule")
     if row["ats_selected"]:
         if row["ats_side"] not in (away_team,home_team):
             raise ValueError("Saved ATS team does not match matchup")
