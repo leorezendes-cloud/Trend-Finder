@@ -25,6 +25,8 @@ class SavedMarketAdapterTest(unittest.TestCase):
     def test_reject_missing_stale_or_invalid_market(self):
         variants=[
             {"markets":MARKET["markets"][:1]},
+            {"markets":[*MARKET["markets"],MARKET["markets"][0]]},
+            {"markets":[{**MARKET["markets"][0],"sides":[{"name":"BAL","line":True},{"name":"PIT","line":-1}]},MARKET["markets"][1]]},
             {"markets":[{**MARKET["markets"][0],"stale":True},MARKET["markets"][1]]},
             {"markets":[{**MARKET["markets"][0],"sides":[{"name":"BAL","line":-8.5},{"name":"PIT","line":7.5}]},MARKET["markets"][1]]},
             {"markets":[MARKET["markets"][0],{**MARKET["markets"][1],"captured":"2026-10-29T01:00:00+00:00"}]},
