@@ -287,7 +287,8 @@ def weekly_dashboard(records, render_record, now):
                 game = item['scout']['game']
                 try:
                     card = card_state(ROOT, game['game_id'], as_of_utc=now.isoformat(),
-                                      away_team=game['away_team'], home_team=game['home_team'])
+                                      away_team=game['away_team'], home_team=game['home_team'],
+                                      kickoff_utc=game['kickoff_utc'])
                     if card['status'] != 'unavailable':
                         item['plug_dynamic_card'] = card
                 except (OSError, ValueError, KeyError, TypeError):
