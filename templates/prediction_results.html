@@ -26,7 +26,7 @@
     <div class="tf-record-card-head"><h2 id="plug-heading">The Plug</h2><span>ATS · O/U</span></div>
     <div class="tf-record-score"><div><small>ATS</small><strong>{% if plug_receipts_review %}Review{% else %}{{ plug_week_totals.Win }}–{{ plug_week_totals.Loss }}–{{ plug_week_totals.Push }}{% endif %}</strong></div>
       <div><small>O/U</small><strong class="tf-plug-ou">{% if plug_ou_review %}Review{% elif plug_ou_week_totals.selected %}{{ plug_ou_week_totals.Win }}–{{ plug_ou_week_totals.Loss }}–{{ plug_ou_week_totals.Push }}{% else %}—{% endif %}</strong></div></div>
-    <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · {% if plug_receipts_review %}Results unavailable{% elif plug_week_picks %}{{ plug_week_totals.Pending }} pending{% else %}No picks issued{% endif %}</p>
+    <p class="tf-record-subline">Week {{ selected_week if selected_week is not none else '—' }} · {% if plug_receipts_review or plug_ou_review %}Results unavailable{% elif plug_week_picks or plug_ou_week_picks %}ATS: {{ plug_week_totals.Pending }} pending · O/U: {{ plug_ou_week_totals.Pending }} pending{% else %}No picks issued{% endif %}</p>
     <p class="tf-record-history-pill">2026 Weeks 4–6 · <strong>9–2–1</strong> historical</p>
   </section>
 </div>
