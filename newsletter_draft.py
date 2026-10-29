@@ -301,7 +301,11 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
             lines[-1],
         ])
         return featured, [version] if version else []
-    warnings.append('No approved publicly featured Expert pick matched an eligible saved Scout pick; feature remains pending.')
+    warnings.append('No approved publicly featured Expert pick matched an eligible saved Scout pick; Expert analysis remains pending.')
+    # Never hide legitimately published Plug selections simply because the
+    # separately approved Expert report has not become available yet.
+    if picks:
+        return '\n\n'.join(picks), [v for v in versions if v]
     return 'The featured Expert pick is being prepared. Check The Plug for published picks.', []
 
 
