@@ -110,7 +110,8 @@ def collect(root=ROOT):
             raw=response.read()
         captured=datetime.now(timezone.utc)
         stamp=captured.strftime('%Y%m%dT%H%M%S%fZ')
-        archive=evidence/f'{stamp}-page{page}.html'; archive.write_bytes(raw)
+        from archive_storage import save_capture
+        archive=evidence/f'{stamp}-page{page}.html'; save_capture(archive,raw)
         html=raw.decode('utf-8')
         markets_by_game=parse_markets(html)
         captures.append(dict(url=url,captured_at_utc=captured.isoformat(),file=archive.name,sha256=hashlib.sha256(raw).hexdigest()))

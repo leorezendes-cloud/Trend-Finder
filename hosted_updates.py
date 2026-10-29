@@ -82,14 +82,17 @@ def update_once(root, feed_lock_fd=None):
     if datetime.now(timezone.utc).month < 8:
         season -= 1
     started = datetime.now(timezone.utc).isoformat()
+    from storage_maintenance import maintain
+    storage = maintain(root)
     if shutil.disk_usage(root).free < 128 * 1024 * 1024:
         status = {'started':started, 'finished':started, 'state':'needs attention',
-                  'stages':{'storage':'Updates paused: less than 128 MB free'}}
+                  'stages':{'storage':'Updates paused: less than 128 MB free'},
+                  'details':{'storage':storage}}
         (root/'logs/auto_update_status.json').write_text(json.dumps(status))
         return status
     from plug_dynamic_official import PIPELINE
     stages = {}
-    details = {}
+    details = {'storage':storage}
     warnings = {}
     def attempt(name, action):
         from scheduler_runtime import atomic_json

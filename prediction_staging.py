@@ -270,6 +270,35 @@ def recover(stage, final, config_path, clock):
         raise
 
 
+def all_upcoming_sealed(root, final, source, config_path, cutoff):
+    """No new isolated snapshot is needed when the unchanged engine would preserve all.
+
+    Still validate existing seals and the configured pipeline. Incomplete staging
+    recovery runs first; missing/new games always use the original full engine.
+    """
+    from scout4.shadow import kickoff
+    from scout4.stats import read_csv
+    config = strict_json(config_path.read_bytes())
+    for name, expected in config['code_sha256'].items():
+        if digest((source/safe_relative(name)).read_bytes()) != expected:
+            raise StagingError('Snapshot fingerprint mismatch: '+name)
+    existing = {p.stem:checked_existing(p) for p in final.glob('*.json')}
+    for game in read_csv(root/'nfl_games.csv'):
+        if game.get('game_type') != 'REG' or not game.get('gameday') or not game.get('gametime'):
+            continue
+        at = kickoff(game)
+        if not 0 < (at-cutoff).total_seconds() <= 7*86400:
+            continue
+        record = existing.get(game['game_id'])
+        if record is None:
+            return False
+        if (at != datetime.fromisoformat(record['kickoff_utc'])
+                or any(str(game[k])!=str(record[k]) for k in
+                       ('season','week','away_team','home_team'))):
+            raise StagingError('Existing forecast differs from scheduled game')
+    return True
+
+
 def run_staged(root, source=None, configuration=None, *, clock=None):
     """Run only beneath scheduler's shared update lock; never call on requests."""
     from scout4.blend import run
@@ -307,6 +336,9 @@ def run_staged(root, source=None, configuration=None, *, clock=None):
             recovered |= (result['state'] == 'complete' and before != 'complete')
         if recovered:
             return {'state':'ok', 'recovered':True}
+        if all_upcoming_sealed(root, final, source, configuration, clock()):
+            return {'state':'ok', 'records':{}, 'preserved':len(list(final.glob('*.json'))),
+                    'snapshot_skipped':'all eligible forecasts already sealed'}
         stage = staging/('run-'+uuid.uuid4().hex)
         stage.mkdir()
         sync_directory(staging)
