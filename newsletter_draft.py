@@ -7,6 +7,7 @@ import csv
 import hashlib
 import json
 import math
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -67,7 +68,7 @@ def _side_label(side, quote, market):
     return f'{side} {line:g}' if line is not None else side
 
 
-def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
+def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
     """Newsletter selections come from the same immutable official receipts as The Plug.
 
     Expert analysis remains independent and must be approved and publicly
@@ -81,7 +82,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
         from plug_ou_weekly_v3 import read_effective
         archive = store()
         records = archive.records()
-        root = Path(current_app.root_path)
+        root = Path(root) if root is not None else Path(current_app.root_path)
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
         warnings.append('Published Plug records are unavailable; no predictions were invented.')
         return [], [], []
@@ -104,6 +105,16 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS):
         try:
             ats = for_game(game_id)
             ou = read_effective(root, game_id)
+            if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1':
+                from plug_dynamic_official import apply
+                item = {'scout':record['scout']}
+                apply(root, item, as_of_utc=now.isoformat())
+                if item.get('plug_dynamic_official'):
+                    if item.get('plug_dynamic_review'):
+                        warnings.append('Dynamic Plug selection needs receipt review; game omitted.')
+                        continue
+                    ats = item['plug_ats_decision']
+                    ou = item['plug_ou_receipt']
         except (OSError, ValueError, KeyError, TypeError):
             warnings.append('One official Plug receipt could not be validated.')
             continue
@@ -749,7 +760,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
     else:
         # Read all eligible pregame records, but select only one published Expert
         # report AND its matching Scout snapshot for the free weekly newsletter.
-        picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None)
+        picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None, root=root)
         matchups = _matchups(root, now, origin, sources, warnings,
                             max_games=5 if not premium else 8, editorial=not premium)
         if premium:

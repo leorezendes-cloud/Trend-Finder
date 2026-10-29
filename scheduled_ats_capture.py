@@ -44,6 +44,26 @@ def missing_markets(root, upcoming, now):
 def missing_prices(root, upcoming, now):
     return sorted({gid for gid,market in missing_markets(root,upcoming,now)})
 
+def refresh_dynamic(root, status):
+    from hosted_updates import dynamic_enabled
+    if not dynamic_enabled():
+        return
+    from plug_dynamic_batch import refresh
+    from plug_dynamic_finalize_batch import finalize_due
+    try:
+        # Use completion time, never capture-start time, at the kickoff boundary.
+        completed = datetime.now(timezone.utc)
+        status['dynamic'] = refresh(root, now=completed)
+        status['dynamic_closing'] = finalize_due(root, as_of_utc=completed.isoformat())
+        if status['dynamic_closing']['errors']:
+            raise RuntimeError('Invalid dynamic closing receipt')
+        status['dynamic_finished_utc'] = datetime.now(timezone.utc).isoformat()
+    except Exception as error:
+        status['dynamic_error'] = type(error).__name__+': '+str(error)
+        save_status(root, status)
+        raise
+
+
 def run(root=ROOT, now=None):
     now=now or datetime.now(timezone.utc)
     logs=root/'logs';logs.mkdir(parents=True,exist_ok=True)
@@ -51,11 +71,13 @@ def run(root=ROOT, now=None):
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError:
             print('Collection already running; skipped overlapping run.');return 0
-        status=dict(checked_at_utc=now.isoformat(),source='DraftKings',saved=0)
+        from plug_dynamic_official import PIPELINE
+        status=dict(checked_at_utc=now.isoformat(),source='DraftKings',saved=0,pipeline=PIPELINE)
         try:
             upcoming=upcoming_games(root,now)
             if not upcoming:
                 status.update(state='idle',message='No upcoming games in the next eight days.')
+                refresh_dynamic(root,status)
                 save_status(root,status);print(status['message']);return 0
             required=None
             try:
@@ -79,9 +101,11 @@ def run(root=ROOT, now=None):
                 status.update(state='ok', source='ESPN / DraftKings', saved=len(prices),
                               latest_capture_utc=max(r['captured_at_utc'] for r in prices),
                               message='Backup spreads and totals saved; public betting percentages unavailable.')
+                refresh_dynamic(root,status)
                 save_status(root,status);print(status['message']);return 0
             report=analyze(root/'ats_handle_snapshots.csv',root/'nfl_games.csv')
             status.update(state='ok',splits_available=True,saved=len(rows),qualifying=report['all']['qualifying'],pending=report['all']['pending'],latest_capture_utc=max(r['captured_at_utc'] for r in rows))
+            refresh_dynamic(root,status)
             save_status(root,status)
             print(f"Capture complete: {len(rows)} observations saved; {report['all']['qualifying']} latest qualifying games, {report['all']['pending']} pending.")
             return 0

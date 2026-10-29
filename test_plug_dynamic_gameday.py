@@ -11,7 +11,7 @@ GID="2026_08_BAL_PIT"
 CSV="game_id,gameday\n"+GID+",2026-10-29\n"
 
 class GameDayRefreshTest(unittest.TestCase):
-    def test_refresh_only_after_successful_capture_when_enabled(self):
+    def test_compatibility_wrapper_does_not_duplicate_collector_hook(self):
         with tempfile.TemporaryDirectory() as root:
             Path(root,"nfl_games.csv").write_text(CSV)
             with patch("scheduled_ats_capture.upcoming_games",return_value=[GID]),\
@@ -20,7 +20,7 @@ class GameDayRefreshTest(unittest.TestCase):
                  patch.dict("os.environ",{"TREND_FINDAH_DYNAMIC_RESEARCH":"1"}):
                 refresh_game_day_market(root,now=NOW)
                 capture.assert_called_once()
-                dynamic.assert_called_once()
+                dynamic.assert_not_called()
     def test_disabled_and_capture_failure(self):
         with tempfile.TemporaryDirectory() as root:
             Path(root,"nfl_games.csv").write_text(CSV)

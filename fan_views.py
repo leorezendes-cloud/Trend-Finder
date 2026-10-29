@@ -611,7 +611,9 @@ def prediction_results():
     plug_ou_week_totals={k:sum(r['result']==k for r in plug_ou_week_picks)
                          for k in ('Win','Loss','Push','Pending')}
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
-    return render_template('prediction_results.html', groups=groups,
+    from plug_dynamic_official import record_context
+    dynamic_context = record_context(ROOT, _completed_games(ROOT), season, selected_week)
+    return render_template('prediction_results.html', **dynamic_context, groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
                            season=season, weeks=weeks, selected_week=selected_week,
                            excluded=excluded, freshness=data_freshness(),

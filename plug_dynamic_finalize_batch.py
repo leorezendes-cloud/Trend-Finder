@@ -13,7 +13,7 @@ def finalize_due(root, *, as_of_utc=None):
     root=Path(root)
     at=_time(as_of_utc or datetime.now(timezone.utc).isoformat())
     journal_dir=root/"plug_dynamic_research"
-    results={"due":0,"locked":0,"missing":0,"errors":0}
+    results={"due":0,"locked":0,"missing":0,"errors":0,"issues":{}}
     if not journal_dir.is_dir():
         return results
     from plug_dynamic_journal import read
@@ -27,6 +27,7 @@ def finalize_due(root, *, as_of_utc=None):
             receipt=finalize(root,game_id,as_of_utc=at.isoformat())
             results["locked"]+=int(receipt is not None)
             results["missing"]+=int(receipt is None)
-        except (ValueError,KeyError,OSError,TypeError):
+        except (ValueError,KeyError,OSError,TypeError) as error:
             results["errors"]+=1
+            results["issues"][game_id]=type(error).__name__+": "+str(error)
     return results

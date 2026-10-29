@@ -7,7 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from plug_dynamic_journal import read, _time
+from plug_dynamic_journal import read, _time, _lock, _path
 from plug_publication import immutable
 
 
@@ -37,11 +37,20 @@ def read_closing(root, game_id):
     if (payload["revision"] != history[-1]["revision"]
             or _time(payload["kickoff_utc"]) != _time(history[-1]["kickoff_utc"])):
         raise ValueError("Closing revision identity mismatch")
+    for key in ('ats_selected', 'ats_side', 'ats_away_line', 'ou_selected',
+                'ou_side', 'ou_market_total'):
+        if payload[key] != history[-1][key]:
+            raise ValueError("Closing selection differs from locked revision")
     payload["receipt_sha256"] = checksum
     return payload
 
 
 def finalize(root, game_id, *, as_of_utc):
+    with _lock(_path(root, game_id)):
+        return _finalize(root, game_id, as_of_utc=as_of_utc)
+
+
+def _finalize(root, game_id, *, as_of_utc):
     """Lock the last observed revision at/after kickoff; never fabricate one."""
     history = read(root, game_id)
     if not history:

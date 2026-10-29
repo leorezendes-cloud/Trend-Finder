@@ -9,12 +9,14 @@ from plug_dynamic_journal import append, read
 
 
 def observe(root, *, game_id, away_team, home_team, kickoff_utc,
-            model_away_spread, v14_total, original_total_side, evaluation_utc):
+            model_away_spread, v14_total, original_total_side, evaluation_utc, clock=None):
+    if clock is not None:
+        evaluation_utc = clock().isoformat()
     state=verified_decision(root,game_id=game_id,away_team=away_team,
         home_team=home_team,kickoff_utc=kickoff_utc,
         model_away_spread=model_away_spread,v14_total=v14_total,
         original_total_side=original_total_side,evaluation_utc=evaluation_utc)
-    return append(root,game_id,state)
+    return append(root,game_id,state,clock=clock)
 
 
 def snapshot(root, game_id, *, as_of_utc):

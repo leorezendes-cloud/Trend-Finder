@@ -23,10 +23,22 @@ def initialize_data(source, target):
             temporary = path.with_suffix('.persistent-link')
             temporary.symlink_to(saved)
             temporary.replace(path)
-    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'logs'):
+    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'logs',
+                     'plug_dynamic_research', 'plug_dynamic_closing', 'plug_dynamic_official'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
             continue
+        if relative.startswith('plug_dynamic_') and original.exists() and saved.exists():
+            # Preserve records made before persistence was configured. Conflicts
+            # require review; never discard either immutable copy.
+            files = [p for p in original.rglob('*') if p.is_file() and p.suffix != '.lock']
+            for path in files:
+                destination = saved/path.relative_to(original)
+                if destination.exists() and destination.read_bytes() != path.read_bytes():
+                    raise ValueError('Conflicting persistent dynamic record: '+str(path))
+            from plug_publication import immutable
+            for path in files:
+                immutable(saved/path.relative_to(original), path.read_bytes())
         if not saved.exists():
             if original.exists():
                 shutil.copytree(original, saved)
@@ -51,6 +63,19 @@ def configure_persistent_data():
     initialize_data(SOURCE, target)
 
 
+def record_web_boot(root):
+    # Only Gunicorn's actual web-worker hook calls this. Importing wsgi in a
+    # short-lived command must never count as proof of a service restart.
+    if os.environ.get('TREND_FINDAH_ENV') != 'production':
+        return
+    from scheduler_runtime import atomic_json
+    from plug_dynamic_official import PIPELINE
+    from uuid import uuid4
+    atomic_json(Path(root)/'logs/dynamic_boot.json', dict(
+        boot_id=str(uuid4()), pipeline=PIPELINE,
+        started_at_utc=datetime.now(timezone.utc).isoformat()))
+
+
 def update_once(root, feed_lock_fd=None):
     root = Path(root)
     season = datetime.now(timezone.utc).year
@@ -62,18 +87,24 @@ def update_once(root, feed_lock_fd=None):
                   'stages':{'storage':'Updates paused: less than 128 MB free'}}
         (root/'logs/auto_update_status.json').write_text(json.dumps(status))
         return status
+    from plug_dynamic_official import PIPELINE
     stages = {}
+    details = {}
+    warnings = {}
     def attempt(name, action):
         from scheduler_runtime import atomic_json
         stages[name] = 'running'
         def progress():
             atomic_json(root/'logs/auto_update_status.json', {
                 'started':started, 'checked_at':datetime.now(timezone.utc).isoformat(),
-                'state':'running', 'pid':os.getpid(), 'stages':dict(stages)})
+                'state':'running', 'pid':os.getpid(), 'stages':dict(stages),
+                'details':details, 'warnings':warnings})
         progress()
         scheduler_event(root, 'scout-worker', 'stage_started', stage=name)
         try:
-            action()
+            result = action()
+            if isinstance(result, (dict, list, str, int, float, bool)):
+                details[name] = result
             stages[name] = 'ok'
         except Exception as error:
             stages[name] = 'failed: ' + type(error).__name__
@@ -111,6 +142,7 @@ def update_once(root, feed_lock_fd=None):
             # block otherwise successful Scout/Plug updates for that backlog.
             if 'requested/completed games still need QB verification' not in str(error):
                 raise
+            warnings['QB verification'] = str(error)
             scheduler_event(root, 'scout-worker', 'qb_verification_pending',
                             reason=str(error))
     attempt('QB verification', verify_qbs_nonblocking)
@@ -120,10 +152,6 @@ def update_once(root, feed_lock_fd=None):
         if quotes(root) != 0:
             raise RuntimeError('Market capture failed')
     attempt('quotes', capture)
-    if (os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1'
-            and stages['quotes'] == 'ok'):
-        from plug_dynamic_batch import refresh as refresh_dynamic
-        attempt('dynamic Plug research (unpublished)', lambda: refresh_dynamic(root))
     if os.environ.get('TREND_FINDAH_CONTEXT_RESEARCH') == '1' and stages['stats']=='ok':
         attempt('injury/weather collection', lambda: feed('context'))
     if all(stages[name]=='ok' for name in ('finals','stats','quotes')):
@@ -181,12 +209,13 @@ def update_once(root, feed_lock_fd=None):
         temporary = target.with_suffix('.tmp')
         temporary.write_text(json.dumps({'groups':groups,'recent':recent,'excluded':excluded,'research_benchmarks':research},indent=2))
         temporary.replace(target)
-    if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+    if dynamic_enabled():
         from plug_dynamic_finalize_batch import finalize_due
         def finish_dynamic():
             report = finalize_due(root)
             if report['errors']:
-                raise RuntimeError('Dynamic closing receipts failed validation')
+                raise RuntimeError('Dynamic closing receipts failed validation: '+json.dumps(report.get('issues', {})))
+            return report
         attempt('dynamic Plug closing research (unpublished)', finish_dynamic)
     attempt('grading', grade)
     # Optional research collection is separate from the locked prediction model.
@@ -194,7 +223,8 @@ def update_once(root, feed_lock_fd=None):
         from scout4.context_model import capture as capture_context
         attempt('injury/weather research', lambda: capture_context(root))
     status = {'started':started,'finished':datetime.now(timezone.utc).isoformat(),
-              'state':'ok' if all(v=='ok' for v in stages.values()) else 'needs attention','stages':stages}
+              'state':'ok' if all(v=='ok' for v in stages.values()) else 'needs attention',
+              'stages':stages, 'details':details, 'warnings':warnings, 'pipeline':PIPELINE}
     path = root/'logs/auto_update_status.json'
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix('.tmp');temp.write_text(json.dumps(status,indent=2));temp.replace(path)
@@ -213,9 +243,18 @@ def refresh_game_day_market(root, now=None):
     if ids.intersection(upcoming_games(Path(root), now)):
         if run(Path(root), now) != 0:
             raise RuntimeError('Game-day market refresh failed')
-        if os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
-            from plug_dynamic_batch import refresh as refresh_dynamic
-            refresh_dynamic(Path(root), now=now)
+
+
+def dynamic_enabled():
+    return any(os.environ.get(key) == '1' for key in
+               ('TREND_FINDAH_DYNAMIC_RESEARCH', 'TREND_FINDAH_DYNAMIC_OFFICIAL'))
+
+
+def refresh_scheduled_market(root, now=None):
+    """All-week quotes, including Tuesday/Wednesday; no model or AI workers."""
+    from scheduled_ats_capture import run
+    if run(Path(root), now) != 0:
+        raise RuntimeError('Scheduled market/dynamic refresh failed; see ats_capture_status.json')
 
 
 LOGGER = logging.getLogger(__name__)
@@ -229,6 +268,8 @@ _SCHEDULER_THREAD = None
 def scheduler_event(root, job, state, **details):
     """Append durable attempt history; logging trouble must not kill a timer."""
     details.setdefault('pid', os.getpid())
+    from plug_dynamic_official import PIPELINE
+    details.setdefault('pipeline', PIPELINE)
     event = dict(at=datetime.now(timezone.utc).isoformat(), job=job,
                  state=state, **details)
     LOGGER.info('Hosted scheduler %s', json.dumps(event))
@@ -480,7 +521,7 @@ def locked_update(root, market=False):
             scheduler_event(root, job, 'lock_busy')
             return LOCK_BUSY
         try:
-            result = (refresh_game_day_market(root) if market
+            result = (refresh_scheduled_market(root) if market
                       else update_once(root, feed_lock_fd=lock.fileno()))
             failed = isinstance(result, dict) and result.get('state') != 'ok'
             scheduler_event(root, job, 'failure' if failed else 'success')

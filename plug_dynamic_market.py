@@ -3,6 +3,7 @@
 Reads spread and total from the same validated saved snapshot API already used
 on matchup cards. Does not fetch odds, publish picks or alter sealed receipts.
 """
+from plug_dynamic_errors import Unavailable
 from datetime import datetime, timezone
 import math
 
@@ -29,7 +30,7 @@ def verified_decision(root, *, game_id, away_team, home_team, kickoff_utc,
                        ("Total",("Over","Under"))):
         item=by_key.get(kind)
         if not item or item.get("stale") or [s["name"] for s in item["sides"]]!=list(names):
-            raise ValueError("Missing, stale or mismatched "+kind+" quote")
+            raise Unavailable("Missing, stale or mismatched "+kind+" quote")
         lines=[s.get("line") for s in item["sides"]]
         if any(isinstance(x,bool) or not isinstance(x,(int,float)) or not math.isfinite(x) for x in lines):
             raise ValueError("Invalid "+kind+" line")

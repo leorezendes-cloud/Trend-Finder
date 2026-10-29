@@ -17,7 +17,8 @@ capture_output = True
 
 def post_worker_init(worker):
     # Accept health probes before any historical analysis is requested.
-    from hosted_updates import start_scheduler
+    from hosted_updates import start_scheduler, record_web_boot, HOSTED_ROOT
+    record_web_boot(HOSTED_ROOT)
     start_scheduler()
 
 # Reset tokens live in URL paths; exclude paths and query strings from access logs.
