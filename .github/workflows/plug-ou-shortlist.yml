@@ -43,7 +43,7 @@ jobs:
       # Legacy dashboard/editorial suites contain preexisting fixture assumptions
       # about pending forecasts and CSS markup; those need a separate baseline audit.
       - name: Verify weekly results, Expert pipeline, prediction cards and hosted worker
-        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates -q
+        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_newsletter_official_feature -q
       - name: Jinja2 syntax validation of all affected templates
         run: |
           python - <<'PY'
