@@ -22,13 +22,7 @@
 {% set selected_ou = item.plug_ou_status == 'selected' and item.plug_ou_pick is defined and item.plug_ou_pick %}
 <div class="plug-pick-summary" aria-label="The Plug's ATS and over/under selections">
 {% if item.plug_dynamic_official is defined and item.plug_dynamic_official %}
-<section class="plug-top-picks"><h3>The Plug's Current Picks:</h3>
-<p><strong>ATS</strong> – {{ item.plug_dynamic_card.ats }}</p>
-<p><strong>O/U</strong> – {{ item.plug_dynamic_card.ou }}</p>
-{% if item.plug_dynamic_grades is defined %}
-<p class="expert-meta">ATS: {{ item.plug_dynamic_grades.ats or 'Stay Away' }} · O/U: {{ item.plug_dynamic_grades.ou or 'Stay Away' }}</p>
-{% endif %}
-<small>{{ item.plug_dynamic_card.note }}</small></section>
+{% include '_plug_dynamic_official.html' %}
 {% else %}
 {% if selected_ats or selected_ou %}
 <section class="plug-top-picks" aria-label="The Plug's Top Picks">
@@ -37,11 +31,7 @@
 {% if selected_ou %}<p><strong>O/U</strong> – ({{ item.plug_ou_pick }})</p>{% endif %}
 </section>
 {% endif %}
-{% if item.plug_ats_status == 'stay_away' %}<p class="plug-market-muted">Plug ATS: Stay Away</p>
-{% elif item.plug_ats_status == 'pending' %}<p class="plug-market-pending">Plug ATS: Awaiting weekly picks</p>{% endif %}
-{% if item.plug_ou_status == 'stay_away' %}<p class="plug-market-muted">Plug O/U: Stay Away</p>
-{% elif item.plug_ou_review %}<p class="plug-market-pending">Plug O/U: Review needed</p>
-{% elif item.upcoming and not selected_ou %}<p class="plug-market-pending">Plug O/U: Awaiting weekly shortlist</p>{% endif %}
+{% if item.plug_ou_review|default(false) %}<p class="plug-market-pending">Plug selections awaiting verified evidence.</p>{% endif %}
 {% endif %}
 </div>
 {% endif %}
@@ -101,23 +91,8 @@
 </section>
 {% if item.earlier_forecast %}<details><summary>Market Spread & Over/Under</summary><p>{{ item.earlier_forecast.ats }} {{ '%+g'|format(item.earlier_forecast.line) }}{% if item.earlier_forecast.total_side %} · {{ item.earlier_forecast.total_side }} {{ item.earlier_forecast.total_line }}{% endif %}</p></details>{% endif %}
 {{ expert_panel(item) }}
-{% if item.completed_grades %}
-<div class="plug-final-grades" aria-label="Graded selections">
-  <p><strong>Saved results</strong>
-    {% if item.completed_grades.scout_ats %}<span>Scout ATS <b class="plug-grade-{{ item.completed_grades.scout_ats|lower }}">{{ item.completed_grades.scout_ats }}</b></span>{% endif %}
-    {% if item.completed_grades.scout_total %}<span>Scout O/U <b class="plug-grade-{{ item.completed_grades.scout_total|lower }}">{{ item.completed_grades.scout_total }}</b></span>{% endif %}
-    {% if item.completed_grades.plug_total is defined and item.completed_grades.plug_total %}<span class="plug-ou-selection">Plug O/U <b class="plug-grade-{{ item.completed_grades.plug_total|lower }}">{{ item.completed_grades.plug_total }}</b></span>{% endif %}
-    {% if item.plug_ats_result %}<span>Plug ATS <b class="plug-grade-{{ item.plug_ats_result|lower }}">{{ item.plug_ats_result }}</b></span>{% endif %}
-  </p>
-  {% if item.expert_picks and (item.completed_grades.expert_ats or item.completed_grades.expert_total) %}
-  <p><strong>The Expert results</strong>
-    {% if item.completed_grades.expert_ats %}<span>ATS <b class="plug-grade-{{ item.completed_grades.expert_ats|lower }}">{{ item.completed_grades.expert_ats }}</b></span>{% endif %}
-    {% if item.completed_grades.expert_total %}<span>O/U <b class="plug-grade-{{ item.completed_grades.expert_total|lower }}">{{ item.completed_grades.expert_total }}</b></span>{% endif %}
-  </p>
-  {% endif %}
-</div>
-{% endif %}
-{% if item.ats_result %}<p>ATS result: {{ item.ats_result }}</p>{% endif %}
+{% include '_plug_saved_results.html' %}
+{% if item.final_score and item.ats_result in ('Win','Loss','Push','Tie','Void') %}<p>ATS result: {{ item.ats_result }}</p>{% endif %}
 
 
 <a href="{{ item.url }}">

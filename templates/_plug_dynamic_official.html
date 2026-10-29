@@ -1,6 +1,11 @@
 {% if item.plug_dynamic_official|default(false) %}
-<section class="plug-official-picks"><h3>The Plug · Dynamic</h3>
-<p><strong>ATS:</strong> {{ item.plug_dynamic_card.ats }}{% if item.plug_ats_result %} · {{ item.plug_ats_result }}{% endif %}</p>
-<p><strong>O/U:</strong> {{ item.plug_dynamic_card.ou }}{% if item.plug_ou_result %} · {{ item.plug_ou_result }}{% endif %}</p>
+{% set selected_ats = item.plug_ats_status|default('') == 'selected' %}
+{% set selected_ou = item.plug_ou_status|default('') == 'selected' %}
+{% set settled = ('Win', 'Loss', 'Push', 'Tie', 'Void') %}
+{% if selected_ats or selected_ou %}
+<section class="plug-top-picks plug-official-picks" aria-label="The Plug's selected picks"><h3>The Plug's Picks:</h3>
+{% if selected_ats %}<p class="plug-selected-pick"><strong>ATS:</strong> {{ item.plug_dynamic_card.ats }}{% if item.plug_ats_result|default(none) in settled %} <span class="plug-settled-grade plug-grade-{{ item.plug_ats_result|lower }}">· {{ item.plug_ats_result }}</span>{% endif %}</p>{% endif %}
+{% if selected_ou %}<p class="plug-selected-pick"><strong>O/U:</strong> {{ item.plug_dynamic_card.ou }}{% if item.plug_ou_result|default(none) in settled %} <span class="plug-settled-grade plug-grade-{{ item.plug_ou_result|lower }}">· {{ item.plug_ou_result }}</span>{% endif %}</p>{% endif %}
 <small>{{ item.plug_dynamic_card.note }}</small></section>
+{% elif item.plug_dynamic_review|default(false) %}<p class="plug-market-pending">Plug selections awaiting verified evidence.</p>{% endif %}
 {% endif %}

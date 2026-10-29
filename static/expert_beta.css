@@ -51,3 +51,9 @@
 .expert-shell .expert-card .plug-top-picks p strong{display:inline-block;min-width:34px}
 .expert-shell .expert-card .plug-market-muted{font-size:.79rem;line-height:1.35;color:#9ca3af;font-weight:400;margin:4px 0}
 .expert-shell .expert-card .plug-market-pending{font-size:.79rem;line-height:1.35;color:#aeb7c6;font-weight:400;margin:4px 0}
+
+.expert-shell .scout-picks,.expert-shell .plug-final-grades{color:#cbd5e1}
+.expert-shell .expert-card .plug-top-picks .plug-settled-grade{color:#cbd5e1;font-weight:400}
+.expert-shell .expert-card .plug-top-picks .plug-grade-win{color:#86efac}
+.expert-shell .expert-card .plug-top-picks .plug-grade-loss{color:#fca5a5}
+.expert-shell .expert-card .plug-top-picks .plug-grade-push{color:#fbbf24}

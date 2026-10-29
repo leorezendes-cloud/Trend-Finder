@@ -29,6 +29,7 @@ on:
       - 'test_scheduler_runtime.py'
       - 'templates/**'
       - 'static/expert_beta.css'
+      - 'static/prediction_cards.css'
       - 'test_plug_pick_summary_ui.py'
       - '.github/workflows/plug-ou-shortlist.yml'
   workflow_dispatch:

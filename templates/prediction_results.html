@@ -49,7 +49,7 @@
   {% for r in plug_week_picks %}<tr>
     <td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
     <td>{{ r.side }} {{ '%+g'|format((r.away_line if r.side==r.away_team else -r.away_line)|float) }}</td>
-    <td><strong class="tf-record-grade tf-record-grade-{{ r.result|lower }}">{{ r.result }}</strong></td>
+    <td><strong class="tf-record-grade tf-record-grade-{{ r.result|lower }}">{{ '—' if r.result=='Pending' else r.result }}</strong></td>
     <td>{{ r.issued_at_utc|eastern_time }}</td>
   </tr>{% else %}<tr><td colspan="4">{{ 'Record needs review.' if plug_receipts_review else 'No picks issued for this week.' }}</td></tr>{% endfor %}
   </tbody></table></div>
@@ -60,7 +60,7 @@
   {% for r in plug_ou_week_picks %}
   <tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
       <td class="tf-plug-ou"><strong>{{ r.side }} {{ '%g'|format(r.market_total) }}</strong></td>
-      <td><strong class="tf-record-grade tf-record-grade-{{ r.result|lower }}">{{ r.result }}</strong></td>
+      <td><strong class="tf-record-grade tf-record-grade-{{ r.result|lower }}">{{ '—' if r.result=='Pending' else r.result }}</strong></td>
       <td>{{ r.issued_at_utc|eastern_time }}</td></tr>
   {% else %}<tr><td colspan="4">{{ 'Receipt needs review' if plug_ou_review else 'No separate O/U picks issued for this week' }}</td></tr>{% endfor %}
   </tbody></table></div>
@@ -71,7 +71,7 @@
   <div class="table-scroll"><table><thead><tr><th>Game</th><th>Original Pick</th><th>Result</th><th>Issued</th></tr></thead><tbody>
   {% for r in plug_ou_legacy_picks %}
   <tr><td><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a></td>
-      <td>{{ r.side }} {{ '%g'|format(r.market_total) }}</td><td>{{ r.result }}</td>
+      <td>{{ r.side }} {{ '%g'|format(r.market_total) }}</td><td>{{ '—' if r.result=='Pending' else r.result }}</td>
       <td>{{ r.issued_at_utc|eastern_time }}</td></tr>
   {% endfor %}</tbody></table></div>
 </details>
