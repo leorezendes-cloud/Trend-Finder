@@ -120,8 +120,20 @@ class AutomaticLinesTests(unittest.TestCase):
         self.assertEqual(json.loads(snapshot_path(self.root,2030,6).read_text()),report)
         with self.app.app_context():self.assertEqual(db().execute('SELECT COUNT(*) FROM pick_games').fetchone()[0],1)
 
-    def test_late_worker_never_fetches_later_lines_as_wednesday_snapshot(self):
+    def test_late_worker_recovers_only_with_verified_later_lines(self):
         self.quotes(self.now+timedelta(hours=1))
+        with patch('weekly_pick_lines.datetime') as clock,patch('scheduled_ats_capture.run') as collector,patch.dict(sys.modules,{'app':SimpleNamespace(app=self.app)}):
+            clock.now.return_value=self.now+timedelta(hours=2)
+            scheduled_capture(self.root)
+            collector.assert_not_called()
+        report=json.loads(snapshot_path(self.root,2030,6).read_text())
+        self.assertTrue(report['exception'])
+        self.assertEqual(report['games'][0]['spread_time'],(self.now+timedelta(hours=1)).isoformat())
+        self.assertEqual(json.loads((self.root/'logs/weekly_lines_status.json').read_text())['state'],'ready')
+        with self.app.app_context():
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM pick_games').fetchone()[0],1)
+
+    def test_late_worker_keeps_pending_when_no_verified_quotes(self):
         with patch('weekly_pick_lines.datetime') as clock,patch('scheduled_ats_capture.run') as collector:
             clock.now.return_value=self.now+timedelta(hours=2)
             scheduled_capture(self.root)
