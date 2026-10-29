@@ -48,6 +48,24 @@ def read(root,game_id):
         signature=item.pop("sha256")
         if item.get("previous_sha256")!=previous or hashlib.sha256(_canonical(item).encode()).hexdigest()!=signature:
             raise ValueError("Revision history integrity failure")
+        if (item.get("game_id") != game_id or item.get("revision") != len(entries)+1):
+            raise ValueError("Revision identity or sequence mismatch")
+        try:
+            observed=_time(item["quote_observed_utc"])
+            evaluated=_time(item["evaluated_utc"])
+            kickoff=_time(item["kickoff_utc"])
+            if not observed<=evaluated<kickoff:
+                raise ValueError("Invalid historic pregame timestamp")
+            if item["ats_selected"] != (item["ats_side"] is not None):
+                raise ValueError("Contradictory historic ATS state")
+            if item["ou_selected"] != (item["ou_side"] is not None):
+                raise ValueError("Contradictory historic total state")
+            if entries and (kickoff != _time(entries[-1]["kickoff_utc"])
+                    or evaluated < _time(entries[-1]["evaluated_utc"])
+                    or observed < _time(entries[-1]["quote_observed_utc"])):
+                raise ValueError("Historic research order changed")
+        except (KeyError, TypeError, AttributeError) as error:
+            raise ValueError("Invalid historic revision") from error
         item["sha256"]=signature
         entries.append(item)
         previous=signature
