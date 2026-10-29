@@ -27,4 +27,9 @@ def refresh(root, *, now=None):
             # Unexpected programming faults should be visible to the scheduler.
             result["failed"] += 1
             raise
+    # Keep missing validated sources visible as nonfatal, but never imply
+    # refresh success when none of the eligible games could be evaluated.
+    result["state"] = ("idle" if not game_ids else
+                       "ok" if result["refreshed"] == len(game_ids) else
+                       "partial" if result["refreshed"] else "unavailable")
     return result
