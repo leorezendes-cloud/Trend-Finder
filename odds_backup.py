@@ -125,7 +125,8 @@ def collect(root, *, clock=None, fetch=None, required=None):
             raise ValueError('Oversized backup response')
         captured = clock()  # Observation is after receipt, never a backdated cutoff.
         filename = captured.strftime('%Y%m%dT%H%M%S%fZ') + f'-{season}-{week}.json'
-        (evidence/filename).write_bytes(raw)
+        from archive_storage import save_capture
+        save_capture(evidence/filename,raw)
         captures.append(dict(url=url, file=filename, captured_at_utc=captured.isoformat(),
                              sha256=hashlib.sha256(raw).hexdigest()))
         rows.extend(parse(json.loads(raw), [g for g in games if (g['season'], g['week']) == (season, week)], captured, url))

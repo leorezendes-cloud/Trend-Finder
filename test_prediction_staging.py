@@ -117,6 +117,38 @@ class AtomicPipelineTests(unittest.TestCase):
         self.assertEqual(self.target().read_bytes(), original)
         self.assertEqual(len(list(self.final.glob('*.json'))), 1)
 
+    def test_fully_issued_slate_does_not_create_another_snapshot_or_run_model(self):
+        self.run_pipeline()
+        before={p:p.read_bytes() for p in self.area.rglob('*') if p.is_file()}
+        original=self.target().read_bytes()
+        self.clock += timedelta(seconds=1)
+        with patch('scout4.blend.run',side_effect=AssertionError('No redundant model run')):
+            result=self.run_pipeline()
+        self.assertEqual(result['snapshot_skipped'],'all eligible forecasts already sealed')
+        self.assertEqual(self.target().read_bytes(),original)
+        self.assertEqual({p:p.read_bytes() for p in self.area.rglob('*') if p.is_file()},before)
+
+    def test_compacted_complete_stage_keeps_recovery_hashes_and_published_forecast(self):
+        from storage_maintenance import compact
+        self.run_pipeline()
+        original=self.target().read_bytes()
+        stage=self.latest()
+        journal=json.loads((stage/'journal.json').read_text())
+        before={p:p.read_bytes() for p in stage.rglob('*') if p.is_file()}
+        compact(self.root,apply=True,min_age=0)
+        staging.verify_snapshot(stage,journal)
+        for path,raw in before.items():self.assertEqual(path.read_bytes(),raw)
+        result=self.run_pipeline()
+        self.assertEqual(result['state'],'ok')
+        self.assertEqual(self.target().read_bytes(),original)
+
+    def test_unissued_scheduled_game_still_needs_normal_pipeline(self):
+        self.run_pipeline()
+        self.target().unlink()  # Disposable fixture only: mimic missing receipt.
+        self.assertFalse(staging.all_upcoming_sealed(self.root,self.final,SOURCE,CONFIG,self.clock))
+        self.run_pipeline()
+        self.assertTrue(self.target().is_file())
+
     def test_interrupted_install_recovers_without_regeneration(self):
         with patch('prediction_staging.os.link', side_effect=OSError('interrupted')):
             with self.assertRaises(OSError): self.run_pipeline()
@@ -317,6 +349,8 @@ class AtomicPipelineTests(unittest.TestCase):
             'fan_views':SimpleNamespace(prediction_performance=lambda *a:({}, [], [])),
             'qb_verification':SimpleNamespace(refresh_qbs=inert),
             'plug_publication':SimpleNamespace(publish=inert),
+            'plug_ou_receipts':SimpleNamespace(issue_pending=inert),
+            'plug_ou_weekly_v3':SimpleNamespace(issue_weekly=inert),
             'scout4.research_benchmarks':SimpleNamespace(grade_benchmarks=lambda *a:{})}), patch.object(hosted, 'backup_database'), patch.dict(os.environ, {'TREND_FINDAH_CONTEXT_RESEARCH':'0','TREND_FINDAH_EXPERT_AUTO_DRAFT':'0'}), patch.object(staging, 'run_staged', return_value={'state':'ok'}) as wrapper:
             hosted.update_once(self.root)
         wrapper.assert_called_once_with(self.root, hosted.SOURCE, hosted.SOURCE/'automatic_model.json')

@@ -17,6 +17,14 @@ on:
       - 'hosted_updates.py'
       - 'gunicorn.conf.py'
       - 'scheduled_ats_capture.py'
+      - 'collect_ats_handle.py'
+      - 'odds_backup.py'
+      - 'archive_storage.py'
+      - 'storage_maintenance.py'
+      - 'prediction_staging.py'
+      - 'test_storage_maintenance.py'
+      - 'test_prediction_staging.py'
+      - 'test_update_feed_memory.py'
       - 'test_hosted_*.py'
       - 'test_scheduler_runtime.py'
       - 'templates/**'
@@ -39,7 +47,7 @@ jobs:
         run: python -m pip install Flask==3.1.3 Werkzeug==3.1.9
       - name: Syntax-check modified modules
         run: |
-          python -m compileall -q plug_ats_v5_model.py plug_ats_v5_weekly.py plug_dynamic_pregame.py plug_dynamic_market.py plug_dynamic_journal.py plug_dynamic_research.py plug_dynamic_grading.py plug_dynamic_cards.py plug_dynamic_receipt_bridge.py plug_dynamic_batch.py plug_dynamic_closing.py plug_dynamic_closing_grade.py plug_dynamic_finalize_batch.py plug_dynamic_authoritative.py plug_dynamic_official.py plug_dynamic_readiness.py plug_dynamic_errors.py scheduled_ats_capture.py plug_ou_shortlist.py plug_ou_weekly.py plug_ou_all_qualifiers.py plug_ou_weekly_v3.py plug_ou_receipts.py plug_dashboard.py fan_views.py expert_beta.py expert_beta_cli.py weekly_results.py hosted_updates.py
+          python -m compileall -q plug_ats_v5_model.py plug_ats_v5_weekly.py plug_dynamic_pregame.py plug_dynamic_market.py plug_dynamic_journal.py plug_dynamic_research.py plug_dynamic_grading.py plug_dynamic_cards.py plug_dynamic_receipt_bridge.py plug_dynamic_batch.py plug_dynamic_closing.py plug_dynamic_closing_grade.py plug_dynamic_finalize_batch.py plug_dynamic_authoritative.py plug_dynamic_official.py plug_dynamic_readiness.py plug_dynamic_errors.py scheduled_ats_capture.py archive_storage.py storage_maintenance.py prediction_staging.py plug_ou_shortlist.py plug_ou_weekly.py plug_ou_all_qualifiers.py plug_ou_weekly_v3.py plug_ou_receipts.py plug_dashboard.py fan_views.py expert_beta.py expert_beta_cli.py weekly_results.py hosted_updates.py
       - name: Regression tests for no-hindsight selection
         run: python -m unittest test_plug_ats_v5_issue test_plug_ats_v5_selection test_plug_pick_summary_ui test_plug_ou_weekly test_plug_ou_all_qualifiers test_plug_ou_receipts test_plug_totals_policy test_plug_v14_model test_plug_dynamic_pregame test_plug_dynamic_market test_plug_dynamic_journal test_plug_dynamic_research test_plug_dynamic_grading test_plug_dynamic_cards test_plug_dynamic_preview test_plug_dynamic_e2e test_plug_dynamic_receipt_bridge test_plug_dynamic_batch test_plug_dynamic_dashboard_wiring test_plug_dynamic_gameday test_plug_dynamic_closing test_plug_dynamic_closing_grade test_plug_dynamic_finalize_batch test_plug_dynamic_authoritative -v
       - name: Install full application dependencies
@@ -47,7 +55,9 @@ jobs:
       # Legacy dashboard/editorial suites contain preexisting fixture assumptions
       # about pending forecasts and CSS markup; those need a separate baseline audit.
       - name: Verify weekly results, Expert pipeline, prediction cards and hosted worker
-        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_hosted_scheduler test_scheduler_runtime test_plug_dynamic_capture test_plug_dynamic_production test_newsletter_official_feature -q
+        run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_hosted_scheduler test_scheduler_runtime test_plug_dynamic_capture test_plug_dynamic_production test_newsletter_official_feature test_storage_maintenance test_prediction_staging -q
+      - name: Verify isolated feed and hosted memory guards
+        run: python -m unittest test_update_feed_memory test_hosted_memory -q
       - name: Jinja2 syntax validation of all affected templates
         run: |
           python - <<'PY'
