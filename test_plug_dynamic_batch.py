@@ -12,6 +12,7 @@ class BatchTest(unittest.TestCase):
                 status=refresh(root)
         self.assertEqual(status["refreshed"],1)
         self.assertEqual(status["unavailable"],1)
+        self.assertEqual(status["state"],"partial")
         self.assertEqual(obs.call_count,2)
     def test_programming_errors_are_not_hidden(self):
         with tempfile.TemporaryDirectory() as root:
