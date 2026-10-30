@@ -948,14 +948,14 @@ def conspiracy_dungeon_page():
     if anomaly_year is not None and anomaly_year != "all" and (not anomaly_year.isdigit() or not 1999 <= int(anomaly_year) <= 2100):
         abort(400)
     # Explicit old category links retain their original records and filters.
-    if (request.args.get('panel') == 'anomalies' and
+    if (request.args.get('panel', 'anomalies') == 'anomalies' and
             request.args.get('research') != '1' and 'category' not in request.args):
         from dungeon_investigations import library_view
         library = library_view(request.args)
         view = dict(panel='anomalies', title=library['title'], week_label='Investigation library',
                     ready=True, investigations=library)
         return render_template('conspiracy_dungeon.html', view=view)
-    view = build_view(request.args.get("panel", "money"),
+    view = build_view(request.args.get("panel", "anomalies"),
                       archive_week=archive_week, archive_stage=archive_stage,
                       anomaly_category=request.args.get("category", "world"), anomaly_year=anomaly_year)
     return render_template("conspiracy_dungeon.html", view=view)
