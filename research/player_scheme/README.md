@@ -150,3 +150,7 @@ peak RSS in a fresh process, across ten read-only feature builds; it fails above
 See `reader_resources.json` and `evaluation.json` for actual measurements. These local
 macOS measurements are not a production Render stress test. There is no production RAM
 or disk impact unless an operator separately installs/copies and invokes this package.
+
+## Expanded ATS follow-up
+
+See [FULL_ATS_RESULTS.md](FULL_ATS_RESULTS.md) for fixed player/PBP/charting ablations, 2020–2022 verified scheme coverage, the same 2023–2026 modern cohort, reproducible game ledgers and 27 tests. Modern cached scheme coverage remains unavailable. The updated reader benchmark includes a full charted historical season. Nothing is integrated into production.

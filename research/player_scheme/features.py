@@ -17,7 +17,14 @@ def rate(rows,num,den,prior=40.,center=0.):
             'exposure':n,'games':len(observed),'missing_games':len(rows)-len(observed)}
 
 def build(db, away, home, cutoff, *, mode='observed'):
-    rows=list(history(db,cutoff,mode=mode))
+    pair={team(away),team(home)}
+    rows=list(history(db,cutoff,mode=mode,kinds=('team','player')))
+    ids={r['pid'] for r in rows if r['kind']=='player' and r['team'] in pair}
+    # League player/team rows are needed for normalization. Charting/PBP only
+    # needs these units and their known player IDs, including prior-team history.
+    for r in history(db,cutoff,mode=mode,kinds=('pbp','charting')):
+        if (r['pid'] and r['pid'] in ids) or (not r['pid'] and (r['team'] in pair or r['opponent'] in pair)):
+            rows.append(r)
     trows=[r for r in rows if r['kind']=='team'];players=[r for r in rows if r['kind']=='player']
     pbp=[r for r in rows if r['kind']=='pbp' and not r['pid']]
     league_points=mean((r['points'] for r in trows),default=22.)
@@ -88,13 +95,15 @@ def build(db, away, home, cutoff, *, mode='observed'):
         targets=sum(r['values'].get('targets') or 0 for r in players if r['team']==t)
         for pid in sorted(ids):
             rr=byplayer[pid];last=rr[-1]
-            metrics={k:mean(r['values'][k] for r in rr[-4:] if r['values'].get(k) is not None) for k in ('passing_yards','rushing_yards','receiving_yards','targets','receptions')}
+            metrics={k:mean(r['values'][k] for r in rr[-4:] if r['values'].get(k) is not None) for k in ('passing_yards','rushing_yards','receiving_yards','targets','receptions','attempts','carries')}
             out['players'].append(dict(player_id=pid,name=last['name'],position=last['position'],games=len(rr),
                 recent=metrics,receiving_yards_per_target=rate(rr,'receiving_yards','targets',prior=20),
                 catch_rate=rate(rr,'receptions','targets',prior=20),passing_epa_per_attempt=rate(rr,'passing_epa','attempts',prior=40),target_share=sum(r['values'].get('targets') or 0 for r in rr)/max(1,targets),
                 availability='unknown; prior participation is not an injury report',
                 hit_epa_response_proxy=rate([r for r in rows if r['kind']=='pbp' and r['pid']==pid],'hit_epa','hit_dropbacks',prior=20) if last['position']=='QB' else None,
-                verified_pressure_response=rate([r for r in rows if r['kind']=='charting' and r['pid']==pid],'pressure_epa','pressure_n',prior=20) if last['position']=='QB' else None))
+                verified_pressure_response=rate([r for r in rows if r['kind']=='charting' and r['pid']==pid],'pressure_epa','pressure_n',prior=20) if last['position']=='QB' else None,
+                man_response=rate([r for r in rows if r['kind']=='charting' and r['pid']==pid],'man_epa','man_n',prior=30) if last['position']=='QB' else None,
+                zone_response=rate([r for r in rows if r['kind']=='charting' and r['pid']==pid],'zone_epa','zone_n',prior=30) if last['position']=='QB' else None))
         return out
     a,h=team(away),team(home);ap,ad=point_strength(a);hp,hd=point_strength(h)
     profiles=[profile(a,h),profile(h,a)]

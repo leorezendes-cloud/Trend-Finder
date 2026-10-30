@@ -54,7 +54,7 @@ def ingest_charting(db,path,pbp_path,*,season,captured_at,url):
     """
     import polars as pl
     from .store import sha
-    checksum=sha(path)+':'+sha(pbp_path);captured=timestamp(captured_at)
+    checksum='charting-v2:'+sha(path)+':'+sha(pbp_path);captured=timestamp(captured_at)
     prior=db.execute("SELECT sha FROM sources WHERE kind='charting' AND season=?",(season,)).fetchone()
     if prior and prior[0]==checksum:return {'unchanged':True,'sha256_pair':checksum}
     scan=pl.scan_parquet(path)
@@ -74,7 +74,10 @@ def ingest_charting(db,path,pbp_path,*,season,captured_at,url):
           pressure.sum().alias('pressure_n'),pl.when(pressure).then(pl.col('epa')).otherwise(0).sum().alias('pressure_epa'),
           pl.col('number_of_pass_rushers').count().alias('rushers_known'),(pl.col('number_of_pass_rushers')>=5).sum().alias('five_plus_rushers'),
           pl.col('defense_man_zone_type').is_in(['MAN','ZONE']).sum().alias('coverage_known'),
-          (pl.col('defense_man_zone_type')=='MAN').sum().alias('man_n')]
+          (pl.col('defense_man_zone_type')=='MAN').sum().alias('man_n'),
+          pl.when(pl.col('defense_man_zone_type')=='MAN').then(pl.col('epa')).otherwise(0).sum().alias('man_epa'),
+          (pl.col('defense_man_zone_type')=='ZONE').sum().alias('zone_n'),
+          pl.when(pl.col('defense_man_zone_type')=='ZONE').then(pl.col('epa')).otherwise(0).sum().alias('zone_epa')]
     frames=[(joined.group_by(['game_id','posteam','defteam']).agg(sums).collect(engine='streaming'),False),
             (joined.filter(pl.col('passer_player_id').is_not_null()).group_by(['game_id','posteam','defteam','passer_player_id']).agg(sums).collect(engine='streaming'),True)]
     count=0

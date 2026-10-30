@@ -127,15 +127,19 @@ def ingest(db, path, kind, *, season, captured_at, url):
         db.execute('INSERT OR REPLACE INTO sources VALUES(?,?,?,?,?,?)',(kind,season,checksum,url,captured,count))
     return {'unchanged':False,'rows':count,'sha256':checksum}
 
-def history(db, cutoff, *, mode='observed', days=180):
+def history(db, cutoff, *, mode='observed', days=180, kinds=None):
     """No same-game or future facts. Two explicit availability policies."""
     if mode not in ('observed','retrospective'):raise ValueError('Unknown cutoff mode')
     at=datetime.fromisoformat(timestamp(cutoff));low=(at-timedelta(days=days)).isoformat()
     sql='''SELECT o.kind,o.gid,o.team,o.opponent,o.pid,o.position,o.name,o.payload,g.kickoff,
          g.end_at,g.available,o.available,g.away,g.home,g.away_score,g.home_score
          FROM observations o JOIN games g ON g.gid=o.gid
-         WHERE g.kickoff>=? AND g.kickoff<? ORDER BY g.kickoff,o.gid,o.team,o.pid'''
-    for r in db.execute(sql,(low,at.isoformat())):
+         WHERE g.kickoff>=? AND g.kickoff<?'''
+    parameters=[low,at.isoformat()]
+    if kinds:
+        sql+=' AND o.kind IN ('+','.join('?' for _ in kinds)+')';parameters.extend(kinds)
+    sql+=' ORDER BY g.kickoff,o.gid,o.team,o.pid'
+    for r in db.execute(sql,parameters):
         # Assumed 48h publication delay after conservative six-hour game end.
         event_ready=datetime.fromisoformat(r[9])+timedelta(hours=48)
         observed=max(datetime.fromisoformat(r[10]),datetime.fromisoformat(r[11]))
