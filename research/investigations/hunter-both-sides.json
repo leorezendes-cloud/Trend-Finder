@@ -3,17 +3,17 @@
   "title": "A touchdown and a takeaway",
   "date": "2026-10-18",
   "season": 2026,
-  "teams": "Texans \u00b7 Jaguars",
+  "teams": "Texans · Jaguars",
   "categories": [
     "oddities"
   ],
-  "summary": "Travis Hunter caught a touchdown and intercepted a pass in the same game. Jacksonville\u2019s team report identifies it as the first such NFL performance since 2002.",
+  "summary": "Travis Hunter caught a touchdown and intercepted a pass in the same game. Jacksonville’s team report identifies it as the first such NFL performance since 2002.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
     {
       "label": "Fourth quarter",
-      "text": "Hunter\u2019s 7-yard touchdown catch cut Houston\u2019s lead to 31\u201328."
+      "text": "Hunter’s 7-yard touchdown catch cut Houston’s lead to 31–28."
     },
     {
       "label": "Next Houston possession",
@@ -21,7 +21,7 @@
     },
     {
       "label": "Closing minutes",
-      "text": "Jacksonville tied it at 31 before Houston won 34\u201331."
+      "text": "Jacksonville tied it at 31 before Houston won 34–31."
     }
   ],
   "unusual": "The same player supplied a scoring reception and a defensive interception, an uncommon two-way contribution in modern NFL personnel usage.",
@@ -52,5 +52,15 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Travis Hunter anytime touchdown",
+      "impact": "Hunter caught a touchdown, which could have won an eligible anytime-TD ticket; not a documented losing wager."
+    },
+    {
+      "market": "Houston / Jacksonville live moneyline",
+      "impact": "The interception and late tying score could have changed live win-bet positions; no specific ticket was verified."
+    }
+  ]
 }
