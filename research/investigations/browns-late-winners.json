@@ -3,11 +3,11 @@
   "title": "Five wins. Five late escapes.",
   "date": "2026-10-25",
   "season": 2026,
-  "teams": "Titans \u00b7 Browns",
+  "teams": "Titans · Browns",
   "categories": [
     "oddities"
   ],
-  "summary": "Cleveland\u2019s 27\u201324 win over Tennessee extended an unusual start: each of its first five wins featured the winning score in the final four minutes of regulation or overtime.",
+  "summary": "Cleveland’s 27–24 win over Tennessee extended an unusual start: each of its first five wins featured the winning score in the final four minutes of regulation or overtime.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
@@ -40,5 +40,11 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Tennessee moneyline / live moneyline",
+      "impact": "Cleveland's late winning score could reverse wagers on Tennessee winning; actual bet placement and prices are unknown."
+    }
+  ]
 }
