@@ -213,7 +213,19 @@
             .primetime-grid { grid-template-columns: minmax(0, 320px) !important; }
         }
 
-    </style>
+    
+        .primetime-stat-panels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:12px 0; }
+        .primetime-stat-panel { min-width:0; padding:10px 8px; border:1px solid #475569; border-radius:9px; background:#17212e; text-align:center; }
+        .primetime-stat-panel-wide { grid-column:1/-1; padding:12px; background:#182c25; border-color:#276749; }
+        .primetime-stat-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; color:#bbf7d0; text-align:left; }
+        .primetime-stat-row strong { white-space:nowrap; color:#4ade80; font-size:19px; }
+        .primetime-stat-secondary { margin-top:7px; padding-top:7px; border-top:1px solid #345044; color:#d1d5db; }
+        .primetime-stat-secondary strong { color:#f1f5f9; font-size:15px; }
+        .primetime-stat-label { display:block; font-size:12px; color:#cbd5e1; margin-bottom:5px; }
+        .primetime-stat-panel > strong { display:block; font-size:20px; color:#4ade80; }
+        .primetime-stat-panel-neutral > strong { color:#f1f5f9; }
+
+</style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
 </head>
@@ -470,7 +482,20 @@
                 <span class="compact-spread primetime-underdog">
                     Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}
                 </span>
-                <p class="primetime-team-ats"><strong>{{ view.season }} team ATS:</strong> {% if game.team_season_ats.graded %}{{ game.team_season_ats.wins }}–{{ game.team_season_ats.losses }}–{{ game.team_season_ats.pushes }}{% else %}No graded games{% endif %}</p>
+                <div class="primetime-stat-panels">
+                    <div class="primetime-stat-panel primetime-stat-panel-wide">
+                        <div class="primetime-stat-row"><span>Primetime Dog ATS</span><strong>{{ game.primetime_dog_ats.wins }}–{{ game.primetime_dog_ats.losses }}–{{ game.primetime_dog_ats.pushes }}</strong></div>
+                        <div class="primetime-stat-row primetime-stat-secondary"><span>All Primetime Dogs ATS</span><strong>{{ game.overall_primetime_ats.wins }}–{{ game.overall_primetime_ats.losses }}–{{ game.overall_primetime_ats.pushes }}</strong></div>
+                    </div>
+                    <div class="primetime-stat-panel">
+                        <span class="primetime-stat-label">Underdog ATS</span>
+                        <strong>{{ game.underdog_ats.wins }}–{{ game.underdog_ats.losses }}–{{ game.underdog_ats.pushes }}</strong>
+                    </div>
+                    <div class="primetime-stat-panel primetime-stat-panel-neutral">
+                        <span class="primetime-stat-label">Team ATS</span>
+                        <strong>{{ game.team_season_ats.wins }}–{{ game.team_season_ats.losses }}–{{ game.team_season_ats.pushes }}</strong>
+                    </div>
+                </div>
                 <details class="primetime-historical">
                     <summary>Historical Investigation</summary>
                 <h3>{{ game.profile.description }}</h3>
