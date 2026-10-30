@@ -57,3 +57,10 @@
 .expert-shell .expert-card .plug-top-picks .plug-grade-win{color:#86efac}
 .expert-shell .expert-card .plug-top-picks .plug-grade-loss{color:#fca5a5}
 .expert-shell .expert-card .plug-top-picks .plug-grade-push{color:#fbbf24}
+
+
+/* Completed games retain a compact scorecard; full picks open on demand. */
+.expert-card:has(> .plug-completed-details) { padding-bottom:12px; }
+.expert-card > .plug-completed-details { margin:10px 0 0; border-top:1px solid #475569; }
+.expert-card > .plug-completed-details > summary { padding:10px 2px 5px; font-size:13px; color:#fbbf24; }
+.expert-card > .plug-completed-details > .plug-completed-body { padding-top:10px; }
