@@ -3,11 +3,11 @@
   "title": "The winning play that lost the spread",
   "date": "2026-10-04",
   "season": 2026,
-  "teams": "Dolphins \u00b7 Vikings",
+  "teams": "Dolphins · Vikings",
   "categories": [
     "bad-beats"
   ],
-  "summary": "T.J. Hockenson stopped short of the end zone so Minnesota could finish in victory formation. The Vikings won 15\u201310, leaving a documented -10.5 spread uncovered.",
+  "summary": "T.J. Hockenson stopped short of the end zone so Minnesota could finish in victory formation. The Vikings won 15–10, leaving a documented -10.5 spread uncovered.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
@@ -53,10 +53,20 @@
   "betting": {
     "market": "Spread",
     "line": "Minnesota -10.5",
-    "provenance": "Reported game line in Yahoo Sports\u2019 Week 4 betting recap; book and exact capture time not specified.",
-    "outcome": "Final margin: 15 \u2212 10 = 5. Minnesota -10.5 loses; Miami +10.5 wins.",
+    "provenance": "Reported game line in Yahoo Sports’ Week 4 betting recap; book and exact capture time not specified.",
+    "outcome": "Final margin: 15 − 10 = 5. Minnesota -10.5 loses; Miami +10.5 wins.",
     "caution": "This describes that documented line only, not every available price."
   },
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "T.J. Hockenson anytime touchdown",
+      "impact": "Choosing to slide rather than score could affect an anytime-touchdown wager if he did not score elsewhere; no actual ticket is verified."
+    },
+    {
+      "market": "Minnesota -10.5 spread",
+      "impact": "The documented -10.5 line lost by 5.5 points. One touchdown alone would not necessarily have made this spread cover."
+    }
+  ]
 }
