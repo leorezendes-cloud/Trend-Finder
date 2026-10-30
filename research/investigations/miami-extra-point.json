@@ -3,25 +3,25 @@
   "title": "An upright changes the ticket",
   "date": "2026-10-11",
   "season": 2026,
-  "teams": "Bengals \u00b7 Dolphins",
+  "teams": "Bengals · Dolphins",
   "categories": [
     "bad-beats"
   ],
-  "summary": "Miami\u2019s late touchdown made it a seven-point game, but Riley Patterson missed the extra point. Cincinnati\u2019s 31\u201324 win covered a documented -6.5 line by half a point.",
+  "summary": "Miami’s late touchdown made it a seven-point game, but Riley Patterson missed the extra point. Cincinnati’s 31–24 win covered a documented -6.5 line by half a point.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
     {
       "label": "Late fourth quarter",
-      "text": "Miami answered Cincinnati\u2019s field goal with a touchdown."
+      "text": "Miami answered Cincinnati’s field goal with a touchdown."
     },
     {
       "label": "0:45 remaining",
-      "text": "Patterson\u2019s extra-point attempt hit the left upright."
+      "text": "Patterson’s extra-point attempt hit the left upright."
     },
     {
       "label": "Final",
-      "text": "Cincinnati held on, 31\u201324."
+      "text": "Cincinnati held on, 31–24."
     }
   ],
   "unusual": "The missed kick preserved the seven-point margin. A successful extra point would instead have left a six-point margin.",
@@ -53,10 +53,20 @@
   "betting": {
     "market": "Spread",
     "line": "Cincinnati -6.5 / Miami +6.5",
-    "provenance": "Sports Illustrated\u2019s Week 5 pregame preview identifies FanDuel at Bengals -6.5.",
-    "outcome": "31 \u2212 24 = 7. Cincinnati covers by 0.5; Miami +6.5 loses by 0.5.",
+    "provenance": "Sports Illustrated’s Week 5 pregame preview identifies FanDuel at Bengals -6.5.",
+    "outcome": "31 − 24 = 7. Cincinnati covers by 0.5; Miami +6.5 loses by 0.5.",
     "caution": "A -7/+7 ticket pushes. This is not a claim about all closing prices."
   },
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Miami +6.5 spread",
+      "impact": "Verified quoted line: Miami lost by seven, so +6.5 lost; a made extra point would have changed the margin to six, all else equal."
+    },
+    {
+      "market": "Miami +7 spread",
+      "impact": "At +7 the final margin would push, not lose; settlement depends on the actual purchased line."
+    }
+  ]
 }
