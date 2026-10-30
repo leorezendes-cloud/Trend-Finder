@@ -192,6 +192,27 @@
             body.mobile-results .dungeon-results > .results:first-child { margin-top: 12px; }
         }
 
+    
+        /* Narrow, scan-friendly primetime matchup cards. */
+        .primetime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 320px)) !important;
+            justify-content: center;
+            max-width: 1050px;
+            gap: 14px;
+        }
+        .primetime-grid .trend-card {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 0;
+            padding: 16px;
+        }
+        .primetime-grid .compact-title { font-size: 20px; }
+        .primetime-grid .primetime-team-ats { margin: 10px 0; font-size: 14px; }
+        @media (max-width: 650px) {
+            .primetime-grid { grid-template-columns: minmax(0, 320px) !important; }
+        }
+
     </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
@@ -449,7 +470,7 @@
                 <span class="compact-spread primetime-underdog">
                     Underdog: {{ game.pick }} {{ "%+.1f"|format(game.pick_spread) }}
                 </span>
-                <p><strong>Current season:</strong> {{ view.primetime_tracker.overall.wins }}–{{ view.primetime_tracker.overall.losses }}–{{ view.primetime_tracker.overall.pushes }} ATS overall</p>
+                <p class="primetime-team-ats"><strong>{{ view.season }} team ATS:</strong> {% if game.team_season_ats.graded %}{{ game.team_season_ats.wins }}–{{ game.team_season_ats.losses }}–{{ game.team_season_ats.pushes }}{% else %}No graded games{% endif %}</p>
                 <details class="primetime-historical">
                     <summary>Historical Investigation</summary>
                 <h3>{{ game.profile.description }}</h3>
