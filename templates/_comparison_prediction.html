@@ -1,7 +1,6 @@
 {% from '_expert_panel.html' import expert_panel %}
 <div class="prediction-columns"><div class="prediction-quantitative">
-<div class="prediction-heading"><h2>Prediction</h2>{% include '_game_anomaly_flag.html' %}{% if use_results_forecast and forecast %}<small>({{ (forecast.decision_cutoff_utc|eastern_time).split(',')[0] }})</small>{% elif prediction_item and not prediction_item.forecast_pending %}<small>({{ (prediction_item.saved_at|eastern_time).split(',')[0] }})</small>{% elif forecast %}<small>({{ (forecast.decision_cutoff_utc|eastern_time).split(',')[0] }})</small>{% endif %}</div>
-{% if forecast or (prediction_item and not prediction_item.forecast_pending) %}<small>Based on the saved market line.</small>{% endif %}
+<div class="prediction-heading"><h2>Prediction</h2>{% include '_game_anomaly_flag.html' %}</div>
 {% if prediction_item and not use_results_forecast and prediction_item.scout_dynamic|default(none) %}
 {% set item=prediction_item %}{% include '_scout_dynamic.html' %}
 {% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% endif %}

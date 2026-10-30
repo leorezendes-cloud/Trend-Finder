@@ -7,7 +7,7 @@
 <p>Straight Up: {% if r.projection.away_margin %}{{ r.away_team if r.projection.away_margin>0 else r.home_team }} by {{ '%g'|format(r.projection.away_margin|abs) }}{% else %}Even{% endif %}</p>
 <p>Scout ATS: {{ r.ats_side or 'No pick' }}{% if r.ats_side %} {{ '%+g'|format(r.spread.line if r.ats_side==r.away_team else -r.spread.line) }}{% endif %}{% if current.grades is defined %} · {{ current.grades.ats }}{% endif %}<br>
 Scout O/U: {{ r.ou_side or 'No pick' }}{% if r.ou_side %} {{ '%g'|format(r.total_quote.line) }}{% endif %}{% if current.grades is defined %} · {{ current.grades.ou }}{% endif %}</p>
-<small>{{ 'Final pregame Scout prediction' if current.status=='locked' else 'Scout updates before kickoff as inputs and lines change.' }} · {{ r.evaluated_at|eastern_time }}</small>
+
 {% endif %}
 </section>
 {% endif %}
