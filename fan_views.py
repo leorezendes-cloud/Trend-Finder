@@ -57,15 +57,32 @@ def hot_upcoming_for(trend):
         path = ROOT / 'nfl_games.csv'
         try:
             rows = read_csv(path)
+            from research_qbs import research_rows
+            # Sourced historical QB identity is needed only to label prospective
+            # QB fixtures, never to claim the future starter is confirmed.
             g._hot_upcoming_context = (
-                effective_rows(rows, path, include_scores=False), active_week(rows),
-                datetime.now(ZoneInfo('America/New_York')))
+                research_rows(effective_rows(rows, path, include_scores=False), path),
+                active_week(rows), datetime.now(ZoneInfo('America/New_York')))
         except (OSError, ValueError, KeyError, TypeError):
             g._hot_upcoming_context = ([], None, datetime.now(ZoneInfo('America/New_York')))
     rows, week, now = g._hot_upcoming_context
     if not week:
         return []
     return upcoming_for_trend(rows, trend, now=now, active_week=week)
+
+
+@bp.app_template_global('hot_potential_for')
+def hot_potential_for(trend):
+    """Show labeled schedule candidates, not confirmed QB or market matches."""
+    from flask import g
+    from hot_matchups import potential_upcoming_for_trend
+    # Initialize the same request-local cached schedule as hot_upcoming_for.
+    if not hasattr(g, '_hot_upcoming_context'):
+        hot_upcoming_for(trend)
+    rows, week, now = g._hot_upcoming_context
+    if not week:
+        return []
+    return potential_upcoming_for_trend(rows, trend, now=now, active_week=week)
 
 
 def parse_scores(payload):
