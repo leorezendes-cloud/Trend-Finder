@@ -1,0 +1,50 @@
+{
+  "slug": "seattle-before-halftime",
+  "title": "Just get to halftime",
+  "date": "2026-10-11",
+  "season": 2026,
+  "teams": "49ers \u00b7 Seahawks",
+  "categories": [
+    "blunders"
+  ],
+  "summary": "A Seattle rushing play near its own goal line became a San Francisco fumble-recovery touchdown just before halftime. The Seahawks lost 32\u201329.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "Late second quarter",
+      "text": "San Francisco punted Seattle deep into its own territory."
+    },
+    {
+      "label": "Before the break",
+      "text": "George Holani lost the ball; Gracen Halton recovered in the end zone."
+    },
+    {
+      "label": "Halftime",
+      "text": "San Francisco led 21\u201313. Seattle had given up three first-half touchdowns after turnovers."
+    }
+  ],
+  "unusual": "A possession intended to reach halftime safely produced an immediate defensive score instead.",
+  "explanations": "Ball security and field position explain the danger. A kneel also needs space behind the line; assuming it was risk-free would oversimplify the situation.",
+  "questions": [
+    "Accounts differ on the exact starting spot. The team play-by-play records the touchdown possession from SEA 4."
+  ],
+  "sources": [
+    {
+      "label": "Seahawks: turnover report",
+      "url": "https://www.seahawks.com/news/seahawks-pissed-after-loss-to-49ers-but-go-forward-with-confidence",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Seahawks: official play-by-play",
+      "url": "https://www.seahawks.com/game-day/2026/reg-week5/seahawks-vs-49ers/play-by-play",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

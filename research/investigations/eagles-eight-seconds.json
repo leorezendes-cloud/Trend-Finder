@@ -1,0 +1,51 @@
+{
+  "slug": "eagles-eight-seconds",
+  "title": "Eight seconds were enough",
+  "date": "2026-10-11",
+  "season": 2026,
+  "teams": "Eagles \u00b7 Jaguars",
+  "categories": [
+    "blunders",
+    "analytics"
+  ],
+  "summary": "Philadelphia took a late lead in London, but a returnable kickoff gave Jacksonville the field position for Cam Little\u2019s winning 57-yard field goal. The Jaguars won 19\u201317.",
+  "evidence": "Documented",
+  "featured": true,
+  "timeline": [
+    {
+      "label": "Late possession",
+      "text": "Jake Elliott made a 48-yard field goal to put Philadelphia ahead."
+    },
+    {
+      "label": "Eight seconds left",
+      "text": "Ameer Abdullah returned the ensuing kickoff into Philadelphia territory."
+    },
+    {
+      "label": "Final kick",
+      "text": "Little converted from 57 yards to win."
+    }
+  ],
+  "unusual": "A kickoff designed to use time also allowed a long return. Field position mattered more than the few seconds consumed.",
+  "explanations": "Sirianni subsequently said he regretted not kicking through the end zone. A touchback would have changed the task for Jacksonville; it would not guarantee a Philadelphia win.",
+  "questions": [
+    "The reviewed reports differ by one yard on the return distance. No win-probability model is presented."
+  ],
+  "sources": [
+    {
+      "label": "Eagles: Sirianni explains the decision",
+      "url": "https://www.philadelphiaeagles.com/news/spadaro-nick-sirianni-knows-our-job-is-to-get-up-and-keep-fighting",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Jaguars: game schedule and London venue",
+      "url": "https://www.jaguars.com/news/where-to-watch-eagles-vs-jaguars-week-5-of-2026-nfl-season",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

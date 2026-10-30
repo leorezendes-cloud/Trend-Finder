@@ -1,0 +1,51 @@
+{
+  "slug": "dicker-fair-catch-kick",
+  "title": "The rule hiding in plain sight",
+  "date": "2024-12-19",
+  "season": 2024,
+  "teams": "Broncos \u00b7 Chargers",
+  "categories": [
+    "oddities",
+    "analytics"
+  ],
+  "summary": "Cameron Dicker made a 57-yard fair-catch kick with no time left in the first half. The rare option helped Los Angeles on the way to a 34\u201327 win.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "End of first half",
+      "text": "Denver interfered with Derius Davis\u2019s fair-catch opportunity."
+    },
+    {
+      "label": "Untimed opportunity",
+      "text": "After enforcement, Los Angeles chose a fair-catch kick rather than a scrimmage play."
+    },
+    {
+      "label": "The kick",
+      "text": "Dicker made the 57-yard attempt with no defensive rush."
+    }
+  ],
+  "unusual": "This was a fair-catch kick, not an ordinary field-goal snap. It was the first successful NFL attempt since 1976 and the longest recorded make.",
+  "explanations": "Preparation for an obscure but existing rule explains the opportunity. This is an example of situational awareness working.",
+  "questions": [
+    "Historical record descriptions are attributed to the Chargers and Hall of Fame."
+  ],
+  "sources": [
+    {
+      "label": "Chargers: rule and game context",
+      "url": "https://www.chargers.com/news/fair-catch-kick-cameron-dicker",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Hall of Fame: record and rule text",
+      "url": "https://www.profootballhof.com/news/items-from-chargers-fair-catch-kick-on-display-in-canton",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

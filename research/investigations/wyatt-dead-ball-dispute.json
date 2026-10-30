@@ -1,0 +1,44 @@
+{
+  "slug": "wyatt-dead-ball-dispute",
+  "title": "When exactly was the play over?",
+  "date": "2026-10-25",
+  "season": 2026,
+  "teams": "Packers \u00b7 Lions",
+  "categories": [
+    "calls"
+  ],
+  "summary": "Devonte Wyatt\u2019s personal foul extended a Detroit possession during a 20\u201317 Green Bay loss. Players disputed whether the play had ended; the referee said it had.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "Third quarter",
+      "text": "Amon-Ra St. Brown returned to his feet during a tackle sequence."
+    },
+    {
+      "label": "The flag",
+      "text": "Wyatt tackled him as umpire Terry Killens Jr. entered the action and fell."
+    },
+    {
+      "label": "Two plays later",
+      "text": "Detroit scored a touchdown to lead 17\u201314."
+    }
+  ],
+  "unusual": "The dispute turns on the distinction between a play being ruled dead and players hearing a whistle.",
+  "explanations": "The referee\u2019s pool-report explanation and the players\u2019 accounts disagree on the live-play perception. Team reporting supplies both accounts, but is not independent adjudication.",
+  "questions": [
+    "Was the whistle audible to the players? No league reversal was located in this review."
+  ],
+  "sources": [
+    {
+      "label": "Packers: player accounts and referee pool report",
+      "url": "https://www.packers.com/news/game-notes-packers-befuddled-as-penalties-again-loom-large-week-7-2026",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

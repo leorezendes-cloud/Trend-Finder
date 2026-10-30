@@ -1,0 +1,54 @@
+{
+  "slug": "washington-clock-runs-out",
+  "title": "A field goal that never happened",
+  "date": "2026-10-11",
+  "season": 2026,
+  "teams": "Giants \u00b7 Commanders",
+  "categories": [
+    "blunders"
+  ],
+  "summary": "Washington reached field-goal territory in overtime, then ran out of time without attempting a kick. The Giants escaped with a 27\u201327 tie.",
+  "evidence": "Documented",
+  "featured": true,
+  "timeline": [
+    {
+      "label": "Overtime",
+      "text": "Both teams failed to score on their first possessions."
+    },
+    {
+      "label": "About 50 seconds left",
+      "text": "Washington faced second-and-8 at the Giants\u2019 24. Neither team had a timeout."
+    },
+    {
+      "label": "12 seconds left",
+      "text": "Jayden Daniels took the snap and went down with about eight seconds remaining."
+    },
+    {
+      "label": "Clock expires",
+      "text": "Washington could not organize another snap. No winning field goal was attempted."
+    }
+  ],
+  "unusual": "The offense had already reached a plausible kicking position. The remaining task was preserving an opportunity to attempt the kick, not necessarily gaining more yards.",
+  "explanations": "Poor communication and clock awareness are supported explanations. A possible field goal was an opportunity, not a guaranteed win.",
+  "questions": [
+    "What specific instruction reached the quarterback before the final snap?"
+  ],
+  "sources": [
+    {
+      "label": "NFL.com: overtime sequence and postgame reaction",
+      "url": "https://amp.nfl.com/news/how-the-commanders-let-an-overtime-win-slip-away-what-are-they-doing",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Giants: final score and historical tie context",
+      "url": "https://www.giants.com/news/notes-stats-giants-vs-commanders-recap",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

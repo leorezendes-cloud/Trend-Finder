@@ -1,0 +1,56 @@
+{
+  "slug": "hunter-both-sides",
+  "title": "A touchdown and a takeaway",
+  "date": "2026-10-18",
+  "season": 2026,
+  "teams": "Texans \u00b7 Jaguars",
+  "categories": [
+    "oddities"
+  ],
+  "summary": "Travis Hunter caught a touchdown and intercepted a pass in the same game. Jacksonville\u2019s team report identifies it as the first such NFL performance since 2002.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "Fourth quarter",
+      "text": "Hunter\u2019s 7-yard touchdown catch cut Houston\u2019s lead to 31\u201328."
+    },
+    {
+      "label": "Next Houston possession",
+      "text": "He intercepted C.J. Stroud in the end zone."
+    },
+    {
+      "label": "Closing minutes",
+      "text": "Jacksonville tied it at 31 before Houston won 34\u201331."
+    }
+  ],
+  "unusual": "The same player supplied a scoring reception and a defensive interception, an uncommon two-way contribution in modern NFL personnel usage.",
+  "explanations": "Offensive and defensive deployment created both opportunities. Rarity alone does not imply a hidden pattern.",
+  "questions": [
+    "The historical comparison is attributed to team reporting, not an independently rebuilt all-time player database."
+  ],
+  "sources": [
+    {
+      "label": "Jaguars: two-way performance and historical comparison",
+      "url": "https://www.jaguars.com/news/top-storylines-from-jaguars-week-6-loss-to-texans-run-run-run",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Reuters: independent game recap",
+      "url": "https://www.reuters.com/sports/nfl/kaimi-fairbairn-kicks-texans-past-jaguars-london--flm-2026-10-18/",
+      "kind": "Independent reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "NFL video: Hunter interception",
+      "url": "https://www.nfl.com/videos/c-j-stroud-s-first-interception-of-2026-locates-travis-hunter-inside-the-end-zone-in-london",
+      "kind": "Video",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}
