@@ -30,6 +30,8 @@ from fan_views import bp as fans_bp
 app.register_blueprint(fans_bp)
 from dungeon_investigations import bp as investigations_bp
 app.register_blueprint(investigations_bp)
+from recovered_nfl_tracker import bp as recovered_nfl_bp
+app.register_blueprint(recovered_nfl_bp)
 from sunday_scout import scout_bp
 app.register_blueprint(scout_bp)
 from scout4.web import bp as scout4_bp

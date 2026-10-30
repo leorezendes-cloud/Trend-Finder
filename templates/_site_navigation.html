@@ -47,6 +47,7 @@
     <a href="{{ url_for('membership.register') }}">Join Free</a>
     {% endif %}
     {% if g.is_owner %}
+    {% if recovered_nfl_enabled %}<a href="{{ url_for('recovered_nfl.dashboard') }}">Recovered Totals · NFL QB Edition</a>{% endif %}
     <a href="{{ url_for('member_picks.admin') }}">Manage Weekly Picks</a>
     <a href="{{ url_for('newsletter.manage') }}">Manage Newsletter</a>
     <a href="{{ url_for('membership.feedback_review') }}">Review Feedback</a>

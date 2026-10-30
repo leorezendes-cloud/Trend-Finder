@@ -23,7 +23,7 @@ def initialize_data(source, target):
             temporary = path.with_suffix('.persistent-link')
             temporary.symlink_to(saved)
             temporary.replace(path)
-    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'logs',
+    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'data/recovered_totals', 'logs',
                      'plug_dynamic_research', 'plug_dynamic_closing', 'plug_dynamic_official', 'scout_dynamic'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
@@ -481,6 +481,7 @@ def run_leader(root, stop):
             return 'prepared' if any(result != 'not_due' for result in results) else 'not_due'
 
     jobs = (
+        ('recovered-nfl-tracker', lambda: run_worker('recovered_nfl_tracker.py', ['--root', str(root)]), 300),
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('plug-ou-qualifiers', lambda: run_worker('plug_ou_weekly_v3.py', ['--once'], 90), 300),

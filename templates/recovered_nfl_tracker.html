@@ -1,0 +1,25 @@
+{% extends 'picks_base.html' %}
+{% block title %}Recovered Totals · NFL QB Edition{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static',filename='recovered_totals.css') }}">
+<section class="recovered-tracker">
+<p class="eyebrow">OWNER RESEARCH · NFL</p><h1>Recovered Totals — NFL QB Edition</h1>
+<p>Automatic pregame picks and results, separate from Scout and The Plug.</p>
+<div class="rt-records">{% for key,label in [('original','Original A–L'),('qb','NFL QB Edition')] %}{% set s=view.summary[key] %}<article><span>{{ label }} · forward tracking</span><strong>{{ s.get('Win',0) }}–{{ s.get('Loss',0) }}–{{ s.get('Push',0) }}</strong><small>{{ s.get('Pending',0) }} pending · {{ s.get('Awaiting QB',0) }} awaiting starters · {{ s.get('No pregame QB pick',0) }} without a pregame QB pick · {{ s.get('Undecided',0) }} undecided</small></article>{% endfor %}</div>
+<p class="rt-history">Historical research, 2026: <b>original 34–27 · QB candidate 40–21</b>. The candidate was fitted to those games; these are separate from the forward records above.</p>
+<p class="rt-note">Original picks save automatically against their first eligible pregame line. A, B, D, and H flip only when sourced pregame starter evidence identifies a change. Missing evidence stays pending; postgame starter discoveries never become pregame picks.</p>
+<div class="rt-table"><table><thead><tr><th>Game / kickoff ET</th><th>Market</th><th>Season / split</th><th>Change / category</th><th>Original</th><th>QB Edition</th><th>QB reference / sample</th><th>Results</th></tr></thead><tbody>
+{% for r in view.rows %}<tr class="{{ 'rt-sensitive' if r.qb_sensitive }}"><td><b>{{ r.away }} @ {{ r.home }}</b><small>Week {{ r.week }} · {{ r.kickoff_utc|eastern_time }}</small><small>{{ 'Locked pregame' if r.locked else 'Preview · awaiting background save' }}</small></td>
+{% if r.state=='ready' %}
+<td><b>{{ r.result.market_total }}</b><small>{{ r.quote.sportsbook }}</small><small>Line {{ r.quote.captured_at_utc|eastern_time }}</small></td>
+<td>{{ r.result.season_total }} / {{ r.result.split_total }}</td><td><b>{{ '%+d'|format(r.result.difference) }} · {{ r.result.selection.rule or 'Unclassified' }}</b>{% if r.qb_sensitive %}<small class="rt-gold">QB-sensitive</small>{% endif %}</td>
+<td><b>{{ r.result.selection.pick or 'Undecided' }}</b>{% if r.result.selection.exception %}<small>{{ r.result.selection.exception }}</small>{% endif %}</td>
+<td>{% if r.qb_record %}<b>{{ r.qb_record.pick }}</b><small>{{ r.qb_record.evidence.reason }}</small><small>Saved {{ r.qb_record.saved_at|eastern_time }}</small>{% else %}<b>{{ 'Awaiting starters' if r.qb_sensitive else 'Undecided' }}</b>{% if r.qb_sensitive and r.result.selection.pick %}<small>If a QB changes: {{ 'Under' if r.result.selection.pick=='Over' else 'Over' }}</small>{% endif %}{% endif %}</td>
+<td><small>Previous game: {{ r.away }} {{ r.previous_qbs.away.name or 'Unknown' }}<br>{{ r.home }} {{ r.previous_qbs.home.name or 'Unknown' }}</small><small>Season {{ r.counts[0] }}/{{ r.counts[1] }} · splits {{ r.counts[2] }}/{{ r.counts[3] }}</small></td>
+<td><small>Original: <b>{{ r.original_grade }}</b><br>QB: <b>{{ r.qb_grade }}</b>{% if r.actual_total is not none %}<br>Final total {{ r.actual_total }}{% endif %}{% if r.review %}<br>{{ r.review }}{% endif %}</small></td>
+{% else %}<td colspan="7">{{ r.reason }}</td>{% endif %}</tr>
+{% else %}<tr><td colspan="8">No eligible games or saved records yet.</td></tr>{% endfor %}</tbody></table></div>
+<details><summary>A–L forward records</summary><div class="rt-table"><table><thead><tr><th>Category</th><th>Original W–L–P</th><th>QB Edition W–L–P</th></tr></thead><tbody>{% for letter,groups in view.categories.items() %}<tr><td>{{ letter }}</td>{% for key in ['original','qb'] %}{% set s=groups[key] %}<td>{{ s.get('Win',0) }}–{{ s.get('Loss',0) }}–{{ s.get('Push',0) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div></details>
+<p class="rt-note">Background capture checks every five minutes when hosted automatic updates are running. Reload to see saved picks and newly imported finals. A sourced expected-starter report is evidence, not independent confirmation. Pages perform no API calls and do not save picks.</p>
+</section>
+{% endblock %}
