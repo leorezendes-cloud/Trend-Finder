@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install polars==2.0.0
       - run: python -m compileall -q research/player_scheme
-      - run: python -m unittest research.player_scheme.test_engine research.player_scheme.test_ats research.player_scheme.test_full_ats research.player_scheme.test_score_bands -v
+      - run: python -m unittest research.player_scheme.test_engine research.player_scheme.test_ats research.player_scheme.test_full_ats research.player_scheme.test_score_bands research.player_scheme.test_pace -v
       - name: Verify research imports never load application pipelines
         run: |
           python - <<'PY'

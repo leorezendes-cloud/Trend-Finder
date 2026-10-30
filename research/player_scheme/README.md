@@ -158,3 +158,7 @@ See [FULL_ATS_RESULTS.md](FULL_ATS_RESULTS.md) for fixed player/PBP/charting abl
 ## Threshold score-adjustment experiment
 
 [SCORE_BAND_RESULTS.md](SCORE_BAND_RESULTS.md) tests passing-only, rushing-only and jointly calibrated threshold bonuses to each projected team score. Includes ATS and totals records, learned point values, full weekly calibration histories, game ledgers and 32 tests. No target-year parameter tuning or production changes.
+
+## Pace follow-up
+
+[PACE_RESULTS.md](PACE_RESULTS.md) compares pace-only, conservative pace, matchup-only and combined score adjustments on all 703 original games. It documents neutral-clock proxy limitations, embedded-pace correction, ATS/O-U results, score impacts, compact sources and 36 tests. No live integration or promotion.
