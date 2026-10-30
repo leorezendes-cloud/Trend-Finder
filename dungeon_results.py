@@ -123,9 +123,29 @@ def build_view(panel='money', now=None, games_path=GAMES, money_report=None, arc
     if panel=='primetime':
         historical=primetime_records(games, only_primetime=False)
         for row in current:
-            row.update(profile=dog_profile(row,historical),
-                       team_season_ats=team_season_ats_before(
-                           games, row['pick'], row['season'], row['gameday']))
+            earlier_dogs = [
+                r for r in historical
+                if r['season'] == row['season']
+                and r['game_type'] == 'REG'
+                and r['gameday'] < row['gameday']
+                and r['pick'] == row['pick']
+                and r['result'] in ('Win', 'Loss', 'Push')
+            ]
+            earlier_primetime = [r for r in earlier_dogs if r['primetime']]
+            earlier_all_primetime = [
+                r for r in records
+                if r['game_type'] == 'REG'
+                and r['gameday'] < row['gameday']
+                and r['result'] in ('Win', 'Loss', 'Push')
+            ]
+            row.update(
+                profile=dog_profile(row, historical),
+                team_season_ats=team_season_ats_before(
+                    games, row['pick'], row['season'], row['gameday']),
+                underdog_ats=summarize(earlier_dogs),
+                primetime_dog_ats=summarize(earlier_primetime),
+                overall_primetime_ats=summarize(earlier_all_primetime),
+            )
     running=summarize([r for r in records if r['season']==season and (r['game_type']!='REG' or int(r['week'])>=6)])
     # Weekly archives use recorded data, including still-pending outcomes; no invented history.
     past=[r for r in records if r['gameday']<start.isoformat() and (panel=='money' or r['season']==season)]
