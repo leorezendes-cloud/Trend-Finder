@@ -48,5 +48,15 @@
   "betting": null,
   "source_note": "The Jaguars mailbag gives a different score at the moment of the run than CBS. This case uses the agreed sequence and final result, and does not assert the disputed in-play score.",
   "reviewed": "2026-10-30",
-  "potential_betting_impact": "Anytime touchdown scorer prop: Lawrence choosing to go down short of the end zone meant that scramble did not produce a Lawrence rushing touchdown. A bettor holding a Lawrence anytime-TD ticket could have been affected, depending on whether he scored at another point in the game and the ticket's settlement rules. No actual ticket, prop odds, or specific losing wager has been verified."
+  "potential_betting_impact": "Anytime touchdown scorer prop: Lawrence choosing to go down short of the end zone meant that scramble did not produce a Lawrence rushing touchdown. A bettor holding a Lawrence anytime-TD ticket could have been affected, depending on whether he scored at another point in the game and the ticket's settlement rules. No actual ticket, prop odds, or specific losing wager has been verified.",
+  "potential_bets": [
+    {
+      "market": "Trevor Lawrence anytime touchdown",
+      "impact": "Lawrence went down rather than scoring on the scramble. A qualifying anytime-TD ticket could have been affected, depending on his other plays and the offer's settlement rules."
+    },
+    {
+      "market": "Lawrence rushing touchdown",
+      "impact": "If a rushing-touchdown prop was offered, the decision could matter; no posted odds or ticket has been verified."
+    }
+  ]
 }
