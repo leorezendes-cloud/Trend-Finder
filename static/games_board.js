@@ -117,8 +117,18 @@
       } finally { activeFetch.delete(card); }
     });
   }
+  // Live games open on team stats; other states retain the scoring default.
+  function selectView(card, view, repaint = true) {
+    card.dataset.view = view;
+    card.querySelectorAll('[data-view]').forEach(button => {
+      const on = button.dataset.view === view;
+      button.classList.toggle('is-active', on);
+      button.setAttribute('aria-pressed', String(on));
+    });
+    if (repaint) render(card);
+  }
   cards.forEach(card => {
-    card.dataset.view = 'scoring';
+    selectView(card, card.dataset.state === 'in' ? 'stats' : 'scoring', false);
     card.addEventListener('click',event => {
       if (event.target.closest('summary')) touched.add(card);
     });
@@ -126,13 +136,8 @@
       if (card.open) loadDetail(card);
     });
     card.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click',() => {
-      card.dataset.view = button.dataset.view;
-      card.querySelectorAll('[data-view]').forEach(b => {
-        const on = b === button;
-        b.classList.toggle('is-active',on);
-        b.setAttribute('aria-pressed',String(on));
-      });
-      render(card);
+      touched.add(card);
+      selectView(card, button.dataset.view);
     }));
   });
   // Use the same saved-line grades as the existing scoreboard; never grade
@@ -191,7 +196,10 @@
     badge.textContent = state === 'in' ? '● LIVE' : final ? 'FINAL' : 'UPCOMING';
     card.querySelector('.tf-board-game-status').textContent = `${live.status || (final ? 'Final' : 'Scheduled')} · Tap for details`;
     showMarket(card, live);
-    if (prior !== state && !touched.has(card)) card.open = state === 'in';
+    if (prior !== state && !touched.has(card)) {
+      selectView(card, state === 'in' ? 'stats' : 'scoring', false);
+      card.open = state === 'in';
+    }
     if (card.open) loadDetail(card);
   }
   function organize() {

@@ -28,8 +28,8 @@
           </summary>
           <div class="tf-board-expanded">
             <nav class="tf-board-tabs" aria-label="Game detail sections">
-              <button type="button" class="is-active" data-view="scoring" aria-pressed="true">Scoring</button>
-              <button type="button" data-view="stats" aria-pressed="false">Team Stats</button>
+              <button type="button" class="{% if key != 'in' %}is-active{% endif %}" data-view="scoring" aria-pressed="{{ 'false' if key == 'in' else 'true' }}">Scoring</button>
+              <button type="button" class="{% if key == 'in' %}is-active{% endif %}" data-view="stats" aria-pressed="{{ 'true' if key == 'in' else 'false' }}">Team Stats</button>
               <button type="button" data-view="players" aria-pressed="false">Players</button>
             </nav>
             <div class="tf-board-detail"><p class="tf-gc-empty">Game details load when expanded.</p></div>
