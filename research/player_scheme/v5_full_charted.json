@@ -1,0 +1,458 @@
+{
+  "specification": {
+    "policy": "player-scheme-v5-residual-v1",
+    "ridge_penalty": 100,
+    "minimum_team_games": 3,
+    "player_features_per_team": [
+      "prior_QB_EPA_per_attempt",
+      "prior_QB_recent_passing_yards/300",
+      "top3_WR_recent_yards/100",
+      "top3_WR_target_weighted_yards_per_target/10",
+      "top3_WR_defense_position_mismatch/1000",
+      "top2_TE_recent_yards/100",
+      "top2_TE_target_weighted_yards_per_target/10",
+      "top2_TE_defense_position_mismatch/1000",
+      "top2_RB_recent_rush_yards/100",
+      "top2_RB_receiving_matchup/1000"
+    ],
+    "pbp_features_per_team": [
+      "neutral_pass_EPA/dropback",
+      "neutral_rush_EPA/run",
+      "neutral_CPOE/10",
+      "own_sack_rate*opponent_sack_rate",
+      "prior_QB_hit_EPA*opponent_hit_rate",
+      "pass_share*opponent_hit_rate"
+    ],
+    "charted_features_per_team": [
+      "prior_QB_pressure_EPA*opponent_five_plus_rusher_rate",
+      "prior_QB_man_EPA*opponent_man_rate",
+      "prior_QB_zone_EPA*opponent_zone_rate"
+    ],
+    "variants": {
+      "baseline": "pinned actual ATS v5",
+      "limited": "v5 + original team matchup features",
+      "players": "v5 + team matchup and individual QB/WR/RB/TE features",
+      "pbp": "v5 + players and neutral PBP/protection proxies",
+      "full_available": "v5 + PBP and verified charting only where samples exist"
+    },
+    "missing": "Report exposure. Missing is not measured zero; charting terms gated by both player and opponent exposure.",
+    "unavailable": [
+      "X/Z/slot alignment",
+      "YPRR",
+      "individual WR-CB assignment",
+      "verified current blitz designations",
+      "injury/availability projections"
+    ],
+    "cohort": "Historical player-role proxies only; no claim of knowing next-game starters. No line enters features or fitting.",
+    "validation": "Exploratory fixed feature set; no threshold/penalty search or automatic promotion.",
+    "baseline_commit": "cd491df29ebedd9ca626e879731261b26c05e613",
+    "model_sha256": "0ff7b68e6b0a6649e7f0be9da08cd872c6a0d9274c207b1a6f13f80c213e25fe",
+    "training": "Unchanged fixed features, ridge penalty 100 and minimum 32 earlier completed targets. Fit actual away scoring margin minus frozen v5 away-margin projection; release targets only after game end proxy plus 48 hours, before weekly cutoff. No current game spread in residual fitting. v5 retains its own original prior-season market-label training."
+  },
+  "train_season": 2019,
+  "last_season": 2022,
+  "line_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "warning": "Retrospective corrected snapshots and untimestamped archived closing lines, not official betting records. Charting unavailable in current-season cache. Same eligible cohort, not full-season official Plug records. All variants exploratory; no tuning or production promotion. No pace or transferred score-band bonuses.",
+  "seasons": {
+    "2020": {
+      "games": 208,
+      "variants": {
+        "baseline": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846,
+          "changed_vs_baseline": 0,
+          "margin_mae": 10.286134615384615
+        },
+        "limited": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846,
+          "changed_vs_baseline": 0,
+          "margin_mae": 10.28892775932374
+        },
+        "players": {
+          "wins": 118,
+          "losses": 90,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 56.73076923076923,
+          "changed_vs_baseline": 73,
+          "margin_mae": 10.211244751297498
+        },
+        "pbp": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846,
+          "changed_vs_baseline": 72,
+          "margin_mae": 10.219079554309719
+        },
+        "full_available": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846,
+          "changed_vs_baseline": 72,
+          "margin_mae": 10.21966808544831
+        }
+      },
+      "fully_charted_games": 208,
+      "charted_cohort": {
+        "baseline": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846
+        },
+        "limited": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846
+        },
+        "players": {
+          "wins": 118,
+          "losses": 90,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 56.73076923076923
+        },
+        "pbp": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846
+        },
+        "full_available": {
+          "wins": 119,
+          "losses": 89,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 57.21153846153846
+        }
+      },
+      "games_with_pbp_both_sides": 208,
+      "same_original_v5_shortlist": {
+        "games": 18,
+        "variants": {
+          "baseline": {
+            "wins": 12,
+            "losses": 6,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 66.66666666666667
+          },
+          "limited": {
+            "wins": 12,
+            "losses": 6,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 66.66666666666667
+          },
+          "players": {
+            "wins": 9,
+            "losses": 9,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 50.0
+          },
+          "pbp": {
+            "wins": 9,
+            "losses": 9,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 50.0
+          },
+          "full_available": {
+            "wins": 9,
+            "losses": 9,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 50.0
+          }
+        }
+      }
+    },
+    "2021": {
+      "games": 224,
+      "variants": {
+        "baseline": {
+          "wins": 104,
+          "losses": 116,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.27272727272727,
+          "changed_vs_baseline": 0,
+          "margin_mae": 11.207129464285714
+        },
+        "limited": {
+          "wins": 101,
+          "losses": 119,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 45.90909090909091,
+          "changed_vs_baseline": 3,
+          "margin_mae": 11.20466702782195
+        },
+        "players": {
+          "wins": 106,
+          "losses": 114,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 48.18181818181818,
+          "changed_vs_baseline": 67,
+          "margin_mae": 11.29782788562648
+        },
+        "pbp": {
+          "wins": 105,
+          "losses": 115,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.72727272727273,
+          "changed_vs_baseline": 68,
+          "margin_mae": 11.29809100696976
+        },
+        "full_available": {
+          "wins": 105,
+          "losses": 115,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.72727272727273,
+          "changed_vs_baseline": 68,
+          "margin_mae": 11.296181556299143
+        }
+      },
+      "fully_charted_games": 224,
+      "charted_cohort": {
+        "baseline": {
+          "wins": 104,
+          "losses": 116,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.27272727272727
+        },
+        "limited": {
+          "wins": 101,
+          "losses": 119,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 45.90909090909091
+        },
+        "players": {
+          "wins": 106,
+          "losses": 114,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 48.18181818181818
+        },
+        "pbp": {
+          "wins": 105,
+          "losses": 115,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.72727272727273
+        },
+        "full_available": {
+          "wins": 105,
+          "losses": 115,
+          "pushes": 4,
+          "no_calls": 0,
+          "cover_pct": 47.72727272727273
+        }
+      },
+      "games_with_pbp_both_sides": 224,
+      "same_original_v5_shortlist": {
+        "games": 21,
+        "variants": {
+          "baseline": {
+            "wins": 9,
+            "losses": 11,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 45.0
+          },
+          "limited": {
+            "wins": 7,
+            "losses": 13,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 35.0
+          },
+          "players": {
+            "wins": 8,
+            "losses": 12,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 40.0
+          },
+          "pbp": {
+            "wins": 9,
+            "losses": 11,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 45.0
+          },
+          "full_available": {
+            "wins": 9,
+            "losses": 11,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 45.0
+          }
+        }
+      }
+    },
+    "2022": {
+      "games": 223,
+      "variants": {
+        "baseline": {
+          "wins": 107,
+          "losses": 108,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 49.76744186046512,
+          "changed_vs_baseline": 0,
+          "margin_mae": 8.971614349775786
+        },
+        "limited": {
+          "wins": 111,
+          "losses": 104,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 51.627906976744185,
+          "changed_vs_baseline": 6,
+          "margin_mae": 8.970069114406424
+        },
+        "players": {
+          "wins": 109,
+          "losses": 106,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 50.69767441860465,
+          "changed_vs_baseline": 43,
+          "margin_mae": 9.075138051054259
+        },
+        "pbp": {
+          "wins": 108,
+          "losses": 107,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 50.23255813953488,
+          "changed_vs_baseline": 44,
+          "margin_mae": 9.046307585779816
+        },
+        "full_available": {
+          "wins": 107,
+          "losses": 108,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 49.76744186046512,
+          "changed_vs_baseline": 43,
+          "margin_mae": 9.047199855591755
+        }
+      },
+      "fully_charted_games": 223,
+      "charted_cohort": {
+        "baseline": {
+          "wins": 107,
+          "losses": 108,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 49.76744186046512
+        },
+        "limited": {
+          "wins": 111,
+          "losses": 104,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 51.627906976744185
+        },
+        "players": {
+          "wins": 109,
+          "losses": 106,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 50.69767441860465
+        },
+        "pbp": {
+          "wins": 108,
+          "losses": 107,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 50.23255813953488
+        },
+        "full_available": {
+          "wins": 107,
+          "losses": 108,
+          "pushes": 8,
+          "no_calls": 0,
+          "cover_pct": 49.76744186046512
+        }
+      },
+      "games_with_pbp_both_sides": 223,
+      "same_original_v5_shortlist": {
+        "games": 12,
+        "variants": {
+          "baseline": {
+            "wins": 6,
+            "losses": 5,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 54.54545454545455
+          },
+          "limited": {
+            "wins": 7,
+            "losses": 4,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 63.63636363636363
+          },
+          "players": {
+            "wins": 7,
+            "losses": 4,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 63.63636363636363
+          },
+          "pbp": {
+            "wins": 6,
+            "losses": 5,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 54.54545454545455
+          },
+          "full_available": {
+            "wins": 6,
+            "losses": 5,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 54.54545454545455
+          }
+        }
+      }
+    }
+  },
+  "skipped": {
+    "team_warmup": 192
+  },
+  "resources": {
+    "elapsed_seconds": 37.259,
+    "peak_rss_bytes": 93569024,
+    "database_bytes": 22474752
+  },
+  "ledger": {
+    "path": "v5_full_charted.games.csv",
+    "rows": 655,
+    "sha256": "3f22d36a36e3bc66f5bac9e8ebae700d90cca21889ec74b61c1e311fba89ab1b"
+  }
+}

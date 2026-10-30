@@ -1,0 +1,1722 @@
+{
+  "policy": "v5-fixed-matchup-transfer-v1",
+  "baseline_commit": "cd491df29ebedd9ca626e879731261b26c05e613",
+  "model_sha256": "0ff7b68e6b0a6649e7f0be9da08cd872c6a0d9274c207b1a6f13f80c213e25fe",
+  "schedule_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "score_bonus_ledger_sha256": "bea7185b4140938f79c5dc8a2b0c180beac1e2279fc9e9874619fcc368ee4c89",
+  "adjustment": "Previously specified combined passing/rushing score-band bonus: away bonus minus home bonus, added to the unchanged v5 away-margin projection. No pace, no refit, no new tuning.",
+  "important": "Point bonuses were learned against the earlier PF/PA team-score baseline; this measures transfer to v5, not a newly trained v5 residual model. v5 itself predicts market spread and has no absolute team-score output.",
+  "cohort": "Same 703 eligible games, after earlier matchup warmup; not full-season v5 or official Plug records. Original shortlist held fixed for primary selected-game comparison. Secondary rule reapplication uses different candidate cohorts.",
+  "warning": "Retrospective corrected inputs and archived closing spreads without certified original quote times. Original v5 prior-season-label training and preweek feature logic remain unchanged. No published predictions are altered.",
+  "seasons": {
+    "2023": {
+      "games": 224,
+      "full_cohort": {
+        "baseline": {
+          "wins": 103,
+          "losses": 110,
+          "pushes": 11,
+          "no_calls": 0,
+          "cover_pct": 48.35680751173709
+        },
+        "adjusted": {
+          "wins": 99,
+          "losses": 114,
+          "pushes": 11,
+          "no_calls": 0,
+          "cover_pct": 46.478873239436616
+        }
+      },
+      "same_original_shortlist": {
+        "games": 9,
+        "baseline": {
+          "wins": 4,
+          "losses": 5,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 44.44444444444444
+        },
+        "adjusted": {
+          "wins": 5,
+          "losses": 4,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 55.55555555555556
+        },
+        "candidate_still_qualifies": 7
+      },
+      "reapplied_rule_secondary": {
+        "baseline": {
+          "wins": 4,
+          "losses": 5,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 44.44444444444444
+        },
+        "adjusted": {
+          "wins": 4,
+          "losses": 7,
+          "pushes": 1,
+          "no_calls": 0,
+          "cover_pct": 36.36363636363637
+        }
+      },
+      "changed_decisions": 32,
+      "changed_games": [
+        {
+          "game_id": "2023_04_CIN_TEN",
+          "away_line": -2.5,
+          "baseline_away_margin": 1.654,
+          "fixed_matchup_margin_adjustment": 1.338347010967509,
+          "adjusted_away_margin": 2.992347010967509,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_04_LA_IND",
+          "away_line": -1.0,
+          "baseline_away_margin": 0.096,
+          "fixed_matchup_margin_adjustment": 1.4284363890520535,
+          "adjusted_away_margin": 1.5244363890520536,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_04_TB_NO",
+          "away_line": 4.0,
+          "baseline_away_margin": -2.902,
+          "fixed_matchup_margin_adjustment": -1.3126590834606833,
+          "adjusted_away_margin": -4.214659083460683,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_05_BAL_PIT",
+          "away_line": -4.5,
+          "baseline_away_margin": 4.167,
+          "fixed_matchup_margin_adjustment": 2.694725068478391,
+          "adjusted_away_margin": 6.861725068478391,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_06_IND_JAX",
+          "away_line": 4.0,
+          "baseline_away_margin": -4.579,
+          "fixed_matchup_margin_adjustment": 0.9964536683562036,
+          "adjusted_away_margin": -3.582546331643796,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_06_MIN_CHI",
+          "away_line": -3.0,
+          "baseline_away_margin": 2.894,
+          "fixed_matchup_margin_adjustment": 1.1316128874523967,
+          "adjusted_away_margin": 4.025612887452397,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_06_ARI_LA",
+          "away_line": 7.0,
+          "baseline_away_margin": -6.167,
+          "fixed_matchup_margin_adjustment": -1.2733550037395935,
+          "adjusted_away_margin": -7.440355003739594,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_07_ARI_SEA",
+          "away_line": 9.5,
+          "baseline_away_margin": -9.329,
+          "fixed_matchup_margin_adjustment": -1.6541398462783827,
+          "adjusted_away_margin": -10.983139846278384,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2023_07_PIT_LA",
+          "away_line": 3.5,
+          "baseline_away_margin": -2.01,
+          "fixed_matchup_margin_adjustment": -1.6286906069027536,
+          "adjusted_away_margin": -3.6386906069027534,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_07_MIA_PHI",
+          "away_line": 3.0,
+          "baseline_away_margin": -1.905,
+          "fixed_matchup_margin_adjustment": -1.371549630558045,
+          "adjusted_away_margin": -3.276549630558045,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_08_BAL_ARI",
+          "away_line": -9.5,
+          "baseline_away_margin": 9.179,
+          "fixed_matchup_margin_adjustment": 0.8958579279370756,
+          "adjusted_away_margin": 10.074857927937076,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2023_09_TEN_PIT",
+          "away_line": 3.5,
+          "baseline_away_margin": -3.587,
+          "fixed_matchup_margin_adjustment": 0.5952695751999453,
+          "adjusted_away_margin": -2.991730424800055,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_10_CAR_CHI",
+          "away_line": 3.0,
+          "baseline_away_margin": -3.353,
+          "fixed_matchup_margin_adjustment": 0.9648561234868731,
+          "adjusted_away_margin": -2.3881438765131273,
+          "baseline": {
+            "side": "home",
+            "result": "Push"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Push"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_10_HOU_CIN",
+          "away_line": 5.5,
+          "baseline_away_margin": -4.416,
+          "fixed_matchup_margin_adjustment": -1.208604089066722,
+          "adjusted_away_margin": -5.624604089066723,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_10_WAS_SEA",
+          "away_line": 6.0,
+          "baseline_away_margin": -5.386,
+          "fixed_matchup_margin_adjustment": -0.949734930819587,
+          "adjusted_away_margin": -6.335734930819587,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_11_DAL_CAR",
+          "away_line": -11.0,
+          "baseline_away_margin": 10.966,
+          "fixed_matchup_margin_adjustment": 0.2595938811882572,
+          "adjusted_away_margin": 11.225593881188257,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2023_11_NYG_WAS",
+          "away_line": 7.5,
+          "baseline_away_margin": -7.469,
+          "fixed_matchup_margin_adjustment": -0.09667827356032178,
+          "adjusted_away_margin": -7.565678273560322,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2023_11_TEN_JAX",
+          "away_line": 6.5,
+          "baseline_away_margin": -5.912,
+          "fixed_matchup_margin_adjustment": -1.019168151058036,
+          "adjusted_away_margin": -6.931168151058036,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_11_PHI_KC",
+          "away_line": 2.5,
+          "baseline_away_margin": -1.58,
+          "fixed_matchup_margin_adjustment": -1.1091980961345331,
+          "adjusted_away_margin": -2.6891980961345334,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_12_SF_SEA",
+          "away_line": -7.0,
+          "baseline_away_margin": 6.924,
+          "fixed_matchup_margin_adjustment": 1.0076012837960304,
+          "adjusted_away_margin": 7.931601283796031,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_12_JAX_HOU",
+          "away_line": -1.0,
+          "baseline_away_margin": 0.42,
+          "fixed_matchup_margin_adjustment": 1.1267624853693443,
+          "adjusted_away_margin": 1.5467624853693442,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_12_NO_ATL",
+          "away_line": -2.0,
+          "baseline_away_margin": 1.915,
+          "fixed_matchup_margin_adjustment": 1.0670262166557063,
+          "adjusted_away_margin": 2.982026216655706,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_12_TB_IND",
+          "away_line": 2.5,
+          "baseline_away_margin": -1.723,
+          "fixed_matchup_margin_adjustment": -1.0505334443878815,
+          "adjusted_away_margin": -2.7735334443878816,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_13_IND_TEN",
+          "away_line": -1.5,
+          "baseline_away_margin": 1.074,
+          "fixed_matchup_margin_adjustment": 1.2760766452439516,
+          "adjusted_away_margin": 2.3500766452439517,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_14_MIN_LV",
+          "away_line": -3.0,
+          "baseline_away_margin": 1.955,
+          "fixed_matchup_margin_adjustment": 1.2822226550491984,
+          "adjusted_away_margin": 3.2372226550491985,
+          "baseline": {
+            "side": "home",
+            "result": "Push"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Push"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_15_SF_ARI",
+          "away_line": -12.5,
+          "baseline_away_margin": 12.145,
+          "fixed_matchup_margin_adjustment": 0.6822927238741265,
+          "adjusted_away_margin": 12.827292723874127,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2023_17_DET_DAL",
+          "away_line": 5.5,
+          "baseline_away_margin": -4.92,
+          "fixed_matchup_margin_adjustment": -1.2567826973493552,
+          "adjusted_away_margin": -6.176782697349355,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_17_NE_BUF",
+          "away_line": 15.0,
+          "baseline_away_margin": -12.592,
+          "fixed_matchup_margin_adjustment": -2.490086778330479,
+          "adjusted_away_margin": -15.08208677833048,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_17_LAC_DEN",
+          "away_line": 3.5,
+          "baseline_away_margin": -3.817,
+          "fixed_matchup_margin_adjustment": 1.321532386527773,
+          "adjusted_away_margin": -2.4954676134722273,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_18_JAX_TEN",
+          "away_line": -3.5,
+          "baseline_away_margin": 1.988,
+          "fixed_matchup_margin_adjustment": 2.1251645742710688,
+          "adjusted_away_margin": 4.113164574271069,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_18_NYJ_NE",
+          "away_line": 2.5,
+          "baseline_away_margin": -2.744,
+          "fixed_matchup_margin_adjustment": 0.746244830861314,
+          "adjusted_away_margin": -1.9977551691386863,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2023_18_SEA_ARI",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.142,
+          "fixed_matchup_margin_adjustment": 0.9171737884935011,
+          "adjusted_away_margin": 3.059173788493501,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        }
+      ],
+      "margin_mae": {
+        "baseline": 10.262598214285715,
+        "adjusted": 10.382629227718967
+      },
+      "mean_abs_margin_adjustment": 0.6298662942685003
+    },
+    "2024": {
+      "games": 224,
+      "full_cohort": {
+        "baseline": {
+          "wins": 118,
+          "losses": 103,
+          "pushes": 3,
+          "no_calls": 0,
+          "cover_pct": 53.39366515837104
+        },
+        "adjusted": {
+          "wins": 117,
+          "losses": 104,
+          "pushes": 3,
+          "no_calls": 0,
+          "cover_pct": 52.94117647058823
+        }
+      },
+      "same_original_shortlist": {
+        "games": 11,
+        "baseline": {
+          "wins": 7,
+          "losses": 4,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 63.63636363636363
+        },
+        "adjusted": {
+          "wins": 4,
+          "losses": 7,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 36.36363636363637
+        },
+        "candidate_still_qualifies": 7
+      },
+      "reapplied_rule_secondary": {
+        "baseline": {
+          "wins": 7,
+          "losses": 4,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 63.63636363636363
+        },
+        "adjusted": {
+          "wins": 5,
+          "losses": 6,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 45.45454545454545
+        }
+      },
+      "changed_decisions": 19,
+      "changed_games": [
+        {
+          "game_id": "2024_04_JAX_HOU",
+          "away_line": 5.5,
+          "baseline_away_margin": -5.49,
+          "fixed_matchup_margin_adjustment": -1.888185169072203,
+          "adjusted_away_margin": -7.378185169072204,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_04_PIT_IND",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.214,
+          "fixed_matchup_margin_adjustment": 1.438561300414978,
+          "adjusted_away_margin": 3.6525613004149777,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_04_TEN_MIA",
+          "away_line": 2.5,
+          "baseline_away_margin": -3.159,
+          "fixed_matchup_margin_adjustment": 0.9663626899981929,
+          "adjusted_away_margin": -2.192637310001807,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_05_GB_LA",
+          "away_line": -3.0,
+          "baseline_away_margin": 2.174,
+          "fixed_matchup_margin_adjustment": 0.8743689692496396,
+          "adjusted_away_margin": 3.0483689692496396,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_06_PIT_LV",
+          "away_line": -3.5,
+          "baseline_away_margin": 2.836,
+          "fixed_matchup_margin_adjustment": 1.280730113068437,
+          "adjusted_away_margin": 4.116730113068437,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_06_ATL_CAR",
+          "away_line": -6.0,
+          "baseline_away_margin": 5.796,
+          "fixed_matchup_margin_adjustment": 0.7126052404075693,
+          "adjusted_away_margin": 6.50860524040757,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_08_BUF_SEA",
+          "away_line": -3.0,
+          "baseline_away_margin": 2.76,
+          "fixed_matchup_margin_adjustment": 1.4445561128271593,
+          "adjusted_away_margin": 4.204556112827159,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_08_DAL_SF",
+          "away_line": 5.5,
+          "baseline_away_margin": -3.659,
+          "fixed_matchup_margin_adjustment": -2.4207404899599867,
+          "adjusted_away_margin": -6.0797404899599865,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_10_DEN_KC",
+          "away_line": 7.5,
+          "baseline_away_margin": -6.897,
+          "fixed_matchup_margin_adjustment": -0.7995397255245471,
+          "adjusted_away_margin": -7.696539725524548,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2024_12_KC_CAR",
+          "away_line": -11.0,
+          "baseline_away_margin": 10.018,
+          "fixed_matchup_margin_adjustment": 3.7015045187832247,
+          "adjusted_away_margin": 13.719504518783225,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2024_12_TB_NYG",
+          "away_line": -6.5,
+          "baseline_away_margin": 6.331,
+          "fixed_matchup_margin_adjustment": 0.5973530104876248,
+          "adjusted_away_margin": 6.928353010487625,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_12_TEN_HOU",
+          "away_line": 8.0,
+          "baseline_away_margin": -7.729,
+          "fixed_matchup_margin_adjustment": -1.0433246855828475,
+          "adjusted_away_margin": -8.772324685582849,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2024_12_DEN_LV",
+          "away_line": -6.5,
+          "baseline_away_margin": 5.331,
+          "fixed_matchup_margin_adjustment": 1.7457295581830894,
+          "adjusted_away_margin": 7.076729558183089,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_12_ARI_SEA",
+          "away_line": -1.0,
+          "baseline_away_margin": 0.814,
+          "fixed_matchup_margin_adjustment": 0.7073481294459673,
+          "adjusted_away_margin": 1.5213481294459672,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_13_LAC_ATL",
+          "away_line": -1.0,
+          "baseline_away_margin": 0.689,
+          "fixed_matchup_margin_adjustment": 1.0958716250112637,
+          "adjusted_away_margin": 1.7848716250112635,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_14_NO_NYG",
+          "away_line": -5.5,
+          "baseline_away_margin": 5.145,
+          "fixed_matchup_margin_adjustment": 1.1864230034143535,
+          "adjusted_away_margin": 6.331423003414353,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_16_PHI_WAS",
+          "away_line": -4.0,
+          "baseline_away_margin": 3.078,
+          "fixed_matchup_margin_adjustment": 0.9576914517251356,
+          "adjusted_away_margin": 4.035691451725135,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_17_SEA_CHI",
+          "away_line": -3.5,
+          "baseline_away_margin": 3.08,
+          "fixed_matchup_margin_adjustment": 1.2249370247887243,
+          "adjusted_away_margin": 4.304937024788725,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2024_17_MIA_CLE",
+          "away_line": -3.0,
+          "baseline_away_margin": 3.473,
+          "fixed_matchup_margin_adjustment": -0.48908466938849565,
+          "adjusted_away_margin": 2.983915330611504,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        }
+      ],
+      "margin_mae": {
+        "baseline": 9.78207142857143,
+        "adjusted": 9.808535861888084
+      },
+      "mean_abs_margin_adjustment": 0.703080222562291
+    },
+    "2025": {
+      "games": 224,
+      "full_cohort": {
+        "baseline": {
+          "wins": 112,
+          "losses": 111,
+          "pushes": 1,
+          "no_calls": 0,
+          "cover_pct": 50.224215246636774
+        },
+        "adjusted": {
+          "wins": 112,
+          "losses": 111,
+          "pushes": 1,
+          "no_calls": 0,
+          "cover_pct": 50.224215246636774
+        }
+      },
+      "same_original_shortlist": {
+        "games": 17,
+        "baseline": {
+          "wins": 11,
+          "losses": 6,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 64.70588235294117
+        },
+        "adjusted": {
+          "wins": 12,
+          "losses": 5,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 70.58823529411765
+        },
+        "candidate_still_qualifies": 3
+      },
+      "reapplied_rule_secondary": {
+        "baseline": {
+          "wins": 11,
+          "losses": 6,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 64.70588235294117
+        },
+        "adjusted": {
+          "wins": 7,
+          "losses": 6,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 53.84615384615385
+        }
+      },
+      "changed_decisions": 38,
+      "changed_games": [
+        {
+          "game_id": "2025_04_NO_BUF",
+          "away_line": 15.5,
+          "baseline_away_margin": -14.481,
+          "fixed_matchup_margin_adjustment": -1.239436368751997,
+          "adjusted_away_margin": -15.720436368751997,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_04_TEN_HOU",
+          "away_line": 7.5,
+          "baseline_away_margin": -7.337,
+          "fixed_matchup_margin_adjustment": -1.4114155778132786,
+          "adjusted_away_margin": -8.748415577813278,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_04_GB_DAL",
+          "away_line": -7.0,
+          "baseline_away_margin": 4.994,
+          "fixed_matchup_margin_adjustment": 2.0681218290480885,
+          "adjusted_away_margin": 7.062121829048088,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_04_CIN_DEN",
+          "away_line": 7.5,
+          "baseline_away_margin": -7.045,
+          "fixed_matchup_margin_adjustment": -1.8971256705004111,
+          "adjusted_away_margin": -8.942125670500412,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_05_MIN_CLE",
+          "away_line": -3.5,
+          "baseline_away_margin": 5.323,
+          "fixed_matchup_margin_adjustment": -2.140733357549178,
+          "adjusted_away_margin": 3.1822666424508226,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_05_DEN_PHI",
+          "away_line": 3.5,
+          "baseline_away_margin": -4.486,
+          "fixed_matchup_margin_adjustment": 1.1858961614847876,
+          "adjusted_away_margin": -3.300103838515212,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_05_LV_IND",
+          "away_line": 7.0,
+          "baseline_away_margin": -6.768,
+          "fixed_matchup_margin_adjustment": -2.789692380489945,
+          "adjusted_away_margin": -9.557692380489945,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_05_NYG_NO",
+          "away_line": 1.5,
+          "baseline_away_margin": -1.218,
+          "fixed_matchup_margin_adjustment": -0.5535371330428317,
+          "adjusted_away_margin": -1.7715371330428318,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_05_TB_SEA",
+          "away_line": 3.5,
+          "baseline_away_margin": -3.764,
+          "fixed_matchup_margin_adjustment": 1.032738753602282,
+          "adjusted_away_margin": -2.7312612463977177,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_06_DEN_NYJ",
+          "away_line": -7.5,
+          "baseline_away_margin": 6.093,
+          "fixed_matchup_margin_adjustment": 3.7782890352406895,
+          "adjusted_away_margin": 9.87128903524069,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_06_ARI_IND",
+          "away_line": 8.5,
+          "baseline_away_margin": -5.7,
+          "fixed_matchup_margin_adjustment": -2.9247642158610523,
+          "adjusted_away_margin": -8.624764215861052,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_06_CIN_GB",
+          "away_line": 14.0,
+          "baseline_away_margin": -11.737,
+          "fixed_matchup_margin_adjustment": -2.7854336522286727,
+          "adjusted_away_margin": -14.522433652228672,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_08_TEN_IND",
+          "away_line": 15.5,
+          "baseline_away_margin": -14.567,
+          "fixed_matchup_margin_adjustment": -2.4329300892597483,
+          "adjusted_away_margin": -16.99993008925975,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_08_GB_PIT",
+          "away_line": -3.0,
+          "baseline_away_margin": 0.942,
+          "fixed_matchup_margin_adjustment": 2.409745639155997,
+          "adjusted_away_margin": 3.3517456391559968,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_09_LAC_TEN",
+          "away_line": -10.0,
+          "baseline_away_margin": 8.799,
+          "fixed_matchup_margin_adjustment": 3.0607026077564594,
+          "adjusted_away_margin": 11.859702607756459,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_09_JAX_LV",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.262,
+          "fixed_matchup_margin_adjustment": 1.7348976747533444,
+          "adjusted_away_margin": 3.9968976747533445,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_09_ARI_DAL",
+          "away_line": 3.5,
+          "baseline_away_margin": -2.257,
+          "fixed_matchup_margin_adjustment": -1.8768102581419985,
+          "adjusted_away_margin": -4.133810258141999,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_10_BUF_MIA",
+          "away_line": -8.5,
+          "baseline_away_margin": 6.674,
+          "fixed_matchup_margin_adjustment": 2.625413832779166,
+          "adjusted_away_margin": 9.299413832779166,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_10_LA_SF",
+          "away_line": -5.5,
+          "baseline_away_margin": 3.187,
+          "fixed_matchup_margin_adjustment": 2.458137363697075,
+          "adjusted_away_margin": 5.645137363697074,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_11_LAC_JAX",
+          "away_line": -3.0,
+          "baseline_away_margin": 2.179,
+          "fixed_matchup_margin_adjustment": 1.038940617371258,
+          "adjusted_away_margin": 3.2179406173712577,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_12_MIN_GB",
+          "away_line": 6.5,
+          "baseline_away_margin": -6.413,
+          "fixed_matchup_margin_adjustment": -0.6948163726486343,
+          "adjusted_away_margin": -7.107816372648634,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_12_SEA_TEN",
+          "away_line": -12.5,
+          "baseline_away_margin": 12.269,
+          "fixed_matchup_margin_adjustment": 3.9609850149847663,
+          "adjusted_away_margin": 16.229985014984766,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_12_JAX_ARI",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.002,
+          "fixed_matchup_margin_adjustment": 1.7797346383737038,
+          "adjusted_away_margin": 3.7817346383737034,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_13_KC_DAL",
+          "away_line": -3.5,
+          "baseline_away_margin": 3.031,
+          "fixed_matchup_margin_adjustment": 1.717096670197836,
+          "adjusted_away_margin": 4.748096670197836,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_13_LA_CAR",
+          "away_line": -10.0,
+          "baseline_away_margin": 9.886,
+          "fixed_matchup_margin_adjustment": 2.5210325923206423,
+          "adjusted_away_margin": 12.407032592320641,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_14_TEN_CLE",
+          "away_line": 4.5,
+          "baseline_away_margin": -3.735,
+          "fixed_matchup_margin_adjustment": -1.673384263583603,
+          "adjusted_away_margin": -5.408384263583603,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_14_PHI_LAC",
+          "away_line": -1.5,
+          "baseline_away_margin": 0.063,
+          "fixed_matchup_margin_adjustment": 1.655684066057132,
+          "adjusted_away_margin": 1.7186840660571319,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_15_ATL_TB",
+          "away_line": 6.0,
+          "baseline_away_margin": -6.19,
+          "fixed_matchup_margin_adjustment": 0.7986197397205662,
+          "adjusted_away_margin": -5.391380260279434,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_15_ARI_HOU",
+          "away_line": 10.5,
+          "baseline_away_margin": -8.895,
+          "fixed_matchup_margin_adjustment": -2.2824686327995667,
+          "adjusted_away_margin": -11.177468632799567,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_15_BAL_CIN",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.025,
+          "fixed_matchup_margin_adjustment": 0.8810611296441899,
+          "adjusted_away_margin": 2.90606112964419,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_15_LV_PHI",
+          "away_line": 12.5,
+          "baseline_away_margin": -11.367,
+          "fixed_matchup_margin_adjustment": -1.387205726057383,
+          "adjusted_away_margin": -12.754205726057384,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_16_PHI_WAS",
+          "away_line": -7.0,
+          "baseline_away_margin": 5.078,
+          "fixed_matchup_margin_adjustment": 3.067618476055901,
+          "adjusted_away_margin": 8.145618476055901,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_16_TB_CAR",
+          "away_line": -3.0,
+          "baseline_away_margin": 2.347,
+          "fixed_matchup_margin_adjustment": 0.8815368321045853,
+          "adjusted_away_margin": 3.2285368321045853,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_16_LV_HOU",
+          "away_line": 14.5,
+          "baseline_away_margin": -14.333,
+          "fixed_matchup_margin_adjustment": -2.497221207408428,
+          "adjusted_away_margin": -16.830221207408428,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2025_17_BAL_GB",
+          "away_line": 2.5,
+          "baseline_away_margin": -2.358,
+          "fixed_matchup_margin_adjustment": -1.558412062708415,
+          "adjusted_away_margin": -3.916412062708415,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_17_NO_TEN",
+          "away_line": -1.5,
+          "baseline_away_margin": 0.322,
+          "fixed_matchup_margin_adjustment": 1.8309379316747056,
+          "adjusted_away_margin": 2.1529379316747055,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_18_SEA_SF",
+          "away_line": -2.5,
+          "baseline_away_margin": 2.041,
+          "fixed_matchup_margin_adjustment": 0.8234702905780045,
+          "adjusted_away_margin": 2.864470290578004,
+          "baseline": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Win"
+          },
+          "baseline_selected": false
+        },
+        {
+          "game_id": "2025_18_ARI_LA",
+          "away_line": 14.5,
+          "baseline_away_margin": -14.129,
+          "fixed_matchup_margin_adjustment": -2.850267756924934,
+          "adjusted_away_margin": -16.979267756924934,
+          "baseline": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Win"
+          },
+          "baseline_selected": true
+        }
+      ],
+      "margin_mae": {
+        "baseline": 10.361183035714287,
+        "adjusted": 10.430719809092455
+      },
+      "mean_abs_margin_adjustment": 0.9329170004679316
+    },
+    "2026": {
+      "games": 31,
+      "full_cohort": {
+        "baseline": {
+          "wins": 19,
+          "losses": 10,
+          "pushes": 2,
+          "no_calls": 0,
+          "cover_pct": 65.51724137931035
+        },
+        "adjusted": {
+          "wins": 17,
+          "losses": 12,
+          "pushes": 2,
+          "no_calls": 0,
+          "cover_pct": 58.62068965517241
+        }
+      },
+      "same_original_shortlist": {
+        "games": 2,
+        "baseline": {
+          "wins": 1,
+          "losses": 1,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 50.0
+        },
+        "adjusted": {
+          "wins": 0,
+          "losses": 2,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 0.0
+        },
+        "candidate_still_qualifies": 2
+      },
+      "reapplied_rule_secondary": {
+        "baseline": {
+          "wins": 1,
+          "losses": 1,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 50.0
+        },
+        "adjusted": {
+          "wins": 0,
+          "losses": 2,
+          "pushes": 0,
+          "no_calls": 0,
+          "cover_pct": 0.0
+        }
+      },
+      "changed_decisions": 2,
+      "changed_games": [
+        {
+          "game_id": "2026_04_TEN_BAL",
+          "away_line": 11.5,
+          "baseline_away_margin": -10.81,
+          "fixed_matchup_margin_adjustment": -1.382169543201509,
+          "adjusted_away_margin": -12.19216954320151,
+          "baseline": {
+            "side": "away",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "home",
+            "result": "Loss"
+          },
+          "baseline_selected": true
+        },
+        {
+          "game_id": "2026_05_LV_NE",
+          "away_line": 3.5,
+          "baseline_away_margin": -4.791,
+          "fixed_matchup_margin_adjustment": 1.4834560195960522,
+          "adjusted_away_margin": -3.307543980403948,
+          "baseline": {
+            "side": "home",
+            "result": "Win"
+          },
+          "adjusted": {
+            "side": "away",
+            "result": "Loss"
+          },
+          "baseline_selected": false
+        }
+      ],
+      "margin_mae": {
+        "baseline": 8.21625806451613,
+        "adjusted": 8.319946933626943
+      },
+      "mean_abs_margin_adjustment": 0.9702549495674615
+    }
+  },
+  "resources": {
+    "elapsed_seconds": 5.484,
+    "peak_rss_bytes": 89325568
+  },
+  "ledger": {
+    "file": "v5_matchup_results.games.csv",
+    "rows": 703,
+    "sha256": "1ad7de6854efe7eb9f168bee402a984604fa9e0ace38fc17dd6da91f57f5d212"
+  }
+}
