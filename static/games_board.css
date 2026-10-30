@@ -93,38 +93,51 @@
 }
 
 
-/* Live and final cards read like the full Game Center when collapsed.
-   Leave upcoming cards and expanded scoreboards unchanged. */
-.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-match,
-.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-match{
-  grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);
-  width:min(100%,430px);
+/* Homepage live/final scoreboards mirror the full Game Center:
+   center two stacked team-and-score columns in the card, open or closed.
+   Upcoming game tiles intentionally retain their original compact layout. */
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-match,
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-match{
+  grid-template-columns:minmax(0,1fr) minmax(28px,.3fr) minmax(0,1fr);
+  width:min(100%,700px);
   margin:14px auto 0;
-  gap:8px;
+  align-items:center;
+  gap:10px;
 }
-.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-side,
-.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-side{
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-side,
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-side,
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-side:nth-child(3),
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-side:nth-child(3){
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:3px;
   text-align:center;
+  gap:5px;
 }
-.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-match .tf-board-at,
-.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-match .tf-board-at{
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-side strong,
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-side strong{
+  font-size:clamp(2rem,5vw,3rem);
+  line-height:1.04;
+}
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-side b,
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-side b{
+  font-size:clamp(1rem,2.3vw,1.3rem);
+}
+.tf-board-home .tf-board-game[data-state="in"] .tf-board-at,
+.tf-board-home .tf-board-game[data-state="post"] .tf-board-at{
+  text-align:center;
   align-self:center;
-  text-align:center;
-}
-.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-side strong,
-.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-side strong{
-  font-size:clamp(1.8rem,4vw,2.45rem);
-  line-height:1.1;
 }
 @media(max-width:420px){
-  .tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-match,
-  .tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-match{
-    width:min(100%,300px);
+  .tf-board-home .tf-board-game[data-state="in"] .tf-board-match,
+  .tf-board-home .tf-board-game[data-state="post"] .tf-board-match{
+    width:100%;
+    grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);
     gap:4px;
+  }
+  .tf-board-home .tf-board-game[data-state="in"] .tf-board-side strong,
+  .tf-board-home .tf-board-game[data-state="post"] .tf-board-side strong{
+    font-size:clamp(1.85rem,8vw,2.5rem);
   }
 }
