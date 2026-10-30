@@ -3,11 +3,11 @@
   "title": "A field goal that never happened",
   "date": "2026-10-11",
   "season": 2026,
-  "teams": "Giants \u00b7 Commanders",
+  "teams": "Giants · Commanders",
   "categories": [
     "blunders"
   ],
-  "summary": "Washington reached field-goal territory in overtime, then ran out of time without attempting a kick. The Giants escaped with a 27\u201327 tie.",
+  "summary": "Washington reached field-goal territory in overtime, then ran out of time without attempting a kick. The Giants escaped with a 27–27 tie.",
   "evidence": "Documented",
   "featured": true,
   "timeline": [
@@ -17,7 +17,7 @@
     },
     {
       "label": "About 50 seconds left",
-      "text": "Washington faced second-and-8 at the Giants\u2019 24. Neither team had a timeout."
+      "text": "Washington faced second-and-8 at the Giants’ 24. Neither team had a timeout."
     },
     {
       "label": "12 seconds left",
@@ -50,5 +50,15 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Washington moneyline",
+      "impact": "The game finished tied rather than with a Washington field goal; handling of a tie depends on sportsbook market rules."
+    },
+    {
+      "market": "Washington team total / game total",
+      "impact": "The unattempted field goal could matter near certain thresholds, but no actual posted total or loss is verified."
+    }
+  ]
 }
