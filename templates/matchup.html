@@ -33,6 +33,15 @@
 .matchup-final-player strong{font-size:.96rem}
 .matchup-final-player span{font-size:.82rem;color:#cbd5e1}
 
+
+.matchup-comparison-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.matchup-comparison-tab{cursor:pointer;background:#111827;border:1px solid #475569;border-radius:9px;color:#cbd5e1;font:700 15px Arial,sans-serif;padding:10px 15px}
+.matchup-comparison-tab[aria-selected="true"]{color:#fbbf24;border-color:#fbbf24;background:#263445}
+.matchup-comparison-tab:focus-visible{outline:2px solid #fbbf24;outline-offset:3px}
+.matchup-comparison-panel[hidden]{display:none!important}
+.matchup-top-players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.matchup-top-players .matchup-team-card{margin:0;min-width:0}
+@media(max-width:540px){.matchup-top-players{gap:8px}.matchup-top-players .matchup-team-card{padding:9px}.matchup-top-players h2{font-size:1rem}.matchup-top-players p{overflow-wrap:anywhere}}
 @media(max-width:540px){.matchup-final-head{display:block}.matchup-final-score{margin-top:6px;font-size:1.05rem}.matchup-final-column-head,.matchup-final-metric{gap:3px;padding:9px 4px}.matchup-final-metric span{font-size:.78rem}.matchup-final-metric strong{font-size:.95rem}.matchup-final-team{padding:9px}.matchup-final-leaders{gap:8px}.matchup-final-player strong{font-size:.85rem}.matchup-final-player span{font-size:.74rem}}
 </style>
 {% if is_final %}
@@ -79,13 +88,61 @@
   </details>
 </section>
 {% endif %}
-<section class="stats-card matchup-panel matchup-comparison"><h2>Team comparison</h2><div class="table-scroll"><table><thead><tr><th>Per game</th>{% for side in teams %}<th><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} →</a></th>{% endfor %}</tr></thead><tbody>
+<section class="stats-card matchup-panel matchup-comparison" aria-label="Matchup comparison">
+  <h2>Matchup Comparison</h2>
+  <div class="matchup-comparison-tabs" role="tablist" aria-label="Compare teams and players">
+    <button type="button" class="matchup-comparison-tab" id="matchup-tab-teams" role="tab" aria-controls="matchup-panel-teams" aria-selected="true" tabindex="0">Team Comparison</button>
+    <button type="button" class="matchup-comparison-tab" id="matchup-tab-players" role="tab" aria-controls="matchup-panel-players" aria-selected="false" tabindex="-1">Top Players</button>
+  </div>
+  <div id="matchup-panel-teams" class="matchup-comparison-panel" role="tabpanel" aria-labelledby="matchup-tab-teams">
+    <div class="table-scroll"><table><thead><tr><th>Per game</th>{% for side in teams %}<th><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} →</a></th>{% endfor %}</tr></thead><tbody>
 <tr><td>Record</td>{% for side in teams %}<td>{{ side.summary.wins }}–{{ side.summary.losses }}–{{ side.summary.ties }}</td>{% endfor %}</tr>
 <tr><td>ATS record</td>{% for side in teams %}<td>{{ side.summary.markets.ats_w }}–{{ side.summary.markets.ats_l }}–{{ side.summary.markets.ats_p }} <small>({{ side.summary.markets.ats_known }} graded)</small></td>{% endfor %}</tr>
 <tr><td>Over–Under–Push</td>{% for side in teams %}<td>{{ side.summary.markets.over }}–{{ side.summary.markets.under }}–{{ side.summary.markets.total_push }} <small>({{ side.summary.markets.ou_known }} graded)</small></td>{% endfor %}</tr>
 {% for key,label in [('points_for','Points scored'),('points_against','Points allowed'),('passing_yards','Passing yards'),('rushing_yards','Rushing yards'),('passing_yards_allowed','Passing yards allowed'),('rushing_yards_allowed','Rushing yards allowed')] %}<tr><td>{{ label }}</td>{% for side in teams %}<td>{{ side.summary.metrics[key].value|stat }} <small>({{ side.summary.metrics[key].n }} games)</small></td>{% endfor %}</tr>{% endfor %}
-</tbody></table></div></section>
-<div class="stats-grid matchup-team-cards">{% for side in teams %}<section class="stats-card matchup-panel matchup-team-card"><h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
-{{ save_item('team',side.code,side.code) }}
-{% for leader in side.leaders %}<h3>{{ leader.role }}</h3><p><a href="{{ url_for('scout4.players_page',player=leader.id,team=side.code,season=season,before_week=week) }}">{{ leader.name }} →</a></p><p>{% for key in leader.fields %}{{ key|replace('_',' ')|title }}: {{ leader.summary.metrics[key].total|stat(0) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% else %}<p>No recorded player leaders before this matchup.</p>{% endfor %}</section>{% endfor %}</div>
+</tbody></table></div>
+  </div>
+  <div id="matchup-panel-players" class="matchup-comparison-panel" role="tabpanel" aria-labelledby="matchup-tab-players" hidden>
+    <div class="matchup-top-players">
+      {% for side in teams %}
+      <div class="matchup-team-card">
+        <h2><a href="{{ url_for('scout4.teams_page',team=side.code,season=season,before_week=week) }}">{{ side.code }} team stats →</a></h2>
+        {{ save_item('team',side.code,side.code) }}
+        {% for leader in side.leaders %}
+        <h3>{{ leader.role }}</h3>
+        <p><a href="{{ url_for('scout4.players_page',player=leader.id,team=side.code,season=season,before_week=week) }}">{{ leader.name }} →</a></p>
+        <p>{% for key in leader.fields %}{{ key|replace('_',' ')|title }}: {{ leader.summary.metrics[key].total|stat(0) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+        {% else %}
+        <p>No recorded player leaders before this matchup.</p>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<script>
+(function () {
+  const tabs = Array.from(document.querySelectorAll('.matchup-comparison-tab'));
+  if (tabs.length !== 2) return;
+  function activate(tab, focus) {
+    tabs.forEach(function (item) {
+      const selected = item === tab;
+      item.setAttribute('aria-selected', String(selected));
+      item.tabIndex = selected ? 0 : -1;
+      document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
+    });
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (tab, index) {
+    tab.addEventListener('click', function () { activate(tab, false); });
+    tab.addEventListener('keydown', function (event) {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      let next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :
+        (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      activate(tabs[next], true);
+    });
+  });
+}());
+</script>
 {% endblock %}
