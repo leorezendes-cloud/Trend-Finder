@@ -227,6 +227,26 @@
 
         .primetime-all-dogs-footer { margin: 9px 0 12px; color: #cbd5e1; text-align: center; font-size: 12px; }
         .primetime-all-dogs-footer strong { color: #f1f5f9; white-space: nowrap; }
+
+        /* Compact Fade the Public / reverse-line-movement game gallery. */
+        .money-matchups { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),330px)); justify-content:center; gap:14px; max-width:1100px; }
+        .money-matchups > .dungeon-game-card { width:100%; min-width:0; box-sizing:border-box; min-height:0; padding:15px; margin:0; -webkit-text-stroke:0; }
+        .money-matchups .dungeon-game-heading h3 { font-size:19px; margin:0 0 5px; overflow-wrap:anywhere; }
+        .money-matchups .dungeon-game-heading p { font-size:12px; margin:0 0 10px; color:#cbd5e1; }
+        .money-matchups .dungeon-market-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+        .money-matchups .dungeon-market-card { min-width:0; border:1px solid #475569; border-radius:9px; background:#17212e; padding:10px; }
+        .money-matchups .dungeon-market-card h4 { font-size:14px; margin:0 0 8px; }
+        .money-matchups .market-quick { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 8px; padding:5px 0; border-top:1px solid #334155; font-size:12px; }
+        .money-matchups .market-quick-label { color:#cbd5e1; }
+        .money-matchups .market-quick strong { font-size:12px; overflow-wrap:anywhere; text-align:right; }
+        .money-matchups .market-quick small { flex-basis:100%; color:#cbd5e1; text-align:right; }
+        .money-matchups .market-quick .fade-qualified { color:#86efac; }
+        .money-matchups .movement-review { margin-top:8px; font-size:12px; }
+        .money-matchups .movement-review summary { cursor:pointer; color:#fbbf24; }
+        .money-matchups .movement-review p { overflow-wrap:anywhere; margin:7px 0; }
+        .money-matchups .dungeon-game-source { margin:10px 0 0; font-size:12px; }
+        @media(max-width:650px) { .money-matchups { grid-template-columns:minmax(0,330px); } }
+
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
@@ -382,70 +402,34 @@
             <div class="dungeon-market-grid">
                 {% for market in game.markets %}
                 <article class="dungeon-market-card">
-
                     <h4>{{ market.market_label }}</h4>
-
-                    {% if market.movement %}
-                    <p class="market-line">
-                        {{ market.movement.latest_quote }}
-                    </p>
-                    {% endif %}
-
-                    <div class="market-info">
-                        <strong>Public Money</strong>
-                        <p>
-                            {{ market.side_a }} {{ market.handle_a }}%
-                            /
-                            {{ market.side_b }} {{ market.handle_b }}%
-                        </p>
+                    <div class="market-quick">
+                        <span class="market-quick-label">Money split</span>
+                        <strong>{{ market.side_a }} {{ market.handle_a }}% / {{ market.side_b }} {{ market.handle_b }}%</strong>
                     </div>
-
-                    <div class="market-info">
-                        <strong>Mike's 65% Rule</strong>
-                        <p class="{{ 'fade-qualified' if market.qualifies else '' }}">
-                            {{ market.pick }}
-                        </p>
-                        <small>
-                            {{ market.result }}
-                            {% if market.profit is not none %}
-                            • {{ "%+.2f"|format(market.profit) }}u
-                            {% endif %}
-                        </small>
+                    <div class="market-quick">
+                        <span class="market-quick-label">Mike's Fade</span>
+                        <strong class="{{ 'fade-qualified' if market.qualifies else '' }}">{{ market.pick }}</strong>
+                        <small>{{ market.result }}{% if market.profit is not none %} • {{ "%+.2f"|format(market.profit) }}u{% endif %}</small>
                     </div>
-
-                    <div class="market-info">
-                        <strong>Reverse Line Movement</strong>
-
+                    <div class="market-quick">
+                        <span class="market-quick-label">Reverse Line Movement</span>
                         {% if market.movement %}
-                            <p>{{ market.movement.status }}</p>
-
-                            {% if market.movement.qualifies %}
-                            <small class="fade-qualified">
-                                {{ market.movement.pick }}
-                                • {{ market.movement.result }}
-                            </small>
-                            {% endif %}
-                        {% else %}
-                            <p>Insufficient movement data</p>
-                        {% endif %}
+                        <strong>{{ market.movement.status }}</strong>
+                        {% if market.movement.qualifies %}<small class="fade-qualified">{{ market.movement.pick }} • {{ market.movement.result }}</small>{% endif %}
+                        {% else %}<small>Insufficient movement data</small>{% endif %}
                     </div>
-
-                    {% if market.movement %}
                     <details class="movement-review">
-                        <summary>Review line movement</summary>
-                        <p>
-                            <strong>Recorded change:</strong>
-                            {{ market.movement.first_quote }}
-                            →
-                            {{ market.movement.latest_quote }}
-                        </p>
-                        <small>
-                            {{ market.movement.snapshot_count }}
-                            pregame observations
-                        </small>
+                        <summary>Explore market details</summary>
+                        <p><strong>Public money:</strong> {{ market.side_a }} {{ market.handle_a }}% / {{ market.side_b }} {{ market.handle_b }}%</p>
+                        <p><strong>Mike's Rule:</strong> {{ market.pick }} • {{ market.result }}</p>
+                        {% if market.movement %}
+                        <p><strong>First quote:</strong> {{ market.movement.first_quote }}</p>
+                        <p><strong>Latest quote:</strong> {{ market.movement.latest_quote }}</p>
+                        <p><strong>RLM status:</strong> {{ market.movement.status }}</p>
+                        <p><strong>Observations:</strong> {{ market.movement.snapshot_count }} pregame snapshots</p>
+                        {% else %}<p>No verified movement history recorded.</p>{% endif %}
                     </details>
-                    {% endif %}
-
                 </article>
                 {% endfor %}
             </div>
