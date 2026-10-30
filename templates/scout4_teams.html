@@ -5,6 +5,25 @@
 {% macro metric(value) %}{{ value.value|stat }} <small>n={{ value.n }}</small>{% endmacro %}
 {% block content %}
 {% if opponent and not team %}<p class="stats-note">Choose a team to compare both offenses against the opposing defenses.</p>{% endif %}
+{% if team %}
+<section class="stats-team-current-trends">
+  <h2>{{ team }} · Recent trends</h2>
+  <p>Active team streaks and the most recently recorded starting quarterback, using games from the current or preceding season. Small streaks remain visible; these are historical patterns, not forecasts.</p>
+  {% if related_trends %}
+  <div class="stats-grid">
+    {% for trend in related_trends %}
+    <article class="stats-card">
+      <h3>{{ trend.title }}</h3>
+      <p>{% if trend.streak >= 5 %}{{ trend.streak }} consecutive {{ trend.outcome|lower }} results{% else %}{{ trend.wins }} of the last {{ trend.sample }} {{ trend.outcome|lower }} results{% endif %}{% if trend.kind == 'ats' %} ATS{% endif %} · through {{ trend.latest }}</p>
+      <a href="{{ url_for('hot_trends_page', _anchor=hot_trend_id(trend)) }}">View supporting games →</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No currently qualifying team or recent-QB hot streaks.</p>
+  {% endif %}
+</section>
+{% endif %}
 {% if matchup %}{% include '_inline_picks.html' %}<section><h2>{{ team }} ↔ {{ opponent }} matchup comparison</h2><p>Observed averages in the selected venue window. Both teams use the same venue filter. These are comparisons, not projected final scores.</p><div class="stats-grid">
 {% for side in matchup %}<article class="stats-card"><h3>{{ side.attacker }} offense vs {{ side.defender }} defense</h3><p>{{ side.attack_games }} offensive games · {{ side.defense_games }} defensive games</p><div class="table-scroll"><table><thead><tr><th>Metric</th><th>Offense</th><th>Opponent allows</th></tr></thead><tbody>{% for m in side.metrics %}<tr><td>{{ m.label }}</td><td>{{ metric(m.offense) }}</td><td>{{ metric(m.allowed) }}</td></tr>{% endfor %}</tbody></table></div></article>{% endfor %}</div></section>{% endif %}
 <section><h2>{{ cards|length }} team{% if cards|length != 1 %}s{% endif %}</h2><div class="stats-grid">
