@@ -3,11 +3,11 @@
   "title": "Just get to halftime",
   "date": "2026-10-11",
   "season": 2026,
-  "teams": "49ers \u00b7 Seahawks",
+  "teams": "49ers · Seahawks",
   "categories": [
     "blunders"
   ],
-  "summary": "A Seattle rushing play near its own goal line became a San Francisco fumble-recovery touchdown just before halftime. The Seahawks lost 32\u201329.",
+  "summary": "A Seattle rushing play near its own goal line became a San Francisco fumble-recovery touchdown just before halftime. The Seahawks lost 32–29.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
@@ -21,7 +21,7 @@
     },
     {
       "label": "Halftime",
-      "text": "San Francisco led 21\u201313. Seattle had given up three first-half touchdowns after turnovers."
+      "text": "San Francisco led 21–13. Seattle had given up three first-half touchdowns after turnovers."
     }
   ],
   "unusual": "A possession intended to reach halftime safely produced an immediate defensive score instead.",
@@ -46,5 +46,15 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Seattle moneyline",
+      "impact": "Seattle lost by three after conceding the defensive touchdown; the play contributed to the result, without proving what would otherwise have happened."
+    },
+    {
+      "market": "Over / under",
+      "impact": "A defensive touchdown can affect a game's total, but without a verified total line it cannot be called a bad beat."
+    }
+  ]
 }
