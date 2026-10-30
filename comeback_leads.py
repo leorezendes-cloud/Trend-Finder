@@ -168,14 +168,14 @@ def records(doc, sort='comebacks'):
     if sort == 'blown':
         output.sort(key=lambda t: (
             inactive(t), -t['blown_leads_10_plus'],
-            -t['comeback_wins_10_plus'], t['name']
+            t['comeback_wins_10_plus'], t['name']
         ))
     elif sort == 'team':
         output.sort(key=lambda t: (inactive(t), t['name']))
     else:
         output.sort(key=lambda t: (
             inactive(t), -t['comeback_wins_10_plus'],
-            -t['blown_leads_10_plus'], t['name']
+            t['blown_leads_10_plus'], t['name']
         ))
     return output
 
