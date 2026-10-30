@@ -6,29 +6,46 @@
 {% block content %}
 {% if opponent and not team %}<p class="stats-note">Choose a team to compare both offenses against the opposing defenses.</p>{% endif %}
 {% if team %}
-<section class="stats-team-current-trends">
-  <h2>{{ team }} · Recent trends</h2>
-  <p>Active team streaks and the most recently recorded starting quarterback, using games from the current or preceding season. Small streaks remain visible; these are historical patterns, not forecasts.</p>
+{% set overview = cards[0] %}
+<section class="tf-team-overview" aria-labelledby="tf-team-overview-title">
+  <div class="tf-team-overview-heading">
+    <div><p class="tf-team-kicker">Team profile · {{ view.season }}</p><h2 id="tf-team-overview-title">{{ team }} at a glance</h2><p>{{ overview.summary.games }} completed games · {{ view.venue }} venue{% if view.venue != 'All' %}s{% endif %} · before Week {{ view.before_week }}</p></div>
+    {{ save_item('team',team,team) }}
+  </div>
+  <div class="tf-team-kpis">
+    <div class="tf-team-kpi"><span>Overall record</span><strong>{{ overview.summary.wins }}–{{ overview.summary.losses }}{% if overview.summary.ties %}–{{ overview.summary.ties }}{% endif %}</strong><small>W–L{% if overview.summary.ties %}–T{% endif %}</small></div>
+    <div class="tf-team-kpi"><span>Against the spread</span><strong>{{ overview.summary.markets.ats_w }}–{{ overview.summary.markets.ats_l }}–{{ overview.summary.markets.ats_p }}</strong><small>{{ overview.summary.markets.ats_known }} graded</small></div>
+    <div class="tf-team-kpi"><span>Game totals</span><strong>{{ overview.summary.markets.over }}–{{ overview.summary.markets.under }}–{{ overview.summary.markets.total_push }}</strong><small>Over–Under–Push</small></div>
+    <div class="tf-team-kpi"><span>Points per game</span><strong>{{ overview.summary.metrics.points_for.value|stat }}</strong><small>{{ overview.summary.metrics.points_against.value|stat }} allowed</small></div>
+  </div>
+  <div class="tf-team-form">
+    <div><span>Recent form</span><strong>{{ overview.form.streak }}</strong><small>Last five: {{ overview.form.sequence or '—' }}</small></div>
+    <div><span>Current ATS / O/U streak</span><strong>{{ overview.summary.markets.ats_streak }}</strong><small>{{ overview.summary.markets.ou_streak }}</small></div>
+  </div>
+</section>
+<section class="tf-team-trends" aria-labelledby="tf-team-trends-title">
+  <div class="tf-team-section-title"><div><p class="tf-team-kicker">What's happening lately</p><h2 id="tf-team-trends-title">Relevant trends</h2></div><a class="tf-team-browse-link" href="{{ url_for('hot_trends_page') }}">Browse all hot trends ↗</a></div>
   {% if related_trends %}
-  <div class="stats-grid">
+  <div class="tf-team-trend-grid">
     {% for trend in related_trends %}
-    <article class="stats-card">
+    <article class="tf-team-trend">
+      <div class="tf-team-trend-heading"><span class="tf-team-trend-type">{{ 'Quarterback' if trend.category == 'qb' else 'Team' }} · {{ trend.kind|upper }}</span><small>Through {{ trend.latest }}</small></div>
       <h3>{{ trend.title }}</h3>
-      <p>{% if trend.streak >= 5 %}{{ trend.streak }} consecutive {{ trend.outcome|lower }} results{% else %}{{ trend.wins }} of the last {{ trend.sample }} {{ trend.outcome|lower }} results{% endif %}{% if trend.kind == 'ats' %} ATS{% endif %} · through {{ trend.latest }}</p>
-      <a href="{{ url_for('hot_trends_page', _anchor=hot_trend_id(trend)) }}">View supporting games →</a>
+      <p class="tf-team-trend-stat">{% if trend.streak >= 5 %}<strong>{{ trend.streak }}</strong> consecutive {{ {'Cover':'covers','Win':'wins','Loss':'losses','Over':'overs','Under':'unders'}.get(trend.outcome,trend.outcome|lower) }}{% else %}<strong>{{ trend.wins }}/{{ trend.sample }}</strong> recent {{ {'Cover':'covers','Win':'wins','Loss':'losses','Over':'overs','Under':'unders'}.get(trend.outcome,trend.outcome|lower) }}{% endif %}</p>
+      <a class="tf-team-trend-link" href="{{ url_for('hot_trends_page', _anchor=hot_trend_id(trend)) }}">View supporting games <span aria-hidden="true">↗</span></a>
     </article>
     {% endfor %}
   </div>
   {% else %}
-  <p>No currently qualifying team or recent-QB hot streaks.</p>
+  <p class="tf-team-no-trends">No qualifying recent team or quarterback hot trends right now.</p>
   {% endif %}
 </section>
 {% endif %}
 {% if matchup %}{% include '_inline_picks.html' %}<section><h2>{{ team }} ↔ {{ opponent }} matchup comparison</h2><p>Observed averages in the selected venue window. Both teams use the same venue filter. These are comparisons, not projected final scores.</p><div class="stats-grid">
 {% for side in matchup %}<article class="stats-card"><h3>{{ side.attacker }} offense vs {{ side.defender }} defense</h3><p>{{ side.attack_games }} offensive games · {{ side.defense_games }} defensive games</p><div class="table-scroll"><table><thead><tr><th>Metric</th><th>Offense</th><th>Opponent allows</th></tr></thead><tbody>{% for m in side.metrics %}<tr><td>{{ m.label }}</td><td>{{ metric(m.offense) }}</td><td>{{ metric(m.allowed) }}</td></tr>{% endfor %}</tbody></table></div></article>{% endfor %}</div></section>{% endif %}
-<section><h2>{{ cards|length }} team{% if cards|length != 1 %}s{% endif %}</h2><div class="stats-grid">
-{% for card in cards %}<details class="stats-card" {% if team %}open{% endif %}><summary><span class="card-title">{{ card.team }} <small>{{ card.summary.games }} games · {{ card.summary.wins }}–{{ card.summary.losses }}–{{ card.summary.ties }}</small></span><span class="stats-inline">{{ card.summary.metrics.points_for.value|stat }} scored / game · {{ card.summary.metrics.points_against.value|stat }} allowed</span><span class="expand-label">View splits & game log</span></summary>
-<div class="card-body">{{ save_item('team',card.team,card.team) }}<p>ATS: {{ card.summary.markets.ats_w }}–{{ card.summary.markets.ats_l }}–{{ card.summary.markets.ats_p }} ({{ card.summary.markets.ats_known }} graded) · Over–Under–Push: {{ card.summary.markets.over }}–{{ card.summary.markets.under }}–{{ card.summary.markets.total_push }} ({{ card.summary.markets.ou_known }} graded).</p><p>{{ card.summary.markets.ats_streak }} · {{ card.summary.markets.ou_streak }}</p><p>Records and streaks use saved lines. Missing lines are ungraded; pushes interrupt covering or over/under streaks.</p><h3>Recent form</h3><p>{{ card.form.streak }} · Last five, oldest first: {{ card.form.sequence or '—' }}</p><p>Points scored: last three games {{ card.form.recent_points|stat }} / game · Season {{ card.form.season_points|stat }} / game.</p>
+<section class="tf-team-deep-dive"><h2>{% if team %}Detailed team statistics{% else %}{{ cards|length }} teams{% endif %}</h2>{% if team %}<p class="tf-team-deep-note">Open the breakdown for venue splits, performance history and advanced efficiency metrics.</p>{% endif %}<div class="stats-grid">
+{% for card in cards %}<details class="stats-card tf-team-detail-card"><summary><span class="card-title">{{ card.team }} <small>{{ card.summary.games }} games · {{ card.summary.wins }}–{{ card.summary.losses }}–{{ card.summary.ties }}</small></span><span class="stats-inline">{{ card.summary.metrics.points_for.value|stat }} scored / game · {{ card.summary.metrics.points_against.value|stat }} allowed</span><span class="expand-label">Explore statistics, splits &amp; game log ↓</span></summary>
+<div class="card-body">{% if not team %}{{ save_item('team',card.team,card.team) }}{% endif %}<p>ATS: {{ card.summary.markets.ats_w }}–{{ card.summary.markets.ats_l }}–{{ card.summary.markets.ats_p }} ({{ card.summary.markets.ats_known }} graded) · Over–Under–Push: {{ card.summary.markets.over }}–{{ card.summary.markets.under }}–{{ card.summary.markets.total_push }} ({{ card.summary.markets.ou_known }} graded).</p><p>{{ card.summary.markets.ats_streak }} · {{ card.summary.markets.ou_streak }}</p><p>Records and streaks use saved lines. Missing lines are ungraded; pushes interrupt covering or over/under streaks.</p><h3>Recent form</h3><p>{{ card.form.streak }} · Last five, oldest first: {{ card.form.sequence or '—' }}</p><p>Points scored: last three games {{ card.form.recent_points|stat }} / game · Season {{ card.form.season_points|stat }} / game.</p>
 <h3>Home and away splits</h3>
 <p>Completed games in the selected season before Week {{ view.before_week }}, regardless of the venue filter above. Neutral-site games are separate. A dash means no recorded data; n is the number of games with that metric.</p>
 <div class="table-scroll"><table class="venue-splits"><caption>{{ card.team }} home and away statistics</caption><thead><tr><th scope="col">Statistic</th>{% for split in card.venue_splits %}<th scope="col">{{ split.venue }}</th>{% endfor %}</tr></thead><tbody>
