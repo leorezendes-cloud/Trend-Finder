@@ -76,3 +76,28 @@
 
 .case-research-shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 22px}.case-research-shelf a{display:grid;gap:4px;padding:13px 15px;border:1px solid #425063;border-radius:9px;background:#172332;text-decoration:none;min-width:0}.case-research-shelf strong{font-size:14px;color:#f5d18b}.case-research-shelf span{font-size:12px;color:#becbd8;line-height:1.5}.case-research-shelf a:hover,.case-research-shelf a[aria-current]{border-color:#f8c563;background:#253244}.case-research-content>h3{font-size:27px}.case-research-context{font-size:14px!important;color:#d6e1eb}.case-research-grid .compact-title{font-size:21px;line-height:1.3;margin:8px 0}.case-research-grid .case-card>p{font-size:13px}.case-research-grid .anomaly-key-fact{font-size:24px}.case-research-grid .anomaly-type{font-size:10px;padding:4px 7px;background:#233747;color:#c2e7ee}.case-research-grid .anomaly-highlight{padding:12px;margin:8px 0;width:100%;box-sizing:border-box}.case-research-grid .anomaly-highlight p{font-size:13px}.case-research-grid .anomaly-highlight h3{font-size:18px}.case-research-grid .international-team-grid{width:100%;gap:8px}.case-research-grid .international-team-record{padding:10px;font-size:12px}.case-research-grid .international-team-record .stat-value{font:700 23px/1.3 system-ui}.case-research-grid .international-team-record p{font-size:12px}.case-research-grid .case-card>h3{font-size:17px}.case-research-grid .anomaly-details{margin-top:12px}.case-pagination{align-items:center;margin-top:20px}.case-pagination span{font-size:12px;color:#b4c2d1}.case-research-content .money-scoreboard{margin:22px 0;max-width:none}.case-research-content .money-scoreboard summary{cursor:pointer}
 @media(max-width:650px){.case-research-shelf{grid-template-columns:1fr}.case-research-shelf a{padding:11px 13px}}
+
+
+/* Give the research utilities their own breathing room after the case grid. */
+.investigation-library > .case-research-shelf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 28px 0 16px;
+    clear: both;
+}
+.investigation-library > .case-method {
+    margin-top: 0;
+}
+@media (max-width: 650px) {
+    .investigation-library > .case-research-shelf {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        margin-top: 26px;
+        margin-bottom: 18px;
+    }
+    .investigation-library > .case-research-shelf a {
+        padding: 14px 15px;
+    }
+    .investigation-library > .case-grid {
+        margin-bottom: 0;
+    }
+}
