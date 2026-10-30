@@ -154,3 +154,7 @@ or disk impact unless an operator separately installs/copies and invokes this pa
 ## Expanded ATS follow-up
 
 See [FULL_ATS_RESULTS.md](FULL_ATS_RESULTS.md) for fixed player/PBP/charting ablations, 2020–2022 verified scheme coverage, the same 2023–2026 modern cohort, reproducible game ledgers and 27 tests. Modern cached scheme coverage remains unavailable. The updated reader benchmark includes a full charted historical season. Nothing is integrated into production.
+
+## Threshold score-adjustment experiment
+
+[SCORE_BAND_RESULTS.md](SCORE_BAND_RESULTS.md) tests passing-only, rushing-only and jointly calibrated threshold bonuses to each projected team score. Includes ATS and totals records, learned point values, full weekly calibration histories, game ledgers and 32 tests. No target-year parameter tuning or production changes.
