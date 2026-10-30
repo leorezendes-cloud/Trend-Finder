@@ -406,7 +406,9 @@ def matchup(game_id):
         if hashlib.sha256(raw).hexdigest() == history_digest:
             forecast = json.loads(raw)
             forecast['_history_digest'] = history_digest
-    if forecast and archive_version is None and (forecast is not None or history_digest is not None):
+    # Only final games and explicit saved-version links use frozen results display.
+    # Upcoming comparisons should show the current Scout/Plug overlay when available.
+    if forecast and archive_version is None and (is_final or history_digest is not None):
         try:
             pregame_record(forecast)
         except (KeyError, TypeError, ValueError):
