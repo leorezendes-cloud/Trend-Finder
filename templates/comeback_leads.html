@@ -142,8 +142,8 @@
       const secondary = mode === 'blown' ? 'comebacks' : 'blown';
 
       return Number(b.dataset[key]) - Number(a.dataset[key]) ||
-             Number(b.dataset[secondary]) -
-             Number(a.dataset[secondary]) ||
+             Number(a.dataset[secondary]) -
+             Number(b.dataset[secondary]) ||
              compareNames(a, b);
     });
 
