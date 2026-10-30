@@ -3,7 +3,7 @@
   "title": "A trophy night, then a drone",
   "date": "2026-10-29",
   "season": 2026,
-  "teams": "Panthers \u00b7 Packers",
+  "teams": "Panthers · Packers",
   "categories": [
     "coincidences"
   ],
@@ -17,11 +17,11 @@
     },
     {
       "label": "Third quarter",
-      "text": "Play paused with Green Bay ahead 20\u201310 while a drone was reported near the stadium."
+      "text": "Play paused with Green Bay ahead 20–10 while a drone was reported near the stadium."
     },
     {
       "label": "Restart",
-      "text": "Yahoo\u2019s broadcast account reports a Josh Jacobs touchdown reception on the next play."
+      "text": "Yahoo’s broadcast account reports a Josh Jacobs touchdown reception on the next play."
     }
   ],
   "unusual": "An aerial safety interruption and a baseball championship celebration occurred on the same football night.",
@@ -46,5 +46,11 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Live betting / next touchdown",
+      "impact": "A pause and the reported touchdown on the following play could affect live wagers; no bet or market price is verified."
+    }
+  ]
 }
