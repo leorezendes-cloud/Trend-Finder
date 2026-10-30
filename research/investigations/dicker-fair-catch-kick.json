@@ -3,18 +3,18 @@
   "title": "The rule hiding in plain sight",
   "date": "2024-12-19",
   "season": 2024,
-  "teams": "Broncos \u00b7 Chargers",
+  "teams": "Broncos · Chargers",
   "categories": [
     "oddities",
     "analytics"
   ],
-  "summary": "Cameron Dicker made a 57-yard fair-catch kick with no time left in the first half. The rare option helped Los Angeles on the way to a 34\u201327 win.",
+  "summary": "Cameron Dicker made a 57-yard fair-catch kick with no time left in the first half. The rare option helped Los Angeles on the way to a 34–27 win.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
     {
       "label": "End of first half",
-      "text": "Denver interfered with Derius Davis\u2019s fair-catch opportunity."
+      "text": "Denver interfered with Derius Davis’s fair-catch opportunity."
     },
     {
       "label": "Untimed opportunity",
@@ -47,5 +47,15 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "First-half total",
+      "impact": "The fair-catch kick added three points before halftime; wagers close to a first-half total threshold could have been affected."
+    },
+    {
+      "market": "Cameron Dicker made field goals",
+      "impact": "An eligible made-kick prop might be affected, depending on whether that sportsbook counts a fair-catch kick. Market availability and rules are unverified."
+    }
+  ]
 }
