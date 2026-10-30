@@ -28,13 +28,19 @@
 {% if earlier_games %}<details class="hot-trend-evidence"><summary>Games from other seasons ({{ earlier_games|length }})</summary><ul class="hot-trend-game-list">{% for game in earlier_games %}<li class="hot-trend-game-row"><span class="hot-trend-game-label">{{ game.date }} · {{ game.matchup }}</span><span class="hot-trend-result" data-result="{{ game.result }}">{{ game.result }}</span></li>{% endfor %}</ul></details>{% endif %}
 {% if hot_fireworthy(trend) %}
 {% set future_games = hot_upcoming_for(trend) %}
+{% set potential_games = hot_potential_for(trend) %}
 <details class="hot-trend-evidence hot-trend-upcoming">
-<summary>🔥 Upcoming games matching this trend ({{ future_games|length }})</summary>
-{% if future_games %}
-<ul>{% for game in future_games %}
-<li><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.away_team }} @ {{ game.home_team }}</a> · {{ game.gameday }} · {{ game.gametime }} ET</li>
-{% endfor %}</ul>
-{% else %}<p>No qualifying upcoming games this week.</p>{% endif %}
+<summary>🔥 Upcoming games for this trend ({{ future_games|length + potential_games|length }})</summary>
+{% if future_games or potential_games %}
+<ul class="hot-trend-game-list">
+{% for game in future_games %}
+<li class="hot-trend-game-row"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.gameday }} · {{ game.away_team }} @ {{ game.home_team }}</a><span class="hot-trend-result">Scheduled · {{ game.gametime }} ET</span></li>
+{% endfor %}
+{% for candidate in potential_games %}{% set game = candidate.game %}
+<li class="hot-trend-game-row"><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">{{ game.gameday }} · {{ game.away_team }} @ {{ game.home_team }}</a><span class="hot-trend-result">{{ candidate.note }}</span></li>
+{% endfor %}
+</ul>
+{% else %}<p>No scheduled qualifying or potential games this week.</p>{% endif %}
 </details>
 {% endif %}
 <a class="hot-trend-games" href="{{ url_for('trend_finder', **hot_research_params(trend)) ~ '#matching-games' }}">Explore {{ trend.season }} games in Trend Finder →</a>
