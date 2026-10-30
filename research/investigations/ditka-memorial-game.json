@@ -1,0 +1,74 @@
+{
+  "slug": "ditka-memorial-game",
+  "title": "The Coach\u2019s night. A familiar opponent.",
+  "date": "2026-10-22",
+  "season": 2026,
+  "teams": "Patriots \u00b7 Bears",
+  "categories": [
+    "coincidences"
+  ],
+  "summary": "Chicago\u2019s first home game after Mike Ditka\u2019s death brought New England to Soldier Field\u2014the same opponent his Bears beat in Super Bowl XX. The Bears honored him before a 30\u201324 win.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "October 9",
+      "text": "Ditka died at age 86. He had been a Hall of Fame tight end and Chicago\u2019s Super Bowl-winning head coach."
+    },
+    {
+      "label": "October 22 \u00b7 Before kickoff",
+      "text": "Soldier Field held a moment of silence. Commemorative No. 89 markings and jersey patches accompanied fan tributes and stick-on mustaches."
+    },
+    {
+      "label": "The opponent",
+      "text": "New England was also Chicago\u2019s opponent in Super Bowl XX, which Ditka\u2019s Bears won 46\u201310 following the 1985 season."
+    },
+    {
+      "label": "Final whistle",
+      "text": "Chicago won 30\u201324. The tribute and the victory are documented; their coexistence does not measure an emotional effect on performance."
+    }
+  ],
+  "unusual": "The first home tribute paired Ditka\u2019s team with the opponent from his defining championship. That historical echo gives the evening significance beyond an ordinary Thursday game.",
+  "explanations": "A scheduled matchup became a meaningful memorial occasion. Team emotion may be part of the human story, but one result cannot isolate its effect from football factors or establish a repeatable betting pattern.",
+  "questions": [
+    "How much did the tribute affect performance? No causal measurement or comparable-game study is available here.",
+    "The original sourced team-event entry remains intact; this case expands it without changing its saved record."
+  ],
+  "statistics": [
+    {
+      "label": "Historical echo",
+      "value": "Super Bowl XX: Chicago 46, New England 10",
+      "method": "Historical result reported by Reuters; not an ATS statistic."
+    }
+  ],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30",
+  "legacy_event_id": "323f3391a6bf42d383cec38f302c3b2f",
+  "sources": [
+    {
+      "label": "Bears: official account of the Ditka tribute",
+      "url": "https://www.chicagobears.com/news/bears-pay-tribute-to-legendary-mike-ditka-thursday-soldier-field",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Bears: Patriots game recap and final score",
+      "url": "https://www.chicagobears.com/news/game-recap-bears-knock-off-patriots-on-thursday-night-football-improve-to-5-2",
+      "kind": "Game report",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Reuters: Ditka\u2019s death and Super Bowl history",
+      "url": "https://www.reuters.com/sports/legendary-coach-hall-fame-te-mike-ditka-dies-86--flm-2026-10-09/",
+      "kind": "Independent reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Bears video: pregame moment of silence",
+      "url": "https://www.chicagobears.com/video/bears-honor-mike-ditka-with-moment-of-silence",
+      "kind": "Video",
+      "checked": "2026-10-30"
+    }
+  ]
+}

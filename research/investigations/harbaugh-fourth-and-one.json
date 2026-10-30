@@ -1,0 +1,51 @@
+{
+  "slug": "harbaugh-fourth-and-one",
+  "title": "One yard. A very short field.",
+  "date": "2026-10-11",
+  "season": 2026,
+  "teams": "Broncos \u00b7 Chargers",
+  "categories": [
+    "analytics",
+    "blunders"
+  ],
+  "summary": "Leading 17\u201310, the Chargers failed on fourth-and-1 at their own 41. Denver tied the game on the ensuing short field and eventually won 23\u201317.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "10:33 remaining",
+      "text": "Jim Harbaugh kept the offense on the field on fourth down."
+    },
+    {
+      "label": "The attempt",
+      "text": "Denver stopped Justin Herbert\u2019s quarterback sneak."
+    },
+    {
+      "label": "Afterward",
+      "text": "Denver scored a tying touchdown; later Herbert turnovers preceded two field goals."
+    }
+  ],
+  "unusual": "The location made a failed attempt especially costly. A failed conversion alone does not establish that every fourth-down attempt in this situation is wrong.",
+  "explanations": "Harbaugh accepted responsibility and said the defensive alignment should have prompted a timeout and punt. No proprietary analytics recommendation was verified.",
+  "questions": [
+    "What conversion estimate and defensive look informed the original call?"
+  ],
+  "sources": [
+    {
+      "label": "Chargers: Harbaugh\u2019s explanation",
+      "url": "https://www.chargers.com/news/jim-harbaugh-fourth-down-takeaway-broncos-week-5",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Chargers: game recap",
+      "url": "https://www.chargers.com/news/game-recap-broncos-week-5-2026",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

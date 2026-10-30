@@ -7,7 +7,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>{% if seo and seo.title %}{{ seo.title }}{% else %}Conspiracy Dungeon | Gravy Train{% endif %}</title>
+    <title>{% if view.investigations is defined %}{{ investigation_title }} | Conspiracy Dungeon{% elif seo and seo.title %}{{ seo.title }}{% else %}Conspiracy Dungeon | Gravy Train{% endif %}</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='styles.css') }}">
@@ -249,7 +249,7 @@
 
 
         /* Horizontal market cards with fast scanning; compact mobile stack. */
-        .dungeon-grid .dungeon-card-featured { grid-column:1 / -1; padding:28px; border-color:#fbbf24; }
+        .dungeon-grid .dungeon-card-featured { grid-column:1 / -1; padding:28px; }
         .dungeon-grid .dungeon-card-featured h2 { font-size:clamp(22px,3vw,30px); }
         .money-matchups { grid-template-columns:minmax(0,1fr); max-width:1050px; }
         .money-matchups .dungeon-game-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; }
@@ -267,12 +267,13 @@
             .dungeon-grid .dungeon-card-featured { padding:18px; }
         }
 
-</style>
+    </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='investigations.css') }}">
 {% include '_branding_head.html' %}
 </head>
 
-<body{% if request.args.get('mobile_results') == '1' %} class="mobile-results"{% endif %}>
+<body class="{% if request.args.get('mobile_results') == '1' %}mobile-results {% endif %}{% if view.investigations is defined %}investigations-library-page{% endif %}">
 <div class="section-logo-title">
     <img
         src="{{ url_for('static', filename='Images/Branding/The Conspiracy Dungeon Investigation Board.png') }}"
@@ -291,7 +292,15 @@
         Follow the evidence.
     </p>
 
-   <div class="dungeon-grid">
+   <div class="dungeon-grid dungeon-section-nav" aria-label="Dungeon sections">
+
+        <a class="dungeon-card dungeon-card-link dungeon-card-featured"
+        href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}"
+        {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
+            <h2>🏈 {{ investigation_title }}</h2>
+            <p>Unusual football. Documented decisions. Follow the evidence.</p>
+            <p>Case files · Bad Beats · Research archive</p>
+        </a>
 
         <a class="dungeon-card dungeon-card-link"
         href="{{ url_for('conspiracy_dungeon_page', panel='money') }}"
@@ -310,13 +319,7 @@
             <p>Status: Weekly results</p>
         </a>
 
-        <a class="dungeon-card dungeon-card-link dungeon-card-featured"
-        href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}"
-        {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
-            <h2>🏈 NFL Anomalies</h2>
-            <p>Unusual fumbles, turnovers, penalties, and other patterns.</p>
-            <p>Status: Four event categories</p>
-        </a>
+
 
     </div>
     <div class="dungeon-results" id="dungeon-results">
@@ -369,7 +372,7 @@
         {% endif %}
         <p class="active-filters" style="font-size: 14px;">New week appears Wednesday at noon Eastern. Cover rate excludes pushes.</p>
         {% else %}
-        <p class="active-filters">Explore game, world, player, and team events below.</p>
+        <p class="active-filters">{% if view.investigations is defined %}Documented events. Open questions. No invented explanations.{% else %}Explore game, world, player, and team events below.{% endif %}</p>
         {% endif %}
     </section>
 

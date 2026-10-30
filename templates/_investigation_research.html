@@ -1,0 +1,101 @@
+{% set research = library.research %}
+<section class="case-research-content" aria-labelledby="research-heading">
+<p class="case-eyebrow">{% if library.tool=='international' %}Around the league · Around the world{% elif library.tool=='statistics' %}Calculated from saved records{% else %}Original sourced notes{% endif %}</p>
+<h3 id="research-heading">{{ research.title }}</h3>
+<form method="get" class="case-search" aria-label="Research filters">
+<input type="hidden" name="panel" value="anomalies"><input type="hidden" name="tool" value="{{ library.tool }}">
+{% if request.args.get('mobile_results')=='1' %}<input type="hidden" name="mobile_results" value="1">{% endif %}
+<label>Research season<select name="research_year">{% for year in research.data.years %}<option value="{{ year }}" {% if year==research.year %}selected{% endif %}>{{ year }}</option>{% endfor %}<option value="all" {% if research.year=='all' %}selected{% endif %}>All seasons</option></select></label>
+{% if library.tool=='statistics' %}<label>Type<select name="anomaly_type">{% for value,label in [('all','All statistical flags'),('High Penalty Count','High penalties'),('High scoring','High scoring'),('Large winning margin','Large margins')] %}<option value="{{ value }}" {% if value==research.anomaly_type %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>{% endif %}
+{% if library.tool=='notes' %}<label>Event category<select name="event_category">{% for key,label in research.data.categories.items() %}<option value="{{ key }}" {% if key==research.category %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>{% endif %}
+<button type="submit">Show records</button>
+</form>
+{% if library.tool=='international' %}
+<p class="case-research-context">{{ research.total }} scheduled/recorded games · Underdogs {{ research.data.dog_record.wins }}–{{ research.data.dog_record.losses }}–{{ research.data.dog_record.pushes }} ATS{% if research.data.dog_record.rate is not none %} · {{ research.data.dog_record.rate }}% covers{% endif %}.</p>
+<p class="case-meta">Neutral venue is separate from designated home/away. Team records use international games before that matchup. ATS uses saved game-data lines; source links verify schedules and venues. Pending results are excluded from cover percentages.</p>
+{% elif library.tool=='statistics' %}
+<p class="case-research-context">{{ research.total }} statistical flags · High scores, large margins and unusually frequent penalties.</p>
+<p class="case-meta">These are calculated flags, not allegations or editorial findings. Baselines use prior games in the current and previous three seasons. Fumble and turnover-event tracking remains unavailable.</p>
+{% else %}<p class="case-meta">{{ research.total }} saved notes. Original descriptions and evidence labels are preserved. A saved “Confirmed” label is the contributor’s assessment, not automatic independent verification.</p>{% endif %}
+<div class="case-grid case-research-grid">
+    {% for game in (research.rows if library.tool=='international' else []) %}
+    <section class="case-card world-anomaly-card">
+        <span class="anomaly-type">INTERNATIONAL GAME</span>
+        <strong class="compact-title">{{ game.matchup }}</strong>
+        <p class="anomaly-meta">Week {{ game.week }} • {{ game.gameday }} • {{ game.city }}, {{ game.country }}</p>
+        {% for note in game.highlights %}
+        <aside class="anomaly-highlight">
+            <span class="anomaly-type">{{ note.anomaly_type|upper }} • {{ note.status }}</span>
+            <h3>{{ note.headline }}</h3>
+            <strong class="anomaly-key-fact">{{ note.key_fact }}</strong>
+            {% if note.description %}<p>{{ note.description }}</p>{% endif %}
+            <a href="{{ note.source_url }}" target="_blank" rel="noopener noreferrer">View Event Source</a>
+        </aside>
+        {% endfor %}
+        <h3>International ATS history</h3>
+        <div class="international-team-grid">
+        {% for team in game.teams %}
+            <div class="international-team-record">
+                <strong>{{ team.team }}</strong>
+                <span class="stat-value">{% if team.prior.rate is not none %}{{ team.prior.rate }}%{% else %}N/A{% endif %}</span>
+                <span>{{ team.prior.wins }}-{{ team.prior.losses }}-{{ team.prior.pushes }} ATS</span>
+                <small>{{ team.prior_games }} prior international games recorded • Before this game</small>
+                <p>This game: <strong>{{ team.result }}</strong></p>
+            </div>
+        {% endfor %}
+        </div>
+        <p class="anomaly-meta">{{ game.stadium }} • Neutral venue{% if game.dog %} • {{ game.dog }} {{ "%+g"|format(game.dog_spread) }}{% endif %}</p>
+        <details class="anomaly-details">
+            <summary>Kickoff, rest and next-game details</summary>
+            <p>Kickoff: {{ game.gametime }} Eastern{% if game.local_kickoff %} • {{ game.local_kickoff }} local{% endif %}</p>
+            {% if game.zone_difference is defined %}<p>Venue time zone: {{ "%+g"|format(game.zone_difference) }} hours versus Eastern.</p>{% endif %}
+            {% for team in game.teams %}
+                <h4>{{ team.team }} — {{ team.designation }}</h4>
+                <p>Rest: {{ team.rest or 'Unknown' }} days</p>
+                {% if team.next_matchup %}<p>Next: {{ team.next_matchup }} • {{ team.next_date }} • {{ team.gap }} days later • ATS {{ team.next_result }}</p>{% else %}<p>No following game recorded.</p>{% endif %}
+            {% endfor %}
+        </details>
+        <p><a href="{{ game.source_url }}" target="_blank" rel="noopener noreferrer">View Schedule Source</a></p>
+    </section>
+    {% endfor %}
+    {% for event in (research.rows if library.tool!='international' else []) %}
+    <section class="case-card" id="anomaly-{{ event.event_id }}" data-game-anomaly="{{ event.title }}">
+        <span class="anomaly-type">{{ event.title|upper }}</span>
+        <strong class="compact-title">{{ event.matchup or event.title }}</strong>
+        <p>{{ event.event_date }} • {{ event.status }}{% if event.matchup %} • {{ event.matchup }}{% endif %}</p>
+        {% if event.team or event.player %}<p>{{ event.team }} {{ event.player }}</p>{% endif %}
+        {% if event.penalty is not defined and not event.scoring %}<p>{{ event.description }}</p>{% endif %}
+        {% if event.scoring %}
+        <div class="anomaly-highlight">
+            <p>Pregame betting total: <strong>{% if event.scoring.betting_total is not none %}{{ "%g"|format(event.scoring.betting_total) }} points{% else %}Unavailable{% endif %}</strong></p>
+            <p>Actual game total: <strong class="anomaly-key-fact">{{ "%g"|format(event.scoring.actual) }} points</strong></p>
+            <p>League average game total: <strong>{{ event.scoring.average }} points</strong></p>
+            {% if event.scoring.difference is not none %}<p>{% if event.scoring.difference > 0 %}{{ "%g"|format(event.scoring.difference) }} points over the betting total{% elif event.scoring.difference < 0 %}{{ "%g"|format(-event.scoring.difference) }} points under the betting total{% else %}Matched the betting total{% endif %}</p>{% endif %}
+            <details class="anomaly-details"><summary>View statistics</summary><p>League average uses {{ event.scoring.sample }} completed regular-season games before this game, from the current and previous three seasons.</p><p>High-scoring cutoff: {{ "%g"|format(event.scoring.cutoff) }} points (prior-game 95th percentile).</p><p>Pregame betting total uses the saved game-data line.</p></details>
+        </div>
+        {% endif %}
+        {% if event.penalty is defined %}
+            <div class="anomaly-highlight">
+                <h3>{{ event.penalty.count }} penalties • {{ event.penalty.yards }} yards</h3>
+                <p>{{ event.penalty.game.away_team }}: {{ event.penalty.away_count }} • {{ event.penalty.game.home_team }}: {{ event.penalty.home_count }}</p>
+                <strong>Referee: {{ event.referee }}</strong>
+                <p><strong>{% if event.ref_games < 5 %}Not enough past games to establish a tendency.{% elif event.ref_high_rate > event.league_high_rate + 2 %}This referee has a higher tendency for high-penalty games.{% elif event.ref_high_rate < event.league_high_rate - 2 %}This referee has a lower tendency for high-penalty games.{% else %}This referee has a similar tendency to the league for high-penalty games.{% endif %}</strong></p>
+                <details class="anomaly-details">
+                    <summary>View statistics</summary>
+                    {% if event.ref_high_rate is not none %}<p>High-penalty games: <strong>{{ event.ref_high_rate }}%</strong> ({{ event.ref_high }} of {{ event.ref_games }} prior games)<br>League: {{ event.league_high_rate }}% across {{ event.league_games }} prior games.</p>{% endif %}
+                    {% if event.ref_mean is not none %}<p>Average penalties per game: {{ event.ref_mean }} for this referee • {{ event.league_mean }} league-wide.</p>{% endif %}
+                    <p>{{ event.description }}</p>
+                    <p>Higher/lower means a difference of more than 2 percentage points, with at least 5 prior games. Both rates use this game's penalty cutoff.</p>
+                    {% if event.penalty.referee_source %}<p><a href="{{ event.penalty.referee_source }}" target="_blank" rel="noopener noreferrer">View Referee Assignment</a></p>{% endif %}
+                </details>
+            </div>
+        {% endif %}
+        {% if event.event_id=='323f3391a6bf42d383cec38f302c3b2f' %}<p><a class="case-explore" href="{{ url_for('investigations.case_page',slug='ditka-memorial-game') }}">Explore the Ditka case ↗</a></p>{% endif %}
+        {% if event.source_url %}<a href="{{ event.source_url }}" target="_blank" rel="noopener noreferrer">View Source</a>{% else %}<p>Source: local NFL game results.</p>{% endif %}
+    </section>
+    {% endfor %}
+</div>
+{% if not research.total %}<p class="case-empty">No recorded events match these filters.</p>{% endif %}
+{% if research.pages>1 %}<nav class="case-views case-pagination" aria-label="Research pages">{% if research.page>1 %}<a href="{{ library.link(research_year=research.year,event_category=research.category,anomaly_type=research.anomaly_type,research_page=research.page-1) }}">← Previous</a>{% endif %}<span>Page {{ research.page }} of {{ research.pages }}</span>{% if research.page<research.pages %}<a href="{{ library.link(research_year=research.year,event_category=research.category,anomaly_type=research.anomaly_type,research_page=research.page+1) }}">Next →</a>{% endif %}</nav>{% endif %}
+{% if library.tool=='notes' %}{% with view={'anomalies':research.data} %}{% include '_anomaly_event_form.html' %}{% endwith %}{% endif %}
+</section>

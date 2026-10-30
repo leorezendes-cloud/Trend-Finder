@@ -1,0 +1,44 @@
+{
+  "slug": "browns-late-winners",
+  "title": "Five wins. Five late escapes.",
+  "date": "2026-10-25",
+  "season": 2026,
+  "teams": "Titans \u00b7 Browns",
+  "categories": [
+    "oddities"
+  ],
+  "summary": "Cleveland\u2019s 27\u201324 win over Tennessee extended an unusual start: each of its first five wins featured the winning score in the final four minutes of regulation or overtime.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "Week 7",
+      "text": "Cleveland beat Tennessee by three points."
+    },
+    {
+      "label": "After the game",
+      "text": "NFL Communications highlighted the timing pattern across all five Cleveland wins."
+    },
+    {
+      "label": "Historical comparison",
+      "text": "The published comparison identifies the 2016 Lions as the other team to do this since 1970."
+    }
+  ],
+  "unusual": "It is a narrow, explicitly defined historical filter, not a claim that Cleveland always wins close games.",
+  "explanations": "Close contests create late winning-score opportunities. A descriptive streak alone does not establish repeatable skill or a betting edge.",
+  "questions": [
+    "The league comparison is cited as published; no independent play-by-play rebuild was performed."
+  ],
+  "sources": [
+    {
+      "label": "Pro Football Hall of Fame / NFL Communications: Week 7 notes",
+      "url": "https://www.profootballhof.com/news/extra-points-from-nfl-week-7-games",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

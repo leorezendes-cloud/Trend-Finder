@@ -1,0 +1,62 @@
+{
+  "slug": "hockenson-winning-slide",
+  "title": "The winning play that lost the spread",
+  "date": "2026-10-04",
+  "season": 2026,
+  "teams": "Dolphins \u00b7 Vikings",
+  "categories": [
+    "bad-beats"
+  ],
+  "summary": "T.J. Hockenson stopped short of the end zone so Minnesota could finish in victory formation. The Vikings won 15\u201310, leaving a documented -10.5 spread uncovered.",
+  "evidence": "Documented",
+  "featured": false,
+  "timeline": [
+    {
+      "label": "Final drive",
+      "text": "Hockenson caught a pass and went down near the goal line."
+    },
+    {
+      "label": "Two-minute warning",
+      "text": "Miami had no timeouts left."
+    },
+    {
+      "label": "Finish",
+      "text": "Minnesota used kneel-downs to end the game."
+    }
+  ],
+  "unusual": "The football objective was securing the win. That objective diverged from what favorite spread bettors needed.",
+  "explanations": "Avoiding another Miami possession explains the slide. The team report spots it at the 2; betting accounts commonly describe the 1.",
+  "questions": [
+    "No individual ticket or universal closing line is asserted."
+  ],
+  "sources": [
+    {
+      "label": "Vikings: clock, timeout and reception context",
+      "url": "https://www.vikings.com/news/dolphins-week-4-observations-tj-hockenson-13-catches",
+      "kind": "Primary reporting",
+      "checked": "2026-10-30"
+    },
+    {
+      "label": "Yahoo Sports: contemporaneous spread report",
+      "url": "https://sports.yahoo.com/nfl/betting/article/week-4-nfl-betting-odds-tj-hockensons-slide-down-at-1-yard-line-results-in-bad-beat-for-vikings-spread-bettors-232157998.html",
+      "kind": "Betting reporting",
+      "checked": "2026-10-30"
+    }
+  ],
+  "statistics": [
+    {
+      "label": "Receiving",
+      "value": "13 catches on 13 targets",
+      "method": "Vikings team report; no derived rate."
+    }
+  ],
+  "betting": {
+    "market": "Spread",
+    "line": "Minnesota -10.5",
+    "provenance": "Reported game line in Yahoo Sports\u2019 Week 4 betting recap; book and exact capture time not specified.",
+    "outcome": "Final margin: 15 \u2212 10 = 5. Minnesota -10.5 loses; Miami +10.5 wins.",
+    "caution": "This describes that documented line only, not every available price."
+  },
+  "source_note": null,
+  "reviewed": "2026-10-30"
+}

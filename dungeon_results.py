@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from ats_money_analysis import GAMES, analyze, load_games, summarize
 
+from dungeon_investigations import TITLE as ANOMALIES_TITLE
+
 EDITING_PREVIEW = False
 
 PANELS = {'money': "Mike's Fade the Public", 'primetime': 'Primetime Dogs',
-          'movement': 'Reverse Line Movement', 'anomalies': 'NFL Anomalies'}
+          'movement': 'Reverse Line Movement', 'anomalies': ANOMALIES_TITLE}
 
 
 def weekly_window(now=None):

@@ -1,0 +1,27 @@
+<section class="investigation-library" aria-label="{{ library.title }} investigations">
+  <header class="case-intro"><div><p class="case-eyebrow">The evidence room</p><h3>Football gets weird.<br>Here’s what we can prove.</h3><p>Close calls, costly decisions, improbable finishes. Open a case and decide what the evidence supports.</p></div><div class="case-library-stamp"><strong>{{ library.total }}</strong><span>researched case files</span><small>Reviewed October 30, 2026</small></div></header>
+  <nav class="case-views" aria-label="Investigation archive"><a href="{{ library.link(case_season=library.latest, tool=None) }}" {% if library.season|string == library.latest|string %}aria-current="page"{% endif %}>{{ library.latest }} season</a><a href="{{ library.link(case_season='archive', tool=None) }}" {% if library.season == 'archive' %}aria-current="page"{% endif %}>Historical case files</a></nav>
+  <section class="case-research-shelf" aria-label="Research tools">
+    <a href="{{ library.link(tool='international', _anchor='research-heading') }}" {% if library.tool=='international' %}aria-current="page"{% endif %}><strong>International field notes</strong><span>Venues, travel context & team ATS history</span></a>
+    <a href="{{ library.link(tool='statistics', _anchor='research-heading') }}" {% if library.tool=='statistics' %}aria-current="page"{% endif %}><strong>By the numbers</strong><span>High scores, big margins & penalty outliers</span></a>
+    <a href="{{ library.link(tool='notes', _anchor='research-heading') }}" {% if library.tool=='notes' %}aria-current="page"{% endif %}><strong>Sourced event log</strong><span>Saved team, player & world-event notes</span></a>
+  </section>
+  {% if library.tool %}
+    <p><a href="{{ library.link(tool=None) }}">← Back to case files</a></p>
+    {% include '_investigation_research.html' %}
+  {% else %}
+  <form method="get" class="case-search" role="search" aria-label="Search investigations">
+    <input type="hidden" name="panel" value="anomalies"><input type="hidden" name="case_category" value="{{ library.category }}">
+    {% if request.args.get('mobile_results') == '1' %}<input type="hidden" name="mobile_results" value="1">{% endif %}
+    <label>Find a case<input type="search" name="q" value="{{ library.query }}" maxlength="120" placeholder="Team, decision or unusual play"></label>
+    <label>Season<select name="case_season"><option value="all" {% if library.season == 'all' %}selected{% endif %}>All seasons</option>{% for year in library.years %}<option value="{{ year }}" {% if library.season|string == year|string %}selected{% endif %}>{{ year }}</option>{% endfor %}<option value="archive" {% if library.season == 'archive' %}selected{% endif %}>Historical archive</option></select></label>
+    <label>Order<select name="sort">{% for value,label in [('featured','Featured first'),('newest','Newest first'),('oldest','Oldest first')] %}<option value="{{ value }}" {% if library.sort==value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><button type="submit">Search cases</button>
+  </form>
+  <nav class="case-filters" aria-label="Investigation categories"><a href="{{ library.link(case_category='all') }}" {% if library.category=='all' %}aria-current="page"{% endif %}>All cases</a>{% for key,label in library.categories.items() %}<a href="{{ library.link(case_category=key) }}" {% if library.category==key %}aria-current="page"{% endif %}>{{ label }} <span>{{ library.counts[key] }}</span></a>{% endfor %}</nav>
+  <p class="case-result-count" role="status">{{ library.count }} case{{ '' if library.count==1 else 's' }}{% if library.query %} matching “{{ library.query }}”{% endif %} · {{ library.categories.get(library.category, 'All categories') }}</p>
+  {% if library.featured %}{% with card=library.featured, featured=true %}{% include '_investigation_card.html' %}{% endwith %}{% endif %}
+  <div class="case-grid">{% for card in library.cards %}{% with featured=false %}{% include '_investigation_card.html' %}{% endwith %}{% endfor %}</div>
+  {% if not library.count %}<div class="case-empty"><h3>No cases match those filters.</h3><p>Try another category or season, or clear your search.</p><a href="{{ library.link(case_category='all', case_season='all', q='') }}">Show all case files</a></div>{% endif %}
+  {% endif %}
+  <details class="case-method"><summary>How we investigate</summary><p>We check reporting, team accounts and game records before publishing. “Documented” describes the event, not every interpretation of it. Disputed details and gaps remain visible. A strange sequence is not evidence of game fixing.</p><p>Betting outcomes refer only to specifically documented lines. No assumed props, community tickets, or reconstructed prices are used. Cases are reviewed editorially; this is not a live news feed.</p></details>
+</section>

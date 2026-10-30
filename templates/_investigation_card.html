@@ -1,0 +1,8 @@
+<article class="case-card{% if featured %} case-featured{% endif %}">
+  <div class="case-labels">{% if featured %}<span class="case-spotlight">Featured investigation</span>{% endif %}{% for key in card.categories %}<span class="case-tag">{{ library.categories[key] }}</span>{% endfor %}</div>
+  <p class="case-meta"><time datetime="{{ card.date }}">{{ card.date }}</time> · {{ card.teams }}</p>
+  <h3><a href="{{ url_for('investigations.case_page', slug=card.slug) }}">{{ card.title }}</a></h3>
+  <p class="case-description">{{ card.summary }}</p>
+  <details><summary>Open the evidence brief</summary><p>{{ card.preview }}</p><p class="case-meta">Documented event · Facts and interpretations separated in the full case.</p></details>
+  <a class="case-explore" href="{{ url_for('investigations.case_page', slug=card.slug) }}">Explore Case <span aria-hidden="true">↗</span><span class="case-sr">: {{ card.title }}</span></a>
+</article>

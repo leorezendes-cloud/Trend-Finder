@@ -28,6 +28,8 @@ from huddle_leaderboard import init_huddle_leaderboard
 init_huddle_leaderboard(app)
 from fan_views import bp as fans_bp
 app.register_blueprint(fans_bp)
+from dungeon_investigations import bp as investigations_bp
+app.register_blueprint(investigations_bp)
 from sunday_scout import scout_bp
 app.register_blueprint(scout_bp)
 from scout4.web import bp as scout4_bp
@@ -928,7 +930,7 @@ def add_anomaly_event():
     except ValueError as exc:
         abort(400, description=str(exc))
     return redirect(url_for("conspiracy_dungeon_page", panel="anomalies",
-                            category=event["category"], anomaly_year=event["event_date"][:4],
+                            tool='notes', event_category=event["category"], research_year=event["event_date"][:4],
                             mobile_results="1" if request.form.get("mobile_results") == "1" else None))
 
 @app.route("/conspiracy-dungeon")
@@ -945,6 +947,14 @@ def conspiracy_dungeon_page():
     anomaly_year = request.args.get("anomaly_year")
     if anomaly_year is not None and anomaly_year != "all" and (not anomaly_year.isdigit() or not 1999 <= int(anomaly_year) <= 2100):
         abort(400)
+    # Explicit old category links retain their original records and filters.
+    if (request.args.get('panel') == 'anomalies' and
+            request.args.get('research') != '1' and 'category' not in request.args):
+        from dungeon_investigations import library_view
+        library = library_view(request.args)
+        view = dict(panel='anomalies', title=library['title'], week_label='Investigation library',
+                    ready=True, investigations=library)
+        return render_template('conspiracy_dungeon.html', view=view)
     view = build_view(request.args.get("panel", "money"),
                       archive_week=archive_week, archive_stage=archive_stage,
                       anomaly_category=request.args.get("category", "world"), anomaly_year=anomaly_year)
@@ -960,7 +970,8 @@ def market_page():
 @app.context_processor
 def site_week_context():
     from site_week import current_site_week
-    return {'current_site_week': current_site_week(Path(__file__).resolve().parent / 'nfl_games.csv')}
+    from dungeon_investigations import TITLE
+    return {'investigation_title': TITLE, 'current_site_week': current_site_week(Path(__file__).resolve().parent / 'nfl_games.csv')}
 
 app.config['METHODOLOGY_ENABLED']=True
 @app.get('/about')
