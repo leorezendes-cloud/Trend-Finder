@@ -103,9 +103,46 @@ def teams_page():
                                                              ('Rushing yards / game', 'rushing_yards'),
                                                              ('Passing EPA / game', 'passing_epa'),
                                                              ('Rushing EPA / game', 'rushing_epa'))]})
+    # The active-streak engine is already cached and restricted to recent,
+    # documented games. Only attach trends when viewing a specific team.
+    related_trends = []
+    if team:
+        import csv
+        from datetime import datetime
+        from active_trends import load_highlights
+        from trend_finder_2 import game_file
+        recent = load_highlights(all_trends=True)
+        current_year = datetime.now().year
+        related_trends = [trend for trend in recent
+                          if trend['subject'] == 'team:' + team
+                          and int(trend['season']) >= current_year - 1]
+        # Add the QB from the team's latest finished regular-season game.
+        # A QB streak is not a claim that every past starter is still active.
+        latest_game = None
+        today = datetime.now().date().isoformat()
+        with open(game_file, newline='', encoding='utf-8-sig') as stream:
+            for game in csv.DictReader(stream):
+                if (game.get('game_type') != 'REG'
+                        or team not in (game.get('away_team'), game.get('home_team'))
+                        or not game.get('gameday')
+                        or game['gameday'] >= today
+                        or not game.get('away_score')
+                        or not game.get('home_score')):
+                    continue
+                if latest_game is None or (game['gameday'], game['game_id']) > (latest_game['gameday'], latest_game['game_id']):
+                    latest_game = game
+        if latest_game:
+            role = 'away' if latest_game['away_team'] == team else 'home'
+            qb = latest_game.get(role + '_qb_name')
+            if qb:
+                related_trends.extend(trend for trend in recent
+                                      if trend['subject'] == 'qb:' + qb
+                                      and int(trend['season']) >= current_year - 1
+                                      and trend['latest_id'] == latest_game['game_id'])
+        related_trends = related_trends[:8]
     from member_picks import comparison_picks
     inline_picks=comparison_picks(team=team,opponent=opponent) if matchup else []
-    return render_template('scout4_teams.html', inline_picks=inline_picks, view=v, cards=cards, team=team, opponent=opponent, matchup=matchup)
+    return render_template('scout4_teams.html', inline_picks=inline_picks, view=v, cards=cards, team=team, opponent=opponent, matchup=matchup, related_trends=related_trends)
 
 
 OFFENSE_POSITIONS = {'QB', 'RB', 'FB', 'WR', 'TE'}
