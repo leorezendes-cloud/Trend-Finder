@@ -39,6 +39,43 @@ def primetime_records(games, only_primetime=True):
     return records
 
 
+
+def team_season_ats_before(games, team, season, cutoff_date):
+    """Team ATS W-L-P in completed regular-season games before the target date.
+
+    spread_line is the away-team spread in the saved game dataset.
+    Exclude ungraded games and games on/after the target date to avoid
+    leaking the upcoming game's result into the preview or archive.
+    """
+    wins = losses = pushes = 0
+    for game in games.values():
+        if (str(game.get('season')) != str(season)
+                or game.get('game_type') != 'REG'
+                or game.get('gameday', '') >= cutoff_date
+                or team not in (game.get('away_team'), game.get('home_team'))):
+            continue
+        try:
+            spread = float(game['spread_line'])
+            away = float(game['away_score'])
+            home = float(game['home_score'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not all(math.isfinite(x) for x in (spread, away, home)):
+            continue
+        away_ats_margin = away - home + spread
+        team_ats_margin = (away_ats_margin if team == game['away_team']
+                           else -away_ats_margin)
+        if team_ats_margin > 1e-8:
+            wins += 1
+        elif team_ats_margin < -1e-8:
+            losses += 1
+        else:
+            pushes += 1
+    return dict(wins=wins, losses=losses, pushes=pushes,
+                graded=wins + losses + pushes)
+
+
+
 def build_view(panel='money', now=None, games_path=GAMES, money_report=None, archive_week=None, archive_stage='REG', anomaly_category='world', anomaly_year=None):
     panel = panel if panel in PANELS else 'money'
 
@@ -85,7 +122,10 @@ def build_view(panel='money', now=None, games_path=GAMES, money_report=None, arc
     current=sorted(visible,key=lambda r:(r['gameday'],r['game_id']))
     if panel=='primetime':
         historical=primetime_records(games, only_primetime=False)
-        for row in current: row.update(profile=dog_profile(row,historical))
+        for row in current:
+            row.update(profile=dog_profile(row,historical),
+                       team_season_ats=team_season_ats_before(
+                           games, row['pick'], row['season'], row['gameday']))
     running=summarize([r for r in records if r['season']==season and (r['game_type']!='REG' or int(r['week'])>=6)])
     # Weekly archives use recorded data, including still-pending outcomes; no invented history.
     past=[r for r in records if r['gameday']<start.isoformat() and (panel=='money' or r['season']==season)]
