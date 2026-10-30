@@ -162,3 +162,7 @@ See [FULL_ATS_RESULTS.md](FULL_ATS_RESULTS.md) for fixed player/PBP/charting abl
 ## Pace follow-up
 
 [PACE_RESULTS.md](PACE_RESULTS.md) compares pace-only, conservative pace, matchup-only and combined score adjustments on all 703 original games. It documents neutral-clock proxy limitations, embedded-pace correction, ATS/O-U results, score impacts, compact sources and 36 tests. No live integration or promotion.
+
+## Actual v5 baseline comparison
+
+[V5_MATCHUP_RESULTS.md](V5_MATCHUP_RESULTS.md) tests the unchanged PR #36 model against one previously fixed passing/rushing bonus. Includes full-cohort and same-selected-game ATS records, every changed pick, hash-gated original model, provenance and 40 tests. The candidate worsens the partial 2026 record and is not promoted.
