@@ -225,3 +225,69 @@ def matches_for_score(game, trends, *, state, now=None, active_week=None):
         if is_match:
             output.append(trend)
     return output
+
+
+def potential_upcoming_for_trend(schedule, trend, *, now=None, active_week=None):
+    """Labeled scheduled possibilities, never verified trend matches or fire badges.
+
+    A QB's latest sourced, completed appearance identifies only a candidate
+    team's next fixture; it does NOT confirm the QB starts that fixture.
+    A team totals fixture without a pregame total is likewise only potential.
+    """
+    if not is_fireworthy(trend):
+        return []
+    now = now or datetime.now(EASTERN)
+    if now.tzinfo is None:
+        raise ValueError('now must be timezone-aware')
+    category = trend.get('category')
+    kind = trend.get('kind')
+    team = None
+    note = None
+    if category == 'team' and kind == 'total':
+        team = (trend.get('params') or {}).get('research_team')
+        note = 'Potential · Total line pending'
+    elif category == 'qb':
+        from trend_finder_2 import canonical_name
+        name = (trend.get('params') or {}).get('qb_name')
+        latest_id = trend.get('latest_id')
+        latest = next((g for g in schedule if g.get('game_id') == latest_id), None)
+        if not latest or not name:
+            return []
+        # Do not extrapolate from unsourced or ambiguous old QB labels.
+        for side in ('away', 'home'):
+            if (canonical_name(latest.get(side + '_qb_name')) == canonical_name(name)
+                    and str(latest.get(side + '_qb_source') or '').strip()
+                    and latest.get(side + '_score') not in ('', None)
+                    and latest.get(('home' if side == 'away' else 'away') + '_score') not in ('', None)):
+                team = latest.get(side + '_team')
+                break
+        note = 'Potential · QB starter unconfirmed'
+    else:
+        return []
+
+    if not team:
+        return []
+    result = []
+    for game in schedule:
+        kickoff = _kickoff(game)
+        if (kickoff is None or kickoff <= now.astimezone(EASTERN)
+                or game.get('game_type') != 'REG'
+                or team not in (game.get('away_team'), game.get('home_team'))):
+            continue
+        try:
+            season, week = int(game['season']), int(game['week'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if season != int(trend.get('season', -1)):
+            continue
+        if active_week is not None and (season, week) != tuple(map(int, active_week)):
+            continue
+        # A verified match takes precedence. Never duplicate it as a possibility.
+        if qualifies_upcoming(game, trend, now=now, active_week=active_week):
+            continue
+        if category == 'team' and _numeric(game.get('total_line')) is not None:
+            continue
+        result.append(dict(game=game, note=note))
+    return sorted(result, key=lambda item: (item['game']['gameday'],
+                                           item['game']['gametime'],
+                                           item['game']['game_id']))
