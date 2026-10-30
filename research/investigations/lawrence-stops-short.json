@@ -3,11 +3,11 @@
   "title": "Too early for victory formation?",
   "date": "2026-09-27",
   "season": 2026,
-  "teams": "Patriots \u00b7 Jaguars",
+  "teams": "Patriots · Jaguars",
   "categories": [
     "blunders"
   ],
-  "summary": "Trevor Lawrence stopped near the goal line with more than eight minutes left. New England used a timeout, and Bhayshul Tuten scored on the next play in Jacksonville\u2019s 35\u20136 win.",
+  "summary": "Trevor Lawrence stopped near the goal line with more than eight minutes left. New England used a timeout, and Bhayshul Tuten scored on the next play in Jacksonville’s 35–6 win.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
@@ -27,11 +27,12 @@
   "unusual": "Giving up a score can protect a lead late in a game, but this happened well before the final minutes.",
   "explanations": "Lawrence explained that he was trying to consume time and acknowledged the timing was unnecessary. That is a football explanation; it does not establish any betting motive.",
   "questions": [
-    "No independently documented price for a Lawrence touchdown prop was located."
+    "Was Trevor Lawrence offered in the anytime-touchdown scorer market for this game, at what odds, and did any verified tickets lose?",
+    "No independently documented Lawrence anytime-touchdown prop price or ticket was located."
   ],
   "sources": [
     {
-      "label": "CBS Sports: sequence and Lawrence\u2019s explanation",
+      "label": "CBS Sports: sequence and Lawrence’s explanation",
       "url": "https://scoutfly.cbsistatic.com/nfl/news/jaguars-trevor-lawrence-explains-why-he-took-knee-1-yard-line/",
       "kind": "Primary reporting",
       "checked": "2026-10-30"
@@ -46,5 +47,6 @@
   "statistics": [],
   "betting": null,
   "source_note": "The Jaguars mailbag gives a different score at the moment of the run than CBS. This case uses the agreed sequence and final result, and does not assert the disputed in-play score.",
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_betting_impact": "Anytime touchdown scorer prop: Lawrence choosing to go down short of the end zone meant that scramble did not produce a Lawrence rushing touchdown. A bettor holding a Lawrence anytime-TD ticket could have been affected, depending on whether he scored at another point in the game and the ticket's settlement rules. No actual ticket, prop odds, or specific losing wager has been verified."
 }
