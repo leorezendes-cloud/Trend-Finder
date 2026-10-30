@@ -1,0 +1,20 @@
+<section class="money-scoreboard">
+<details class="trend-card" style="-webkit-text-stroke: 0;">
+    <summary>Add a sourced event</summary>
+    <form action="{{ url_for('add_anomaly_event') }}" method="POST">
+        <input type="hidden" name="category" value="{{ research.category if research is defined else view.anomalies.category }}">
+        <input type="hidden" name="mobile_results" value="{{ request.args.get('mobile_results','') }}">
+        <p><label>Event date <input type="date" name="event_date" required></label></p>
+        <p><label>Title <input type="text" name="title" maxlength="200" required></label></p>
+        <p><label>Team (optional) <input type="text" name="team" maxlength="20"></label></p>
+        <p><label>Player (optional) <input type="text" name="player" maxlength="100"></label></p>
+        <p><label>Game ID (optional) <input type="text" name="game_id" maxlength="80" placeholder="2026_05_PHI_JAX"></label></p>
+        <p><label>Evidence status <select name="status"><option>Reported</option><option>Confirmed</option></select></label></p>
+        <p><label>What happened <textarea name="description" maxlength="4000" rows="4" required style="width: 100%; box-sizing: border-box;"></textarea></label></p>
+        <p><label>Source link <input type="url" name="source_url" required placeholder="https://..."></label></p>
+        <p>Use documented facts and identify reported claims. This label records your assessment; saving an event does not independently verify it.</p>
+        <button type="submit">Save event</button>
+    </form>
+</details>
+</section>
+
