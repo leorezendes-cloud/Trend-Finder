@@ -4,7 +4,6 @@
   <section class="case-research-shelf" aria-label="Research tools">
     <a href="{{ library.link(tool='international', _anchor='research-heading') }}" {% if library.tool=='international' %}aria-current="page"{% endif %}><strong>International field notes</strong><span>Venues, travel context & team ATS history</span></a>
     <a href="{{ library.link(tool='statistics', _anchor='research-heading') }}" {% if library.tool=='statistics' %}aria-current="page"{% endif %}><strong>By the numbers</strong><span>High scores, big margins & penalty outliers</span></a>
-    <a href="{{ library.link(tool='notes', _anchor='research-heading') }}" {% if library.tool=='notes' %}aria-current="page"{% endif %}><strong>Sourced event log</strong><span>Saved team, player & world-event notes</span></a>
   </section>
   {% if library.tool %}
     <p><a href="{{ library.link(tool=None) }}">← Back to case files</a></p>
