@@ -5,7 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 from flask import Blueprint, abort, render_template, request, url_for
 
-TITLE = 'NFL Anomalies'  # Single display-name setting; stable case URLs survive renaming.
+TITLE = 'The Case Files'  # Display branding only; preserve stable anomaly routes and case URLs.
 CATEGORIES = {
     'calls': 'Controversial Calls',
     'blunders': 'What Were They Thinking?',
