@@ -99,7 +99,7 @@
 .tf-board-home .tf-board-game[data-state="in"] .tf-board-match,
 .tf-board-home .tf-board-game[data-state="post"] .tf-board-match{
   grid-template-columns:minmax(0,1fr) minmax(28px,.3fr) minmax(0,1fr);
-  width:min(100%,700px);
+  width:min(100%,520px);
   margin:14px auto 0;
   align-items:center;
   gap:10px;
@@ -140,4 +140,17 @@
   .tf-board-home .tf-board-game[data-state="post"] .tf-board-side strong{
     font-size:clamp(1.85rem,8vw,2.5rem);
   }
+}
+
+/* The home-score element must not inherit .tf-board-home container margins.
+   Keep a narrower but identical centered scoreboard in collapsed live/final cards. */
+.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-match,
+.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-match{
+  width:min(100%,330px);
+  grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);
+  gap:5px;
+}
+.tf-board-home .tf-board-game:not([open])[data-state="in"] .tf-board-side strong,
+.tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-side strong{
+  font-size:clamp(1.75rem,3.8vw,2.3rem);
 }

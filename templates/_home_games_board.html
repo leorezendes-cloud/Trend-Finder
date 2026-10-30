@@ -18,7 +18,7 @@
             <span class="tf-board-match">
               <span class="tf-board-side"><b>{{ item.away_team }}</b><strong class="tf-board-away">{{ item.away_score if key == 'post' else '—' }}</strong></span>
               <span class="tf-board-at">@</span>
-              <span class="tf-board-side"><b>{{ item.home_team }}</b><strong class="tf-board-home">{{ item.home_score if key == 'post' else '—' }}</strong></span>
+              <span class="tf-board-side"><b>{{ item.home_team }}</b><strong class="tf-board-home-score">{{ item.home_score if key == 'post' else '—' }}</strong></span>
             </span>
             <span class="tf-board-game-status">{{ 'Final' if key == 'post' else 'Scheduled' }} · Tap for details</span>
             <span class="tf-board-market" aria-label="Saved spread and total" hidden>

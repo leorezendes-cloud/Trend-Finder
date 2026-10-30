@@ -191,7 +191,7 @@
     card.classList.toggle('is-live',state === 'in');
     const final = state === 'post';
     card.querySelector('.tf-board-away').textContent = state === 'pre' ? '—' : live.away_score ?? '—';
-    card.querySelector('.tf-board-home').textContent = state === 'pre' ? '—' : live.home_score ?? '—';
+    card.querySelector('.tf-board-home-score').textContent = state === 'pre' ? '—' : live.home_score ?? '—';
     const badge = card.querySelector('.tf-board-livebadge');
     badge.textContent = state === 'in' ? '● LIVE' : final ? 'FINAL' : 'UPCOMING';
     card.querySelector('.tf-board-game-status').textContent = `${live.status || (final ? 'Final' : 'Scheduled')} · Tap for details`;
