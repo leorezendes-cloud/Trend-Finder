@@ -225,6 +225,8 @@
         .primetime-stat-panel > strong { display:block; font-size:20px; color:#4ade80; }
         .primetime-stat-panel-neutral > strong { color:#f1f5f9; }
 
+        .primetime-all-dogs-footer { margin: 9px 0 12px; color: #cbd5e1; text-align: center; font-size: 12px; }
+        .primetime-all-dogs-footer strong { color: #f1f5f9; white-space: nowrap; }
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
@@ -485,7 +487,7 @@
                 <div class="primetime-stat-panels">
                     <div class="primetime-stat-panel primetime-stat-panel-wide">
                         <div class="primetime-stat-row"><span>Primetime Dog ATS</span><strong>{{ game.primetime_dog_ats.wins }}–{{ game.primetime_dog_ats.losses }}–{{ game.primetime_dog_ats.pushes }}</strong></div>
-                        <div class="primetime-stat-row primetime-stat-secondary"><span>All Primetime Dogs ATS</span><strong>{{ game.overall_primetime_ats.wins }}–{{ game.overall_primetime_ats.losses }}–{{ game.overall_primetime_ats.pushes }}</strong></div>
+                        <div class="primetime-stat-row primetime-stat-secondary"><span>Team Primetime ATS</span><strong>{{ game.team_primetime_ats.wins }}–{{ game.team_primetime_ats.losses }}–{{ game.team_primetime_ats.pushes }}</strong></div>
                     </div>
                     <div class="primetime-stat-panel">
                         <span class="primetime-stat-label">Underdog ATS</span>
@@ -496,6 +498,7 @@
                         <strong>{{ game.team_season_ats.wins }}–{{ game.team_season_ats.losses }}–{{ game.team_season_ats.pushes }}</strong>
                     </div>
                 </div>
+                <p class="primetime-all-dogs-footer">All Primetime Underdogs ATS: <strong>{{ game.overall_primetime_ats.wins }}–{{ game.overall_primetime_ats.losses }}–{{ game.overall_primetime_ats.pushes }}</strong></p>
                 <details class="primetime-historical">
                     <summary>Historical Investigation</summary>
                 <h3>{{ game.profile.description }}</h3>
