@@ -40,7 +40,7 @@ def primetime_records(games, only_primetime=True):
 
 
 
-def team_season_ats_before(games, team, season, cutoff_date):
+def team_season_ats_before(games, team, season, cutoff_date, primetime_only=False):
     """Team ATS W-L-P in completed regular-season games before the target date.
 
     spread_line is the away-team spread in the saved game dataset.
@@ -52,7 +52,8 @@ def team_season_ats_before(games, team, season, cutoff_date):
         if (str(game.get('season')) != str(season)
                 or game.get('game_type') != 'REG'
                 or game.get('gameday', '') >= cutoff_date
-                or team not in (game.get('away_team'), game.get('home_team'))):
+                or team not in (game.get('away_team'), game.get('home_team'))
+                or (primetime_only and (not game.get('gametime') or game['gametime'] < '19:00'))):
             continue
         try:
             spread = float(game['spread_line'])
@@ -144,6 +145,9 @@ def build_view(panel='money', now=None, games_path=GAMES, money_report=None, arc
                     games, row['pick'], row['season'], row['gameday']),
                 underdog_ats=summarize(earlier_dogs),
                 primetime_dog_ats=summarize(earlier_primetime),
+                team_primetime_ats=team_season_ats_before(
+                    games, row['pick'], row['season'], row['gameday'],
+                    primetime_only=True),
                 overall_primetime_ats=summarize(earlier_all_primetime),
             )
     running=summarize([r for r in records if r['season']==season and (r['game_type']!='REG' or int(r['week'])>=6)])
