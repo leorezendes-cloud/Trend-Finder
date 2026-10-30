@@ -3,17 +3,17 @@
   "title": "The no-call, then the suspension",
   "date": "2026-10-04",
   "season": 2026,
-  "teams": "Cardinals \u00b7 Giants",
+  "teams": "Cardinals · Giants",
   "categories": [
     "calls"
   ],
-  "summary": "A disputed third-down non-call was followed by an official\u2019s confrontation with Trey McBride. The NFL subsequently suspended line judge Jeff Seeman for two games.",
+  "summary": "A disputed third-down non-call was followed by an official’s confrontation with Trey McBride. The NFL subsequently suspended line judge Jeff Seeman for two games.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
     {
       "label": "Fourth quarter",
-      "text": "Contact on McBride\u2019s third-and-2 target did not draw a pass-interference or illegal-contact flag."
+      "text": "Contact on McBride’s third-and-2 target did not draw a pass-interference or illegal-contact flag."
     },
     {
       "label": "After the play",
@@ -24,7 +24,7 @@
       "text": "The league announced a two-game suspension for unprofessional conduct."
     }
   ],
-  "unusual": "The league\u2019s disciplinary action is established. It addresses conduct toward a player, rather than proving that the underlying coverage ruling was deliberately wrong.",
+  "unusual": "The league’s disciplinary action is established. It addresses conduct toward a player, rather than proving that the underlying coverage ruling was deliberately wrong.",
   "explanations": "A heated exchange following a contested call explains the investigation. Intentional manipulation is unsupported.",
   "questions": [
     "The discipline announcement does not supply a formal correction of the non-call."
@@ -40,5 +40,11 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Arizona drive / next-score live wagers",
+      "impact": "The non-call ended a third-down opportunity; a hypothetical effect on live markets cannot be graded without exact play context and quotes."
+    }
+  ]
 }
