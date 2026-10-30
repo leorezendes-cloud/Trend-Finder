@@ -1,0 +1,14 @@
+{
+  "baseline_rss_bytes": 20381696,
+  "peak_rss_bytes": 44924928,
+  "additional_peak_bytes": 24543232,
+  "additional_target_bytes": 26214400,
+  "database_bytes": 11816960,
+  "reads": 10,
+  "cases": [
+    "current observed",
+    "full prior regular season retrospective"
+  ],
+  "elapsed_seconds": 0.306,
+  "within_memory_target": true
+}

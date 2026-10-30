@@ -1,0 +1,844 @@
+{
+  "policy": "player-scheme-v1",
+  "availability_mode": "retrospective",
+  "training_start_season": 2022,
+  "warning": "Retrospective corrected data; 48h after estimated end is assumed availability, NOT timestamp-certified historical replay.",
+  "player_cohort": "Prior observed IDs on same latest historical team, conditional on target boxscore presence; no injury/participation forecast.",
+  "inference": "Exploratory paired week-block bootstrap; no multiple-comparison correction or confirmatory holdout. Small deltas do not establish production value.",
+  "parameters": {
+    "ridge": 100,
+    "minimum_team_games": 3,
+    "minimum_model_targets": 32,
+    "history_days": 180,
+    "recent_player_games": 4
+  },
+  "seasons": {
+    "2023": {
+      "margin": {
+        "n": 224,
+        "baseline_mae": 10.613347664796658,
+        "enhanced_mae": 10.604609420723815,
+        "mae_delta": -0.00873824407284296,
+        "week_block_bootstrap_95pct_delta": [
+          -0.025193443833137607,
+          0.005889919733975674
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "total": {
+        "n": 224,
+        "baseline_mae": 10.77333647464258,
+        "enhanced_mae": 10.776531720668208,
+        "mae_delta": 0.003195246025628151,
+        "week_block_bootstrap_95pct_delta": [
+          -0.001617271519657672,
+          0.007259315481318095
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "passing_yards": {
+        "n": 514,
+        "baseline_mae": 68.80642023346303,
+        "enhanced_mae": 68.80677063920021,
+        "mae_delta": 0.0003504057371799263,
+        "week_block_bootstrap_95pct_delta": [
+          -0.3117827223840369,
+          0.3287337880989848
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "rushing_yards": {
+        "n": 4632,
+        "baseline_mae": 7.196441421991939,
+        "enhanced_mae": 7.219775548842777,
+        "mae_delta": 0.023334126850837578,
+        "week_block_bootstrap_95pct_delta": [
+          0.007784516914367052,
+          0.03867112361875592
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "receiving_yards": {
+        "n": 4118,
+        "baseline_mae": 17.729156548486323,
+        "enhanced_mae": 17.635753795161296,
+        "mae_delta": -0.09340275332502657,
+        "week_block_bootstrap_95pct_delta": [
+          -0.13965563590827684,
+          -0.047688880586709656
+        ],
+        "exploratory_interval_below_zero": true
+      }
+    },
+    "2024": {
+      "margin": {
+        "n": 224,
+        "baseline_mae": 10.296442235686142,
+        "enhanced_mae": 10.269837688290393,
+        "mae_delta": -0.026604547395749023,
+        "week_block_bootstrap_95pct_delta": [
+          -0.06469934684687927,
+          0.007318533568768877
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "total": {
+        "n": 224,
+        "baseline_mae": 10.007562182897688,
+        "enhanced_mae": 10.00441650342797,
+        "mae_delta": -0.003145679469717777,
+        "week_block_bootstrap_95pct_delta": [
+          -0.015072023951101654,
+          0.007132435011232604
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "passing_yards": {
+        "n": 517,
+        "baseline_mae": 68.45551257253385,
+        "enhanced_mae": 68.42126742434772,
+        "mae_delta": -0.034245148186130336,
+        "week_block_bootstrap_95pct_delta": [
+          -0.4177775826456199,
+          0.36213644240403514
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "rushing_yards": {
+        "n": 4659,
+        "baseline_mae": 7.471757172497674,
+        "enhanced_mae": 7.463183002198646,
+        "mae_delta": -0.008574170299028516,
+        "week_block_bootstrap_95pct_delta": [
+          -0.02582770873999384,
+          0.007078216887647812
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "receiving_yards": {
+        "n": 4142,
+        "baseline_mae": 17.08705536777724,
+        "enhanced_mae": 17.01867397863411,
+        "mae_delta": -0.06838138914313063,
+        "week_block_bootstrap_95pct_delta": [
+          -0.10736075623847527,
+          -0.03393189203595709
+        ],
+        "exploratory_interval_below_zero": true
+      }
+    },
+    "2025": {
+      "margin": {
+        "n": 224,
+        "baseline_mae": 10.56807847814204,
+        "enhanced_mae": 10.530339945856166,
+        "mae_delta": -0.037738532285873205,
+        "week_block_bootstrap_95pct_delta": [
+          -0.09329391331239224,
+          0.018184251241336158
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "total": {
+        "n": 224,
+        "baseline_mae": 10.45578365405453,
+        "enhanced_mae": 10.436957488166842,
+        "mae_delta": -0.018826165887688262,
+        "week_block_bootstrap_95pct_delta": [
+          -0.034723118182877204,
+          -0.002483452367551486
+        ],
+        "exploratory_interval_below_zero": true
+      },
+      "passing_yards": {
+        "n": 519,
+        "baseline_mae": 68.94733461785485,
+        "enhanced_mae": 69.24153601027554,
+        "mae_delta": 0.294201392420689,
+        "week_block_bootstrap_95pct_delta": [
+          -0.08868948340885824,
+          0.6222786042768835
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "rushing_yards": {
+        "n": 4776,
+        "baseline_mae": 7.0912723338916805,
+        "enhanced_mae": 7.078454945233143,
+        "mae_delta": -0.012817388658537432,
+        "week_block_bootstrap_95pct_delta": [
+          -0.01978049813104147,
+          -0.006526299856958006
+        ],
+        "exploratory_interval_below_zero": true
+      },
+      "receiving_yards": {
+        "n": 4257,
+        "baseline_mae": 16.37074230678882,
+        "enhanced_mae": 16.269130072819245,
+        "mae_delta": -0.10161223396957553,
+        "week_block_bootstrap_95pct_delta": [
+          -0.14838597325686864,
+          -0.057381977052957944
+        ],
+        "exploratory_interval_below_zero": true
+      }
+    },
+    "2026": {
+      "margin": {
+        "n": 31,
+        "baseline_mae": 8.454205069124425,
+        "enhanced_mae": 8.385056357947747,
+        "mae_delta": -0.06914871117667865,
+        "week_block_bootstrap_95pct_delta": [
+          -0.0916978091989174,
+          -0.04509633995295516
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "total": {
+        "n": 31,
+        "baseline_mae": 10.932051651305683,
+        "enhanced_mae": 10.937516420701147,
+        "mae_delta": 0.005464769395464586,
+        "week_block_bootstrap_95pct_delta": [
+          -0.0216852500735745,
+          0.03091791264768773
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "passing_yards": {
+        "n": 64,
+        "baseline_mae": 76.42578125,
+        "enhanced_mae": 76.80964686644408,
+        "mae_delta": 0.38386561644408346,
+        "week_block_bootstrap_95pct_delta": [
+          0.037860875416267564,
+          0.7298703574719028
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "rushing_yards": {
+        "n": 658,
+        "baseline_mae": 6.425151975683891,
+        "enhanced_mae": 6.415477264232658,
+        "mae_delta": -0.009674711451232554,
+        "week_block_bootstrap_95pct_delta": [
+          -0.016359673518572992,
+          -0.0033457532809693484
+        ],
+        "exploratory_interval_below_zero": false
+      },
+      "receiving_yards": {
+        "n": 594,
+        "baseline_mae": 17.74761503928171,
+        "enhanced_mae": 17.651192117466593,
+        "mae_delta": -0.09642292181511536,
+        "week_block_bootstrap_95pct_delta": [
+          -0.16560887905182298,
+          -0.03130672676880067
+        ],
+        "exploratory_interval_below_zero": false
+      }
+    }
+  },
+  "player_position_breakdown": {
+    "2023": {
+      "passing_yards": {
+        "QB": {
+          "n": 514,
+          "baseline_mae": 68.80642023346303,
+          "enhanced_mae": 68.80677063920021,
+          "mae_delta": 0.0003504057371799263,
+          "week_block_bootstrap_95pct_delta": [
+            -0.3117827223840369,
+            0.3287337880989848
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 0
+        },
+        "WR": {
+          "n": 0
+        },
+        "TE": {
+          "n": 0
+        }
+      },
+      "rushing_yards": {
+        "QB": {
+          "n": 514,
+          "baseline_mae": 11.469195849546045,
+          "enhanced_mae": 11.459710070859552,
+          "mae_delta": -0.009485778686492807,
+          "week_block_bootstrap_95pct_delta": [
+            -0.05679697964734835,
+            0.036811431345808394
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 1174,
+          "baseline_mae": 19.75688529244747,
+          "enhanced_mae": 19.766089229353813,
+          "mae_delta": 0.009203936906342136,
+          "week_block_bootstrap_95pct_delta": [
+            -0.005098406946278243,
+            0.022404274004786857
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "WR": {
+          "n": 1989,
+          "baseline_mae": 1.9455756661639014,
+          "enhanced_mae": 1.9553209719811722,
+          "mae_delta": 0.009745305817270733,
+          "week_block_bootstrap_95pct_delta": [
+            -0.011361416764265213,
+            0.03119405077082771
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "TE": {
+          "n": 955,
+          "baseline_mae": 0.3920593368237347,
+          "enhanced_mae": 0.47873004951413606,
+          "mae_delta": 0.08667071269040133,
+          "week_block_bootstrap_95pct_delta": [
+            0.0643990954928218,
+            0.1085362922334696
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      },
+      "receiving_yards": {
+        "QB": {
+          "n": 0
+        },
+        "RB": {
+          "n": 1174,
+          "baseline_mae": 11.305437251561614,
+          "enhanced_mae": 11.211628060400319,
+          "mae_delta": -0.09380919116129505,
+          "week_block_bootstrap_95pct_delta": [
+            -0.1278126279428356,
+            -0.05758912760755173
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "WR": {
+          "n": 1989,
+          "baseline_mae": 22.4252555723144,
+          "enhanced_mae": 22.295420451968674,
+          "mae_delta": -0.12983512034572442,
+          "week_block_bootstrap_95pct_delta": [
+            -0.22705233886773998,
+            -0.03150406215494664
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "TE": {
+          "n": 955,
+          "baseline_mae": 15.845287958115183,
+          "enhanced_mae": 15.828263357694821,
+          "mae_delta": -0.01702460042036158,
+          "week_block_bootstrap_95pct_delta": [
+            -0.07808849296525743,
+            0.045750332651320544
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      }
+    },
+    "2024": {
+      "passing_yards": {
+        "QB": {
+          "n": 517,
+          "baseline_mae": 68.45551257253385,
+          "enhanced_mae": 68.42126742434772,
+          "mae_delta": -0.034245148186130336,
+          "week_block_bootstrap_95pct_delta": [
+            -0.4177775826456199,
+            0.36213644240403514
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 0
+        },
+        "WR": {
+          "n": 0
+        },
+        "TE": {
+          "n": 0
+        }
+      },
+      "rushing_yards": {
+        "QB": {
+          "n": 517,
+          "baseline_mae": 12.956963249516441,
+          "enhanced_mae": 12.912512727592416,
+          "mae_delta": -0.04445052192402521,
+          "week_block_bootstrap_95pct_delta": [
+            -0.08704315000663257,
+            -0.005134293723826595
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "RB": {
+          "n": 1223,
+          "baseline_mae": 20.378304715181248,
+          "enhanced_mae": 20.37864594210558,
+          "mae_delta": 0.00034122692433413704,
+          "week_block_bootstrap_95pct_delta": [
+            -0.015883577405495685,
+            0.015330022828040144
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "WR": {
+          "n": 1938,
+          "baseline_mae": 1.5035689714482283,
+          "enhanced_mae": 1.476967323649219,
+          "mae_delta": -0.02660164779900942,
+          "week_block_bootstrap_95pct_delta": [
+            -0.05015691687705101,
+            -0.005187901435353434
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "TE": {
+          "n": 981,
+          "baseline_mae": 0.28092082908596666,
+          "enhanced_mae": 0.3157531770141658,
+          "mae_delta": 0.034832347928199114,
+          "week_block_bootstrap_95pct_delta": [
+            0.017256677903801046,
+            0.053867394828949006
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      },
+      "receiving_yards": {
+        "QB": {
+          "n": 0
+        },
+        "RB": {
+          "n": 1223,
+          "baseline_mae": 10.517170891251022,
+          "enhanced_mae": 10.432597893748651,
+          "mae_delta": -0.08457299750237013,
+          "week_block_bootstrap_95pct_delta": [
+            -0.10663889191479536,
+            -0.06029686017851136
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "WR": {
+          "n": 1938,
+          "baseline_mae": 21.75206398348813,
+          "enhanced_mae": 21.710635209725712,
+          "mae_delta": -0.04142877376241927,
+          "week_block_bootstrap_95pct_delta": [
+            -0.11143387094641363,
+            0.019199701715076095
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "TE": {
+          "n": 981,
+          "baseline_mae": 16.06175671083928,
+          "enhanced_mae": 15.960315350662036,
+          "mae_delta": -0.10144136017724392,
+          "week_block_bootstrap_95pct_delta": [
+            -0.18216308632419156,
+            -0.01654391212129544
+          ],
+          "exploratory_interval_below_zero": true
+        }
+      }
+    },
+    "2025": {
+      "passing_yards": {
+        "QB": {
+          "n": 519,
+          "baseline_mae": 68.94733461785485,
+          "enhanced_mae": 69.24153601027554,
+          "mae_delta": 0.294201392420689,
+          "week_block_bootstrap_95pct_delta": [
+            -0.08868948340885824,
+            0.6222786042768835
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 0
+        },
+        "WR": {
+          "n": 0
+        },
+        "TE": {
+          "n": 0
+        }
+      },
+      "rushing_yards": {
+        "QB": {
+          "n": 519,
+          "baseline_mae": 11.872190109184329,
+          "enhanced_mae": 11.82826863147361,
+          "mae_delta": -0.04392147771071819,
+          "week_block_bootstrap_95pct_delta": [
+            -0.08603353309727721,
+            0.00405701004491764
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 1249,
+          "baseline_mae": 19.66619962636776,
+          "enhanced_mae": 19.660658882634852,
+          "mae_delta": -0.005540743732908027,
+          "week_block_bootstrap_95pct_delta": [
+            -0.010083926552838282,
+            -0.0009841260795574896
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "WR": {
+          "n": 1982,
+          "baseline_mae": 1.3652875882946518,
+          "enhanced_mae": 1.3465414418490516,
+          "mae_delta": -0.018746146445600242,
+          "week_block_bootstrap_95pct_delta": [
+            -0.030752453098801764,
+            -0.009345382456481359
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "TE": {
+          "n": 1026,
+          "baseline_mae": 0.42608836907082526,
+          "enhanced_mae": 0.43159972372606265,
+          "mae_delta": 0.005511354655237388,
+          "week_block_bootstrap_95pct_delta": [
+            0.00034294362016184724,
+            0.010477566411587168
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      },
+      "receiving_yards": {
+        "QB": {
+          "n": 0
+        },
+        "RB": {
+          "n": 1249,
+          "baseline_mae": 9.98705631171604,
+          "enhanced_mae": 9.891158644803083,
+          "mae_delta": -0.09589766691295765,
+          "week_block_bootstrap_95pct_delta": [
+            -0.13496302595808007,
+            -0.05990157330892075
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "WR": {
+          "n": 1982,
+          "baseline_mae": 20.842709384460143,
+          "enhanced_mae": 20.750434955259767,
+          "mae_delta": -0.09227442920037632,
+          "week_block_bootstrap_95pct_delta": [
+            -0.1686540276805873,
+            -0.014030333781136805
+          ],
+          "exploratory_interval_below_zero": true
+        },
+        "TE": {
+          "n": 1026,
+          "baseline_mae": 15.503086419753085,
+          "enhanced_mae": 15.376479036362213,
+          "mae_delta": -0.12660738339087274,
+          "week_block_bootstrap_95pct_delta": [
+            -0.20128672943653653,
+            -0.053169071073649925
+          ],
+          "exploratory_interval_below_zero": true
+        }
+      }
+    },
+    "2026": {
+      "passing_yards": {
+        "QB": {
+          "n": 64,
+          "baseline_mae": 76.42578125,
+          "enhanced_mae": 76.80964686644408,
+          "mae_delta": 0.38386561644408346,
+          "week_block_bootstrap_95pct_delta": [
+            0.037860875416267564,
+            0.7298703574719028
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 0
+        },
+        "WR": {
+          "n": 0
+        },
+        "TE": {
+          "n": 0
+        }
+      },
+      "rushing_yards": {
+        "QB": {
+          "n": 64,
+          "baseline_mae": 13.890625,
+          "enhanced_mae": 13.839225465080643,
+          "mae_delta": -0.05139953491935678,
+          "week_block_bootstrap_95pct_delta": [
+            -0.14364369476601654,
+            0.04084462492730295
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "RB": {
+          "n": 167,
+          "baseline_mae": 17.454590818363272,
+          "enhanced_mae": 17.440019914574833,
+          "mae_delta": -0.014570903788438727,
+          "week_block_bootstrap_95pct_delta": [
+            -0.020367140696986686,
+            -0.008267496150400835
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "WR": {
+          "n": 270,
+          "baseline_mae": 1.5243827160493826,
+          "enhanced_mae": 1.5058004501100313,
+          "mae_delta": -0.018582265939351306,
+          "week_block_bootstrap_95pct_delta": [
+            -0.023309837971767222,
+            -0.014320792558019036
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "TE": {
+          "n": 157,
+          "baseline_mae": 0.07802547770700637,
+          "enhanced_mae": 0.10588638749186402,
+          "mae_delta": 0.027860909784857654,
+          "week_block_bootstrap_95pct_delta": [
+            0.01776105424980793,
+            0.037582020737343035
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      },
+      "receiving_yards": {
+        "QB": {
+          "n": 0
+        },
+        "RB": {
+          "n": 167,
+          "baseline_mae": 10.051397205588822,
+          "enhanced_mae": 9.944784437749185,
+          "mae_delta": -0.10661276783963736,
+          "week_block_bootstrap_95pct_delta": [
+            -0.12737836778531567,
+            -0.08403017789871274
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "WR": {
+          "n": 270,
+          "baseline_mae": 23.337654320987657,
+          "enhanced_mae": 23.30906928166265,
+          "mae_delta": -0.028585039325005113,
+          "week_block_bootstrap_95pct_delta": [
+            -0.17151023215946237,
+            0.10024893731450626
+          ],
+          "exploratory_interval_below_zero": false
+        },
+        "TE": {
+          "n": 157,
+          "baseline_mae": 16.32059447983015,
+          "enhanced_mae": 16.11834656447214,
+          "mae_delta": -0.2022479153580079,
+          "week_block_bootstrap_95pct_delta": [
+            -0.23774541523271023,
+            -0.16536739600766795
+          ],
+          "exploratory_interval_below_zero": false
+        }
+      }
+    }
+  },
+  "skipped": {
+    "team_warmup": 240,
+    "prior_player_missing_target_boxscore": 10953
+  },
+  "evaluated_rows": 30856,
+  "conclusion": "Research only. No automatic model promotion, season priority change, or production adjustments.",
+  "inputs": [
+    {
+      "kind": "schedule",
+      "season": 2022,
+      "file": "schedule_input.csv",
+      "unchanged": false,
+      "rows": 271,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2022,
+      "file": "team_2022.csv",
+      "unchanged": false,
+      "rows": 542,
+      "sha256": "66db0f53316f259c9945f446ccd182ca9dcebc172742318d45544831f289d284"
+    },
+    {
+      "kind": "player",
+      "season": 2022,
+      "file": "player_2022.csv",
+      "unchanged": false,
+      "rows": 5808,
+      "sha256": "f57cc58e3c551aeb73fddf5971cbfe131e6888a9f0019913de815749a6d17d8f"
+    },
+    {
+      "kind": "schedule",
+      "season": 2023,
+      "file": "schedule_input.csv",
+      "unchanged": false,
+      "rows": 272,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2023,
+      "file": "team_2023.csv",
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "8aebaf16335662166bdd785b05503b1b4e3c35ba687332e64a893df5af6b68f7"
+    },
+    {
+      "kind": "player",
+      "season": 2023,
+      "file": "player_2023.csv",
+      "unchanged": false,
+      "rows": 5801,
+      "sha256": "a8bd2e0c4d30890a91f4ea290486d8160f4e30f01e29483f3caa3c596bc104f9"
+    },
+    {
+      "kind": "pbp",
+      "season": 2023,
+      "file": "play_by_play_2023.parquet",
+      "unchanged": false,
+      "rows": 1143,
+      "sha256": "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+    },
+    {
+      "kind": "schedule",
+      "season": 2024,
+      "file": "schedule_input.csv",
+      "unchanged": false,
+      "rows": 272,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2024,
+      "file": "team_2024.csv",
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "6c4ac463c872d009d24444aec9a5f56bba21fe210e2aa3fc0054f79ce42a7a1b"
+    },
+    {
+      "kind": "player",
+      "season": 2024,
+      "file": "player_2024.csv",
+      "unchanged": false,
+      "rows": 5864,
+      "sha256": "9a58b56d5be5b4f5ed8d3be63efe5694cbf9468d2bc25b1b3f64d0d83f335045"
+    },
+    {
+      "kind": "pbp",
+      "season": 2024,
+      "file": "play_by_play_2024.parquet",
+      "unchanged": false,
+      "rows": 1127,
+      "sha256": "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b"
+    },
+    {
+      "kind": "schedule",
+      "season": 2025,
+      "file": "schedule_input.csv",
+      "unchanged": false,
+      "rows": 272,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2025,
+      "file": "team_2025.csv",
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "91551442bafea1bcdb4840ff85889da0c1cbdc378229fd6d2d3daba86090ca06"
+    },
+    {
+      "kind": "player",
+      "season": 2025,
+      "file": "player_2025.csv",
+      "unchanged": false,
+      "rows": 6037,
+      "sha256": "c192c13c6cd54ca32d6dcb37826e38d3bd81aa8b72e987a167e302937df23c10"
+    },
+    {
+      "kind": "pbp",
+      "season": 2025,
+      "file": "play_by_play_2025.parquet",
+      "unchanged": false,
+      "rows": 1128,
+      "sha256": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+    },
+    {
+      "kind": "schedule",
+      "season": 2026,
+      "file": "schedule_input.csv",
+      "unchanged": false,
+      "rows": 79,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2026,
+      "file": "team_2026.csv",
+      "unchanged": false,
+      "rows": 158,
+      "sha256": "5acdf24ea619f7f535b363e3f59574bd8a81574661f26cea11ff46134f53a784"
+    },
+    {
+      "kind": "player",
+      "season": 2026,
+      "file": "player_2026.csv",
+      "unchanged": false,
+      "rows": 1778,
+      "sha256": "9b5dc2354a7c2d9f507cb7c27097bc92977af4ad8ecd7aaceb5f2b5d4d69e62d"
+    },
+    {
+      "kind": "pbp",
+      "season": 2026,
+      "file": "play_by_play_2026.parquet",
+      "unchanged": false,
+      "rows": 327,
+      "sha256": "ee522ed424afebab54c9d2082c2e05173d4cbfa94b55bef41c22999cba11c540"
+    }
+  ],
+  "resources": {
+    "database_bytes": 11816960,
+    "elapsed_seconds": 19.099,
+    "peak_rss_bytes": 197066752
+  }
+}
