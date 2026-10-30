@@ -3,12 +3,12 @@
   "title": "One yard. A very short field.",
   "date": "2026-10-11",
   "season": 2026,
-  "teams": "Broncos \u00b7 Chargers",
+  "teams": "Broncos · Chargers",
   "categories": [
     "analytics",
     "blunders"
   ],
-  "summary": "Leading 17\u201310, the Chargers failed on fourth-and-1 at their own 41. Denver tied the game on the ensuing short field and eventually won 23\u201317.",
+  "summary": "Leading 17–10, the Chargers failed on fourth-and-1 at their own 41. Denver tied the game on the ensuing short field and eventually won 23–17.",
   "evidence": "Documented",
   "featured": false,
   "timeline": [
@@ -18,7 +18,7 @@
     },
     {
       "label": "The attempt",
-      "text": "Denver stopped Justin Herbert\u2019s quarterback sneak."
+      "text": "Denver stopped Justin Herbert’s quarterback sneak."
     },
     {
       "label": "Afterward",
@@ -32,7 +32,7 @@
   ],
   "sources": [
     {
-      "label": "Chargers: Harbaugh\u2019s explanation",
+      "label": "Chargers: Harbaugh’s explanation",
       "url": "https://www.chargers.com/news/jim-harbaugh-fourth-down-takeaway-broncos-week-5",
       "kind": "Primary reporting",
       "checked": "2026-10-30"
@@ -47,5 +47,15 @@
   "statistics": [],
   "betting": null,
   "source_note": null,
-  "reviewed": "2026-10-30"
+  "reviewed": "2026-10-30",
+  "potential_bets": [
+    {
+      "market": "Chargers moneyline",
+      "impact": "The failed conversion helped set up Denver's comeback; a Chargers win ticket would lose on the final result."
+    },
+    {
+      "market": "Live spreads / totals",
+      "impact": "The short field and ensuing touchdown could change settlement near some live lines; no actual quote verified."
+    }
+  ]
 }
