@@ -401,3 +401,52 @@
 }
 
 .tf-plug-ou,.tf-record-card#plug-record .tf-record-score strong{color:#4ade80}
+
+
+/* TEAM PROFILE — focused overview, compact trends, optional detailed tables. */
+.scout4 .tf-team-overview,
+.scout4 .tf-team-trends,
+.scout4 .tf-team-deep-dive { margin:20px 0 28px; }
+.scout4 .tf-team-overview { padding:22px; border:1px solid #465b74; border-radius:14px; background:#1c2a3d; color:#f1f5f9; }
+.scout4 .tf-team-overview-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+.scout4 .tf-team-overview-heading h2 { margin:2px 0 6px; font-size:clamp(23px,3vw,31px); }
+.scout4 .tf-team-overview-heading p:not(.tf-team-kicker) { font-size:13px; color:#cbd5e1; margin:0; }
+.scout4 .tf-team-kicker { margin:0 0 5px; color:#fbbf24; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.10em; }
+.scout4 .tf-team-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.scout4 .tf-team-kpi { display:flex; flex-direction:column; gap:5px; padding:14px; border:1px solid #41546a; border-radius:10px; background:#142132; min-width:0; }
+.scout4 .tf-team-kpi span, .scout4 .tf-team-form span { color:#cbd5e1; font-size:12px; }
+.scout4 .tf-team-kpi strong { color:#f8fafc; font-size:clamp(22px,2.8vw,29px); line-height:1.2; font-variant-numeric:tabular-nums; }
+.scout4 .tf-team-kpi small, .scout4 .tf-team-form small { color:#a8bbd1; font-size:11px; }
+.scout4 .tf-team-form { display:flex; flex-wrap:wrap; gap:12px 30px; padding-top:16px; margin-top:16px; border-top:1px solid #42546b; }
+.scout4 .tf-team-form > div { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.scout4 .tf-team-form strong { color:#f8fafc; font-size:15px; overflow-wrap:anywhere; }
+.scout4 .tf-team-section-title { display:flex; align-items:end; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:14px; color:#f8fafc; }
+.scout4 .tf-team-section-title h2 { margin:0; font-size:24px; }
+.scout4 .tf-team-browse-link { color:#fbbf24; font-size:13px; text-decoration:none; font-weight:700; }
+.scout4 .tf-team-trend-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:12px; }
+.scout4 .tf-team-trend { display:flex; flex-direction:column; min-width:0; padding:17px; background:#253247; border:1px solid #425674; border-radius:12px; color:#f1f5f9; }
+.scout4 .tf-team-trend-heading { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; color:#bdcbdb; font-size:11px; }
+.scout4 .tf-team-trend-type { color:#fbbf24; text-transform:uppercase; font-size:10px; font-weight:800; letter-spacing:.06em; }
+.scout4 .tf-team-trend-heading small { font-size:11px; }
+.scout4 .tf-team-trend h3 { color:#f8fafc; font-size:17px; margin:11px 0 5px; }
+.scout4 .tf-team-trend-stat { margin:0 0 16px; color:#dce6f0; line-height:1.4; font-size:13px; }
+.scout4 .tf-team-trend-stat strong { font-size:23px; color:#4ade80; font-variant-numeric:tabular-nums; }
+.scout4 .tf-team-trend-link { display:flex; justify-content:space-between; align-items:center; gap:10px; width:100%; margin-top:auto; padding:11px 13px; color:#172234; background:#f8c563; border:1px solid #fbd88c; border-radius:8px; font-size:13px; font-weight:800; text-decoration:none; box-sizing:border-box; }
+.scout4 .tf-team-trend-link:hover, .scout4 .tf-team-trend-link:focus-visible { background:#ffe3a2; text-decoration:none; }
+.scout4 .tf-team-no-trends, .scout4 .tf-team-deep-note { color:#d4e0eb; font-size:13px; }
+.scout4 .tf-team-deep-dive>h2 { color:#f1f5f9; font-size:23px; margin-bottom:6px; }
+.scout4 .tf-team-deep-dive .tf-team-detail-card { border:1px solid #465a74; }
+.scout4 .tf-team-deep-dive .tf-team-detail-card>summary { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.scout4 .tf-team-deep-dive .tf-team-detail-card>summary .stats-inline { margin:0; }
+.scout4 .tf-team-deep-dive .tf-team-detail-card>summary .expand-label { display:block; color:#fbbf24; }
+.scout4 .tf-team-deep-dive .tf-team-detail-card[open]>summary { border-bottom:1px solid #465a74; margin-bottom:16px; }
+.scout4 .tf-team-overview a:focus-visible, .scout4 .tf-team-trends a:focus-visible { outline:2px solid #fbbf24; outline-offset:3px; }
+@media(max-width:800px) { .scout4 .tf-team-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:480px) {
+ .scout4 .tf-team-overview { padding:15px; }
+ .scout4 .tf-team-kpi { padding:11px; }
+ .scout4 .tf-team-kpi strong { font-size:22px; }
+ .scout4 .tf-team-form { gap:14px; }
+ .scout4 .tf-team-trend-grid { grid-template-columns:minmax(0,1fr); }
+ .scout4 .tf-team-trend { padding:14px; }
+}
