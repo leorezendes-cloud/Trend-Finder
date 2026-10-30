@@ -247,6 +247,26 @@
         .money-matchups .dungeon-game-source { margin:10px 0 0; font-size:12px; }
         @media(max-width:650px) { .money-matchups { grid-template-columns:minmax(0,330px); } }
 
+
+        /* Horizontal market cards with fast scanning; compact mobile stack. */
+        .dungeon-grid .dungeon-card-featured { grid-column:1 / -1; padding:28px; border-color:#fbbf24; }
+        .dungeon-grid .dungeon-card-featured h2 { font-size:clamp(22px,3vw,30px); }
+        .money-matchups { grid-template-columns:minmax(0,1fr); max-width:1050px; }
+        .money-matchups .dungeon-game-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .money-matchups .dungeon-game-lines { display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:12px; }
+        .money-matchups .dungeon-game-lines span { background:#253345; border:1px solid #475569; border-radius:6px; padding:6px 9px; }
+        .money-matchups .dungeon-game-lines small { color:#fbbf24; margin-right:5px; }
+        .money-matchups .dungeon-market-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .money-matchups .dungeon-market-card { padding:10px; }
+        @media(max-width:750px) {
+            .money-matchups .dungeon-market-grid { grid-template-columns:1fr; }
+            .money-matchups .dungeon-game-lines { width:100%; }
+        }
+        @media(max-width:650px) {
+            .money-matchups { grid-template-columns:minmax(0,1fr); }
+            .dungeon-grid .dungeon-card-featured { padding:18px; }
+        }
+
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='navigation.css') }}">
 {% include '_branding_head.html' %}
@@ -290,7 +310,7 @@
             <p>Status: Weekly results</p>
         </a>
 
-        <a class="dungeon-card dungeon-card-link"
+        <a class="dungeon-card dungeon-card-link dungeon-card-featured"
         href="{{ url_for('conspiracy_dungeon_page', panel='anomalies') }}"
         {% if view.panel == 'anomalies' %}aria-current="page"{% endif %}>
             <h2>🏈 NFL Anomalies</h2>
@@ -360,8 +380,11 @@
         <p class="active-filters" style="font-size: 15px;">
             Mike's Rule: When at least 65% of public betting dollars
             back one side, take the opposite side.
-            Reverse Line Movement is evaluated separately using
-            recorded pregame line changes.
+            Reverse Line Movement (RLM) happens when recorded betting lines
+            move against the side attracting most of the public money.
+            It may suggest disagreement between betting activity and the market,
+            but is not proof of sharp action or a guaranteed edge.
+            Only documented qualifying signals are shown as selections.
         </p>
         <p class="active-filters" style="font-size: 15px;">{{ view.week_label }} • {{ view.public_markets.total.qualifying }} qualifying fades • {{ view.public_markets.total.pending }} pending</p>
         <div class="money-tally-grid">
@@ -395,8 +418,14 @@
         <section class="trend-card dungeon-game-card">
 
             <header class="dungeon-game-heading">
-                <h3>{{ game.matchup }}</h3>
-                <p>Week {{ game.week }} • {{ game.gameday }}</p>
+                <div><h3>{{ game.matchup }}</h3><p>Week {{ game.week }} • {{ game.gameday }}</p></div>
+                <div class="dungeon-game-lines" aria-label="Recorded market lines">
+                    {% for market in game.markets %}
+                    {% if market.movement and market.movement.latest_quote %}
+                    <span><small>{{ market.market_label }}</small> {{ market.movement.latest_quote }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </header>
 
             <div class="dungeon-market-grid">
@@ -409,8 +438,10 @@
                     </div>
                     <div class="market-quick">
                         <span class="market-quick-label">Mike's Fade</span>
-                        <strong class="{{ 'fade-qualified' if market.qualifies else '' }}">{{ market.pick }}</strong>
+                        {% if market.qualifies %}
+                        <strong class="fade-qualified">{{ market.pick }}</strong>
                         <small>{{ market.result }}{% if market.profit is not none %} • {{ "%+.2f"|format(market.profit) }}u{% endif %}</small>
+                        {% else %}<small>No Mike's Rule signal</small>{% endif %}
                     </div>
                     <div class="market-quick">
                         <span class="market-quick-label">Reverse Line Movement</span>
@@ -422,7 +453,7 @@
                     <details class="movement-review">
                         <summary>Explore market details</summary>
                         <p><strong>Public money:</strong> {{ market.side_a }} {{ market.handle_a }}% / {{ market.side_b }} {{ market.handle_b }}%</p>
-                        <p><strong>Mike's Rule:</strong> {{ market.pick }} • {{ market.result }}</p>
+                        <p><strong>Mike's Rule:</strong> {% if market.qualifies %}{{ market.pick }} • {{ market.result }}{% else %}Not triggered{% endif %}</p>
                         {% if market.movement %}
                         <p><strong>First quote:</strong> {{ market.movement.first_quote }}</p>
                         <p><strong>Latest quote:</strong> {{ market.movement.latest_quote }}</p>
