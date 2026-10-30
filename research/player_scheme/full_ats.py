@@ -79,7 +79,7 @@ def inputs(f):
     if not all(math.isfinite(v) for x in vectors.values() for v in x):raise ValueError('Invalid feature')
     return vectors,coverage
 
-def run(db,schedule,*,train_season=2022,last_season=2026):
+def run(db,schedule,*,train_season=2022,last_season=2026,baseline_provider=None):
     with Path(schedule).open(newline='') as f:
         markets={r['game_id']:r for r in csv.DictReader(f) if r.get('game_type')=='REG' and r.get('spread_line')}
     games=db.execute('SELECT gid,season,week,kickoff,end_at,away,home,away_score,home_score FROM games WHERE season BETWEEN ? AND ? ORDER BY kickoff,gid',(train_season,last_season)).fetchall()
@@ -98,7 +98,9 @@ def run(db,schedule,*,train_season=2022,last_season=2026):
             if min(t['games'] for t in f['teams'])<3:skipped['team_warmup']+=1;continue
             xs,cov=inputs(f)
             if not models:models={key:CachedRidge(len(x)) for key,x in xs.items()}
-            base=f['baseline']['away_points']-f['baseline']['home_points'];actual=a-h
+            base=(baseline_provider(year,week,gid) if baseline_provider else
+                f['baseline']['away_points']-f['baseline']['home_points']);actual=a-h
+            if not math.isfinite(base):raise ValueError('Invalid baseline margin')
             margins={'baseline':base,**{key:base+models[key].predict(x) for key,x in xs.items()}}
             pending.append((datetime.fromisoformat(end)+timedelta(hours=48),xs,actual-base))
             if year<=train_season:continue

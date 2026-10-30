@@ -166,3 +166,7 @@ See [FULL_ATS_RESULTS.md](FULL_ATS_RESULTS.md) for fixed player/PBP/charting abl
 ## Actual v5 baseline comparison
 
 [V5_MATCHUP_RESULTS.md](V5_MATCHUP_RESULTS.md) tests the unchanged PR #36 model against one previously fixed passing/rushing bonus. Includes full-cohort and same-selected-game ATS records, every changed pick, hash-gated original model, provenance and 40 tests. The candidate worsens the partial 2026 record and is not promoted.
+
+## Full player concept directly over v5
+
+[V5_FULL_RESULTS.md](V5_FULL_RESULTS.md) fits the fixed player/PBP/verified-scheme residual features against actual v5 errors, with modern and historical charted cohorts, same-selected-game records, hashed game ledgers, resources and 45 tests. No consistent improvement; production remains unchanged.
