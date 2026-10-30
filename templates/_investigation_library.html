@@ -9,7 +9,7 @@
     <p><a href="{{ library.link(tool=None) }}">← Back to case files</a></p>
     {% include '_investigation_research.html' %}
   {% else %}
-  <form method="get" class="case-search" role="search" aria-label="Search investigations">
+  <form method="get" action="#case-search" id="case-search" class="case-search" role="search" aria-label="Search investigations">
     <input type="hidden" name="panel" value="anomalies"><input type="hidden" name="case_category" value="{{ library.category }}">
     {% if request.args.get('mobile_results') == '1' %}<input type="hidden" name="mobile_results" value="1">{% endif %}
     <label>Find a case<input type="search" name="q" value="{{ library.query }}" maxlength="120" placeholder="Team, decision or unusual play"></label>
