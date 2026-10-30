@@ -1,7 +1,13 @@
 <article class="pick-game pick-compact inline-public-market" aria-label="Public betting for {{ pick.away }} at {{ pick.home }}">
 <h2>Public Bets &amp; Lines</h2><p><strong>{{ pick.away }} at {{ pick.home }}</strong></p>
 <div class="public-market-columns">{% for market in public_market.markets %}<section class="public-market-section"><h3>{{ market.label }}</h3>
-{% if market.sides %}{% for side in market.sides %}<p class="public-market-side"><strong>{{ side.name }}{% if side.line is not none %} {{ '%+g'|format(side.line) if market.key=='Spread' else '%g'|format(side.line) }}{% endif %}</strong> <span>{{ '%g'|format(side.bets) }}% bets</span><br><small>{{ '%g'|format(side.money) }}% money · Odds {{ '%+g'|format(side.odds) }}</small></p>{% endfor %}
+{% if market.sides %}{% for side in market.sides %}
+<p class="public-market-side">
+  <strong>{{ side.name }}{% if side.line is not none %} {{ '%+g'|format(side.line) if market.key=='Spread' else '%g'|format(side.line) }}{% endif %}</strong>
+  <span>{% if side.bets is defined %}{{ '%g'|format(side.bets) }}% bets{% else %}Bets unavailable{% endif %}</span><br>
+  <small>{% if side.money is defined %}{{ '%g'|format(side.money) }}% money{% else %}Money unavailable{% endif %} · Odds {{ '%+g'|format(side.odds) }}</small>
+</p>
+{% endfor %}
 <p class="pick-deadline"><a href="{{ market.url }}" target="_blank" rel="noopener noreferrer">{{ market.source }}</a> · {{ market.captured|pick_time }}{% if market.stale %}<br>Over 24 hours old{% endif %}</p>
 {% else %}<p>Public percentages unavailable.</p>{% endif %}</section>{% endfor %}</div>
 <p class="pick-deadline">{{ 'Final saved pregame snapshots.' if public_market.closed else 'Latest saved snapshots, not tick-by-tick live odds.' }} Bets = number of wagers; money = amount wagered.</p>
