@@ -16,8 +16,6 @@
 <main class="weekly-results-main">
 
 <h1>🏈 Weekly Game Results 🚂</h1>
-{% include '_plug_dynamic_record.html' %}
-{% include '_scout_dynamic_records.html' %}
 {% set record_page='weekly' %}{% include '_record_navigation.html' %}
 <p class="weekly-results-note">Final scores and independent Scout and Plug selections.</p>
 {% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
@@ -28,6 +26,10 @@
 
 
 <div class="weekly-ou-records"><div><span>Scout O/U</span><strong>{{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }}</strong></div><div class="weekly-plug-ou"><span>The Plug{% if dynamic_record_enabled|default(false) %} legacy weekly{% endif %} O/U</span><strong>{% if plug_ou_tally.selected %}{{ plug_ou_tally.Win }}–{{ plug_ou_tally.Loss }}–{{ plug_ou_tally.Push }}{% else %}—{% endif %}</strong><small>{{ plug_ou_tally.Pending }} pending</small></div></div>
+<section class="weekly-dynamic-group" aria-label="Dynamic prediction records">
+{% include '_plug_dynamic_record.html' %}
+{% include '_scout_dynamic_records.html' %}
+</section>
 <h2>Week {{ selected_week }} Matchups</h2>
 {% if games %}
 <div class="weekly-matchup-grid">
