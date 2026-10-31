@@ -1,13 +1,26 @@
 {% if dynamic_record_enabled|default(false) %}
-<section class="stats-card" id="dynamic-plug-record"><h2>The Plug · Dynamic record</h2>
-<p>Prospective dynamic selections · separate from legacy weekly records.</p>
-{% if dynamic_record_review %}<p>Dynamic receipts need review. Results unavailable.</p>{% else %}
-<p>ATS: {{ dynamic_record_counts.ats.Win }}–{{ dynamic_record_counts.ats.Loss }}–{{ dynamic_record_counts.ats.Push }} · {{ dynamic_record_counts.ats.Pending }} pending</p>
-<p>O/U: {{ dynamic_record_counts.ou.Win }}–{{ dynamic_record_counts.ou.Loss }}–{{ dynamic_record_counts.ou.Push }} · {{ dynamic_record_counts.ou.Pending }} pending</p>
-<ul class="dynamic-plug-picks">
-{% for r in dynamic_record_rows if r.ats_selected or r.ou_selected %}
-  {% if r.ats_selected %}<li><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a> — <strong>{{ r.ats_side }} {{ '%+g'|format(r.ats_away_line if r.ats_side==r.away_team else -r.ats_away_line) }}</strong></li>{% endif %}
-  {% if r.ou_selected %}<li><a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a> — <strong>{{ r.ou_side }} {{ '%g'|format(r.ou_market_total) }}</strong></li>{% endif %}
-{% else %}<li>No official dynamic selections for this week.</li>{% endfor %}
-</ul>{% endif %}</section>
+<section class="weekly-dynamic-panel" id="dynamic-plug-record">
+  <div class="weekly-dynamic-heading">
+    <div><p class="weekly-dynamic-eyebrow">Prospective selections</p><h2>The Plug · Dynamic record</h2></div>
+    <span class="weekly-dynamic-tag">Separate from legacy weekly records</span>
+  </div>
+  {% if dynamic_record_review %}<p class="weekly-dynamic-caution">Dynamic receipts need review. Results unavailable.</p>{% else %}
+  <div class="weekly-dynamic-stats">
+    <div><span>ATS record</span><strong>{{ dynamic_record_counts.ats.Win }}–{{ dynamic_record_counts.ats.Loss }}–{{ dynamic_record_counts.ats.Push }}</strong><small>{{ dynamic_record_counts.ats.Pending }} pending</small></div>
+    <div><span>O/U record</span><strong>{{ dynamic_record_counts.ou.Win }}–{{ dynamic_record_counts.ou.Loss }}–{{ dynamic_record_counts.ou.Push }}</strong><small>{{ dynamic_record_counts.ou.Pending }} pending</small></div>
+  </div>
+  <details class="weekly-dynamic-details">
+    <summary>View issued Plug selections</summary>
+    <div class="weekly-dynamic-list">
+    {% for r in dynamic_record_rows if r.ats_selected or r.ou_selected %}
+      <div class="weekly-dynamic-game">
+        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
+        {% if r.ats_selected %}<div><span>ATS</span><strong>{{ r.ats_side }} {{ '%+g'|format(r.ats_away_line if r.ats_side==r.away_team else -r.ats_away_line) }}</strong></div>{% endif %}
+        {% if r.ou_selected %}<div><span>O/U</span><strong>{{ r.ou_side }} {{ '%g'|format(r.ou_market_total) }}</strong></div>{% endif %}
+      </div>
+    {% else %}<p>No official dynamic selections for this week.</p>{% endfor %}
+    </div>
+  </details>
+  {% endif %}
+</section>
 {% endif %}
