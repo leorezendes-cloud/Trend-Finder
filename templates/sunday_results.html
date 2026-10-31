@@ -21,14 +21,10 @@
 {% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
 {% if latest_completed_week is not none and latest_completed_week!=selected_week %}<p><a class="archive-link" href="{{ url_for('sunday_results_page',week=latest_completed_week) }}">View Week {{ latest_completed_week }} completed results →</a></p>{% endif %}
 <form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
-<div class="weekly-result-tallies"><div><span>Underdog results</span><strong>{{ tally.covers }}–{{ tally.losses }}–{{ tally.pushes }}</strong></div><div><span>Scout ATS</span><strong>{{ tally.correct }}–{{ tally.wrong }}–{{ tally.pick_pushes }}</strong></div><div><span>Plug{% if dynamic_record_enabled|default(false) %} legacy weekly{% endif %} selected ATS</span><strong>{% if plug_receipts_review %}Review needed{% else %}{{ plug_tally.Win }}–{{ plug_tally.Loss }}–{{ plug_tally.Push }}{% endif %}</strong><small>{% if plug_receipts_review %}Receipt integrity check required{% elif plug_tally.selected %}{{ plug_tally.selected }} picks · {{ plug_tally.Pending }} pending{% else %}No issued picks for this week{% endif %}</small></div><div><span>Completed games</span><strong>{{ tally.finals }} / {{ tally.games }}</strong></div></div>
-
-
-
-<div class="weekly-ou-records"><div><span>Scout O/U</span><strong>{{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }}</strong></div><div class="weekly-plug-ou"><span>The Plug{% if dynamic_record_enabled|default(false) %} legacy weekly{% endif %} O/U</span><strong>{% if plug_ou_tally.selected %}{{ plug_ou_tally.Win }}–{{ plug_ou_tally.Loss }}–{{ plug_ou_tally.Push }}{% else %}—{% endif %}</strong><small>{{ plug_ou_tally.Pending }} pending</small></div></div>
-<section class="weekly-dynamic-group" aria-label="Dynamic prediction records">
-{% include '_plug_dynamic_record.html' %}
+<p class="weekly-results-progress">{{ tally.finals }} of {{ tally.games }} games final · Week {{ selected_week }}</p>
+<section class="weekly-dynamic-group" aria-label="Official dynamic Scout and Plug ATS and totals records">
 {% include '_scout_dynamic_records.html' %}
+{% include '_plug_dynamic_record.html' %}
 </section>
 <h2>Week {{ selected_week }} Matchups</h2>
 {% if games %}
