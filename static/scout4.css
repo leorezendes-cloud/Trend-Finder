@@ -450,3 +450,38 @@
  .scout4 .tf-team-trend-grid { grid-template-columns:minmax(0,1fr); }
  .scout4 .tf-team-trend { padding:14px; }
 }
+
+
+/* Dynamic-only Scout & Plug records dashboard: scoped to this page. */
+.scout4 .tf-dynamic-only { max-width:1100px; margin:22px auto 36px; color:#f1f5f9; font:14px/1.55 system-ui,sans-serif; }
+.scout4 .tf-dynamic-record-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-panel { min-width:0; padding:21px; background:#1b2a3d; border:1px solid #455970; border-radius:14px; color:#f1f5f9; box-sizing:border-box; box-shadow:none; }
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-heading {display:flex; flex-direction:column; gap:5px; margin-bottom:16px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-eyebrow {color:#f8c563; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin:0 0 3px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-panel h2 {color:#f8fafc; font:800 22px/1.25 system-ui,sans-serif; margin:0; }
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-tag {font-size:12px;color:#abbdd0;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-stats {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-stats>div {background:#111e2f;border:1px solid #40516a;border-radius:10px;padding:14px;min-width:0;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-stats span,.scout4 .tf-dynamic-record-grid .weekly-dynamic-stats small {display:block;color:#b9cadc;font-size:12px;line-height:1.5;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-stats strong {display:block;color:#f8fafc;font:800 clamp(21px,2.4vw,29px)/1.3 system-ui,sans-serif;font-variant-numeric:tabular-nums;margin:4px 0;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-details {border-top:1px solid #40516a;margin-top:16px;padding-top:8px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-details>summary {color:#f8c563;padding:11px 0;cursor:pointer;font:750 13px/1.4 system-ui,sans-serif;list-style:revert;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-list {display:grid;gap:8px;padding-top:8px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game {display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:12px;background:#122033;border:1px solid #33475d;border-radius:9px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game>a {color:#f8c563;font-size:13px;font-weight:800;text-decoration:none;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game>div {display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 11px;font-size:12px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game>div>span {color:#a9bdd3;min-width:30px;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game>div>strong {color:#f1f5f9;overflow-wrap:anywhere;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-game>div>small {color:#c9d7e5;}
+.scout4 .tf-dynamic-record-grid .weekly-dynamic-caution {margin:8px 0;color:#f8c563;font-size:12px;}
+.scout4 .tf-dynamic-only .prediction-week-selector {max-width:100%;width:fit-content;padding:12px 17px;background:#1e2c40;border:1px solid #455970;border-radius:11px;box-shadow:none;}
+.scout4 .tf-dynamic-only .prediction-week-selector select {background:#111e2f;border:1px solid #52647b;border-radius:7px;padding:10px;color:#f8fafc;}
+.scout4 .tf-dynamic-only .prediction-week-selector button {background:#f8c563;color:#172234;border:0;border-radius:7px;font-weight:800;}
+.scout4 .tf-dynamic-empty {color:#b9cadc;font-size:13px;margin:14px 0 0;}
+.scout4 .tf-dynamic-footnote {max-width:760px;margin:22px auto 0;text-align:center;color:#adbed0;font-size:12px;}
+@media(max-width:760px) { .scout4 .tf-dynamic-record-grid {grid-template-columns:minmax(0,1fr);} }
+@media(max-width:480px) {
+ .scout4 .tf-dynamic-record-grid .weekly-dynamic-panel {padding:15px;}
+ .scout4 .tf-dynamic-record-grid .weekly-dynamic-stats>div {padding:11px;}
+ .scout4 .tf-dynamic-record-grid .weekly-dynamic-stats strong {font-size:21px;}
+}
