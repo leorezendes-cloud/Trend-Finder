@@ -30,85 +30,44 @@
 <div class="weekly-ou-records"><div><span>Scout O/U</span><strong>{{ tally.total_correct }}–{{ tally.total_wrong }}–{{ tally.total_pushes }}</strong></div><div class="weekly-plug-ou"><span>The Plug{% if dynamic_record_enabled|default(false) %} legacy weekly{% endif %} O/U</span><strong>{% if plug_ou_tally.selected %}{{ plug_ou_tally.Win }}–{{ plug_ou_tally.Loss }}–{{ plug_ou_tally.Push }}{% else %}—{% endif %}</strong><small>{{ plug_ou_tally.Pending }} pending</small></div></div>
 <h2>Week {{ selected_week }} Matchups</h2>
 {% if games %}
-<div class="tf-desktop-results weekly-results-table-wrap">
-<table class="weekly-results-table"><thead><tr><th>Matchup</th><th>Scores</th><th>Underdog</th><th>ATS as Dog</th><th>Result</th><th>Scout's Pick</th><th>Scout O/U</th><th>Scout Results</th><th>Plug ATS</th><th>Plug O/U</th><th>Details</th></tr></thead><tbody>
-{% for game in games %}<tr>
-<td><strong>{{ game.matchup }}</strong><br><small>{{ game.gameday }}</small></td>
-<td>{{ game.live_score }}{% if game.score_source %}<br><small>{{ game.score_source }}</small>{% endif %}</td>
-<td>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</td>
-<td class="dog-ats-record">{{ game.dog_ats_record }}</td>
-<td><span class="result-badge result-{{ game.ats_result|lower }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</span></td>
-<td>{{ game.scout_pick }}{% if game.forecast_digest %}<br><small><a href="{{ url_for('fans.matchup',game_id=game.game_id,forecast=game.forecast_digest) }}">Saved forecast →</a></small>{% endif %}</td>
-<td>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</td>
-<td><small>ATS</small><br><span class="result-badge result-{{ game.scout_result|lower }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</span>{% if game.total_result!='—' %}<br><small>Total</small><br><span class="result-badge result-{{ game.total_result|lower }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</span>{% endif %}</td>
-<td>{% if game.plug_status == 'selected' %}<span class="result-badge result-correct">Top Pick</span><br><small>{{ game.plug_pick }}</small>{% if game.plug_result in ('Win','Loss','Push','Tie','Void') %}<br><b class="{{ 'result-badge result-correct' if game.plug_result=='Win' else 'result-badge result-wrong' if game.plug_result=='Loss' else 'result-badge' }}">{{ game.plug_result }}</b>{% endif %}{% elif game.plug_status=='stay_away' %}—{% elif game.plug_status=='review' %}Review needed{% else %}Not issued{% endif %}</td>
-<td class="weekly-plug-ou">{% if game.plug_ou_pick %}<strong>{{ game.plug_ou_pick }}</strong>{% if game.plug_ou_result in ('Win','Loss','Push','Tie','Void') %}<br><span class="result-badge result-{{ 'correct' if game.plug_ou_result=='Win' else 'wrong' if game.plug_ou_result=='Loss' else 'push' if game.plug_ou_result=='Push' else 'pending' }}">{{ game.plug_ou_result }}</span>{% endif %}{% elif game.plug_ou_status=='stay_away' %}—{% else %}—{% endif %}</td><td><details><summary>View details</summary><p>Dog straight-up: {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>{% if game.has_rankings %}<p>Historical ranks: 3Y #{{ game.rank_3y }} • 5Y #{{ game.rank_5y }} • 10Y #{{ game.rank_10y }} • All #{{ game.rank_all }}</p>{% else %}<p>No saved rankings for this game.</p>{% endif %}</details></td>
-</tr>{% endfor %}</tbody></table></div>
-
-<!-- MOBILE SUNDAY RESULTS -->
-
-<div class="tf-mobile-results">
-
-    {% for game in games %}
-
-    <article class="tf-game-card">
-
-        <div class="tf-card-heading">
-            <strong>{{ game.matchup }}</strong>
-
-        </div>
-
-        <p class="tf-game-score">Scores: {{ game.live_score }}{% if game.score_source %}<br><small>{{ game.score_source }}</small>{% endif %}</p>
-
-        <p class="tf-game-spread">
-            Underdog:
-            {{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}
-        </p>
-
-        <p>ATS as Dog: <strong class="dog-ats-record">{{ game.dog_ats_record }}</strong></p>
-        <p class="tf-game-result">Result: {{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</p>
-        <div class="tf-card-stats">
-            <div><span class="tf-stat-label">Scout's Pick</span><strong>{{ game.scout_pick }}</strong><small>Cushion: {{ game.scout_cushion }}</small></div>
-            <div><span class="tf-stat-label">Scout O/U</span><strong>{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</strong></div>
-        </div>
-        <p>Scout Result: ATS — {{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}{% if game.total_result!='—' %} · Total — {{ game.pending_note if game.total_result=='Pending' else game.total_result }}{% endif %}</p>
-
-        {% if game.plug_ou_pick %}<p class="weekly-plug-ou"><strong>The Plug O/U:</strong> {{ game.plug_ou_pick }}{% if game.plug_ou_result in ('Win','Loss','Push','Tie','Void') %} · {{ game.plug_ou_result }}{% endif %}</p>{% endif %}
-        {% if game.plug_status=='selected' %}<p><strong>The Plug ATS:</strong> {{ game.plug_pick }}{% if game.plug_result in ('Win','Loss','Push','Tie','Void') %} · {{ game.plug_result }}{% endif %}</p>{% elif game.plug_status=='review' %}<p>Plug selections need review.</p>{% endif %}
-        <details class="tf-card-details">
-            <summary>Details</summary><p>Spread: {{ game.line_source }}{% if game.line_capture %}<br>{{ game.line_capture }} • {{ game.line_minutes }} min before kickoff{% endif %}</p>
-            {% if game.has_rankings %}
-
-            <div class="tf-history-grid">
-                <div>
-                    <span>3Y</span>
-                    <strong>#{{ game.rank_3y }}</strong>
-                </div>
-
-                <div>
-                    <span>5Y</span>
-                    <strong>#{{ game.rank_5y }}</strong>
-                </div>
-
-                <div>
-                    <span>10Y</span>
-                    <strong>#{{ game.rank_10y }}</strong>
-                </div>
-
-                <div>
-                    <span>All</span>
-                    <strong>#{{ game.rank_all }}</strong>
-                </div>
-            </div>
-            {% else %}<p>No saved rankings for this game.</p>{% endif %}
-        </details>
-
-    </article>
-
-    {% endfor %}
-
+<div class="weekly-matchup-grid">
+{% for game in games %}
+<article class="weekly-matchup-card">
+  <header class="weekly-matchup-head">
+    <div><p class="weekly-matchup-date">{{ game.gameday }}</p><h3><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.matchup }}</a></h3></div>
+    <span class="weekly-matchup-status {{ 'weekly-is-final' if game.ats_result!='Pending' else 'weekly-is-pending' }}">{{ 'Final' if game.ats_result!='Pending' else 'Awaiting final' }}</span>
+  </header>
+  <div class="weekly-matchup-score">
+    <div><span class="weekly-mini-label">Score</span><strong>{{ game.live_score }}</strong></div>
+    <div><span class="weekly-mini-label">Underdog / Line</span><strong>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</strong></div>
+  </div>
+  <div class="weekly-matchup-grades">
+    <div class="weekly-grade-item"><span>Underdog ATS</span><strong class="weekly-grade-value">{{ game.dog_ats_record }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.ats_result=='Cover' else 'weekly-loss' if game.ats_result=='Loss' else '' }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</small></div>
+    <div class="weekly-grade-item"><span>Scout ATS</span><strong class="weekly-grade-value">{{ game.scout_pick }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.scout_result in ('Correct','Win') else 'weekly-loss' if game.scout_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</small></div>
+    <div class="weekly-grade-item"><span>Scout O/U</span><strong class="weekly-grade-value">{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.total_result in ('Correct','Win') else 'weekly-loss' if game.total_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</small></div>
+  </div>
+  {% if game.plug_status=='selected' or game.plug_ou_pick %}
+  <div class="weekly-plug-line">
+    <span>The Plug</span>
+    {% if game.plug_status=='selected' %}<strong>ATS: {{ game.plug_pick }}</strong>{% if game.plug_result in ('Win','Loss','Push','Tie','Void') %}<small class="{{ 'weekly-win' if game.plug_result=='Win' else 'weekly-loss' if game.plug_result=='Loss' else '' }}">{{ game.plug_result }}</small>{% endif %}{% endif %}
+    {% if game.plug_ou_pick %}<strong>O/U: {{ game.plug_ou_pick }}</strong>{% if game.plug_ou_result in ('Win','Loss','Push','Tie','Void') %}<small class="{{ 'weekly-win' if game.plug_ou_result=='Win' else 'weekly-loss' if game.plug_ou_result=='Loss' else '' }}">{{ game.plug_ou_result }}</small>{% endif %}{% endif %}
+  </div>
+  {% endif %}
+  <details class="weekly-matchup-details">
+    <summary>Game details <span aria-hidden="true">⌄</span></summary>
+    <div class="weekly-matchup-details-body">
+      {% if game.score_source %}<p><b>Score source:</b> {{ game.score_source }}</p>{% endif %}
+      <p><b>Underdog straight-up:</b> {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p>
+      <p><b>Scout cushion:</b> {{ game.scout_cushion }}</p>
+      {% if game.forecast_digest %}<p><a href="{{ url_for('fans.matchup',game_id=game.game_id,forecast=game.forecast_digest) }}">View saved Scout forecast ↗</a></p>{% endif %}
+      <p><b>Spread source:</b> {{ game.line_source }}{% if game.line_capture %} · {{ game.line_capture }} · {{ game.line_minutes }} minutes before kickoff{% endif %}</p>
+      {% if game.has_rankings %}<p><b>Historical rankings:</b> 3Y #{{ game.rank_3y }} · 5Y #{{ game.rank_5y }} · 10Y #{{ game.rank_10y }} · All #{{ game.rank_all }}</p>{% else %}<p>No saved historical rankings.</p>{% endif %}
+      {% if game.plug_status=='review' %}<p>Plug selections require review.</p>{% endif %}
+    </div>
+  </details>
+</article>
+{% endfor %}
 </div>
-
 {% else %}
 <p>No games recorded for this week.</p>
 {% endif %}
