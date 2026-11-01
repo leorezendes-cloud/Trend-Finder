@@ -1,0 +1,206 @@
+{
+  "policy": "player-scheme-ats-v1",
+  "line_source_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "line_field": "nflverse schedule spread_line (expected home margin)",
+  "warning": "Retrospective corrected inputs and archived closing lines. Original pregame quote capture times are NOT verified; this is not an official or timestamp-certified betting record.",
+  "selection": "Full eligible slate; pick positive model-versus-market edge, exact agreement No Call. No threshold tuning; pushes excluded from cover percentage.",
+  "training": "Unchanged 2022 warmup and expanding prior-outcome-only ridge margin enhancement from PR60. No spread enters model features or fitting.",
+  "seasons": {
+    "2023": {
+      "games": 224,
+      "baseline": {
+        "wins": 96,
+        "losses": 114,
+        "pushes": 11,
+        "no_calls": 3,
+        "cover_pct": 45.714285714285715
+      },
+      "enhanced": {
+        "wins": 95,
+        "losses": 118,
+        "pushes": 11,
+        "no_calls": 0,
+        "cover_pct": 44.60093896713615
+      },
+      "changed_decisions": 5,
+      "changed_baseline": {
+        "wins": 2,
+        "losses": 0,
+        "pushes": 0,
+        "no_calls": 3,
+        "cover_pct": 100.0
+      },
+      "changed_enhanced": {
+        "wins": 1,
+        "losses": 4,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": 20.0
+      },
+      "common_action_games": 221,
+      "common_baseline": {
+        "wins": 96,
+        "losses": 114,
+        "pushes": 11,
+        "no_calls": 0,
+        "cover_pct": 45.714285714285715
+      },
+      "common_enhanced": {
+        "wins": 94,
+        "losses": 116,
+        "pushes": 11,
+        "no_calls": 0,
+        "cover_pct": 44.76190476190476
+      }
+    },
+    "2024": {
+      "games": 224,
+      "baseline": {
+        "wins": 104,
+        "losses": 117,
+        "pushes": 3,
+        "no_calls": 0,
+        "cover_pct": 47.05882352941177
+      },
+      "enhanced": {
+        "wins": 102,
+        "losses": 119,
+        "pushes": 3,
+        "no_calls": 0,
+        "cover_pct": 46.15384615384615
+      },
+      "changed_decisions": 6,
+      "changed_baseline": {
+        "wins": 4,
+        "losses": 2,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": 66.66666666666667
+      },
+      "changed_enhanced": {
+        "wins": 2,
+        "losses": 4,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": 33.333333333333336
+      },
+      "common_action_games": 224,
+      "common_baseline": {
+        "wins": 104,
+        "losses": 117,
+        "pushes": 3,
+        "no_calls": 0,
+        "cover_pct": 47.05882352941177
+      },
+      "common_enhanced": {
+        "wins": 102,
+        "losses": 119,
+        "pushes": 3,
+        "no_calls": 0,
+        "cover_pct": 46.15384615384615
+      }
+    },
+    "2025": {
+      "games": 224,
+      "baseline": {
+        "wins": 120,
+        "losses": 103,
+        "pushes": 1,
+        "no_calls": 0,
+        "cover_pct": 53.81165919282511
+      },
+      "enhanced": {
+        "wins": 117,
+        "losses": 106,
+        "pushes": 1,
+        "no_calls": 0,
+        "cover_pct": 52.46636771300449
+      },
+      "changed_decisions": 3,
+      "changed_baseline": {
+        "wins": 3,
+        "losses": 0,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": 100.0
+      },
+      "changed_enhanced": {
+        "wins": 0,
+        "losses": 3,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": 0.0
+      },
+      "common_action_games": 224,
+      "common_baseline": {
+        "wins": 120,
+        "losses": 103,
+        "pushes": 1,
+        "no_calls": 0,
+        "cover_pct": 53.81165919282511
+      },
+      "common_enhanced": {
+        "wins": 117,
+        "losses": 106,
+        "pushes": 1,
+        "no_calls": 0,
+        "cover_pct": 52.46636771300449
+      }
+    },
+    "2026": {
+      "games": 31,
+      "baseline": {
+        "wins": 18,
+        "losses": 11,
+        "pushes": 2,
+        "no_calls": 0,
+        "cover_pct": 62.06896551724138
+      },
+      "enhanced": {
+        "wins": 18,
+        "losses": 11,
+        "pushes": 2,
+        "no_calls": 0,
+        "cover_pct": 62.06896551724138
+      },
+      "changed_decisions": 0,
+      "changed_baseline": {
+        "wins": 0,
+        "losses": 0,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": null
+      },
+      "changed_enhanced": {
+        "wins": 0,
+        "losses": 0,
+        "pushes": 0,
+        "no_calls": 0,
+        "cover_pct": null
+      },
+      "common_action_games": 31,
+      "common_baseline": {
+        "wins": 18,
+        "losses": 11,
+        "pushes": 2,
+        "no_calls": 0,
+        "cover_pct": 62.06896551724138
+      },
+      "common_enhanced": {
+        "wins": 18,
+        "losses": 11,
+        "pushes": 2,
+        "no_calls": 0,
+        "cover_pct": 62.06896551724138
+      }
+    }
+  },
+  "skipped": {
+    "team_warmup": 240
+  },
+  "game_ledger": {
+    "file": "ats_results.games.csv",
+    "sha256": "526ae03cc7349517565d484f1014f7d383a49dbb81c41d99c78467ee241e0dc5",
+    "rows": 703
+  }
+}
