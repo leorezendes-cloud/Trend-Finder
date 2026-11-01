@@ -49,13 +49,17 @@ def compare(rows, root, now=None):
         plug, plug_state = _safe_plug(root, game, now)
         recovered = None
         family = None
+        preview = False
         if r.get('locked') and r.get('qb_record'):
             recovered = r['qb_record'].get('pick')
             family = 'QB edition'
         elif r.get('locked') and r.get('state') == 'ready':
             recovered = r['result']['selection'].get('pick')
             family = 'Original'
-        # A preview is not an issued independent selection.
+        elif r.get('state') == 'ready':
+            recovered = r['result']['selection'].get('pick')
+            family = 'Preview (not locked)'
+            preview = True
         recovered = recovered if recovered in ('Over', 'Under') else None
         scout_ou = scout.get('ou_side') if scout else None
         scout_ats = scout.get('ats_side') if scout else None
@@ -63,7 +67,8 @@ def compare(rows, root, now=None):
         plug_ats = plug.get('ats_side') if plug and plug.get('ats_selected') else None
         ou = [v for v in (recovered, scout_ou, plug_ou) if v in ('Over', 'Under')]
         ats = [v for v in (scout_ats, plug_ats) if v in (r['away'], r['home'])]
-        ou_label = ('3/3 agree' if len(ou) == 3 and len(set(ou)) == 1 else
+        ou_label = ('3/3 agree (preview)' if preview and len(ou) == 3 and len(set(ou)) == 1 else
+                    '3/3 agree' if len(ou) == 3 and len(set(ou)) == 1 else
                     'Split' if len(ou) >= 2 and len(set(ou)) > 1 else
                     'Partial' if ou else 'Awaiting picks')
         ats_label = ('Scout + Plug agree' if len(ats) == 2 and len(set(ats)) == 1 else
@@ -71,7 +76,9 @@ def compare(rows, root, now=None):
         # Grade only fully locked three-way agreement, at the original recovered
         # pregame line; never mistake an active projection for a historical pick.
         if (ou_label == '3/3 agree' and r.get('locked') and
-                scout_state == plug_state == 'locked'):
+                scout_state == plug_state == 'locked' and
+                scout['total_quote']['line'] == plug['ou_market_total'] ==
+                float(r['result']['market_total'])):
             from recovered_nfl_tracker import grade
             actual = r.get('actual_total')
             market = r['result']['market_total']
