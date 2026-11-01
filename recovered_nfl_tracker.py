@@ -217,7 +217,9 @@ def view(root=ROOT,now=None):
     rows.sort(key=lambda r:(r.get('kickoff_utc') or '',r['game_id']),reverse=False)
     summary={key:Counter(r[field] for r in rows if r['locked']) for key,field in [('original','original_grade'),('qb','qb_grade')]}
     categories={letter:{key:Counter(r[field] for r in rows if r['locked'] and r.get('result',{}).get('selection',{}).get('rule')==letter) for key,field in [('original','original_grade'),('qb','qb_grade')]} for letter in 'ABCDEFGHIJKL'}
-    return dict(rows=rows,summary=summary,categories=categories,now=now.isoformat())
+    from owner_consensus import compare
+    consensus=compare(rows,root,now)
+    return dict(rows=rows,summary=summary,categories=categories,consensus=consensus,now=now.isoformat())
 
 
 @bp.get('/research/recovered-totals')
