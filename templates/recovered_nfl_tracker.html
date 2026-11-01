@@ -5,6 +5,20 @@
 <section class="recovered-tracker">
 <p class="eyebrow">OWNER RESEARCH · NFL</p><h1>Recovered Totals — NFL QB Edition</h1>
 <p>Automatic pregame picks and results, separate from Scout and The Plug.</p>
+<section class="rt-consensus" aria-labelledby="rt-consensus-title">
+<h2 id="rt-consensus-title">NFL System Consensus · 2026</h2>
+<p class="rt-note">Verified picks from existing feeds only. Scout counts once; the recovered original and QB edition are one model family. The Plug is derived from Scout, not an independent vote. Reload for the latest saved revisions.</p>
+<p class="rt-history">Forward three-way O/U agreement: <b>{{ view.consensus.record.get('Win',0) }}–{{ view.consensus.record.get('Loss',0) }}–{{ view.consensus.record.get('Push',0) }}</b> · {{ view.consensus.record.get('Pending',0) }} pending. No separate independent ATS feed is connected yet.</p>
+<div class="rt-table"><table class="rt-consensus-table"><thead><tr><th>Game</th><th>Recovered totals</th><th>Dynamic Scout</th><th>Dynamic Plug</th><th>O/U agreement</th><th>ATS comparison</th></tr></thead><tbody>
+{% for r in view.consensus.rows %}
+<tr><td><b>{{ r.away }} @ {{ r.home }}</b><small>{{ r.kickoff|eastern_time }}</small></td>
+<td><b>{{ r.recovered or 'Awaiting locked pick' }}</b><small>{{ r.family or 'Not issued' }}</small></td>
+<td><b>O/U: {{ r.scout_ou or '—' }}</b><small>ATS: {{ r.scout_ats or '—' }} · {{ r.scout_state or 'Unavailable' }}</small></td>
+<td><b>O/U: {{ r.plug_ou or '—' }}</b><small>ATS: {{ r.plug_ats or '—' }} · {{ r.plug_state or 'Unavailable' }}</small></td>
+<td><b>{{ r.ou_agreement }}</b></td><td>{{ r.ats_agreement }}</td></tr>
+{% else %}<tr><td colspan="6">No saved 2026 NFL totals games to compare yet.</td></tr>{% endfor %}
+</tbody></table></div>
+</section>
 <div class="rt-records">{% for key,label in [('original','Original A–L'),('qb','NFL QB Edition')] %}{% set s=view.summary[key] %}<article><span>{{ label }} · forward tracking</span><strong>{{ s.get('Win',0) }}–{{ s.get('Loss',0) }}–{{ s.get('Push',0) }}</strong><small>{{ s.get('Pending',0) }} pending · {{ s.get('Awaiting QB',0) }} awaiting starters · {{ s.get('No pregame QB pick',0) }} without a pregame QB pick · {{ s.get('Undecided',0) }} undecided</small></article>{% endfor %}</div>
 <p class="rt-history">Historical research, 2026: <b>original 34–27 · QB candidate 40–21</b>. The candidate was fitted to those games; these are separate from the forward records above.</p>
 <p class="rt-note">Original picks save automatically against their first eligible pregame line. A, B, D, and H flip only when sourced pregame starter evidence identifies a change. Missing evidence stays pending; postgame starter discoveries never become pregame picks.</p>
