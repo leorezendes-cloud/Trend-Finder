@@ -262,6 +262,57 @@ def monthly_results(year, month):
 
 
 
+@bp.get('/weekly/diagnostics')
+def weekly_diagnostics():
+    """Owner-only counts for newsletter eligibility; never expose private picks."""
+    require_owner()
+    from flask import jsonify
+    from newsletter_draft import timestamp
+    from expert_beta import store
+    now = datetime.now(timezone.utc)
+    result = {'archive_readable': False, 'archive_records': 0,
+              'released_records': 0, 'upcoming_within_seven_days': 0,
+              'scout_with_side': 0, 'approved_expert': 0,
+              'publicly_featured_expert': 0, 'errors': []}
+    try:
+        archive = store()
+        records = archive.records()
+        result['archive_readable'] = True
+        result['archive_records'] = len(records)
+        featured_cache = {}
+        for record in records:
+            if record.get('kind') not in ('production_import', 'prospective'):
+                continue
+            result['released_records'] += 1
+            game = record['scout']['game']
+            kickoff = timestamp(game['kickoff_utc'])
+            if not now < kickoff <= now + timedelta(days=7):
+                continue
+            result['upcoming_within_seven_days'] += 1
+            scout = record['scout']
+            if (scout.get('spread') or {}).get('side') or (scout.get('total') or {}).get('side'):
+                result['scout_with_side'] += 1
+            expert = record.get('expert') or {}
+            if expert.get('review_status') != 'approved':
+                continue
+            result['approved_expert'] += 1
+            key = (int(game['season']), int(game['week']))
+            if key not in featured_cache:
+                try:
+                    featured_cache[key] = set(archive.featured(*key))
+                except (OSError, ValueError, TypeError):
+                    featured_cache[key] = set()
+                    result['errors'].append('featured_configuration_invalid')
+            identity = f"{key[0]}/{key[1]}/{game['away_team']}-{game['home_team']}"
+            if identity in featured_cache[key]:
+                result['publicly_featured_expert'] += 1
+    except (OSError, ValueError, TypeError, KeyError, RuntimeError):
+        result['errors'].append('archive_read_or_validation_failed')
+    response = jsonify(result)
+    response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+
 @bp.get('/weekly/preview')
 def weekly_preview():
     """Preview currently available weekly content without freezing a draft."""
