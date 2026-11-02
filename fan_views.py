@@ -632,6 +632,27 @@ def prediction_results():
     plug_ou_week_totals={k:sum(r['result']==k for r in plug_ou_week_picks)
                          for k in ('Win','Loss','Push','Pending')}
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
+    # Weeks 6-7 predate prospective Plug receipts. Show the same frozen-line
+    # v5/v14 retrospective replay used by Weekly Results, never as issued picks.
+    historical_plug_rows=[]
+    historical_plug_weeks=[]
+    try:
+        from plug_historical_simulations import historical_simulations
+        replay_weeks = [] if all_weeks else ([selected_week] if selected_week in (6, 7) else [])
+        for replay_week in replay_weeks:
+            historical_plug_rows.extend(historical_simulations(ROOT, season, replay_week))
+            historical_plug_weeks.append(replay_week)
+    except (OSError, KeyError, ValueError, TypeError, ImportError):
+        historical_plug_rows=[]
+        historical_plug_weeks=[]
+    historical_plug_tally={
+        market:{outcome:sum(bool(r.get(market+'_side')) and r.get(market+'_result')==outcome
+                            for r in historical_plug_rows)
+                for outcome in ('Win','Loss','Push')}
+        for market in ('ats','ou')}
+    historical_plug_tally.update({
+        'ats_selected':sum(bool(r.get('ats_side')) for r in historical_plug_rows),
+        'ou_selected':sum(bool(r.get('ou_side')) for r in historical_plug_rows)})
     from plug_dynamic_official import record_context
     dynamic_context = record_context(ROOT, _completed_games(ROOT), season, record_week)
     from scout_dynamic_public import records as scout_dynamic_records
@@ -648,4 +669,7 @@ def prediction_results():
                            plug_ou_week_picks=plug_ou_week_picks,
                            plug_ou_legacy_picks=plug_ou_legacy_picks,
                            plug_ou_week_totals=plug_ou_week_totals,
-                           plug_ou_review=plug_ou_review, all_weeks=all_weeks)
+                           plug_ou_review=plug_ou_review, all_weeks=all_weeks,
+                           historical_plug_simulation=bool(historical_plug_weeks),
+                           historical_plug_weeks=historical_plug_weeks,
+                           historical_plug_tally=historical_plug_tally)
