@@ -22,9 +22,9 @@ def test_week_six_replay_is_separate_and_uses_v5_v14_rules(tmp_path, monkeypatch
             "total_line": 48,
         })
     monkeypatch.setattr(plug_ats_v5_model, "projections",
-                        lambda path, season, week: {"2026_06_AAA_BBB": -7.5})
+                        lambda path, season, week: {"2026_06_AAA_BBB": 7.5})
     monkeypatch.setattr(plug_v14_model, "projections",
-                        lambda path, season, eligible_ids: {"2026_06_AAA_BBB": 49.5})
+                        lambda path, season, eligible_ids: {"2026_06_AAA_BBB": 48.5})
     monkeypatch.setattr(forecast_history, "official_sources", lambda root: {
         "2026_06_AAA_BBB": {
             "quote": {"line": 8},
