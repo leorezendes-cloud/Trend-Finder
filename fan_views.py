@@ -585,6 +585,53 @@ def plug_week_record(rows, season, week):
     }
 
 
+def combine_plug_record(historical_rows, prospective_rows):
+    """Build one public Plug record from Weeks 6–7 research and prospective picks.
+
+    The source/provenance remains on each row for audit, while the public
+    scoreboard treats selected ATS and O/U outcomes as one combined record.
+    """
+    combined = []
+    for row in historical_rows or []:
+        combined.append({
+            'game_id': row.get('game_id'), 'season': row.get('season'),
+            'week': int(row.get('week') or 0),
+            'away_team': row.get('away_team'), 'home_team': row.get('home_team'),
+            'ats_selected': bool(row.get('ats_side')),
+            'ats_side': row.get('ats_side'), 'ats_pick': row.get('ats_pick'),
+            'ats_result': row.get('ats_result') or 'Pending',
+            'ou_selected': bool(row.get('ou_side')),
+            'ou_side': row.get('ou_side'), 'ou_pick': row.get('ou_pick'),
+            'ou_result': row.get('ou_result') or 'Pending',
+            'source_kind': 'historical',
+        })
+    for row in prospective_rows or []:
+        combined.append({
+            'game_id': row.get('game_id'), 'season': row.get('season'),
+            'week': int(row.get('week') or 0),
+            'away_team': row.get('away_team'), 'home_team': row.get('home_team'),
+            'ats_selected': bool(row.get('ats_selected')),
+            'ats_side': row.get('ats_side'),
+            'ats_pick': row.get('ats_side'),
+            'ats_result': row.get('ats_result') or 'Pending',
+            'ou_selected': bool(row.get('ou_selected')),
+            'ou_side': row.get('ou_side'),
+            'ou_pick': row.get('ou_side'),
+            'ou_result': row.get('ou_result') or 'Pending',
+            'source_kind': 'prospective',
+        })
+    combined.sort(key=lambda row: (row['week'], str(row.get('game_id') or '')))
+    counts = {}
+    for market in ('ats', 'ou'):
+        selected = [row for row in combined if row[market + '_selected']]
+        counts[market] = {
+            outcome: sum(row[market + '_result'] == outcome for row in selected)
+            for outcome in ('Win', 'Loss', 'Push', 'Pending')
+        }
+        counts[market]['selected'] = len(selected)
+    return {'rows': combined, 'counts': counts}
+
+
 @bp.get('/predictions/results')
 def prediction_results():
     from flask import request
@@ -702,6 +749,8 @@ def prediction_results():
         'ou_selected':sum(bool(r.get('ou_side')) for r in historical_plug_rows)})
     from plug_dynamic_official import record_context
     dynamic_context = record_context(ROOT, _completed_games(ROOT), season, record_week)
+    plug_combined_record = combine_plug_record(
+        historical_plug_rows, dynamic_context.get('dynamic_record_rows', []))
     from scout_dynamic_public import records as scout_dynamic_records
     scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, record_week)
     from scout_fade import safe_record_context as scout_fade_context
@@ -721,4 +770,5 @@ def prediction_results():
                            historical_plug_simulation=bool(historical_plug_weeks),
                            historical_plug_weeks=historical_plug_weeks,
                            historical_plug_tally=historical_plug_tally,
-                           historical_plug_tallies_by_week=historical_plug_tallies_by_week)
+                           historical_plug_tallies_by_week=historical_plug_tallies_by_week,
+                           plug_combined_record=plug_combined_record)
