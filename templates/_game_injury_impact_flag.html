@@ -1,0 +1,8 @@
+{# Small, non-disruptive marker for a materially injury-distorted final. #}
+{% set injury_impact = injury_impact_for_game(game.game_id) %}
+{% if injury_impact %}
+<details class="game-injury-impact">
+  <summary title="{{ injury_impact.title }}" aria-label="Injury impact: {{ injury_impact.title }}">⚑ Injury impact</summary>
+  <div class="game-injury-impact-body"><strong>{{ injury_impact.title }}</strong><p>{{ injury_impact.details }}</p><small>Research context only · official score and grades unchanged</small></div>
+</details>
+{% endif %}
