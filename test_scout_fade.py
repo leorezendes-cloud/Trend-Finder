@@ -21,10 +21,10 @@ class ScoutFadeChecks(unittest.TestCase):
             "season": 2026, "week": 6, "game_id": "2026_06_NO_NYG",
             "away_team": "NO", "home_team": "NYG",
             "version": "legacy-scout", "weights": {"scout_scoring": .5, "plug_points_only": .5},
-            "components": {"Blend": {"pick": "NO"}},
+            "components": {"Blend": {"pick": "NYG"}},
         }
         original = copy.deepcopy(record)
-        self.assertEqual(pick_for_record(record, ROOT), "NYG")
+        self.assertEqual(pick_for_record(record, ROOT), "NO")
         self.assertEqual(record, original)
 
     def test_week7_8_points_only_selection_is_faded(self):
