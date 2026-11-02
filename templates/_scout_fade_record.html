@@ -1,32 +1,52 @@
-{% if scout_fade %}
-<section class="weekly-dynamic-panel scout-fade-record" id="scout-fade-record">
+{% if scout_fade or scout_dynamic_counts is defined %}
+<section class="weekly-dynamic-panel scout-fade-record" id="scout-record">
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Public Scout · updated formula</p><h2>Scout Record</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Public Scout · independent ATS and totals records</p><h2>Scout Record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
-    {% if all_weeks|default(false) %}<div><span>All Weeks ATS</span><strong>{{ scout_fade.overall.Win }}–{{ scout_fade.overall.Loss }}–{{ scout_fade.overall.Push }}</strong><small>{{ scout_fade.overall.win_rate if scout_fade.overall.win_rate is not none else '—' }}% win rate · {{ scout_fade.overall.decisions }} decisions</small></div>{% else %}<div><span>Week {{ scout_fade.selected_week }} ATS</span><strong>{{ scout_fade.week.Win }}–{{ scout_fade.week.Loss }}–{{ scout_fade.week.Push }}</strong><small>{{ scout_fade.week.Pending }} pending · {{ scout_fade.week.selected }} selections</small></div>{% endif %}
+    <div>
+      <span>{% if all_weeks|default(false) %}All Weeks ATS{% else %}Week {{ selected_week }} ATS{% endif %}</span>
+      {% if scout_fade %}
+        {% set ats_record = scout_fade.overall if all_weeks|default(false) else scout_fade.week %}
+        <strong>{{ ats_record.Win }}–{{ ats_record.Loss }}–{{ ats_record.Push }}</strong>
+        <small>{{ ats_record.Pending }} pending · {{ ats_record.selected }} selections</small>
+      {% else %}
+        <strong>—</strong><small>ATS record unavailable</small>
+      {% endif %}
+    </div>
+    <div>
+      <span>{% if all_weeks|default(false) %}All Weeks O/U{% else %}Week {{ selected_week }} O/U{% endif %}</span>
+      {% if scout_dynamic_counts is defined %}
+        <strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong>
+        <small>{{ scout_dynamic_counts.ou.Pending }} pending{% if scout_dynamic_coverage is defined %} · {{ scout_dynamic_coverage.available }}/{{ scout_dynamic_coverage.expected }} available{% endif %}</small>
+      {% else %}
+        <strong>—</strong><small>O/U record unavailable</small>
+      {% endif %}
+    </div>
   </div>
   <details class="weekly-dynamic-details">
-    <summary>View Scout picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ scout_fade.selected_week }}{% endif %}</summary>
+    <summary>View Scout ATS picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ selected_week }}{% endif %}</summary>
     <div class="weekly-dynamic-list">
-    {% for r in scout_fade.rows %}
-      <div class="weekly-dynamic-game">
-        <span>{{ r.away_team }} @ {{ r.home_team }}</span>
-        <div><span>Scout ATS</span><strong>{{ r.pick_line }}</strong><small>{{ r.result }}{% if r.replayed %} · Week 6 replay{% endif %}</small></div>
-      </div>
-    {% else %}<p>No eligible updated-formula Scout selections for this week.</p>{% endfor %}
+    {% if scout_fade %}
+      {% for r in scout_fade.rows %}
+        <div class="weekly-dynamic-game">
+          <span>{{ r.away_team }} @ {{ r.home_team }}</span>
+          <div><span>Scout ATS</span><strong>{{ r.pick_line }}</strong><small>{{ r.result }}{% if r.replayed %} · Week 6 replay{% endif %}</small></div>
+        </div>
+      {% else %}<p>No eligible updated-formula Scout ATS selections for this week.</p>{% endfor %}
+    {% else %}<p>Scout ATS records are unavailable for this week.</p>{% endif %}
     </div>
   </details>
-</section>
-{% endif %}
-
-{% if scout_dynamic_counts is defined %}
-<section class="weekly-dynamic-panel scout-ou-record" id="scout-ou-record">
-  <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Separate dynamic Scout totals</p><h2>Scout O/U Record</h2></div>
-  </div>
-  <div class="weekly-dynamic-stats">
-    <div><span>{% if all_weeks|default(false) %}All Weeks O/U{% else %}Scout O/U · Unified{% endif %}</span><strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong><small>{{ scout_dynamic_counts.ou.Pending }} pending</small></div>
-  </div>
+  <details class="weekly-dynamic-details">
+    <summary>View Scout O/U picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ selected_week }}{% endif %}</summary>
+    <div class="weekly-dynamic-list">
+    {% for r in scout_dynamic_records if r.ou_side %}
+      <div class="weekly-dynamic-game">
+        <span>{{ r.away_team }} @ {{ r.home_team }}</span>
+        <div><span>Scout O/U</span><strong>{{ r.ou_side }} {{ '%g'|format(r.total_quote.line) }}</strong><small>{{ r.grades.ou }}{% if r.source == 'sealed historical simulation' %} · Week 6 historical simulation{% endif %}</small></div>
+      </div>
+    {% else %}<p>No eligible Scout O/U selections for this week.</p>{% endfor %}
+    </div>
+  </details>
 </section>
 {% endif %}

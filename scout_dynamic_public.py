@@ -165,4 +165,23 @@ def records(root, finals, season, week, *, now=None):
     rows.sort(key=lambda r:(int(r.get('week',0)),r.get('kickoff_utc',''),r.get('game_id','')))
     counts={m:{outcome:sum(r['grades'][m]==outcome for r in rows)
                for outcome in ('Win','Loss','Push','Pending','No Call','Tie')} for m in ('ats','ou','su')}
-    return dict(scout_dynamic_records=rows,scout_dynamic_counts=counts,scout_dynamic_review=review)
+    # Make cohort coverage visible: an empty/missing receipt set is not a 0-0-0 record.
+    import csv
+    schedule_path=Path(root)/'nfl_games.csv'
+    expected_ids=set()
+    if schedule_path.exists():
+        with schedule_path.open(newline='') as handle:
+            for game in csv.DictReader(handle):
+                try:
+                    if (int(game.get('season',0))==int(season)
+                            and game.get('game_type')=='REG'
+                            and int(game.get('week',0)) >= 6
+                            and (week is None or int(game.get('week',0))==int(week))):
+                        expected_ids.add(game['game_id'])
+                except (TypeError,ValueError,KeyError):
+                    continue
+    available_ids={r['game_id'] for r in rows if r.get('ou_side') in ('Over','Under')}
+    coverage=dict(expected=len(expected_ids),available=len(expected_ids & available_ids),
+                  missing=max(0,len(expected_ids)-len(expected_ids & available_ids)))
+    return dict(scout_dynamic_records=rows,scout_dynamic_counts=counts,
+                scout_dynamic_review=review,scout_dynamic_coverage=coverage)
