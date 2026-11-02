@@ -638,7 +638,7 @@ def prediction_results():
     historical_plug_weeks=[]
     try:
         from plug_historical_simulations import historical_simulations
-        replay_weeks = [6, 7] if all_weeks else ([selected_week] if selected_week in (6, 7) else [])
+        replay_weeks = [] if all_weeks else ([selected_week] if selected_week in (6, 7) else [])
         for replay_week in replay_weeks:
             historical_plug_rows.extend(historical_simulations(ROOT, season, replay_week))
             historical_plug_weeks.append(replay_week)
