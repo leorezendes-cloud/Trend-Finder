@@ -1,20 +1,20 @@
 {% if scout_fade %}
 <section class="weekly-dynamic-panel scout-fade-record" id="scout-fade-record">
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Public Scout · updated formula</p><h2>Scout Record</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Public Scout · Fade</p><h2>Public Scout · Fade Record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
     {% if all_weeks|default(false) %}<div><span>All Weeks ATS</span><strong>{{ scout_fade.overall.Win }}–{{ scout_fade.overall.Loss }}–{{ scout_fade.overall.Push }}</strong><small>{{ scout_fade.overall.win_rate if scout_fade.overall.win_rate is not none else '—' }}% win rate · {{ scout_fade.overall.decisions }} decisions</small></div>{% else %}<div><span>Week {{ scout_fade.selected_week }} ATS</span><strong>{{ scout_fade.week.Win }}–{{ scout_fade.week.Loss }}–{{ scout_fade.week.Push }}</strong><small>{{ scout_fade.week.Pending }} pending · {{ scout_fade.week.selected }} selections</small></div>{% endif %}
   </div>
   <details class="weekly-dynamic-details">
-    <summary>View Scout picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ scout_fade.selected_week }}{% endif %}</summary>
+    <summary>View Fade picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ scout_fade.selected_week }}{% endif %}</summary>
     <div class="weekly-dynamic-list">
     {% for r in scout_fade.rows %}
       <div class="weekly-dynamic-game">
         <span>{{ r.away_team }} @ {{ r.home_team }}</span>
-        <div><span>Scout ATS</span><strong>{{ r.pick_line }}</strong><small>{{ r.result }}{% if r.replayed %} · Week 6 replay{% endif %}</small></div>
+        <div><span>Fade ATS</span><strong>{{ r.pick_line }}</strong><small>{{ r.result }}{% if r.replayed %} · Week 6 replay{% endif %}</small></div>
       </div>
-    {% else %}<p>No eligible updated-formula Scout selections for this week.</p>{% endfor %}
+    {% else %}<p>No eligible updated-formula Fade selections for this week.</p>{% endfor %}
     </div>
   </details>
 </section>
