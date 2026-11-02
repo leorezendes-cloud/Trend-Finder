@@ -13,6 +13,8 @@ class RecordTabsReleaseTests(unittest.TestCase):
         for p in ('templates/sunday_results.html','templates/prediction_results.html'):
             s=(root/p).read_text()
             self.assertIn("'_record_navigation.html'",s,p)
+        for p in ('templates/sunday_results.html','templates/prediction_results.html'):
+            self.assertIn('All Weeks', (root/p).read_text(), p)
         nav=(root/'templates/_record_navigation.html').read_text()
         for s in ('Weekly Results','Scout &amp; The Plug'):
             self.assertIn(s,nav)

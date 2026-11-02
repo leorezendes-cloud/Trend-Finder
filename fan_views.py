@@ -554,7 +554,7 @@ def plug_week_record(rows, season, week):
     """An independent weekly slice of previously issued Plug ATS receipts."""
     from collections import Counter
     matches = [r for r in rows if str(r['season']) == str(season)
-               and str(r['week']) == str(week)]
+               and (week is None or str(r['week']) == str(week))]
     counts = Counter(r['result'] for r in matches)
     return matches, {name: counts.get(name, 0) for name in ('Win','Loss','Push','Pending')}
 
@@ -585,7 +585,8 @@ def prediction_results():
     else:
         season, weeks, default_week = (current[0] if current else None), [], None
     selection = request.args.get('week')
-    if selection is not None:
+    all_weeks = selection == 'all'
+    if selection is not None and not all_weeks:
         try:
             selected_week = int(selection)
         except (TypeError, ValueError):
@@ -594,8 +595,9 @@ def prediction_results():
             abort(400, description='No saved predictions for that week.')
     else:
         selected_week = default_week
+    record_week = None if all_weeks else selected_week
     selected_records = [r for r in records if str(r.get('season')) == str(season)
-                        and str(r.get('week')) == str(selected_week)] if selected_week is not None else []
+                        and (record_week is None or str(r.get('week')) == str(record_week))] if season is not None else []
     groups, recent, excluded = prediction_performance(selected_records, schedule)
     # Only actually issued Plug receipts count; never reconstruct issued picks
     # from retrospective edge rankings or current market lines.
@@ -607,7 +609,7 @@ def prediction_results():
     except (OSError, TypeError, ValueError, KeyError):
         plug_picks, plug_seasons = [], {}
         plug_receipts_review = True
-    plug_week_picks, plug_week_totals = plug_week_record(plug_picks, season, selected_week)
+    plug_week_picks, plug_week_totals = plug_week_record(plug_picks, season, record_week)
     from plug_ou_weekly_v3 import read_effective as read_plug_ou
     from plug_ou_receipts import grade as grade_plug_ou
     by_game={g['game_id']:g for g in schedule}
@@ -631,11 +633,11 @@ def prediction_results():
                          for k in ('Win','Loss','Push','Pending')}
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
     from plug_dynamic_official import record_context
-    dynamic_context = record_context(ROOT, _completed_games(ROOT), season, selected_week)
+    dynamic_context = record_context(ROOT, _completed_games(ROOT), season, record_week)
     from scout_dynamic_public import records as scout_dynamic_records
-    scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, selected_week)
+    scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, record_week)
     from scout_fade import safe_record_context as scout_fade_context
-    fade_context=scout_fade_context(ROOT, records, schedule, season, selected_week)
+    fade_context=scout_fade_context(ROOT, records, schedule, season, record_week)
     return render_template('prediction_results.html', **scout_context, **dynamic_context, scout_fade=fade_context, groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
                            season=season, weeks=weeks, selected_week=selected_week,
@@ -646,4 +648,4 @@ def prediction_results():
                            plug_ou_week_picks=plug_ou_week_picks,
                            plug_ou_legacy_picks=plug_ou_legacy_picks,
                            plug_ou_week_totals=plug_ou_week_totals,
-                           plug_ou_review=plug_ou_review)
+                           plug_ou_review=plug_ou_review, all_weeks=all_weeks)
