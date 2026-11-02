@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scout_dynamic_public import records
+from scout_dynamic_public import records, _week_six_shadow_totals
 
 
 class ScoutDynamicCoverageTests(unittest.TestCase):
@@ -67,6 +67,26 @@ class ScoutDynamicCoverageTests(unittest.TestCase):
             self.assertEqual(row['ou_side'],'Over')
             self.assertEqual(row['grades']['ou'],'Win')
             self.assertEqual(row['source'],'saved positive Scout totals')
+
+
+    def test_week6_shadow_totals_use_frozen_candidate_schema_and_template_line_shape(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            config={'totals_model_file_sha256':'f'*64,'totals_candidate':{
+                'name':'Market + statistics','target_season':2026,'first_eligible_week':6,
+                'model':{'version':'scout4-totals-1'}}}
+            (root/'automatic_model.json').write_text(json.dumps(config))
+            shadow=[]
+            for n in range(14):
+                shadow.append({'game_id':f'2026_06_A{n}_B{n}','season':2026,'week':6,
+                    'market':'Total','model_sha256':'f'*64,'model_name':'Market + statistics',
+                    'away_team':f'A{n}','home_team':f'B{n}',
+                    'kickoff_utc':'2026-10-18T17:00:00+00:00','selected_side':'Over',
+                    'quote':{'line':44.5},'result':'Correct'})
+            with patch('scout4.shadow.view',return_value={'records':shadow}):
+                rows=_week_six_shadow_totals(root)
+            self.assertEqual(len(rows),14)
+            self.assertEqual(rows[0]['total_quote'],{'line':44.5})
 
 if __name__=='__main__':
     unittest.main()
