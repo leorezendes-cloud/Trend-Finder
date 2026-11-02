@@ -165,3 +165,14 @@ html body > main.weekly-results-main {
  .weekly-results-main .weekly-results-selector select { width:auto; flex:0 1 auto; }
  .weekly-results-main .weekly-results-selector button { width:auto; }
 }
+
+
+/* Red injury-impact marker is distinct from the yellow anomaly flag. */
+.weekly-injury-impact { margin:10px 0 12px; border:1px solid #991b1b; border-radius:9px; background:rgba(69,10,10,.28); color:#fee2e2; }
+.weekly-injury-impact>summary { display:flex; align-items:center; gap:7px; padding:9px 11px; cursor:pointer; list-style:none; color:#fca5a5; font:700 12px/1.4 Arial,sans-serif; }
+.weekly-injury-impact>summary::-webkit-details-marker { display:none; }
+.weekly-injury-impact>summary span { color:#ef4444; font-size:17px; line-height:1; }
+.weekly-injury-impact>summary:focus-visible { outline:2px solid #fca5a5; outline-offset:3px; }
+.weekly-injury-impact-body { padding:0 12px 10px; color:#fecaca; font:13px/1.55 Arial,sans-serif; }
+.weekly-injury-impact-body p { margin:7px 0; }
+.weekly-injury-impact-note { color:#fca5a5; font-size:12px; }
