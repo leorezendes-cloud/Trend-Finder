@@ -1,11 +1,20 @@
 """Clearly labeled retrospective Plug v5/v14 simulations for 2026 Weeks 6-7.
 
-These are research replays, not pregame-issued picks or official receipts.
-They are kept outside the immutable prospective receipt stores.
+These are research replays against the closing lines in nfl_games.csv, not
+pregame-issued picks or official receipts. They remain separate from the
+immutable prospective receipt stores and official season record.
 """
 import csv
 import math
 from pathlib import Path
+
+
+def _finite(value):
+    try:
+        result = float(value)
+        return result if math.isfinite(result) else None
+    except (TypeError, ValueError):
+        return None
 
 
 def historical_simulations(root, season, week):
@@ -34,60 +43,49 @@ def historical_simulations(root, season, week):
     output = []
     for game in games:
         gid = game["game_id"]
-        try:
-            away_score = float(game["away_score"])
-            home_score = float(game["home_score"])
-            if (not math.isfinite(away_score) or not math.isfinite(home_score)
-                    or not away_score.is_integer() or not home_score.is_integer()):
-                continue
-        except (KeyError, TypeError, ValueError):
+        away_score = _finite(game.get("away_score"))
+        home_score = _finite(game.get("home_score"))
+        if (away_score is None or home_score is None
+                or not away_score.is_integer() or not home_score.is_integer()):
             continue
 
         source = forecasts.get(gid) or {}
-        # ATS and O/U are independent systems. A missing source for one market
-        # must not silently erase a valid selection in the other.
-        spread = projection = None
+        # ATS v5 projections and classify() use the away team's line
+        # perspective. nfl_games.csv stores spread_line from the home team's
+        # perspective, so invert it before applying the unchanged v5 rule.
+        away_line = _finite(game.get("spread_line"))
+        if away_line is not None:
+            away_line = -away_line
+        projection = _finite(ats.get(gid))
         ats_side = ats_result = ats_pick = None
-        try:
-            # Use the frozen pregame spread, never a later closing/current line.
-            spread = float(source["quote"]["line"])
-            projection = float(ats[gid])
-            if not math.isfinite(spread) or not math.isfinite(projection):
-                raise ValueError("Invalid ATS source")
-            ats_side = classify(projection, spread, game["away_team"], game["home_team"])
+        if away_line is not None and projection is not None:
+            ats_side = classify(projection, away_line,
+                                game["away_team"], game["home_team"])
             if ats_side:
-                edge = away_score - home_score + spread
+                edge = away_score - home_score + away_line
                 ats_result = "Push" if abs(edge) < 1e-9 else (
                     "Win" if (edge > 0) == (ats_side == game["away_team"]) else "Loss")
-                signed_line = spread if ats_side == game["away_team"] else -spread
+                signed_line = away_line if ats_side == game["away_team"] else -away_line
                 ats_pick = f"{ats_side} {signed_line:+g}"
-        except (KeyError, TypeError, ValueError):
-            pass
 
-        total_line = v14 = ou_side = ou_result = ou_pick = None
-        try:
-            # O/U v14 uses its own frozen pregame total and saved original lean.
-            total_line = float(source["totals"]["quote"]["line"])
-            v14 = float(totals[gid])
-            original = ((source.get("totals") or {}).get("prediction") or {}).get("lean")
-            if (not math.isfinite(total_line) or not math.isfinite(v14)
-                    or not 10 < total_line < 90
-                    or original not in ("Over", "Under")):
-                raise ValueError("Missing or invalid O/U source")
-            # Match the published Plug O/U v3 shortlist exactly:
-            # every independent nonzero v14 signal at totals >= 48 qualifies;
-            # sub-48 inherited Scout leans and exact model/market ties do not.
-            if total_line < 48 or abs(v14 - total_line) <= 1e-9:
-                raise ValueError("O/U does not meet Plug v3 eligibility")
-            decision = select_total(original, total_line, v14)
+        # The independent v14 projection is compared with the closing total.
+        # The original saved Scout lean remains the policy's starting side.
+        close_total = _finite(game.get("total_line"))
+        v14 = _finite(totals.get(gid))
+        original = ((source.get("totals") or {}).get("prediction") or {}).get("lean")
+        ou_side = ou_result = ou_pick = None
+        if (close_total is not None and v14 is not None
+                and 10 < close_total < 90
+                and close_total >= 48
+                and original in ("Over", "Under")
+                and abs(v14 - close_total) > 1e-9):
+            decision = select_total(original, close_total, v14)
             ou_side = decision["side"]
-            total_actual = away_score + home_score
-            delta = total_actual - total_line
+            actual_total = away_score + home_score
+            delta = actual_total - close_total
             ou_result = "Push" if abs(delta) < 1e-9 else (
                 "Win" if (delta > 0) == (ou_side == "Over") else "Loss")
-            ou_pick = f"{ou_side} {total_line:g}"
-        except (KeyError, TypeError, ValueError):
-            pass
+            ou_pick = f"{ou_side} {close_total:g}"
 
         if not ats_side and not ou_side:
             continue
@@ -97,7 +95,7 @@ def historical_simulations(root, season, week):
             "ats_side": ats_side, "ats_pick": ats_pick, "ats_result": ats_result,
             "ou_side": ou_side, "ou_pick": ou_pick, "ou_result": ou_result,
             "ats_projection": projection, "v14_projection": v14,
-            "spread_line": spread, "total_line": total_line,
-            "source": "Historical simulation · not issued pregame",
+            "spread_line": away_line, "total_line": close_total,
+            "source": "Closing-line historical simulation · not issued pregame",
         })
     return output
