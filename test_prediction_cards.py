@@ -136,6 +136,22 @@ class PredictionCardTests(unittest.TestCase):
         self.assertLess(html.index('<details class="expert-quick-analysis">'),
                         html.index('Read Full Expert Analysis'))
 
+    def test_current_scout_and_plug_sources_are_shared_across_public_surfaces(self):
+        root = Path(__file__).resolve().parent / 'templates'
+        comparison = (root / '_comparison_prediction.html').read_text()
+        dashboard = (root / 'expert_dashboard.html').read_text()
+        for source in (comparison, dashboard):
+            self.assertIn("{% include '_scout_dynamic.html' %}", source)
+            self.assertIn("{% include '_plug_dynamic_official.html' %}", source)
+        for name in ('expert_game.html', 'expert_game_mobile.html'):
+            detail = (root / name).read_text()
+            self.assertIn("{% include '_scout_dynamic.html' %}", detail)
+            self.assertIn("{% include '_plug_dynamic_official.html' %}", detail)
+            self.assertIn('Archived Scout forecast and research', detail)
+            self.assertIn('Current Scout selection pending verified issuance.', detail)
+            self.assertIn('Current Plug selections pending verified issuance.', detail)
+            self.assertNotIn("The Plug's Picks", detail)
+
     def test_pending_draft_is_not_rendered(self):
         from expert_beta import validate_expert
         draft = report(self.scout)
