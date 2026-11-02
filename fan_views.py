@@ -551,12 +551,38 @@ def combine_prediction_groups(groups):
 
 
 def plug_week_record(rows, season, week):
-    """An independent weekly slice of previously issued Plug ATS receipts."""
+    """Return a deterministic season/week slice of issued Plug ATS receipts.
+
+    The All Weeks view is the union of the same normalized weekly rows used by
+    individual week views. Normalize numeric season/week values so JSON/string
+    representations cannot silently drop a week's receipts from the aggregate.
+    """
     from collections import Counter
-    matches = [r for r in rows if str(r['season']) == str(season)
-               and (week is None or str(r['week']) == str(week))]
-    counts = Counter(r['result'] for r in matches)
-    return matches, {name: counts.get(name, 0) for name in ('Win','Loss','Push','Pending')}
+
+    def number(value):
+        try:
+            return int(value)
+        except (TypeError, ValueError, OverflowError):
+            return None
+
+    target_season = number(season)
+    target_week = None if week is None else number(week)
+    matches = [
+        row for row in rows
+        if isinstance(row, dict)
+        and number(row.get('season')) == target_season
+        and (target_week is None or number(row.get('week')) == target_week)
+        and row.get('result') in ('Win', 'Loss', 'Push', 'Pending')
+    ]
+    matches.sort(key=lambda row: (
+        str(row.get('kickoff_utc') or ''),
+        str(row.get('game_id') or '')
+    ))
+    counts = Counter(row['result'] for row in matches)
+    return matches, {
+        name: counts.get(name, 0)
+        for name in ('Win', 'Loss', 'Push', 'Pending')
+    }
 
 
 @bp.get('/predictions/results')

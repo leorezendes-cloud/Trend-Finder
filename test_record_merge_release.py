@@ -18,6 +18,34 @@ class MergedRecordsTests(unittest.TestCase):
         self.assertEqual(total,dict(Win=1,Loss=1,Push=1,Pending=1))
         self.assertEqual(plug_week_record([],2026,8),( [], {'Win':0,'Loss':0,'Push':0,'Pending':0}))
 
+    def test_all_weeks_is_union_of_normalized_weekly_receipts(self):
+        rows = [
+            dict(season="2026", week="6", result="Win", game_id="w6-a"),
+            dict(season=2026, week=7, result="Loss", game_id="w7-a"),
+            dict(season="2026", week="8", result="Push", game_id="w8-a"),
+            dict(season=2026, week=8, result="Pending", game_id="w8-b"),
+            dict(season=2025, week=8, result="Win", game_id="old-season"),
+            dict(season=2026, week=9, result="Loss", game_id="other-week"),
+        ]
+        all_picks, all_total = plug_week_record(rows, 2026, None)
+        week_picks = [
+            plug_week_record(rows, 2026, week)[0]
+            for week in (6, 7, 8)
+        ]
+        self.assertEqual(
+            {row["game_id"] for row in all_picks},
+            {row["game_id"] for group in week_picks for row in group},
+        )
+        self.assertEqual(len(all_picks), sum(map(len, week_picks)))
+        self.assertEqual(
+            all_total,
+            dict(Win=1, Loss=1, Push=1, Pending=1),
+        )
+        self.assertEqual(
+            plug_week_record(rows, "2026", "8")[1],
+            dict(Win=0, Loss=0, Push=1, Pending=1),
+        )
+
     def test_one_unified_page_and_legacy_url_remain(self):
         nav=(ROOT/'templates/_record_navigation.html').read_text()
         self.assertIn('Scout &amp; The Plug',nav)
