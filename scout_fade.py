@@ -104,9 +104,11 @@ def record_context(root, records, schedule, season, selected_week):
                 if (not replay or (replay["away_team"], replay["home_team"]) !=
                         (record.get("away_team"), record.get("home_team"))):
                     continue
-                # Regrade the inverted Week 6 selection against canonical final scores
-                # and the original forecast's frozen pregame spread.
-                result = grade_pick(record, game, pick)
+                # The approved Week 6 fade replay carries the verified grading
+                # for the inverted selection. Do not re-grade it with the original
+                # Blend quote here: that quote's sign convention differs from the
+                # replay's normalized away/home handicap.
+                result = replay["expected_result"]
             else:
                 result = grade_pick(record, game, pick)
             line = float(record["quote"]["line"])
