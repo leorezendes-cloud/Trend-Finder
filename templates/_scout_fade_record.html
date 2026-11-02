@@ -43,7 +43,7 @@
     {% for r in scout_dynamic_records if r.ou_side %}
       <div class="weekly-dynamic-game">
         <span>{{ r.away_team }} @ {{ r.home_team }}</span>
-        <div><span>Scout O/U</span><strong>{{ r.ou_side }} {{ '%g'|format(r.total_quote.line) }}</strong><small>{{ r.grades.ou }}{% if r.source == 'sealed historical simulation' %} · Week 6 historical simulation{% endif %}</small></div>
+        <div><span>Scout O/U</span><strong>{{ r.ou_side }} {{ '%g'|format(r.total_quote.line if r.total_quote is mapping else r.total_quote) }}</strong><small>{{ r.grades.ou }}{% if r.source == 'sealed historical simulation' %} · Week 6 historical simulation{% endif %}</small></div>
       </div>
     {% else %}<p>No eligible Scout O/U selections for this week.</p>{% endfor %}
     </div>
