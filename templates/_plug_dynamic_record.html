@@ -1,4 +1,4 @@
-{% if (dynamic_record_enabled|default(false)) or historical_plug_simulation %}
+{% if (dynamic_record_enabled|default(false)) or historical_plug_simulation or official_plug_tally is defined %}
 {% if historical_plug_simulation and (all_weeks or selected_week in (6,7)) %}
 <section class="weekly-dynamic-panel" id="dynamic-plug-record">
   <div class="weekly-dynamic-heading">
@@ -21,6 +21,41 @@
     {% endfor %}
   </details>
   {% endif %}
+</section>
+{% endif %}
+{% if official_plug_tally is defined %}
+<section class="weekly-dynamic-panel" id="issued-plug-record">
+  <div class="weekly-dynamic-heading">
+    <div><p class="weekly-dynamic-eyebrow">Official prospective selections · immutable receipts</p><h2>The Plug · {% if all_weeks|default(false) %}All Weeks issued record{% else %}Week {{ selected_week }} issued record{% endif %}</h2></div>
+  </div>
+  {% if plug_receipts_review %}
+    <p class="weekly-dynamic-caution">ATS receipts need review. The official ATS record is unavailable.</p>
+  {% else %}
+  <div class="weekly-dynamic-stats">
+    <div><span>ATS record</span><strong>{{ official_plug_tally.ats.Win }}–{{ official_plug_tally.ats.Loss }}–{{ official_plug_tally.ats.Push }}</strong><small>{{ official_plug_tally.ats.Pending }} pending · {{ official_plug_tally.ats.selected }} issued selections</small></div>
+    <div><span>O/U record</span><strong>{{ official_plug_tally.ou.Win }}–{{ official_plug_tally.ou.Loss }}–{{ official_plug_tally.ou.Push }}</strong><small>{{ official_plug_tally.ou.Pending }} pending · {{ official_plug_tally.ou.selected }} issued selections</small></div>
+  </div>
+  {% endif %}
+  <details class="weekly-dynamic-details">
+    <summary>View official issued picks</summary>
+    <div class="weekly-dynamic-list">
+      {% for r in plug_week_picks %}
+      <div class="weekly-dynamic-game">
+        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
+        <div><span>ATS · Week {{ r.week }}</span><strong>{{ r.side }} {{ '%+g'|format(r.away_line if r.side==r.away_team else -r.away_line) }}</strong><small>{{ r.result }}</small></div>
+      </div>
+      {% endfor %}
+      {% for r in plug_ou_week_picks + plug_ou_legacy_picks %}
+      <div class="weekly-dynamic-game">
+        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
+        <div><span>O/U · Week {{ r.week }}</span><strong>{{ r.side }} {{ '%g'|format(r.market_total) }}</strong><small>{{ r.result }}</small></div>
+      </div>
+      {% endfor %}
+      {% if not plug_week_picks and not plug_ou_week_picks and not plug_ou_legacy_picks %}
+      <p>No prospective Plug selections were issued in this cohort. Weeks 6–7 are shown separately as retrospective research.</p>
+      {% endif %}
+    </div>
+  </details>
 </section>
 {% endif %}
 {% if dynamic_record_enabled|default(false) %}

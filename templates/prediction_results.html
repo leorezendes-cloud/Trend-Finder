@@ -15,17 +15,7 @@
   {% endif %}
   <div class="tf-dynamic-record-grid">
     {% include '_scout_fade_record.html' %}
-    {% if historical_plug_simulation|default(false) %}
-      {% include '_plug_dynamic_record.html' %}
-    {% elif dynamic_record_enabled|default(false) %}
-      {% include '_plug_dynamic_record.html' %}
-    {% else %}
-      <section class="weekly-dynamic-panel">
-        <p class="weekly-dynamic-eyebrow">Dynamic selections</p>
-        <h2>The Plug</h2>
-        <p class="tf-dynamic-empty">No official dynamic Plug record is available for this week.</p>
-      </section>
-    {% endif %}
+    {% include '_plug_dynamic_record.html' %}
   </div>
   <p class="tf-dynamic-footnote">The Plug record uses its own dynamic receipts. Scout now follows the updated points-only fade policy; original Scout forecasts remain archived separately.</p>
 </div>

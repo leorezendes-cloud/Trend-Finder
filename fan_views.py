@@ -632,6 +632,15 @@ def prediction_results():
     plug_ou_week_totals={k:sum(r['result']==k for r in plug_ou_week_picks)
                          for k in ('Win','Loss','Push','Pending')}
     plug_ou_week_totals['selected']=len(plug_ou_week_picks)
+    # Keep all issued prospective receipts visible independently of the
+    # Weeks 6–7 retrospective closing-line replay.
+    official_ou_rows = plug_ou_week_picks + plug_ou_legacy_picks
+    official_plug_tally = {
+        'ats': {**plug_week_totals, 'selected': len(plug_week_picks)},
+        'ou': {key: sum(r.get('result') == key for r in official_ou_rows)
+               for key in ('Win', 'Loss', 'Push', 'Pending')},
+    }
+    official_plug_tally['ou']['selected'] = len(official_ou_rows)
     # Weeks 6-7 predate prospective Plug receipts. Show the same frozen-line
     # v5/v14 retrospective replay used by Weekly Results, never as issued picks.
     historical_plug_rows=[]
@@ -681,6 +690,7 @@ def prediction_results():
                            plug_ou_week_picks=plug_ou_week_picks,
                            plug_ou_legacy_picks=plug_ou_legacy_picks,
                            plug_ou_week_totals=plug_ou_week_totals,
+                           official_plug_tally=official_plug_tally,
                            plug_ou_review=plug_ou_review, all_weeks=all_weeks,
                            historical_plug_simulation=bool(historical_plug_weeks),
                            historical_plug_weeks=historical_plug_weeks,
