@@ -154,3 +154,31 @@
 .tf-board-home .tf-board-game:not([open])[data-state="post"] .tf-board-side strong{
   font-size:clamp(1.75rem,3.8vw,2.3rem);
 }
+
+
+/* Homepage completed-game injury marker: bottom-right inside the existing card. */
+.tf-board-item { position:relative; }
+.tf-board-item > .tf-board-injury {
+  position:absolute;
+  right:10px;
+  bottom:9px;
+  z-index:12;
+  max-width:calc(100% - 20px);
+}
+.tf-board-item > .tf-board-injury .game-injury-impact {
+  margin:0;
+  font-size:11px;
+}
+.tf-board-item > .tf-board-injury .game-injury-impact > summary {
+  padding:4px 7px;
+  font-size:11px;
+}
+.tf-board-item > .tf-board-game[data-state="post"] .tf-board-summary {
+  padding-bottom:43px;
+}
+.tf-board-item:has(.tf-board-injury details[open]) { z-index:70; }
+.tf-board-injury .game-injury-impact-body {
+  left:auto;
+  right:0;
+  width:min(320px,calc(100vw - 44px));
+}
