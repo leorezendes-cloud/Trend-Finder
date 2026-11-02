@@ -7,6 +7,7 @@ from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
 from plug_ats_v5_weekly import for_game, published_history
 from scout_fade import pick_for_record, grade_pick, safe_record_context as scout_fade_record_context
+from injury_impact_flags import for_game as injury_impact_for_game
 
 def read_csv(path):
  if not path.exists():return []
@@ -167,6 +168,7 @@ def build_results(root,week=None,score_updates=None):
       g.get('home_score') if final else None)
    except (OSError,ValueError,TypeError,KeyError):
     item['plug_ou_result']='Review needed'
+  item['injury_impact']=injury_impact_for_game(g['game_id'])
   games.append(item)
  plug_ou_tally={key:sum(bool(g['plug_ou_pick']) and g['plug_ou_result']==key for g in games)
                 for key in ('Win','Loss','Push','Pending')}
