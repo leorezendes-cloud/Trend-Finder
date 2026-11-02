@@ -25,6 +25,16 @@
 <section class="weekly-dynamic-group" aria-label="Official dynamic Scout and Plug ATS and totals records">
 {% include '_scout_fade_record.html' %}
 {% include '_plug_dynamic_record.html' %}
+{% if historical_plug_simulation and selected_week in (6,7) and not all_weeks %}
+<section class="weekly-historical-plug" aria-label="Retrospective Plug simulation record">
+  <h2>Plug Historical Simulation · Week {{ selected_week }}</h2>
+  <p>Reconstructed with current ATS v5 and O/U v14 rules using historical lines and final scores. These are retrospective research simulations, not picks issued before kickoff. Original Scout records are unchanged.</p>
+  <div class="weekly-matchup-grades">
+    <div class="weekly-grade-item"><span>Plug ATS</span><strong>{{ historical_plug_tally.ats_selected }} selections</strong><small>{{ historical_plug_tally.ats.Win }}–{{ historical_plug_tally.ats.Loss }}–{{ historical_plug_tally.ats.Push }}</small></div>
+    <div class="weekly-grade-item"><span>Plug O/U</span><strong>{{ historical_plug_tally.ou_selected }} selections</strong><small>{{ historical_plug_tally.ou.Win }}–{{ historical_plug_tally.ou.Loss }}–{{ historical_plug_tally.ou.Push }}</small></div>
+  </div>
+</section>
+{% endif %}
 </section>
 <h2>Week {{ selected_week }} Matchups</h2>
 {% if games %}
@@ -44,6 +54,13 @@
     <div class="weekly-grade-item"><span>Scout ATS</span><strong class="weekly-grade-value">{{ game.scout_pick }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.scout_result in ('Correct','Win') else 'weekly-loss' if game.scout_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</small></div>
     <div class="weekly-grade-item"><span>Scout O/U</span><strong class="weekly-grade-value">{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.total_result in ('Correct','Win') else 'weekly-loss' if game.total_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</small></div>
   </div>
+  {% if game.plug_historical_simulation %}
+  <div class="weekly-plug-line">
+    <span>Plug · Historical simulation</span>
+    {% if game.plug_historical_simulation.ats_side %}<strong>ATS: {{ game.plug_historical_simulation.ats_pick }}</strong><small>{{ game.plug_historical_simulation.ats_result }}</small>{% else %}<small>ATS: No selection</small>{% endif %}
+    {% if game.plug_historical_simulation.ou_side %}<strong>O/U: {{ game.plug_historical_simulation.ou_pick }}</strong><small>{{ game.plug_historical_simulation.ou_result }}</small>{% endif %}
+  </div>
+  {% endif %}
   {% if game.plug_status=='selected' or game.plug_ou_pick %}
   <div class="weekly-plug-line">
     <span>The Plug</span>
