@@ -113,7 +113,7 @@ def record_context(root, records, schedule, season, selected_week):
         except (OSError, KeyError, TypeError, ValueError):
             continue
     rows.sort(key=lambda row: (row["week"], row["kickoff_utc"], row["game_id"]))
-    week_rows = [row for row in rows if row["week"] == int(selected_week)] if selected_week is not None else []
+    week_rows = [row for row in rows if row["week"] == int(selected_week)] if selected_week is not None else rows
     return dict(
         formula_label="Fade of Original points-for/points-allowed",
         formula_version=FORMULA_VERSION,
