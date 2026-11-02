@@ -9,8 +9,7 @@
   {% set record_page='records' %}{% include '_record_navigation.html' %}
   {% if weeks %}
   <form method="get" action="{{ url_for('fans.prediction_results') }}" class="prediction-week-selector stats-filters">
-    <label for="prediction-week">{{ season }} · Week</label>
-    <select id="prediction-week" name="week" onchange="this.form.requestSubmit()">{% for week in weeks %}<option value="{{ week }}"{% if week==selected_week %} selected{% endif %}>Week {{ week }}</option>{% endfor %}</select>
+    <select id="prediction-week" aria-label="Select week" name="week" onchange="this.form.requestSubmit()">{% for week in weeks %}<option value="{{ week }}"{% if week==selected_week %} selected{% endif %}>Week {{ week }}</option>{% endfor %}</select>
     <button type="submit">Show week</button>
   </form>
   {% endif %}
