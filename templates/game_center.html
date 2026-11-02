@@ -28,6 +28,21 @@
   <p class="tf-gc-source" id="tf-gc-source" role="status" aria-live="polite">Score information provided by ESPN where available. Pregame picks and analysis are on Team Comparison.</p>
 </section>
 
+<section class="tf-gc-current-picks" aria-label="Current Scout and Plug selections">
+  <h2>Current Scout &amp; The Plug</h2>
+  {% if prediction_item and prediction_item.scout_dynamic|default(none) %}
+    {% set item=prediction_item %}{% include '_scout_dynamic.html' %}
+  {% else %}
+    <p class="scout-pending">Current Scout selections pending verified issuance. Archived forecasts are not shown as current picks.</p>
+  {% endif %}
+  {% if prediction_item and prediction_item.plug_dynamic_official|default(false) %}
+    {% set item=prediction_item %}{% include '_plug_dynamic_official.html' %}
+  {% else %}
+    <p class="plug-market-pending">Current Plug selections pending verified issuance.</p>
+  {% endif %}
+  <p><a href="{{ url_for('fans.matchup', game_id=game.game_id) }}">Full team comparison &amp; prediction details →</a></p>
+</section>
+
 <section class="tf-gc-preview" aria-label="Pregame team form and member picks">
   <div class="tf-gc-preview-title"><h2>Matchup snapshot</h2><p>Last five completed games before this matchup · {{ game.season }} season</p></div>
   <div class="tf-gc-form-grid">

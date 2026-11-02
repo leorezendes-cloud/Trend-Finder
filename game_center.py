@@ -198,9 +198,13 @@ def game_page(game_id):
     game, _ = _game_context(game_id)
     recent = _recent_team_context(game)
     my_picks = _member_pick_preview(game_id)
+    # Reuse the exact same current Scout/Plug overlay as Team Comparison.
+    from expert_beta import matchup_prediction
+    prediction_item = matchup_prediction(game_id)
     from flask import g, make_response
     response = make_response(render_template('game_center.html', game=game,
-                                             recent=recent, my_picks=my_picks))
+                                             recent=recent, my_picks=my_picks,
+                                             prediction_item=prediction_item))
     if g.get('member'):
         response.headers['Cache-Control'] = 'private, no-store'
     return response
