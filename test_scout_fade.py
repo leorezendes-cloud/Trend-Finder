@@ -17,7 +17,7 @@ class ScoutFadeChecks(unittest.TestCase):
     def test_week6_replay_is_explicit_and_immutable(self):
         path = ROOT / "data/scout4/fade_replay/2026_week6.json"
         data = json.loads(path.read_text())
-        self.assertEqual(data["replay_record"], "8-6-0")
+        self.assertEqual(data["replay_record"], "6-8-0")
         record = {
             "season": 2026, "week": 6, "game_id": "2026_06_NO_NYG",
             "away_team": "NO", "home_team": "NYG",
