@@ -669,4 +669,7 @@ def prediction_results():
                            plug_ou_week_picks=plug_ou_week_picks,
                            plug_ou_legacy_picks=plug_ou_legacy_picks,
                            plug_ou_week_totals=plug_ou_week_totals,
-                           plug_ou_review=plug_ou_review, all_weeks=all_weeks,\n                           historical_plug_simulation=bool(historical_plug_weeks),\n                           historical_plug_weeks=historical_plug_weeks,\n                           historical_plug_tally=historical_plug_tally)
+                           plug_ou_review=plug_ou_review, all_weeks=all_weeks,
+                           historical_plug_simulation=bool(historical_plug_weeks),
+                           historical_plug_weeks=historical_plug_weeks,
+                           historical_plug_tally=historical_plug_tally)
