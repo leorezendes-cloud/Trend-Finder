@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 FORMULA_VERSION = "plug-points-only-4"
 CONFIGURATION_SHA256 = "4b9a85b948cb0f1eeab19078df6d6f69a0244c947f460e01ab1537bbe9a12a31"
 WEIGHTS = {"scout_scoring": 0.0, "plug_points_only": 1.0}
-REPLAY_PATH = Path("data/scout4/fade_replay/2026_week6.json")
+REPLAY_PATH = Path("scout_fade_replay_2026_week6.json")
 
 
 def replay_data(root):
