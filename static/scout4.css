@@ -485,3 +485,13 @@
  .scout4 .tf-dynamic-record-grid .weekly-dynamic-stats>div {padding:11px;}
  .scout4 .tf-dynamic-record-grid .weekly-dynamic-stats strong {font-size:21px;}
 }
+
+/* Keep the week picker compact and centered on desktop and mobile. */
+.scout4 .tf-dynamic-only .prediction-week-selector { width:fit-content; max-width:100%; margin:16px auto 20px; justify-content:center; align-items:center; flex-wrap:wrap; }
+.scout4 .tf-dynamic-only .prediction-week-selector select { flex:0 1 auto; width:auto; min-width:130px; }
+.scout4 .tf-dynamic-only .prediction-week-selector button { flex:0 0 auto; width:auto; }
+@media(max-width:600px) {
+ .scout4 .tf-dynamic-only .prediction-week-selector { width:fit-content; max-width:100%; margin-left:auto; margin-right:auto; justify-content:center; align-items:center; }
+ .scout4 .tf-dynamic-only .prediction-week-selector select { width:auto; flex:0 1 auto; }
+ .scout4 .tf-dynamic-only .prediction-week-selector button { width:auto; }
+}
