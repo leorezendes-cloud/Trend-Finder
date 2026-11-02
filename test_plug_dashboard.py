@@ -19,6 +19,14 @@ class DashboardTests(ExpertBetaTests):
         self.assertEqual(self.client.get('/sunday-scout').status_code,302)
         self.assertIn('/the-plug',self.client.get('/sunday-scout').location)
 
+
+    def test_scout_fade_replay_error_does_not_break_plug(self):
+        with patch('scout_fade.pick_for_record', side_effect=ValueError('bad replay receipt')):
+            response = self.client.get('/the-plug')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Upcoming Games', response.text)
+        self.assertIn('Historical Results', response.text)
+
     def test_overlapping_matchup_keeps_distinct_older_locked_pick(self):
         game=self.games[0]['game']
         legacy={**game,'components':{'Blend':{'pick':'JAX','away_margin':-4}},

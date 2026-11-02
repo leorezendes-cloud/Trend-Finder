@@ -116,8 +116,14 @@ def combined_cards(records, render_record, now):
         quotes = {'Spread':{'side_a':game['away_team'],'side_b':game['home_team'],
                             'line_a':record['quote']['line'],'line_b':-record['quote']['line']}}
         if total:quotes['Total']={'line_a':total['quote']['line']}
-        from scout_fade import pick_for_record
-        public_pick = pick_for_record(record, ROOT)
+        # A missing or malformed replay receipt must never take down The Plug.
+        # Fail closed for this one public selection while leaving all other cards available.
+        public_pick = None
+        try:
+            from scout_fade import pick_for_record
+            public_pick = pick_for_record(record, ROOT)
+        except (OSError, ValueError, TypeError, KeyError, ImportError):
+            public_pick = None
         selections = {'spread':{'side':public_pick,'label':'Pick'},
                       'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
         archive_item = items.get(game['game_id'])
