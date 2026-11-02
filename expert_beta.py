@@ -506,8 +506,17 @@ def find_record(season, week, matchup):
 
 @bp.route('/the-plug/<int:season>/<int:week>/<matchup>')
 def game_page(season, week, matchup):
-    record, versions = find_record(season, week, matchup)
-    return render_template('expert_game.html', item=public_record(record, True), versions=versions)
+    record, _versions = find_record(season, week, matchup)
+    item = public_record(record, True)
+    # Use the same live Scout/Plug overlays as Team Comparison and dashboard.
+    current = matchup_prediction(record['scout']['game']['game_id'])
+    if current:
+        for key in ('scout_dynamic', 'scout_current_ats', 'plug_dynamic_official',
+                    'plug_dynamic_review', 'plug_dynamic_card', 'plug_ats_status',
+                    'plug_ou_status', 'plug_ats_result', 'plug_ou_result'):
+            if key in current:
+                item[key] = current[key]
+    return render_template('expert_game.html', item=item, versions=[])
 
 
 @bp.route('/api/the-plug/<int:season>/<int:week>/<matchup>/expert')
