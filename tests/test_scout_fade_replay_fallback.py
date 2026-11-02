@@ -15,7 +15,7 @@ def test_week_six_replay_counts_do_not_depend_on_forecast_archive(tmp_path):
         "games": [
             {"game_id": f"g{i}", "away_team": f"A{i}", "home_team": f"H{i}",
              "scout_pick": f"A{i}", "updated_formula_pick": f"H{i}",
-             "expected_result": "Win" if i < 8 else "Loss"}
+             "expected_result": "Loss" if i < 8 else "Win"}
             for i in range(14)
         ],
     }))
