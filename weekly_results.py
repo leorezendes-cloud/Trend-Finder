@@ -6,6 +6,7 @@ from pathlib import Path
 from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
 from plug_ats_v5_weekly import for_game, published_history
+from scout_fade import pick_for_record, grade_pick, record_context
 
 def read_csv(path):
  if not path.exists():return []
@@ -124,6 +125,16 @@ def build_results(root,week=None,score_updates=None):
      tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(tr,tr)
    except ValueError:
     item['scout_pick']='Review needed';item['scout_result']='Review needed';item['total_result']='Review needed'
+  if record:
+   try:
+    public_pick=pick_for_record(record,root)
+    public_grade=grade_pick(record,g,public_pick)
+    signed_line=float(record['quote']['line']) if public_pick==g['away_team'] else -float(record['quote']['line'])
+    item['scout_pick']=f"{public_pick} {signed_line:+g}" if public_pick else 'No pick recorded'
+    item['scout_result']={'Win':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending','No Call':'Not graded','Review needed':'Review needed'}[public_grade]
+    item['scout_cushion']=f"{abs(float(record['components']['Blend']['ats_edge'])):.1f}"
+   except (KeyError,TypeError,ValueError):
+    item['scout_pick']='Review needed';item['scout_result']='Review needed'
   if plug_receipts_review:
    item.update(plug_status='review',plug_pick=None,plug_result=None)
   else:
@@ -168,4 +179,5 @@ def build_results(root,week=None,score_updates=None):
  dynamic_context=record_context(root,verified_finals,season,selected)
  from scout_dynamic_public import records as scout_dynamic_records
  scout_context=scout_dynamic_records(root,verified_finals,season,selected)
- return dict(**scout_context,**dynamic_context,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ fade_context=record_context(root,all_frozen.values(),rows,season,selected)
+ return dict(**scout_context,**dynamic_context,scout_fade=fade_context,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
