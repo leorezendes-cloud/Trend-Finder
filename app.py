@@ -885,7 +885,7 @@ def sunday_page():
 @app.route("/sunday-results")
 def sunday_results_page():
     from weekly_results import build_results
-    view=build_results(Path(__file__).resolve().parent,request.args.get('week'))
+    view=build_results(Path(__file__).resolve().parent,request.args.get('week'),all_weeks=request.args.get('week')=='all')
     return render_template('sunday_results.html',**view)
 
 
