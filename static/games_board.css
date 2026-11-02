@@ -182,3 +182,22 @@
   right:0;
   width:min(320px,calc(100vw - 44px));
 }
+
+
+/* On the homepage, open the injury details above the bottom-right flag.
+   Use the same opaque panel treatment so the score card stays legible. */
+.tf-board-injury .game-injury-impact-body {
+  top:auto;
+  bottom:calc(100% + 8px);
+  right:0;
+  left:auto;
+  width:min(340px,calc(100vw - 44px));
+  background:#111827;
+  border:1px solid #7f1d1d;
+  border-radius:10px;
+  padding:13px 15px;
+  box-shadow:0 12px 30px rgba(0,0,0,.75);
+  color:#f3f4f6;
+  box-sizing:border-box;
+}
+.tf-board-injury .game-injury-impact-body p { margin:8px 0; }
