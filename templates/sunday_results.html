@@ -48,7 +48,7 @@
   <div class="weekly-plug-line">
     <span>The Plug</span>
     {% if game.plug_historical_simulation and game.plug_historical_simulation.ats_side %}<strong>ATS: {{ game.plug_historical_simulation.ats_pick }}</strong><small class="{{ 'weekly-win' if game.plug_historical_simulation.ats_result=='Win' else 'weekly-loss' if game.plug_historical_simulation.ats_result=='Loss' else '' }}">{{ game.plug_historical_simulation.ats_result }}</small>
-    {% elif game.plug_status=='selected' %}<strong>ATS: {{ game.plug_pick }}</strong>{% if game.plug_result in ('Win','Loss','Push','Tie','Void') %}<small class="{{ 'weekly-win' if game.plug_result=='Win' else 'weekly-loss' if game.plug_result=='Loss' else '' }}">{{ game.plug_result }}</small>{% endif %}{% endif %}
+    {% elif game.plug_status=='selected' and game.plug_pick %}<strong>ATS: {{ game.plug_pick }}</strong>{% if game.plug_result in ('Win','Loss','Push','Tie','Void') %}<small class="{{ 'weekly-win' if game.plug_result=='Win' else 'weekly-loss' if game.plug_result=='Loss' else '' }}">{{ game.plug_result }}</small>{% endif %}{% endif %}
     {% if game.plug_historical_simulation and game.plug_historical_simulation.ou_side %}<strong>O/U: {{ game.plug_historical_simulation.ou_pick }}</strong><small class="{{ 'weekly-win' if game.plug_historical_simulation.ou_result=='Win' else 'weekly-loss' if game.plug_historical_simulation.ou_result=='Loss' else '' }}">{{ game.plug_historical_simulation.ou_result }}</small>
     {% elif game.plug_ou_pick %}<strong>O/U: {{ game.plug_ou_pick }}</strong>{% if game.plug_ou_result in ('Win','Loss','Push','Tie','Void') %}<small class="{{ 'weekly-win' if game.plug_ou_result=='Win' else 'weekly-loss' if game.plug_ou_result=='Loss' else '' }}">{{ game.plug_ou_result }}</small>{% endif %}{% endif %}
   </div>
@@ -58,8 +58,6 @@
     <div class="weekly-matchup-details-body">
       {% if game.score_source %}<p><b>Score source:</b> {{ game.score_source }}</p>{% endif %}
       <p><b>Underdog straight-up:</b> {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p>
-      <p><b>Scout cushion:</b> {{ game.scout_cushion }}</p>
-      {% if game.forecast_digest %}<p><a href="{{ url_for('fans.matchup',game_id=game.game_id,forecast=game.forecast_digest) }}">View saved Scout forecast ↗</a></p>{% endif %}
       <p><b>Spread source:</b> {{ game.line_source }}{% if game.line_capture %} · {{ game.line_capture }} · {{ game.line_minutes }} minutes before kickoff{% endif %}</p>
       {% if game.has_rankings %}<p><b>Historical rankings:</b> 3Y #{{ game.rank_3y }} · 5Y #{{ game.rank_5y }} · 10Y #{{ game.rank_10y }} · All #{{ game.rank_all }}</p>{% else %}<p>No saved historical rankings.</p>{% endif %}
       {% if game.plug_status=='review' %}<p>Plug selections require review.</p>{% endif %}

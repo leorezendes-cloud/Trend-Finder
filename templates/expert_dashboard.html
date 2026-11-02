@@ -3,7 +3,7 @@
 {% macro cards(items, compact=false) %}<div class="expert-grid">{% for item in items %}{% set s=item.scout %}{% set g=s.game %}{% set picks=item.saved_picks %}{% set quotes=item.locked_quotes %}
 <article class="expert-card" id="game-{{ '%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team) }}" data-away="{{ g.away_team }}" data-home="{{ g.home_team }}" data-kickoff="{{ g.kickoff_utc }}"><p class="plug-live-score" aria-live="polite"{% if item.final_score %} hidden{% endif %}></p><p class="expert-meta">Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p><h2>
     <a class="matchup-comparison-link"
-       href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team),archive=item.version|default(none)) }}">
+       href="{{ url_for('fans.matchup', game_id='%s_%02d_%s_%s'|format(g.season, g.week|int, g.away_team, g.home_team)) }}">
         {{ g.away_team }} @ {{ g.home_team }}
     </a>
 </h2>
@@ -15,30 +15,10 @@
 </div>
 {% else %}<div class="plug-anomaly-slot"></div>{% endif %}
 {% if compact %}{% if item.final_score %}{% set game = {'game_id': '%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)} %}{% include '_game_injury_impact_flag.html' %}{% endif %}<details class="plug-completed-details"><summary>View picks, results &amp; analysis</summary><div class="plug-completed-body">{% endif %}
-{% if item.pending or item.forecast_pending %}<p class="scout-pending">Scout forecast pending</p><p>Expert analysis awaits a valid Scout forecast.</p>{% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% endif %}{% else %}
-{% if item.scout_dynamic|default(none) %}{% include '_scout_dynamic.html' %}{% else %}{% if item.show_scores %}<p class="expert-score{% if item.final_score %} plug-completed-projection{% endif %}">{% if item.final_score %}Scout projected: {% endif %}{{ g.away_team }} {{ '%.1f'|format(s.scores[g.away_team]) }} — {{ g.home_team }} {{ '%.1f'|format(s.scores[g.home_team]) }}</p>{% elif item.prediction_margin %}<p>Projected winner: {{ g.away_team if item.prediction_margin > 0 else g.home_team }} by {{ '%.1f'|format(item.prediction_margin|abs) }}</p>{% endif %}
-<p class="scout-picks">Scout ATS: {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}<br>Scout O/U: {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ quotes['Total'].line_a }}{% endif %}</p>{% endif %}
-{% set ats_decision = item.plug_ats_decision if item.plug_ats_status == 'selected' else none %}
-{% set selected_ats = ats_decision and ats_decision.side and ats_decision.away_line is defined %}
-{% set selected_ou = item.plug_ou_status == 'selected' and item.plug_ou_pick is defined and item.plug_ou_pick %}
-<div class="plug-pick-summary" aria-label="The Plug's ATS and over/under selections">
-{% if item.plug_dynamic_official is defined and item.plug_dynamic_official %}
-{% include '_plug_dynamic_official.html' %}
-{% else %}
-{% if selected_ats or selected_ou %}
-<section class="plug-top-picks" aria-label="The Plug's Top Picks">
-<h3>The Plug's Top Picks:</h3>
-{% if selected_ats %}<p><strong>ATS</strong> – ({{ ats_decision.side }} {{ '%+g'|format((ats_decision.away_line if ats_decision.side == g.away_team else -ats_decision.away_line)|float) }})</p>{% endif %}
-{% if selected_ou %}<p><strong>O/U</strong> – ({{ item.plug_ou_pick }})</p>{% endif %}
-</section>
-{% endif %}
-{% if item.plug_ou_review|default(false) %}<p class="plug-market-pending">Plug selections awaiting verified evidence.</p>{% endif %}
-{% endif %}
+{% if item.scout_dynamic|default(none) or item.scout_current_ats|default(none) %}{% include '_scout_dynamic.html' %}{% else %}<p class="scout-pending">Current Scout selections pending verified issuance.</p>{% endif %}
+<div class="plug-pick-summary" aria-label="The Plug's current ATS and over/under selections">
+{% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% else %}<p class="plug-market-pending">Current Plug selections pending verified issuance.</p>{% endif %}
 </div>
-{% endif %}
-{# Dynamic research preview stays hidden until an explicitly validated card is provided. #}
-{% set dynamic_card = item.plug_dynamic_card if item.plug_dynamic_card is defined and not item.plug_dynamic_official|default(false) else none %}
-{% include '_plug_dynamic_preview.html' %}
 <section class="plug-market-context">
 {% if item.backup_odds_capture %}<p class="expert-meta">DraftKings odds via ESPN · observed {{ item.backup_odds_capture|eastern_time }}. Public betting percentages unavailable for this capture.</p>{% endif %}
 
@@ -90,13 +70,13 @@
     {% endif %}
 
 </section>
-{% if item.earlier_forecast %}<details><summary>Market Spread & Over/Under</summary><p>{{ item.earlier_forecast.ats }} {{ '%+g'|format(item.earlier_forecast.line) }}{% if item.earlier_forecast.total_side %} · {{ item.earlier_forecast.total_side }} {{ item.earlier_forecast.total_line }}{% endif %}</p></details>{% endif %}
+
 {{ expert_panel(item) }}
-{% include '_plug_saved_results.html' %}
+
 {% if item.final_score and item.ats_result in ('Win','Loss','Push','Tie','Void') %}<p>ATS result: {{ item.ats_result }}</p>{% endif %}
 
 
-<a href="{{ item.url }}">
+<a href="{{ item.url.split('?')[0] }}">
     Open Game Breakdown →
 </a>
 {% if compact %}</div></details>{% endif %}
@@ -109,6 +89,6 @@
 {% if underway_games %}<section><h2>Games Underway</h2>{{ cards(underway_games) }}</section>{% endif %}
 {% if completed_games %}<section><h2>Completed Games</h2>{{ cards(completed_games, true) }}</section>{% endif %}
 {% if awaiting_games %}<section><h2>Game Status Awaiting Confirmation</h2>{{ cards(awaiting_games) }}</section>{% endif %}
-<section class="plug-earlier"><p><a href="{{ url_for('fans.prediction_results') }}">Scout &amp; The Plug Records →</a> · <a href="{{ url_for('expert_beta.archive') }}">Prediction archive →</a></p>
+<section class="plug-earlier"><p><a href="{{ url_for('fans.prediction_results') }}">Scout &amp; The Plug Records →</a></p>
 {% if historical_games %}<details><summary>Previous saved forecasts</summary>{{ cards(historical_games) }}</details>{% endif %}</section>
 </div>{% endblock %}

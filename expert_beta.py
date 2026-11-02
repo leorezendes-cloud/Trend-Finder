@@ -488,22 +488,9 @@ def plug_ats_record():
 
 @bp.route('/the-plug/archive')
 def archive():
-    latest = {identity(r['scout']): r for r in records_or_fail()}
-    primary = {}
-    for record in records_or_fail():
-        primary.setdefault((identity(record['scout']), record['kind']), record)
-    cohorts = {}
-    for record in primary.values():
-        result = results_for(record)
-        cohort = cohorts.setdefault(record['kind'], {'recorded': 0, 'graded': 0, 'scout_ats': {'Win': 0, 'Loss': 0, 'Push': 0, 'Unavailable': 0, 'No selection': 0}, 'score_error_sum': 0.0})
-        cohort['recorded'] += 1
-        if result:
-            cohort['graded'] += 1
-            cohort['score_error_sum'] += result['team_score_mae']
-            cohort['scout_ats'][result['scout']['Spread']['result']] += 1
-    for cohort in cohorts.values():
-        cohort['team_score_mae'] = cohort.pop('score_error_sum') / cohort['graded'] if cohort['graded'] else None
-    return render_template('expert_archive.html', games=[public_record(r) for r in latest.values()], cohorts=cohorts)
+    """Legacy archive URL redirects to current selections, not archived Scout picks."""
+    from flask import redirect, url_for
+    return redirect(url_for('expert_beta.dashboard'), code=302)
 
 
 def find_record(season, week, matchup):
@@ -519,8 +506,17 @@ def find_record(season, week, matchup):
 
 @bp.route('/the-plug/<int:season>/<int:week>/<matchup>')
 def game_page(season, week, matchup):
-    record, versions = find_record(season, week, matchup)
-    return render_template('expert_game.html', item=public_record(record, True), versions=versions)
+    record, _versions = find_record(season, week, matchup)
+    item = public_record(record, True)
+    # Use the same live Scout/Plug overlays as Team Comparison and dashboard.
+    current = matchup_prediction(record['scout']['game']['game_id'])
+    if current:
+        for key in ('scout_dynamic', 'scout_current_ats', 'plug_dynamic_official',
+                    'plug_dynamic_review', 'plug_dynamic_card', 'plug_ats_status',
+                    'plug_ou_status', 'plug_ats_result', 'plug_ou_result'):
+            if key in current:
+                item[key] = current[key]
+    return render_template('expert_game.html', item=item, versions=[])
 
 
 @bp.route('/api/the-plug/<int:season>/<int:week>/<matchup>/expert')

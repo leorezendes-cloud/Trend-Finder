@@ -29,6 +29,31 @@ def underdog_records(rows,season,before_week):
   record[result]+=1
  return records
 
+def _combined_plug_record(historical_rows, prospective_rows):
+ """One public Plug record across retrospective Weeks 6–7 and live receipts."""
+ combined=[]
+ for row in historical_rows or []:
+  combined.append(dict(game_id=row.get('game_id'),season=row.get('season'),week=int(row.get('week') or 0),
+   away_team=row.get('away_team'),home_team=row.get('home_team'),
+   ats_selected=bool(row.get('ats_side')),ats_side=row.get('ats_side'),
+   ats_result=row.get('ats_result') or 'Pending',ou_selected=bool(row.get('ou_side')),
+   ou_side=row.get('ou_side'),ou_result=row.get('ou_result') or 'Pending'))
+ for row in prospective_rows or []:
+  combined.append(dict(game_id=row.get('game_id'),season=row.get('season'),week=int(row.get('week') or 0),
+   away_team=row.get('away_team'),home_team=row.get('home_team'),
+   ats_selected=bool(row.get('ats_selected')),ats_side=row.get('ats_side'),
+   ats_result=row.get('ats_result') or 'Pending',ou_selected=bool(row.get('ou_selected')),
+   ou_side=row.get('ou_side'),ou_result=row.get('ou_result') or 'Pending'))
+ combined.sort(key=lambda row:(row['week'],str(row.get('game_id') or '')))
+ counts={}
+ for market in ('ats','ou'):
+  selected=[row for row in combined if row[market+'_selected']]
+  counts[market]={outcome:sum(row[market+'_result']==outcome for row in selected)
+                  for outcome in ('Win','Loss','Push','Pending')}
+  counts[market]['selected']=len(selected)
+ return {'rows':combined,'counts':counts}
+
+
 def build_results(root,week=None,score_updates=None,all_weeks=False):
  rows=confirmed_score_rows(list(load_games(root/'nfl_games.csv').values()),score_updates)
  from forecast_history import official_sources
@@ -91,7 +116,7 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
   margin=float(g['away_score'])-float(g['home_score']) if final else None
   dog_margin=margin if dog==g['away_team'] else -margin if margin is not None else None
   matchup=f"{g['away_team']} @ {g['home_team']}"
-  item=dict(g,matchup=matchup,underdog=dog or ('Pick’em' if spread==0 else 'Unavailable'),spread=abs(spread) if spread is not None else None,ats_result=grade(dog_margin+abs(spread)) if final and dog else 'Pick’em' if spread==0 else 'Unavailable' if spread is None else 'Pending',su_result='Win' if dog_margin is not None and dog_margin>0 else 'Loss' if dog_margin is not None and dog_margin<0 else 'Tie' if dog_margin==0 else 'Pending',game_status='Final' if final else 'Scheduled',live_score=f"{g['away_team']} {g['away_score']} – {g['home_team']} {g['home_score']}" if final else '—',scout_pick='No saved pick',scout_result='—',scout_cushion='—')
+  item=dict(g,matchup=matchup,underdog=dog or ('Pick’em' if spread==0 else 'Unavailable'),spread=abs(spread) if spread is not None else None,ats_result=grade(dog_margin+abs(spread)) if final and dog else 'Pick’em' if spread==0 else 'Unavailable' if spread is None else 'Pending',su_result='Win' if dog_margin is not None and dog_margin>0 else 'Loss' if dog_margin is not None and dog_margin<0 else 'Tie' if dog_margin==0 else 'Pending',game_status='Final' if final else 'Scheduled',live_score=f"{g['away_team']} {g['away_score']} – {g['home_team']} {g['home_score']}" if final else '—',scout_pick='No current pick',scout_result='—',scout_cushion='—')
   dog_record=dog_records.get(dog,{'Cover':0,'Loss':0,'Push':0})
   item['dog_ats_record']=f"{dog_record['Cover']}–{dog_record['Loss']}–{dog_record['Push']}" if dog else '—'
   try:started=datetime.fromisoformat(g['gameday']+'T'+g.get('gametime','13:00')).replace(tzinfo=ZoneInfo('America/New_York'))<=datetime.now(timezone.utc)
@@ -109,7 +134,7 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
     result=grade((margin if team==g['away_team'] else -margin)+line) if final else 'Pending'
     item['scout_result']={'Cover':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending'}[result]
    else:item['scout_pick']='No pick recorded';item['scout_result']='Not graded'
-  item.update(total_pick='No saved total',total_result='—',model_name=model_label)
+  item.update(total_pick='No current pick',total_result='—',model_name=model_label)
   if record:
    from forecast_history import grade_components,total_result,pregame_record
    try:
@@ -175,7 +200,9 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
  historical_plug_rows=[]
  try:
   from plug_historical_simulations import historical_simulations
-  historical_plug_rows=historical_simulations(root,season,selected)
+  replay_weeks=(6,7) if all_weeks else ((selected,) if selected in (6,7) else ())
+  historical_plug_rows=[r for replay_week in replay_weeks
+                        for r in historical_simulations(root,season,replay_week)]
  except (OSError,KeyError,ValueError,TypeError,ImportError):
   historical_plug_rows=[]
  historical_by_id={r['game_id']:r for r in historical_plug_rows}
@@ -204,7 +231,45 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
  from scout_dynamic_public import records as scout_dynamic_records
  scout_context=scout_dynamic_records(root,verified_finals,season,record_week)
  fade_context=scout_fade_record_context(root,all_frozen.values(),rows,season,record_week)
+ fade_rows=(fade_context or {}).get('season_rows',[]) if all_weeks else (fade_context or {}).get('rows',[])
+ fade_by_id={r['game_id']:r for r in fade_rows if int(r.get('week',0))==selected}
+ ou_rows=scout_context.get('scout_dynamic_records',[])
+ ou_by_id={r['game_id']:r for r in ou_rows if int(r.get('week',0))==selected}
+ dynamic_rows=dynamic_context.get('dynamic_record_rows',[])
+ dynamic_by_id={r['game_id']:r for r in dynamic_rows if int(r.get('week',0))==selected}
+ for item in games:
+  ats=fade_by_id.get(item['game_id'])
+  if ats:
+   item['scout_pick']=ats['pick_line']
+   item['scout_result']={'Win':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending',
+                         'Review needed':'Review needed','No Call':'Not graded'}.get(ats['result'],ats['result'])
+  else:
+   item['scout_pick']='No current pick';item['scout_result']='—'
+  total=ou_by_id.get(item['game_id'])
+  if total and total.get('ou_side') in ('Over','Under'):
+   quote=total.get('total_quote')
+   line=quote.get('line') if isinstance(quote,dict) else quote
+   item['total_pick']=f"{total['ou_side']} {float(line):g}" if line is not None else total['ou_side']
+   grade_value=total.get('grades',{}).get('ou')
+   item['total_result']={'Win':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending',
+                         'No Call':'Not graded','Tie':'Tie'}.get(grade_value,grade_value or '—')
+  else:
+   item['total_pick']='No current pick';item['total_result']='—'
+  item.update(plug_status='not_issued',plug_pick=None,plug_result=None,plug_ou_pick=None,plug_ou_result=None)
+  plug=dynamic_by_id.get(item['game_id'])
+  if plug:
+   side=plug.get('ats_side')
+   signed=(float(plug['ats_away_line']) if side==item['away_team'] else -float(plug['ats_away_line'])) if side else None
+   item.update(plug_status='selected' if plug.get('ats_selected') or plug.get('ou_selected') else 'not_issued',
+               plug_pick=(f"{side} {signed:+g}" if side and signed is not None else None),
+               plug_result=plug.get('ats_result'),
+               plug_ou_pick=(f"{plug['ou_side']} {float(plug['ou_market_total']):g}" if plug.get('ou_selected') else None),
+               plug_ou_result=plug.get('ou_result'))
+  replay=historical_by_id.get(item['game_id'])
+  if replay:
+   item['plug_historical_simulation']=replay
+ plug_combined_record=_combined_plug_record(historical_plug_rows,dynamic_rows)
  if fade_context:
-  model_label='Scout · faded points-only formula'
-  model_note='Public Scout selections invert the approved points-for/points-allowed formula; original forecasts remain archived.'
- return dict(**scout_context,**dynamic_context,scout_fade=fade_context,all_weeks=all_weeks,historical_plug_tally=historical_plug_tally,historical_plug_simulation=True,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+  model_label='Scout · current points-only fade policy'
+  model_note='Public Scout selections use the current points-only fade policy.'
+ return dict(**scout_context,**dynamic_context,scout_fade=fade_context,plug_combined_record=plug_combined_record,all_weeks=all_weeks,historical_plug_tally=historical_plug_tally,historical_plug_simulation=True,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
