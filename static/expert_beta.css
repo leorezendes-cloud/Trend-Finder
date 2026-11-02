@@ -100,3 +100,24 @@
   left:0;
   right:auto;
 }
+
+
+/* Final targeted spacing override for the completed Plug disclosure.
+   Keep the content comfortably inset from every edge of the bordered panel. */
+.expert-shell .expert-card > details.plug-completed-details {
+  padding: 0 18px 18px !important;
+  overflow: visible;
+}
+.expert-shell .expert-card > details.plug-completed-details > summary {
+  margin: 0 -2px 14px !important;
+  padding: 14px 8px 12px !important;
+}
+.expert-shell .expert-card > details.plug-completed-details > .plug-completed-body {
+  padding: 8px 10px 12px !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+.expert-shell .expert-card > details.plug-completed-details > .plug-completed-body > * {
+  margin-left: 0;
+  margin-right: 0;
+}

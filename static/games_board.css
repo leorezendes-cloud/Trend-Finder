@@ -201,3 +201,45 @@
   box-sizing:border-box;
 }
 .tf-board-injury .game-injury-impact-body p { margin:8px 0; }
+
+
+/* High-contrast homepage injury flag. The chip remains bottom-right inside
+   the final card, but now reads clearly against the score-card background. */
+.tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact {
+  border: 0 !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact > summary {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 7px 11px !important;
+  border: 1px solid #f87171 !important;
+  border-radius: 7px !important;
+  background: #7f1d1d !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.8);
+  box-shadow: 0 2px 8px rgba(0,0,0,.55);
+  white-space: nowrap;
+}
+.tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact > summary span {
+  color: #ffffff !important;
+  font-size: 16px !important;
+}
+.tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact > summary:hover {
+  background: #991b1b !important;
+  border-color: #fca5a5 !important;
+}
+.tf-board-home .tf-board-item > .tf-board-injury .game-injury-impact-body {
+  padding: 16px 18px !important;
+  border: 1px solid #f87171 !important;
+  background: #0b1220 !important;
+  color: #ffffff !important;
+}
