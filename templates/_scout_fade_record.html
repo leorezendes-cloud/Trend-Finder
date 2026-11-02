@@ -5,11 +5,10 @@
   </div>
   <div class="weekly-dynamic-stats">
     {% if all_weeks|default(false) %}<div><span>All Weeks ATS</span><strong>{{ scout_fade.overall.Win }}–{{ scout_fade.overall.Loss }}–{{ scout_fade.overall.Push }}</strong><small>{{ scout_fade.overall.win_rate if scout_fade.overall.win_rate is not none else '—' }}% win rate · {{ scout_fade.overall.decisions }} decisions</small></div>{% else %}<div><span>Week {{ scout_fade.selected_week }} ATS</span><strong>{{ scout_fade.week.Win }}–{{ scout_fade.week.Loss }}–{{ scout_fade.week.Push }}</strong><small>{{ scout_fade.week.Pending }} pending · {{ scout_fade.week.selected }} selections</small></div>{% endif %}
-    {% if scout_ou_record is defined %}
-      {% set ou = scout_ou_record.overall if all_weeks|default(false) else scout_ou_record.week %}
-      <div><span>{% if all_weeks|default(false) %}All Weeks Scout O/U{% else %}Week {{ selected_week|default(scout_fade.selected_week) }} Scout O/U{% endif %}</span><strong>{{ ou.Win }}–{{ ou.Loss }}–{{ ou.Push }}</strong><small>{{ ou.Pending }} pending · {{ ou.selected }} saved totals</small></div>
+    {% if scout_dynamic_counts is defined %}
+      <div><span>{% if all_weeks|default(false) %}All Weeks Scout O/U{% else %}Scout O/U · Dynamic{% endif %}</span><strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong><small>{{ scout_dynamic_counts.ou.Pending }} pending · separate closing-line Scout totals</small></div>
     {% else %}
-      <div><span>Scout O/U</span><strong>—</strong><small>Saved Scout totals record unavailable</small></div>
+      <div><span>Scout O/U · Dynamic</span><strong>—</strong><small>No issued dynamic Scout totals for this scope</small></div>
     {% endif %}
   </div>
   <details class="weekly-dynamic-details">
