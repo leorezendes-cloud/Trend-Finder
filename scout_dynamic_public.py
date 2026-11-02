@@ -100,8 +100,8 @@ def _week_six_shadow_totals(root):
     if (config.get('totals_model_file_sha256') is None
             or model.get('version') != 'scout4-totals-1'
             or candidate.get('name') != 'Market + statistics'
-            or candidate.get('target_season') != 2026
-            or candidate.get('first_eligible_week') != 6):
+            or config.get('target_season') != 2026
+            or config.get('first_eligible_week') != 6):
         raise ValueError('Week 6 totals candidate is not the approved frozen model')
     from scout4.shadow import view
     records=[r for r in view(Path(root))['records']
