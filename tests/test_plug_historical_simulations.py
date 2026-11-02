@@ -18,7 +18,7 @@ def test_week_six_replay_is_separate_and_uses_v5_v14_rules(tmp_path, monkeypatch
         writer.writerow({
             "game_id": "2026_06_AAA_BBB", "season": 2026, "week": 6,
             "game_type": "REG", "away_team": "AAA", "home_team": "BBB",
-            "away_score": 20, "home_score": 17, "spread_line": -8,
+            "away_score": 20, "home_score": 17, "spread_line": 8,
             "total_line": 48,
         })
     monkeypatch.setattr(plug_ats_v5_model, "projections",
@@ -96,5 +96,5 @@ def test_replay_applies_plug_ou_v3_eligibility_before_grading(tmp_path, monkeypa
 
     rows = historical_simulations(tmp_path, 2026, 6)
     assert [row["game_id"] for row in rows] == ["2026_06_OK_EEE"]
-    assert rows[0]["ou_side"] == "Over"
-    assert rows[0]["ou_result"] == "Loss"
+    assert rows[0]["ou_side"] == "Under"
+    assert rows[0]["ou_result"] == "Win"
