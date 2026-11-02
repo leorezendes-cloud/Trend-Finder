@@ -37,51 +37,62 @@ def historical_simulations(root, season, week):
         try:
             away_score = float(game["away_score"])
             home_score = float(game["home_score"])
-            source = forecasts.get(gid) or {}
-            # Use the actual frozen pregame sportsbook quotes from the saved
-            # forecast, never a later closing/current line from the schedule.
-            spread = float(source["quote"]["line"])
-            total_line = float(source["totals"]["quote"]["line"])
-            projection = float(ats[gid])
-            v14 = float(totals[gid])
-            if not all(math.isfinite(v) for v in
-                       (away_score, home_score, spread, total_line, projection, v14)):
-                continue
-            if (not away_score.is_integer() or not home_score.is_integer()
-                    or not 10 < total_line < 90):
+            if (not math.isfinite(away_score) or not math.isfinite(home_score)
+                    or not away_score.is_integer() or not home_score.is_integer()):
                 continue
         except (KeyError, TypeError, ValueError):
             continue
 
-        # v5 selection uses its exact production classifier and schedule spread.
-        side = classify(projection, spread, game["away_team"], game["home_team"])
-        ats_result = None
-        ats_pick = None
-        if side:
-            edge = away_score - home_score + spread
-            ats_result = "Push" if abs(edge) < 1e-9 else (
-                "Win" if (edge > 0) == (side == game["away_team"]) else "Loss")
-            signed_line = spread if side == game["away_team"] else -spread
-            ats_pick = f"{side} {signed_line:+g}"
+        source = forecasts.get(gid) or {}
+        # ATS and O/U are independent systems. A missing source for one market
+        # must not silently erase a valid selection in the other.
+        spread = projection = None
+        ats_side = ats_result = ats_pick = None
+        try:
+            # Use the frozen pregame spread, never a later closing/current line.
+            spread = float(source["quote"]["line"])
+            projection = float(ats[gid])
+            if not math.isfinite(spread) or not math.isfinite(projection):
+                raise ValueError("Invalid ATS source")
+            ats_side = classify(projection, spread, game["away_team"], game["home_team"])
+            if ats_side:
+                edge = away_score - home_score + spread
+                ats_result = "Push" if abs(edge) < 1e-9 else (
+                    "Win" if (edge > 0) == (ats_side == game["away_team"]) else "Loss")
+                signed_line = spread if ats_side == game["away_team"] else -spread
+                ats_pick = f"{ats_side} {signed_line:+g}"
+        except (KeyError, TypeError, ValueError):
+            pass
 
-        # Below 48, v14 policy deliberately retains the original Scout lean.
-        # Require the saved pregame Scout direction; never infer it from the final.
-        original = ((source.get("totals") or {}).get("prediction") or {}).get("lean")
-        if original not in ("Over", "Under"):
+        total_line = v14 = ou_side = ou_result = ou_pick = None
+        try:
+            # O/U v14 uses its own frozen pregame total and saved original lean.
+            total_line = float(source["totals"]["quote"]["line"])
+            v14 = float(totals[gid])
+            original = ((source.get("totals") or {}).get("prediction") or {}).get("lean")
+            if (not math.isfinite(total_line) or not math.isfinite(v14)
+                    or not 10 < total_line < 90
+                    or original not in ("Over", "Under")):
+                raise ValueError("Missing or invalid O/U source")
+            decision = select_total(original, total_line, v14)
+            ou_side = decision["side"]
+            total_actual = away_score + home_score
+            delta = total_actual - total_line
+            ou_result = "Push" if abs(delta) < 1e-9 else (
+                "Win" if (delta > 0) == (ou_side == "Over") else "Loss")
+            ou_pick = f"{ou_side} {total_line:g}"
+        except (KeyError, TypeError, ValueError):
+            pass
+
+        if not ats_side and not ou_side:
             continue
-        decision = select_total(original, total_line, v14)
-        ou_side = decision["side"]
-        total_actual = away_score + home_score
-        delta = total_actual - total_line
-        ou_result = "Push" if abs(delta) < 1e-9 else (
-            "Win" if (delta > 0) == (ou_side == "Over") else "Loss")
         output.append({
             "game_id": gid, "season": int(season), "week": int(week),
             "away_team": game["away_team"], "home_team": game["home_team"],
-            "ats_side": side, "ats_pick": ats_pick, "ats_result": ats_result,
-            "ou_side": ou_side, "ou_pick": f"{ou_side} {total_line:g}",
-            "ou_result": ou_result, "ats_projection": projection,
-            "v14_projection": v14, "spread_line": spread, "total_line": total_line,
+            "ats_side": ats_side, "ats_pick": ats_pick, "ats_result": ats_result,
+            "ou_side": ou_side, "ou_pick": ou_pick, "ou_result": ou_result,
+            "ats_projection": projection, "v14_projection": v14,
+            "spread_line": spread, "total_line": total_line,
             "source": "Historical simulation · not issued pregame",
         })
     return output
