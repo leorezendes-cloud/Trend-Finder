@@ -116,7 +116,9 @@ def combined_cards(records, render_record, now):
         quotes = {'Spread':{'side_a':game['away_team'],'side_b':game['home_team'],
                             'line_a':record['quote']['line'],'line_b':-record['quote']['line']}}
         if total:quotes['Total']={'line_a':total['quote']['line']}
-        selections = {'spread':{'side':pick['pick'],'label':'Pick'},
+        from scout_fade import pick_for_record
+        public_pick = pick_for_record(record, ROOT)
+        selections = {'spread':{'side':public_pick,'label':'Pick'},
                       'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
         archive_item = items.get(game['game_id'])
         approved = next((r for r in records if r['version']==record.get('_archive_version')),None)
