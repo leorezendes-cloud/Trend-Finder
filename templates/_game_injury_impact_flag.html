@@ -1,6 +1,13 @@
-{# Compact marker; native title exposes details without nesting an interactive disclosure in a score-card summary. #}
+{# Shared clickable injury-impact disclosure for materially altered completed games. #}
 <link rel="stylesheet" href="{{ url_for('static', filename='injury_impact.css') }}">
 {% set injury_impact = injury_impact_for_game(game.game_id) %}
 {% if injury_impact %}
-<span class="game-injury-impact" role="img" aria-label="Injury impact: {{ injury_impact.title }}" title="{{ injury_impact.title }} — {{ injury_impact.details }}">⚑ Injury impact</span>
+<details class="weekly-injury-impact game-injury-impact">
+  <summary><span aria-hidden="true">⚑</span> Injury impact · review game context</summary>
+  <div class="weekly-injury-impact-body">
+    <p><strong>{{ injury_impact.title }}</strong></p>
+    <p>{{ injury_impact.details }}</p>
+    <p class="weekly-injury-impact-note">Research context only. The official score, selections, and grades remain unchanged.</p>
+  </div>
+</details>
 {% endif %}
