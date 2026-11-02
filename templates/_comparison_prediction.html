@@ -1,21 +1,8 @@
 {% from '_expert_panel.html' import expert_panel %}
 <div class="prediction-columns"><div class="prediction-quantitative">
 <div class="prediction-heading"><h2>Prediction</h2>{% include '_game_anomaly_flag.html' %}</div>
-{% if prediction_item and not use_results_forecast and prediction_item.scout_dynamic|default(none) %}
+{% if prediction_item and (prediction_item.scout_dynamic|default(none) or prediction_item.scout_current_ats|default(none)) %}
 {% set item=prediction_item %}{% include '_scout_dynamic.html' %}
-{% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% endif %}
-{% elif prediction_item and not use_results_forecast and not prediction_item.forecast_pending %}
-{% set picks=prediction_item.saved_picks %}{% set quotes=prediction_item.locked_quotes %}{% set margin=prediction_item.prediction_margin %}
-<p><strong>Scout ATS:</strong> {{ picks.spread.side or 'No pick' }}{% if picks.spread.side and quotes.get('Spread') %}{% set q=quotes['Spread'] %} {{ '%+g'|format((q.line_a if picks.spread.side==q.side_a else q.line_b)|float) }}{% endif %}</p>
-
-<p><strong>Straight Up:</strong> {% if margin %}{{ game.away_team if margin>0 else game.home_team }} by {{ margin|abs|stat }} points{% else %}Even{% endif %}</p>
-<p><strong>Scout O/U:</strong> {{ picks.total.side or 'No pick' }}{% if picks.total.side and quotes.get('Total') %} {{ '%g'|format(quotes['Total'].line_a|float) }}{% endif %}</p>
-{% if prediction_item.plug_dynamic_official|default(false) %}{% set item=prediction_item %}{% include '_plug_dynamic_official.html' %}{% endif %}
-{% elif forecast %}
-{% set prediction=forecast.components['Blend'] %}
-<p><strong>ATS:</strong> {{ prediction.pick or 'No pick recorded' }}{% if prediction.pick %} {{ '%+g'|format(forecast.quote.line if prediction.pick==game.away_team else -forecast.quote.line) }}{% endif %}</p>
-<p><strong>Straight Up:</strong> {% if prediction.away_margin %}{{ game.away_team if prediction.away_margin>0 else game.home_team }} by {{ prediction.away_margin|abs|stat }} points{% else %}Even{% endif %}</p>
-<p><strong>Over/Under:</strong> {% if forecast.totals and forecast.totals.prediction.lean %}{{ forecast.totals.prediction.lean }} {{ '%g'|format(forecast.totals.quote.line|float) }}{% else %}Forecast pending{% endif %}</p>
-{% else %}<p>Scout forecast pending</p>{% endif %}
-{% if prediction_item and not prediction_item.plug_dynamic_official|default(false) and prediction_item.plug_ou_status|default('') == 'selected' and prediction_item.plug_ou_pick|default(none) %}<p class="tf-plug-ou-pick"><strong>The Plug O/U:</strong> {{ prediction_item.plug_ou_pick }}</p>{% endif %}
+{% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% else %}<p class="plug-market-pending">Current Plug selections pending verified issuance.</p>{% endif %}
+{% else %}<p class="scout-pending">Current Scout selections pending verified issuance.</p><p class="plug-market-pending">Current Plug selections pending verified issuance.</p>{% endif %}
 </div>{{ expert_panel(prediction_item, comparison=true) }}</div>
