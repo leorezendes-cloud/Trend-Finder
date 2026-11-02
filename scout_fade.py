@@ -13,7 +13,13 @@ REPLAY_PATH = Path("scout_fade_replay_2026_week6.json")
 
 
 def replay_data(root):
-    data = json.loads((Path(root) / REPLAY_PATH).read_text())
+    replay_file = Path(root) / REPLAY_PATH
+    try:
+        data = json.loads(replay_file.read_text())
+    except FileNotFoundError:
+        # The Week 6 replay is optional for deployments and isolated test roots.
+        # Missing data means no replay selections, not an unavailable results page.
+        return {}
     if (data.get("season"), data.get("week"), data.get("formula_version"),
             data.get("configuration_sha256"), data.get("weights")) != (
             2026, 6, FORMULA_VERSION, CONFIGURATION_SHA256, WEIGHTS):

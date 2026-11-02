@@ -25,12 +25,6 @@
 <section class="weekly-dynamic-group" aria-label="Official dynamic Scout and Plug ATS and totals records">
 {% include '_scout_fade_record.html' %}
 {% include '_plug_dynamic_record.html' %}
-{% if historical_plug_simulation and selected_week in (6,7) and not all_weeks %}
-<div class="weekly-dynamic-stats">
-  <div><span>Plug ATS record</span><strong>{{ historical_plug_tally.ats.Win }}–{{ historical_plug_tally.ats.Loss }}–{{ historical_plug_tally.ats.Push }}</strong><small>{{ historical_plug_tally.ats_selected }} selections</small></div>
-  <div><span>Plug O/U record</span><strong>{{ historical_plug_tally.ou.Win }}–{{ historical_plug_tally.ou.Loss }}–{{ historical_plug_tally.ou.Push }}</strong><small>{{ historical_plug_tally.ou_selected }} selections</small></div>
-</div>
-{% endif %}
 </section>
 <h2>Week {{ selected_week }} Matchups</h2>
 {% if games %}

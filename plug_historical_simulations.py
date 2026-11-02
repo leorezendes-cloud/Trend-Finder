@@ -74,6 +74,11 @@ def historical_simulations(root, season, week):
                     or not 10 < total_line < 90
                     or original not in ("Over", "Under")):
                 raise ValueError("Missing or invalid O/U source")
+            # Match the published Plug O/U v3 shortlist exactly:
+            # every independent nonzero v14 signal at totals >= 48 qualifies;
+            # sub-48 inherited Scout leans and exact model/market ties do not.
+            if total_line < 48 or abs(v14 - total_line) <= 1e-9:
+                raise ValueError("O/U does not meet Plug v3 eligibility")
             decision = select_total(original, total_line, v14)
             ou_side = decision["side"]
             total_actual = away_score + home_score
