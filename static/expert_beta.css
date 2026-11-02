@@ -74,3 +74,29 @@
 .expert-card > .plug-completed-details > .plug-completed-body,
 .expert-card > .plug-completed-details > .plug-completed-body * { text-align:left; }
 .expert-card > .plug-completed-details > .plug-completed-body { width:100%; box-sizing:border-box; }
+
+
+/* Completed Plug cards: give the expanded picks section a clear inset panel. */
+.expert-card > .plug-completed-details {
+  padding:0 12px 12px;
+  border:1px solid #475569;
+  border-radius:11px;
+  background:#111827;
+  box-sizing:border-box;
+}
+.expert-card > .plug-completed-details > summary {
+  padding:11px 4px 9px;
+  border-bottom:1px solid #374151;
+  margin-bottom:10px;
+}
+.expert-card > .plug-completed-details > .plug-completed-body {
+  padding:3px 5px 8px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+.expert-card > .game-injury-impact { margin:10px 0 8px; }
+.expert-card > .game-injury-impact .game-injury-impact-body {
+  left:0;
+  right:auto;
+}
