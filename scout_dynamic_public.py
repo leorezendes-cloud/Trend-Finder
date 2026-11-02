@@ -90,8 +90,49 @@ def attach(root, item, *, now):
     return item
 
 
+def _week_six_shadow_totals(root):
+    """Load the sealed Week 6 replay from the frozen Market + statistics candidate."""
+    import hashlib
+    import json
+    config=json.loads((Path(root)/'automatic_model.json').read_text())
+    candidate=config.get('totals_candidate',{})
+    model=candidate.get('model',{})
+    if (config.get('totals_model_file_sha256') is None
+            or model.get('version') != 'scout4-totals-1'
+            or candidate.get('name') != 'Market + statistics'
+            or candidate.get('target_season') != 2026
+            or candidate.get('first_eligible_week') != 6):
+        raise ValueError('Week 6 totals candidate is not the approved frozen model')
+    from scout4.shadow import view
+    records=[r for r in view(Path(root))['records']
+             if r.get('season') == 2026 and r.get('week') == 6 and r.get('market') == 'Total']
+    expected_hash=config['totals_model_file_sha256']
+    if len(records) != 14 or any(r.get('model_sha256') != expected_hash
+                                 or r.get('model_name') != 'Market + statistics'
+                                 for r in records):
+        raise ValueError('Week 6 shadow totals do not match the approved 14-game model cohort')
+    output=[]
+    seen=set()
+    for record in records:
+        gid=record['game_id']
+        if gid in seen or record.get('selected_side') not in ('Over','Under'):
+            raise ValueError('Invalid or duplicate Week 6 shadow total')
+        seen.add(gid)
+        result={'Correct':'Win','Wrong':'Loss','Push':'Push','Pending':'Pending',
+                'No Call':'No Call','Review needed':'Pending'}.get(record.get('result'))
+        if result is None:
+            raise ValueError('Unrecognized Week 6 shadow grade')
+        output.append(dict(
+            game_id=gid,season=2026,week=6,away_team=record['away_team'],
+            home_team=record['home_team'],kickoff_utc=record['kickoff_utc'],
+            ou_side=record['selected_side'],total_quote=record['quote'],
+            grades={'ou':result,'ats':'No Call','su':'No Call'},
+            source='sealed historical simulation',model_version=model['version']))
+    return output
+
+
 def records(root, finals, season, week, *, now=None):
-    """Separate dynamic cohort. Never aggregate with first-issued Scout results."""
+    """One Scout O/U cohort: Week 6 sealed replay plus later live-issued totals."""
     if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1' or season is None:
         return {}
     now=now or datetime.now(timezone.utc)
@@ -111,9 +152,17 @@ def records(root, finals, season, week, *, now=None):
             if value:
                 row=value['row']
                 result=grade(row,finals.get(path.name) if value['status']=='locked' else None)
-                rows.append(dict(row,grades=result))
+                rows.append(dict(row,grades=result,source='live-issued Dynamic Scout'))
         except (ValueError,OSError,KeyError,TypeError):
             review=True
+    if int(season) == 2026 and (week is None or int(week) == 6):
+        try:
+            replay=_week_six_shadow_totals(root)
+            live_ids={r['game_id'] for r in rows}
+            rows.extend(r for r in replay if r['game_id'] not in live_ids)
+        except (ValueError,OSError,KeyError,TypeError):
+            review=True
+    rows.sort(key=lambda r:(int(r.get('week',0)),r.get('kickoff_utc',''),r.get('game_id','')))
     counts={m:{outcome:sum(r['grades'][m]==outcome for r in rows)
                for outcome in ('Win','Loss','Push','Pending','No Call','Tie')} for m in ('ats','ou','su')}
     return dict(scout_dynamic_records=rows,scout_dynamic_counts=counts,scout_dynamic_review=review)
