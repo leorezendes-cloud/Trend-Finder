@@ -55,6 +55,19 @@ class PredictionCardTests(unittest.TestCase):
         self.assertNotIn('Read Full Expert Analysis', html)
         self.assertIn('Premium Expert report', html)
 
+    def test_public_pick_templates_do_not_show_archived_scout_or_legacy_plug(self):
+        root = Path(__file__).resolve().parent / 'templates'
+        for name in ('_comparison_prediction.html', 'expert_dashboard.html'):
+            source = (root / name).read_text()
+            self.assertNotIn('saved_picks.spread.side', source)
+            self.assertNotIn('earlier_forecast.ats', source)
+            self.assertIn('Current Scout selections pending verified issuance', source)
+            self.assertIn('Current Plug selections pending verified issuance', source)
+        for name in ('expert_game.html', 'expert_game_mobile.html'):
+            source = (root / name).read_text()
+            self.assertNotIn('Original Scout ATS', source)
+            self.assertNotIn('Archived Scout forecast and research', source)
+
     def test_missing_report_pending(self):
         with app.test_request_context('/'):
             self.assertIn('Expert Analysis Coming Soon', self.panel(None))
