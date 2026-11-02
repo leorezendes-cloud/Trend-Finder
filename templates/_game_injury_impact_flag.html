@@ -1,4 +1,5 @@
 {# Small, non-disruptive marker for a materially injury-distorted final. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='injury_impact.css') }}">
 {% set injury_impact = injury_impact_for_game(game.game_id) %}
 {% if injury_impact %}
 <details class="game-injury-impact">
