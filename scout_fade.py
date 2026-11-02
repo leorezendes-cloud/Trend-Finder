@@ -123,6 +123,44 @@ def record_context(root, records, schedule, season, selected_week):
             ))
         except (OSError, KeyError, TypeError, ValueError):
             continue
+    # Week 6 has a separately approved, immutable replay receipt. Do not
+    # make its public W-L-P depend on the legacy forecast files still being
+    # present in official_sources(): the replay itself contains all 14 picks
+    # and their verified grades. Forecast records, when available, enrich the
+    # display with the frozen spread; otherwise show the side without a line.
+    if int(season) == 2026 and selected_week == 6:
+        try:
+            replay_rows = replay_data(root)
+        except (OSError, ValueError, TypeError, KeyError):
+            replay_rows = {}
+        seen = {row["game_id"] for row in rows}
+        record_by_id = {r.get("game_id"): r for r in records}
+        for gid, replay in replay_rows.items():
+            if gid in seen:
+                continue
+            pick = replay["scout_pick"]
+            result = {"Win": "Loss", "Loss": "Win"}.get(
+                replay["expected_result"], replay["expected_result"])
+            record = record_by_id.get(gid)
+            game = games.get(gid) or {}
+            line = None
+            if record:
+                try:
+                    line = float(record["quote"]["line"])
+                    if not math.isfinite(line):
+                        line = None
+                except (KeyError, TypeError, ValueError):
+                    line = None
+            signed_line = (line if pick == replay["away_team"] else -line) if line is not None else None
+            rows.append(dict(
+                game_id=gid, season=2026, week=6,
+                away_team=replay["away_team"], home_team=replay["home_team"],
+                pick=pick,
+                pick_line=f"{pick} {signed_line:+g}" if signed_line is not None else pick,
+                result=result,
+                kickoff_utc=(record or {}).get("kickoff_utc", game.get("gameday", "")),
+                replayed=True,
+            ))
     rows.sort(key=lambda row: (row["week"], row["kickoff_utc"], row["game_id"]))
     week_rows = [row for row in rows if row["week"] == int(selected_week)] if selected_week is not None else rows
     return dict(
