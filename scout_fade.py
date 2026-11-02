@@ -20,7 +20,7 @@ def replay_data(root):
         raise ValueError("Week 6 Scout replay must contain all 14 games")
     result = {}
     for row in rows:
-        gid, pick = row.get("game_id"), row.get("scout_pick")
+        gid, pick = row.get("game_id"), row.get("updated_formula_pick")
         away, home = row.get("away_team"), row.get("home_team")
         updated_pick = row.get("updated_formula_pick")
         if (not isinstance(gid, str) or away == home
@@ -43,7 +43,7 @@ def pick_for_record(record, root):
         if (replay["away_team"], replay["home_team"]) != (
                 record.get("away_team"), record.get("home_team")):
             raise ValueError("Week 6 replay matchup identity differs from its source forecast")
-        return replay["scout_pick"]
+        return replay["updated_formula_pick"]
     if (record.get("version") != FORMULA_VERSION
             or record.get("configuration_sha256") != CONFIGURATION_SHA256
             or record.get("weights") != WEIGHTS):
@@ -104,9 +104,9 @@ def record_context(root, records, schedule, season, selected_week):
                 if (not replay or (replay["away_team"], replay["home_team"]) !=
                         (record.get("away_team"), record.get("home_team"))):
                     continue
-                # Week 6 was explicitly replayed and graded as an immutable 14-game cohort.
-                # Use its saved verified outcomes rather than requiring live schedule scores.
-                result = replay["expected_result"]
+                # Regrade the inverted Week 6 selection against canonical final scores
+                # and the original forecast's frozen pregame spread.
+                result = grade_pick(record, game, pick)
             else:
                 result = grade_pick(record, game, pick)
             line = float(record["quote"]["line"])
