@@ -684,4 +684,5 @@ def prediction_results():
                            plug_ou_review=plug_ou_review, all_weeks=all_weeks,
                            historical_plug_simulation=bool(historical_plug_weeks),
                            historical_plug_weeks=historical_plug_weeks,
-                           historical_plug_tally=historical_plug_tally,\n                           historical_plug_tallies_by_week=historical_plug_tallies_by_week)
+                           historical_plug_tally=historical_plug_tally,
+                           historical_plug_tallies_by_week=historical_plug_tallies_by_week)
