@@ -27,7 +27,9 @@ def test_week_six_replay_is_separate_and_uses_v5_v14_rules(tmp_path, monkeypatch
                         lambda path, season, eligible_ids: {"2026_06_AAA_BBB": 49.5})
     monkeypatch.setattr(forecast_history, "official_sources", lambda root: {
         "2026_06_AAA_BBB": {
-            "totals": {"prediction": {"lean": "Over"}}
+            "quote": {"line": 8},
+            "totals": {"quote": {"line": 48},
+                       "prediction": {"lean": "Over"}}
         }
     })
 
