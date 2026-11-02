@@ -279,7 +279,7 @@ class RenderedIntegration(unittest.TestCase):
                 html=render_template('sunday_results.html',**results)
                 self.assertIn('BAL -7.5',html)
                 self.assertIn('Under 48.5',html)
-                self.assertIn('legacy weekly',html)
+                self.assertNotIn('legacy weekly',html)
 
             from newsletter_draft import _plug_content
             from unittest.mock import Mock

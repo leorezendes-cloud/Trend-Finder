@@ -20,7 +20,7 @@
 <p class="weekly-results-note">Final scores and independent Scout and Plug selections.</p>
 {% if tally.finals<tally.games %}<p>Results appear when ESPN confirms a final or verified final scores are saved. Games that have not started are marked ‘Not played yet’.</p>{% endif %}
 {% if latest_completed_week is not none and latest_completed_week!=selected_week %}<p><a class="archive-link" href="{{ url_for('sunday_results_page',week=latest_completed_week) }}">View Week {{ latest_completed_week }} completed results →</a></p>{% endif %}
-<form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
+<form method="GET" class="weekly-results-selector"><select id="results-week" aria-label="Select week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
 <p class="weekly-results-progress">{{ tally.finals }} of {{ tally.games }} games final · Week {{ selected_week }}</p>
 <section class="weekly-dynamic-group" aria-label="Official dynamic Scout and Plug ATS and totals records">
 {% include '_scout_fade_record.html' %}
