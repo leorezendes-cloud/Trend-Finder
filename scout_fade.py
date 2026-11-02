@@ -110,7 +110,7 @@ def record_context(root, records, schedule, season, selected_week):
                 kickoff_utc=record["kickoff_utc"],
                 replayed=(int(record["week"]) == 6 and int(record["season"]) == 2026),
             ))
-        except (KeyError, TypeError, ValueError):
+        except (OSError, KeyError, TypeError, ValueError):
             continue
     rows.sort(key=lambda row: (row["week"], row["kickoff_utc"], row["game_id"]))
     week_rows = [row for row in rows if row["week"] == int(selected_week)] if selected_week is not None else []
@@ -121,3 +121,11 @@ def record_context(root, records, schedule, season, selected_week):
         overall=_tally(rows), week=_tally(week_rows),
         selected_week=selected_week, rows=week_rows, season_rows=rows,
     )
+
+
+def safe_record_context(root, records, schedule, season, selected_week):
+    """Keep public results pages available when optional Scout replay data is unavailable."""
+    try:
+        return record_context(root, records, schedule, season, selected_week)
+    except (OSError, ValueError, TypeError, KeyError):
+        return None

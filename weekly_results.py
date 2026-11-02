@@ -6,7 +6,7 @@ from pathlib import Path
 from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
 from plug_ats_v5_weekly import for_game, published_history
-from scout_fade import pick_for_record, grade_pick, record_context as scout_fade_record_context
+from scout_fade import pick_for_record, grade_pick, safe_record_context as scout_fade_record_context
 
 def read_csv(path):
  if not path.exists():return []
@@ -133,7 +133,7 @@ def build_results(root,week=None,score_updates=None):
     item['scout_pick']=f"{public_pick} {signed_line:+g}" if public_pick else 'No pick recorded'
     item['scout_result']={'Win':'Correct','Loss':'Wrong','Push':'Push','Pending':'Pending','No Call':'Not graded','Review needed':'Review needed'}[public_grade]
     item['scout_cushion']=f"{abs(float(record['components']['Blend']['ats_edge'])):.1f}"
-   except (KeyError,TypeError,ValueError):
+   except (OSError,KeyError,TypeError,ValueError):
     item['scout_pick']='Review needed';item['scout_result']='Review needed'
   if plug_receipts_review:
    item.update(plug_status='review',plug_pick=None,plug_result=None)

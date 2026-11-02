@@ -6,7 +6,7 @@ from pathlib import Path
 
 from scout_fade import (
     CONFIGURATION_SHA256, FORMULA_VERSION, WEIGHTS,
-    grade_pick, pick_for_record, record_context,
+    grade_pick, pick_for_record, record_context, safe_record_context,
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -54,6 +54,17 @@ class ScoutFadeChecks(unittest.TestCase):
         self.assertEqual(grade_pick(record, game, "A"), "Loss")
         game["away_score"] = ""
         self.assertEqual(grade_pick(record, game, "B"), "Pending")
+
+
+    def test_missing_replay_data_does_not_break_public_results_context(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            record = {
+                "season": 2026, "week": 6, "game_id": "2026_06_A_B",
+                "away_team": "A", "home_team": "B",
+            }
+            context = safe_record_context(Path(tmp), [record], [], 2026, 6)
+            self.assertIsNotNone(context)
+            self.assertEqual(context["week"]["selected"], 0)
 
     def test_replay_cohort_counts_all_14(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())

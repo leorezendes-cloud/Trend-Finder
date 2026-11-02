@@ -634,7 +634,7 @@ def prediction_results():
     dynamic_context = record_context(ROOT, _completed_games(ROOT), season, selected_week)
     from scout_dynamic_public import records as scout_dynamic_records
     scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, selected_week)
-    from scout_fade import record_context as scout_fade_context
+    from scout_fade import safe_record_context as scout_fade_context
     fade_context=scout_fade_context(ROOT, records, schedule, season, selected_week)
     return render_template('prediction_results.html', **scout_context, **dynamic_context, scout_fade=fade_context, groups=groups,
                            summary=combine_prediction_groups(groups), recent=recent,
