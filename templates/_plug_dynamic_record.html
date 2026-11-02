@@ -64,6 +64,7 @@
     <div><p class="weekly-dynamic-eyebrow">Prospective selections</p><h2>The Plug · {% if all_weeks|default(false) %}All Weeks{% else %}Dynamic record{% endif %}</h2></div>
   </div>
   {% if dynamic_record_review %}<p class="weekly-dynamic-caution">Dynamic receipts need review. Results unavailable.</p>{% else %}
+  {% if dynamic_record_errors %}<p class="weekly-dynamic-caution">Some game receipts need review and are excluded from these totals: {{ dynamic_record_errors|join(', ') }}.</p>{% endif %}
   <div class="weekly-dynamic-stats">
     <div><span>{% if all_weeks|default(false) %}All Weeks ATS record{% else %}ATS record{% endif %}</span><strong>{{ dynamic_record_counts.ats.Win }}–{{ dynamic_record_counts.ats.Loss }}–{{ dynamic_record_counts.ats.Push }}</strong><small>{{ dynamic_record_counts.ats.Pending }} pending</small></div>
     <div><span>{% if all_weeks|default(false) %}All Weeks O/U record{% else %}O/U record{% endif %}</span><strong>{{ dynamic_record_counts.ou.Win }}–{{ dynamic_record_counts.ou.Loss }}–{{ dynamic_record_counts.ou.Push }}</strong><small>{{ dynamic_record_counts.ou.Pending }} pending</small></div>
