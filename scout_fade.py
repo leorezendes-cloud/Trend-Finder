@@ -21,8 +21,12 @@ def replay_data(root):
     result = {}
     for row in rows:
         gid, pick = row.get("game_id"), row.get("scout_pick")
-        if not isinstance(gid, str) or pick not in (row.get("away_team"), row.get("home_team")):
-            raise ValueError("Invalid Week 6 Scout replay selection")
+        away, home = row.get("away_team"), row.get("home_team")
+        updated_pick = row.get("updated_formula_pick")
+        if (not isinstance(gid, str) or away == home
+                or pick not in (away, home) or updated_pick not in (away, home)
+                or pick == updated_pick or row.get("expected_result") not in ("Win", "Loss")):
+            raise ValueError("Invalid Week 6 Scout replay selection or inversion")
         if gid in result:
             raise ValueError("Duplicate Week 6 Scout replay game")
         result[gid] = row
