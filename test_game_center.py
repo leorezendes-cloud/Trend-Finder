@@ -7,6 +7,23 @@ from game_center import parse_summary, summary, _DETAIL_CACHE
 
 
 class GameCenterTests(unittest.TestCase):
+    def test_game_page_reuses_current_matchup_prediction_overlay(self):
+        from unittest.mock import patch
+        from flask import g
+        import game_center
+        game = {'game_id':'2026_08_BAL_PIT','away_team':'BAL','home_team':'PIT',
+                'season':'2026','week':'8','gameday':'2026-11-01','gametime':'1:00PM'}
+        prediction = {'scout_dynamic':{'status':'pregame'},'plug_dynamic_official':True}
+        with patch('game_center._game_context', return_value=(game,None)), \
+             patch('game_center._recent_team_context', return_value={}), \
+             patch('game_center._member_pick_preview', return_value=None), \
+             patch('expert_beta.matchup_prediction', return_value=prediction), \
+             patch('game_center.render_template', return_value='rendered'):
+            with app.test_request_context('/game/2026_08_BAL_PIT'):
+                g.member = None
+                response = game_center.game_page(game['game_id'])
+        self.assertEqual(response.get_data(as_text=True), 'rendered')
+
     def test_summary_parser_keeps_scoring_and_team_metrics(self):
         data = {
             'scoringPlays': [
