@@ -5,6 +5,11 @@
   </div>
   <div class="weekly-dynamic-stats">
     {% if all_weeks|default(false) %}<div><span>All Weeks ATS</span><strong>{{ scout_fade.overall.Win }}–{{ scout_fade.overall.Loss }}–{{ scout_fade.overall.Push }}</strong><small>{{ scout_fade.overall.win_rate if scout_fade.overall.win_rate is not none else '—' }}% win rate · {{ scout_fade.overall.decisions }} decisions</small></div>{% else %}<div><span>Week {{ scout_fade.selected_week }} ATS</span><strong>{{ scout_fade.week.Win }}–{{ scout_fade.week.Loss }}–{{ scout_fade.week.Push }}</strong><small>{{ scout_fade.week.Pending }} pending · {{ scout_fade.week.selected }} selections</small></div>{% endif %}
+    {% if scout_dynamic_counts is defined %}
+      <div><span>{% if all_weeks|default(false) %}All Weeks Scout O/U{% else %}Scout O/U{% endif %}</span><strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong><small>{{ scout_dynamic_counts.ou.Pending }} pending · separate dynamic Scout totals</small></div>
+    {% else %}
+      <div><span>Scout O/U</span><strong>—</strong><small>Dynamic Scout totals record unavailable</small></div>
+    {% endif %}
   </div>
   <details class="weekly-dynamic-details">
     <summary>View Scout picks {% if all_weeks|default(false) %}(All Weeks){% else %}for Week {{ scout_fade.selected_week }}{% endif %}</summary>
