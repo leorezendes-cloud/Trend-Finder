@@ -80,6 +80,24 @@ class ScoutFadeChecks(unittest.TestCase):
         self.assertEqual(all_weeks["week"]["selected"],2)
         self.assertEqual(all_weeks["overall"]["selected"],2)
 
+    def test_week6_replay_context_uses_verified_saved_grades(self):
+        data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
+        records = []
+        for row in data["games"]:
+            records.append({
+                "season": 2026, "week": 6, "game_id": row["game_id"],
+                "away_team": row["away_team"], "home_team": row["home_team"],
+                "version": "legacy-scout", "weights": {"scout_scoring": .5, "plug_points_only": .5},
+                "components": {"Blend": {"pick": row["updated_formula_pick"]}},
+                "quote": {"line": 3.5},
+                "kickoff_utc": "2026-10-18T17:00:00+00:00",
+            })
+        context = record_context(ROOT, records, [], 2026, 6)
+        self.assertEqual(context["week"]["Win"], 8)
+        self.assertEqual(context["week"]["Loss"], 6)
+        self.assertEqual(context["week"]["selected"], 14)
+        self.assertTrue(all(row["replayed"] for row in context["rows"]))
+
     def test_replay_cohort_counts_all_14(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
         self.assertEqual(len(data["games"]), 14)
