@@ -18,7 +18,7 @@ def test_week_six_replay_is_separate_and_uses_v5_v14_rules(tmp_path, monkeypatch
         writer.writerow({
             "game_id": "2026_06_AAA_BBB", "season": 2026, "week": 6,
             "game_type": "REG", "away_team": "AAA", "home_team": "BBB",
-            "away_score": 20, "home_score": 17, "spread_line": 8,
+            "away_score": 20, "home_score": 17, "spread_line": -8,
             "total_line": 48,
         })
     monkeypatch.setattr(plug_ats_v5_model, "projections",
@@ -40,7 +40,9 @@ def test_week_six_replay_is_separate_and_uses_v5_v14_rules(tmp_path, monkeypatch
     assert row["ats_result"] == "Win"
     assert row["ou_side"] == "Over"
     assert row["ou_result"] == "Loss"
-    assert row["source"] == "Historical simulation · not issued pregame"
+    assert row["source"] == "Closing-line historical simulation · not issued pregame"
+    assert row["spread_line"] == 8
+    assert row["total_line"] == 48
 
 
 def test_only_weeks_six_and_seven_are_replayed(tmp_path):
@@ -53,7 +55,7 @@ def test_only_weeks_six_and_seven_are_replayed(tmp_path):
 def test_replay_applies_plug_ou_v3_eligibility_before_grading(tmp_path, monkeypatch):
     schedule = tmp_path / "nfl_games.csv"
     fields = ["game_id", "season", "week", "game_type", "away_team",
-              "home_team", "away_score", "home_score"]
+              "home_team", "away_score", "home_score", "total_line"]
     games = [
         ("2026_06_LOW_AAA", "AAA", "BBB", 20, 17),
         ("2026_06_TIE_CCC", "CCC", "DDD", 21, 20),
@@ -67,6 +69,7 @@ def test_replay_applies_plug_ou_v3_eligibility_before_grading(tmp_path, monkeypa
                 "game_id": game_id, "season": 2026, "week": 6,
                 "game_type": "REG", "away_team": away, "home_team": home,
                 "away_score": away_score, "home_score": home_score,
+                "total_line": {"2026_06_LOW_AAA": 47.5, "2026_06_TIE_CCC": 50.0, "2026_06_OK_EEE": 50.0}[game_id],
             })
 
     monkeypatch.setattr(plug_ats_v5_model, "projections",
@@ -79,16 +82,13 @@ def test_replay_applies_plug_ou_v3_eligibility_before_grading(tmp_path, monkeypa
                         })
     sources = {
         "2026_06_LOW_AAA": {
-            "totals": {"quote": {"line": 47.5},
-                       "prediction": {"lean": "Over"}}
+            "totals": {"prediction": {"lean": "Over"}}
         },
         "2026_06_TIE_CCC": {
-            "totals": {"quote": {"line": 50.0},
-                       "prediction": {"lean": "Under"}}
+            "totals": {"prediction": {"lean": "Under"}}
         },
         "2026_06_OK_EEE": {
-            "totals": {"quote": {"line": 50.0},
-                       "prediction": {"lean": "Under"}}
+            "totals": {"prediction": {"lean": "Under"}}
         },
     }
     monkeypatch.setattr(forecast_history, "official_sources",
