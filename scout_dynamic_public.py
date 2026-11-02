@@ -71,10 +71,12 @@ def state(root, game, *, now):
 
 
 def attach(root, item, *, now):
-    """Add a separate display field; never mutate saved_picks, scout or Plug fields."""
+    """Attach current-policy Scout picks; never expose archived Blend picks as live."""
     item.pop('scout_dynamic',None)
+    item.pop('scout_current_ats',None)
     try:
-        value=state(root,item['scout']['game'],now=now)
+        game=item['scout']['game']
+        value=state(root,game,now=now)
         if value is not None:
             if value['status']=='locked':
                 final=item.get('final_score')
@@ -84,7 +86,25 @@ def attach(root, item, *, now):
                     final={'away':scores[0],'home':scores[1]} if scores else None
                 value['grades']=grade(value['row'], (final['away'],final['home']) if final else None)
             item['scout_dynamic']=value
-    except (ValueError,OSError,KeyError,TypeError) as error:
+        from forecast_history import official_sources
+        source=official_sources(Path(root)).get(game['game_id'])
+        if source:
+            from scout_fade import pick_for_record, grade_pick
+            side=pick_for_record(source,root)
+            if side:
+                line=float(source['quote']['line'])
+                signed_line=line if side==game['away_team'] else -line
+                final=item.get('final_score')
+                score_game=dict(game)
+                if final:
+                    score_game.update(away_score=final.get('away'),home_score=final.get('home'))
+                else:
+                    from plug_dashboard import _completed_games
+                    scores=_completed_games(Path(root)).get(game['game_id'])
+                    if scores:score_game.update(away_score=scores[0],home_score=scores[1])
+                item['scout_current_ats']=dict(side=side,pick=f'{side} {signed_line:+g}',
+                    result=grade_pick(source,score_game,side))
+    except (ValueError,OSError,KeyError,TypeError):
         if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1':
             item['scout_dynamic']=dict(status='review',message='Scout update awaiting verified evidence.')
     return item
