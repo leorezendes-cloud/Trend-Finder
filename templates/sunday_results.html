@@ -35,6 +35,16 @@
     <div><p class="weekly-matchup-date">{{ game.gameday }}</p><h3><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.matchup }}</a></h3></div>
     <span class="weekly-matchup-status {{ 'weekly-is-final' if game.ats_result!='Pending' else 'weekly-is-pending' }}">{{ 'Final' if game.ats_result!='Pending' else 'Awaiting final' }}</span>
   </header>
+  {% if game.injury_impact %}
+  <details class="weekly-injury-impact">
+    <summary><span aria-hidden="true">⚑</span> Injury impact · review totals context</summary>
+    <div class="weekly-injury-impact-body">
+      <p><strong>{{ game.injury_impact.title }}</strong></p>
+      <p>{{ game.injury_impact.details }}</p>
+      <p class="weekly-injury-impact-note">Research tag: injury-distorted game. The official Plug selection and result remain unchanged; use this flag to separate the game in future totals analysis.</p>
+    </div>
+  </details>
+  {% endif %}
   <div class="weekly-matchup-score">
     <div><span class="weekly-mini-label">Score</span><strong>{{ game.live_score }}</strong></div>
     <div><span class="weekly-mini-label">Underdog / Line</span><strong>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</strong></div>
