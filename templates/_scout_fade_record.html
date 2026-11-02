@@ -18,7 +18,7 @@
       <span>{% if all_weeks|default(false) %}All Weeks O/U{% else %}Week {{ selected_week }} O/U{% endif %}</span>
       {% if scout_dynamic_counts is defined %}
         <strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong>
-        <small>{{ scout_dynamic_counts.ou.Pending }} pending</small>
+        <small>{{ scout_dynamic_counts.ou.Pending }} pending{% if scout_dynamic_coverage is defined %} · {{ scout_dynamic_coverage.available }}/{{ scout_dynamic_coverage.expected }} available{% endif %}</small>
       {% else %}
         <strong>—</strong><small>O/U record unavailable</small>
       {% endif %}
