@@ -23,6 +23,7 @@
 <form method="GET" class="weekly-results-selector"><label for="results-week">{{ season }} season • Week</label><select id="results-week" name="week">{% for week in weeks %}<option value="{{ week }}" {% if week==selected_week %}selected{% endif %}>Week {{ week }}</option>{% endfor %}</select><button type="submit">Show week</button></form>
 <p class="weekly-results-progress">{{ tally.finals }} of {{ tally.games }} games final · Week {{ selected_week }}</p>
 <section class="weekly-dynamic-group" aria-label="Official dynamic Scout and Plug ATS and totals records">
+{% include '_scout_fade_record.html' %}
 {% include '_scout_dynamic_records.html' %}
 {% include '_plug_dynamic_record.html' %}
 </section>
