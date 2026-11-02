@@ -58,9 +58,13 @@ class ScoutFadeChecks(unittest.TestCase):
 
     def test_missing_replay_data_does_not_break_public_results_context(self):
         with tempfile.TemporaryDirectory() as tmp:
-            self.assertIsNone(safe_record_context(
-                Path(tmp), [], [], 2026, 6
-            ))
+            record = {
+                "season": 2026, "week": 6, "game_id": "2026_06_A_B",
+                "away_team": "A", "home_team": "B",
+            }
+            context = safe_record_context(Path(tmp), [record], [], 2026, 6)
+            self.assertIsNotNone(context)
+            self.assertEqual(context["week"]["selected"], 0)
 
     def test_replay_cohort_counts_all_14(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
