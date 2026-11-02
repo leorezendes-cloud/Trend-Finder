@@ -1,7 +1,10 @@
 """Public Scout policy: fade the approved points-only formula without rewriting source forecasts."""
 import json
+import logging
 import math
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 FORMULA_VERSION = "plug-points-only-4"
 CONFIGURATION_SHA256 = "4b9a85b948cb0f1eeab19078df6d6f69a0244c947f460e01ab1537bbe9a12a31"
@@ -89,11 +92,19 @@ def record_context(root, records, schedule, season, selected_week):
     """Build season and selected-week public records from immutable approved sources."""
     if season is None:
         return None
+    season_number = int(season)
+    week_number = int(selected_week) if selected_week is not None else None
     games = {row.get("game_id"): row for row in schedule}
     rows = []
     for record in records:
         try:
-            if int(record.get("season", 0)) != int(season) or int(record.get("week", 0)) < 6:
+            record_season = int(record.get("season", 0))
+            record_week = int(record.get("week", 0))
+            if record_season != season_number or record_week < 6:
+                continue
+            # Week 6, 2026 is an independently approved replay cohort. Do not
+            # let rejected/malformed legacy forecast files shadow that receipt.
+            if season_number == 2026 and week_number == 6 and record_week == 6:
                 continue
             pick = pick_for_record(record, root)
             if pick is None:
@@ -128,16 +139,12 @@ def record_context(root, records, schedule, season, selected_week):
     # present in official_sources(): the replay itself contains all 14 picks
     # and their verified grades. Forecast records, when available, enrich the
     # display with the frozen spread; otherwise show the side without a line.
-    if int(season) == 2026 and selected_week == 6:
-        try:
-            replay_rows = replay_data(root)
-        except (OSError, ValueError, TypeError, KeyError):
-            replay_rows = {}
-        seen = {row["game_id"] for row in rows}
+    if season_number == 2026 and week_number == 6:
+        # The approved receipt is the source of truth for this cohort. Load it
+        # once, without silently converting a bad/missing receipt into 0-0-0.
+        replay_rows = replay_data(root)
         record_by_id = {r.get("game_id"): r for r in records}
         for gid, replay in replay_rows.items():
-            if gid in seen:
-                continue
             pick = replay["scout_pick"]
             result = {"Win": "Loss", "Loss": "Win"}.get(
                 replay["expected_result"], replay["expected_result"])
@@ -162,13 +169,13 @@ def record_context(root, records, schedule, season, selected_week):
                 replayed=True,
             ))
     rows.sort(key=lambda row: (row["week"], row["kickoff_utc"], row["game_id"]))
-    week_rows = [row for row in rows if row["week"] == int(selected_week)] if selected_week is not None else rows
+    week_rows = [row for row in rows if row["week"] == week_number] if week_number is not None else rows
     return dict(
         formula_label="Fade of Original points-for/points-allowed",
         formula_version=FORMULA_VERSION,
         configuration_sha256=CONFIGURATION_SHA256,
         overall=_tally(rows), week=_tally(week_rows),
-        selected_week=selected_week, rows=week_rows, season_rows=rows,
+        selected_week=week_number, rows=week_rows, season_rows=rows,
     )
 
 
@@ -177,4 +184,9 @@ def safe_record_context(root, records, schedule, season, selected_week):
     try:
         return record_context(root, records, schedule, season, selected_week)
     except (OSError, ValueError, TypeError, KeyError):
+        logger.exception(
+            "Scout fade record unavailable: root=%s season=%r selected_week=%r records=%s",
+            root, season, selected_week,
+            len(records) if hasattr(records, "__len__") else "unknown",
+        )
         return None
