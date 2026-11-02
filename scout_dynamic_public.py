@@ -133,11 +133,12 @@ def _week_six_shadow_totals(root):
 
 def records(root, finals, season, week, *, now=None):
     """One Scout O/U cohort: Week 6 sealed replay plus later live-issued totals."""
-    if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1' or season is None:
+    if season is None:
         return {}
     now=now or datetime.now(timezone.utc)
     rows=[];review=False
-    for path in sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')):
+    live_enabled = os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1'
+    for path in (sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')) if live_enabled else []):
         if not path.is_dir():
             continue
         year,number,away,home=path.name.split('_')
