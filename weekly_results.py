@@ -210,7 +210,8 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
  from scout_dynamic_public import records as scout_dynamic_records
  scout_context=scout_dynamic_records(root,verified_finals,season,record_week)
  fade_context=scout_fade_record_context(root,all_frozen.values(),rows,season,record_week)
+ scout_ou_context=scout_ou_record_context(all_frozen.values(),rows,season,record_week)
  if fade_context:
   model_label='Scout · faded points-only formula'
   model_note='Public Scout selections invert the approved points-for/points-allowed formula; original forecasts remain archived.'
- return dict(**scout_context,**dynamic_context,scout_fade=fade_context,all_weeks=all_weeks,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(**scout_context,**dynamic_context,**scout_ou_context,scout_fade=fade_context,all_weeks=all_weeks,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
