@@ -106,6 +106,7 @@
     lastDetail.set(card,Date.now());
     if (!detailData.has(card)) card.querySelector('.tf-board-detail').replaceChildren(feedback('Loading game details…'));
     enqueue(async () => {
+      if (document.hidden) { activeFetch.delete(card); return; }
       try {
         const response = await fetch(card.dataset.detail,{cache:'no-store',signal:AbortSignal.timeout(8500)});
         if (!response.ok) throw new Error('Game details unavailable');
@@ -244,6 +245,7 @@
       refresh();
     }
   });
+  window.addEventListener('pagehide', () => clearTimeout(timer), {once:true});
   organize();
   refresh();
 })();
