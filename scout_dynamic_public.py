@@ -138,6 +138,8 @@ def records(root, finals, season, week, *, now=None):
     now=now or datetime.now(timezone.utc)
     rows=[];review=False
     live_enabled = os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1'
+    if not live_enabled and int(season) != 2026:
+        return {}
     for path in (sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')) if live_enabled else []):
         if not path.is_dir():
             continue
