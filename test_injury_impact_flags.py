@@ -22,6 +22,28 @@ class InjuryImpactFlagTests(unittest.TestCase):
             self.assertIn("_game_injury_impact_flag.html",
                           (root / "templates" / name).read_text(), name)
 
+    def test_plug_flag_precedes_completed_game_disclosure(self):
+        from pathlib import Path
+        root = Path(__file__).resolve().parent
+        template = (root / "templates/expert_dashboard.html").read_text()
+        flag = template.index("{% include '_game_injury_impact_flag.html' %}")
+        disclosure = template.index('<details class="plug-completed-details">')
+        self.assertLess(flag, disclosure)
+        css = (root / "static/expert_beta.css").read_text()
+        self.assertIn(".plug-completed-body * { text-align:left;", css)
+
+    def test_home_injury_flag_is_outside_live_refreshed_badge_container(self):
+        from pathlib import Path
+        root = Path(__file__).resolve().parent
+        template = (root / "templates/_home_games_board.html").read_text()
+        marks_end = template.index('</div>', template.index('class="tf-board-marks"'))
+        injury = template.index('class="tf-board-injury"')
+        self.assertGreater(injury, marks_end)
+        css = (root / "static/games_board.css").read_text()
+        self.assertIn(".tf-board-item > .tf-board-injury", css)
+        self.assertIn("right:10px", css)
+        self.assertIn("bottom:9px", css)
+
     def test_unrelated_games_are_not_flagged(self):
         self.assertIsNone(for_game("2026_08_BUF_BAL"))
         self.assertIsNone(for_game("2026_08_NE_CHI"))

@@ -64,3 +64,13 @@
 .expert-card > .plug-completed-details { margin:10px 0 0; border-top:1px solid #475569; }
 .expert-card > .plug-completed-details > summary { padding:10px 2px 5px; font-size:13px; color:#fbbf24; }
 .expert-card > .plug-completed-details > .plug-completed-body { padding-top:10px; }
+
+
+/* Completed Plug cards: keep the injury flag directly above the disclosure link,
+   and prevent inherited card-summary alignment from pushing details right. */
+.expert-card > .game-injury-impact { margin:10px 0 0; text-align:left; }
+.expert-card > .plug-completed-details { text-align:left; }
+.expert-card > .plug-completed-details > summary { text-align:left; justify-content:flex-start; }
+.expert-card > .plug-completed-details > .plug-completed-body,
+.expert-card > .plug-completed-details > .plug-completed-body * { text-align:left; }
+.expert-card > .plug-completed-details > .plug-completed-body { width:100%; box-sizing:border-box; }
