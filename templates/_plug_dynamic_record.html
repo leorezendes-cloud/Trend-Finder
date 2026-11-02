@@ -2,7 +2,7 @@
 <section class="weekly-dynamic-panel" id="dynamic-plug-record">
   {% if historical_plug_simulation and selected_week in (6,7) and not all_weeks %}
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Weekly results</p><h2>The Plug · Weekly record</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Historical simulation · not issued pregame</p><h2>The Plug · Week {{ selected_week }} retrospective record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
     <div><span>ATS record</span><strong>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats.Win }}–{{ historical_plug_tally.ats.Loss }}–{{ historical_plug_tally.ats.Push }}{% else %}—{% endif %}</strong><small>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats_selected }} selections{% else %}No qualifying selections{% endif %}</small></div>
