@@ -85,8 +85,9 @@
     }
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) clearTimeout(refreshTimer);
-    else refresh();
+    clearTimeout(refreshTimer);
+    if (!document.hidden) refresh();
   });
+  window.addEventListener('pagehide', () => clearTimeout(refreshTimer), {once:true});
   refresh();
 })();
