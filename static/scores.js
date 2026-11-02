@@ -47,7 +47,7 @@
     return details;
   }
   async function refresh() {
-    if (inFlight) return;
+    if (inFlight || document.hidden) return;
     inFlight = true;
     try {
       const response = await fetch(panel.dataset.url, {cache: 'no-store', signal: AbortSignal.timeout(10000)});
@@ -108,7 +108,9 @@
     });
   });
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) { clearTimeout(timer); refresh(); }
+    clearTimeout(timer);
+    if (!document.hidden) refresh();
   });
+  window.addEventListener('pagehide', () => clearTimeout(timer), {once:true});
   refresh();
 })();

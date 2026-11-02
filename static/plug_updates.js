@@ -1,7 +1,7 @@
 (() => {
   const panel = document.getElementById('plug-refresh');
   if (!panel) return;
-  let timer, busy = false, marketChecked = 0;
+  let timer, busy = false;
   async function refresh() {
     if (busy || document.hidden) return;
     busy = true;
@@ -15,7 +15,7 @@
         const day = new Date(card.dataset.kickoff).toISOString().slice(0,10);
         const game = data.games.find(g => g.away === card.dataset.away && g.home === card.dataset.home && new Date(g.date).toISOString().slice(0,10) === day);
         const slot = card.querySelector('.plug-anomaly-slot');
-        if (slot && game && game.completed && game.state === 'post') {
+        if (slot && game && game.completed && game.state === 'post' && window.gameAnomalyFlag) {
           const flag = window.gameAnomalyFlag(game.anomalies);
           if (flag && !slot.querySelector('details[open]')) slot.replaceChildren(flag);
         }
@@ -27,19 +27,18 @@
           }
         }
       }
-      if (Date.now() - marketChecked >= 60000) {
-        const page = await fetch(location.href, {cache:'no-store', signal:AbortSignal.timeout(10000)});
-        if (page.ok) {
-          const documentCopy = new DOMParser().parseFromString(await page.text(),'text/html');
-          const fresh = documentCopy.getElementById('plug-weekly-slate');
-          const current = document.getElementById('plug-weekly-slate');
-          if (fresh && current) current.replaceChildren(...fresh.childNodes);
-          marketChecked = Date.now();
-        }
-      }
-    } catch (_) { /* Retain the last successful display when a feed is unavailable. */ }
-    finally { busy = false; clearTimeout(timer); timer = setTimeout(refresh,seconds*1000); }
+    } catch (_) {
+      // Retain the last successful display when the score feed is unavailable.
+    } finally {
+      busy = false;
+      clearTimeout(timer);
+      if (!document.hidden) timer = setTimeout(refresh, seconds * 1000);
+    }
   }
-  document.addEventListener('visibilitychange',() => {if (!document.hidden) {clearTimeout(timer);refresh();}});
+  document.addEventListener('visibilitychange', () => {
+    clearTimeout(timer);
+    if (!document.hidden) refresh();
+  });
+  window.addEventListener('pagehide', () => clearTimeout(timer), {once:true});
   refresh();
 })();
