@@ -169,15 +169,44 @@ def history(root, finals, *, as_of_utc=None):
 
 
 def record_context(root, finals, season, week, *, as_of_utc=None):
+    """Aggregate each prospective game independently.
+
+    A damaged or incomplete journal must not erase valid selections from
+    every other week in the All Weeks view. Keep valid rows and surface the
+    affected game IDs as a review warning.
+    """
     if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') != '1':
         return {'dynamic_record_enabled':False}
     try:
-        rows = history(root, finals, as_of_utc=as_of_utc)
-        selected = [r for r in rows if r['season']==season and (week is None or r['week']==week)]
-        counts = {m:{k:sum(r[m+'_selected'] and r[m+'_result']==k for r in selected)
-                     for k in ('Win','Loss','Push','Pending')} for m in ('ats','ou')}
-        return dict(dynamic_record_enabled=True, dynamic_record_review=False,
-                    dynamic_record_rows=selected, dynamic_record_counts=counts)
-    except (OSError,ValueError,KeyError,TypeError):
+        target_season = int(season)
+        target_week = None if week is None else int(week)
+    except (TypeError, ValueError, OverflowError):
         return dict(dynamic_record_enabled=True, dynamic_record_review=True,
-                    dynamic_record_rows=[], dynamic_record_counts={})
+                    dynamic_record_rows=[], dynamic_record_counts={},
+                    dynamic_record_errors=['Invalid season/week filter'])
+    at = as_of_utc or datetime.now(timezone.utc).isoformat()
+    rows, errors = [], []
+    for path in sorted((Path(root)/'plug_dynamic_research').glob('*.jsonl')):
+        try:
+            year, game_week, away, home = path.stem.split('_')
+            if int(year) != target_season or (target_week is not None and int(game_week) != target_week):
+                continue
+            row = official_state(root, path.stem, as_of_utc=at)
+            if row is None:
+                continue
+            result = {'ats':None, 'ou':None}
+            if _time(at) >= _time(row['kickoff_utc']) and path.stem in finals:
+                away_score, home_score = finals[path.stem]
+                result = grade_closing(root, path.stem, away_score=away_score, home_score=home_score)
+            rows.append(dict(row, season=int(year), week=int(game_week),
+                             away_team=away, home_team=home,
+                             ats_result=result['ats'] or 'Pending',
+                             ou_result=result['ou'] or 'Pending', policy=POLICY))
+        except (OSError,ValueError,KeyError,TypeError):
+            errors.append(path.stem)
+    rows.sort(key=lambda r: (_time(r['kickoff_utc']), r['game_id']))
+    counts = {m:{k:sum(bool(r[m+'_selected']) and r[m+'_result']==k for r in rows)
+                 for k in ('Win','Loss','Push','Pending')} for m in ('ats','ou')}
+    return dict(dynamic_record_enabled=True, dynamic_record_review=False,
+                dynamic_record_rows=rows, dynamic_record_counts=counts,
+                dynamic_record_errors=errors)
