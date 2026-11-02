@@ -48,5 +48,25 @@ class ScoutDynamicCoverageTests(unittest.TestCase):
             self.assertEqual(result['scout_dynamic_coverage']['missing'],3)
 
 
+
+    def test_week7_uses_saved_positive_scout_totals_and_frozen_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            with (root/'nfl_games.csv').open('w',newline='') as handle:
+                writer=csv.DictWriter(handle,fieldnames=['game_id','season','week','game_type','away_team','home_team','away_score','home_score'])
+                writer.writeheader()
+                writer.writerow(dict(game_id='2026_07_A_B',season=2026,week=7,game_type='REG',away_team='A',home_team='B',away_score=24,home_score=20))
+            saved={'2026_07_A_B':{'game_id':'2026_07_A_B','season':2026,'week':7,'away_team':'A','home_team':'B','kickoff_utc':'2026-10-25T17:00:00+00:00','totals':{'quote':{'line':43.5},'prediction':{'lean':'Over'}}}}
+            with patch.dict(os.environ,{'TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC':'0'}):
+                with patch('forecast_history.official_sources',return_value=saved):
+                    with patch('forecast_history.total_result',return_value='Correct'):
+                        result=records(root,{},2026,7)
+            self.assertEqual(result['scout_dynamic_counts']['ou']['Win'],1)
+            self.assertEqual(result['scout_dynamic_coverage'],{'expected':1,'available':1,'missing':0})
+            row=result['scout_dynamic_records'][0]
+            self.assertEqual(row['ou_side'],'Over')
+            self.assertEqual(row['grades']['ou'],'Win')
+            self.assertEqual(row['source'],'saved positive Scout totals')
+
 if __name__=='__main__':
     unittest.main()
