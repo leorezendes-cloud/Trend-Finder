@@ -11,6 +11,7 @@
     <summary>
       <span class="tf-game-title">{{ game.away_team }} @ {{ game.home_team }}</span>
       <strong class="tf-game-score">{{ '%g'|format(game.away_score) }}–{{ '%g'|format(game.home_score) }}</strong>
+      {% include '_game_injury_impact_flag.html' %}
     </summary>
     <div class="tf-game-facts">
       <div class="tf-game-fact tf-game-fact--wide"><span>Date (ET)</span>{{ game.gameday }} {{ game.gametime }}{% if game.location=='Neutral' or game.game_type=='SB' %} · Neutral site{% endif %}</div>
