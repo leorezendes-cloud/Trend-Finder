@@ -26,7 +26,7 @@
     <div><p class="weekly-dynamic-eyebrow">Separate dynamic Scout totals</p><h2>Scout O/U Record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
-    <div><span>{% if all_weeks|default(false) %}All Weeks O/U{% else %}Scout O/U · Dynamic{% endif %}</span><strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong><small>{{ scout_dynamic_counts.ou.Pending }} pending</small></div>
+    <div><span>{% if all_weeks|default(false) %}All Weeks O/U{% else %}Scout O/U · Unified{% endif %}</span><strong>{{ scout_dynamic_counts.ou.Win }}–{{ scout_dynamic_counts.ou.Loss }}–{{ scout_dynamic_counts.ou.Push }}</strong><small>{{ scout_dynamic_counts.ou.Pending }} pending</small></div>
   </div>
 </section>
 {% endif %}
