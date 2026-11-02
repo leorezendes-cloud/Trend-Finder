@@ -224,3 +224,12 @@
 .tf-board-home .tf-board-item > .tf-board-injury .game-injury-impact-body p {
   margin:10px 0;
 }
+
+
+/* Homepage alignment for the REAL detail body class (not the old mismatched class). */
+.tf-board-home .tf-board-item > .tf-board-injury .weekly-injury-impact .weekly-injury-impact-body {
+  left:auto !important;
+  right:0 !important;
+  background-color:#111827 !important;
+  padding:20px 24px !important;
+}
