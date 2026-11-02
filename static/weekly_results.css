@@ -176,3 +176,6 @@ html body > main.weekly-results-main {
 .weekly-injury-impact-body { padding:0 12px 10px; color:#fecaca; font:13px/1.55 Arial,sans-serif; }
 .weekly-injury-impact-body p { margin:7px 0; }
 .weekly-injury-impact-note { color:#fca5a5; font-size:12px; }
+
+/* Two remaining matchup grades after removing the redundant Underdog ATS tile. */
+.weekly-matchup-grades{grid-template-columns:repeat(2,minmax(0,1fr))}

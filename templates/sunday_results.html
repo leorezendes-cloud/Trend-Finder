@@ -35,22 +35,12 @@
     <div><p class="weekly-matchup-date">{{ game.gameday }}</p><h3><a href="{{ url_for('fans.matchup',game_id=game.game_id) }}">{{ game.matchup }}</a></h3></div>
     <span class="weekly-matchup-status {{ 'weekly-is-final' if game.ats_result!='Pending' else 'weekly-is-pending' }}">{{ 'Final' if game.ats_result!='Pending' else 'Awaiting final' }}</span>
   </header>
-  {% if game.injury_impact %}
-  <details class="weekly-injury-impact">
-    <summary><span aria-hidden="true">⚑</span> Injury impact · review totals context</summary>
-    <div class="weekly-injury-impact-body">
-      <p><strong>{{ game.injury_impact.title }}</strong></p>
-      <p>{{ game.injury_impact.details }}</p>
-      <p class="weekly-injury-impact-note">Research tag: injury-distorted game. The official Plug selection and result remain unchanged; use this flag to separate the game in future totals analysis.</p>
-    </div>
-  </details>
-  {% endif %}
+  {% include '_game_injury_impact_flag.html' %}
   <div class="weekly-matchup-score">
     <div><span class="weekly-mini-label">Score</span><strong>{{ game.live_score }}</strong></div>
     <div><span class="weekly-mini-label">Underdog / Line</span><strong>{{ game.underdog }}{% if game.spread is not none and game.spread != 0 %} +{{ "%g"|format(game.spread) }}{% endif %}</strong></div>
   </div>
   <div class="weekly-matchup-grades">
-    <div class="weekly-grade-item"><span>Underdog ATS</span><strong class="weekly-grade-value">{{ game.dog_ats_record }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.ats_result=='Cover' else 'weekly-loss' if game.ats_result=='Loss' else '' }}">{{ game.pending_note if game.ats_result=='Pending' else game.ats_result }}</small></div>
     <div class="weekly-grade-item"><span>Scout ATS</span><strong class="weekly-grade-value">{{ game.scout_pick }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.scout_result in ('Correct','Win') else 'weekly-loss' if game.scout_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.scout_result=='Pending' else game.scout_result }}</small></div>
     <div class="weekly-grade-item"><span>Scout O/U</span><strong class="weekly-grade-value">{{ game.total_pick if game.total_pick!='No saved total' else '—' }}</strong><small class="weekly-grade-outcome {{ 'weekly-win' if game.total_result in ('Correct','Win') else 'weekly-loss' if game.total_result in ('Wrong','Loss') else '' }}">{{ game.pending_note if game.total_result=='Pending' else game.total_result }}</small></div>
   </div>

@@ -60,7 +60,7 @@
 <section class="stats-card matchup-panel matchup-final">
   <div class="matchup-final-head">
     <h2>Final Game Stats</h2>
-    <div class="matchup-final-score">{{ game.away_team }} {{ game.away_score }} – {{ game.home_team }} {{ game.home_score }} <small>FINAL</small> {% include '_game_anomaly_flag.html' %}</div>
+    <div class="matchup-final-score">{{ game.away_team }} {{ game.away_score }} – {{ game.home_team }} {{ game.home_score }} <small>FINAL</small> {% include '_game_anomaly_flag.html' %} {% include '_game_injury_impact_flag.html' %}</div>
   </div>
   <details class="matchup-boxscore">
     <summary>View game stats &amp; top performers</summary>

@@ -18,6 +18,11 @@ from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+@app.context_processor
+def injury_impact_template_helpers():
+    from injury_impact_flags import for_game
+    return {'injury_impact_for_game': for_game}
 from pwa import init_app as init_pwa
 init_pwa(app)
 from membership import init_membership
