@@ -1,5 +1,5 @@
 {# Shared clickable injury-impact disclosure for materially altered completed games. #}
-<link rel="stylesheet" href="{{ url_for('static', filename='injury_impact.css') }}?v=20261103-details-only">
+<link rel="stylesheet" href="{{ url_for('static', filename='injury_impact.css') }}?v=20261103-exact-body">
 {% set injury_impact = injury_impact_for_game(game.game_id) %}
 {% if injury_impact %}
 <details class="weekly-injury-impact game-injury-impact">
