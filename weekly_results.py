@@ -170,6 +170,27 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
     item['plug_ou_result']='Review needed'
   item['injury_impact']=injury_impact_for_game(g['game_id'])
   games.append(item)
+ # Retrospective Plug v5/v14 replay is a separate cohort; never alter Scout,
+ # prospective Plug receipts, or their grades.
+ historical_plug_rows=[]
+ try:
+  from plug_historical_simulations import historical_simulations
+  historical_plug_rows=historical_simulations(root,season,selected)
+ except (OSError,KeyError,ValueError,TypeError,ImportError):
+  historical_plug_rows=[]
+ historical_by_id={r['game_id']:r for r in historical_plug_rows}
+ for item in games:
+  replay=historical_by_id.get(item['game_id'])
+  if replay:
+   item['plug_historical_simulation']=replay
+ historical_plug_tally={
+  market:{outcome:sum(bool(r.get(market+'_side')) and r.get(market+'_result')==outcome
+                      for r in historical_plug_rows)
+          for outcome in ('Win','Loss','Push')}
+  for market in ('ats','ou')}
+ historical_plug_tally.update({
+  'ats_selected':sum(bool(r.get('ats_side')) for r in historical_plug_rows),
+  'ou_selected':sum(bool(r.get('ou_side')) for r in historical_plug_rows)})
  plug_ou_tally={key:sum(bool(g['plug_ou_pick']) and g['plug_ou_result']==key for g in games)
                 for key in ('Win','Loss','Push','Pending')}
  plug_ou_tally['selected']=sum(bool(g['plug_ou_pick']) for g in games)
@@ -186,4 +207,4 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
  if fade_context:
   model_label='Scout · faded points-only formula'
   model_note='Public Scout selections invert the approved points-for/points-allowed formula; original forecasts remain archived.'
- return dict(**scout_context,**dynamic_context,scout_fade=fade_context,all_weeks=all_weeks,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(**scout_context,**dynamic_context,scout_fade=fade_context,all_weeks=all_weeks,historical_plug_tally=historical_plug_tally,historical_plug_simulation=True,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
