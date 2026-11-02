@@ -14,6 +14,7 @@
     <button type="submit">Show week</button>
   </form>
   {% endif %}
+  {% include '_scout_fade_record.html' %}
   <div class="tf-dynamic-record-grid">
     {% if dynamic_record_enabled|default(false) %}
       {% include '_plug_dynamic_record.html' %}
@@ -24,16 +25,7 @@
         <p class="tf-dynamic-empty">No official dynamic Plug record is available for this week.</p>
       </section>
     {% endif %}
-    {% if scout_dynamic_counts is defined %}
-      {% include '_scout_dynamic_records.html' %}
-    {% else %}
-      <section class="weekly-dynamic-panel">
-        <p class="weekly-dynamic-eyebrow">Dynamic selections</p>
-        <h2>Scout</h2>
-        <p class="tf-dynamic-empty">No verified dynamic Scout record is available for this week.</p>
-      </section>
-    {% endif %}
   </div>
-  <p class="tf-dynamic-footnote">Records include graded picks and pending selections from saved dynamic receipts. Original first-issued forecasts and older selection policies remain on file but are not included in these displayed records.</p>
+  <p class="tf-dynamic-footnote">The Plug record uses its own dynamic receipts. Scout now follows the updated points-only fade policy; original Scout forecasts remain archived separately.</p>
 </div>
 {% endblock %}

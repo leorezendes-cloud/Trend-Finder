@@ -1,0 +1,129 @@
+{
+  "schema": "trend-findah-scout-fade-replay-v1",
+  "season": 2026,
+  "week": 6,
+  "formula_version": "plug-points-only-4",
+  "published_formula": "Original points-for/points-allowed",
+  "weights": {
+    "scout_scoring": 0,
+    "plug_points_only": 1
+  },
+  "configuration_sha256": "4b9a85b948cb0f1eeab19078df6d6f69a0244c947f460e01ab1537bbe9a12a31",
+  "replay_method": "Recomputed each Week 6 forecast from its frozen pregame scout_scoring.margin_first, plug_points_only.away_margin, and original quoted spread using the Week 7–8 approved weights; then inverted the resulting ATS side. Final scores were used only for grading.",
+  "original_week6_scout_record": "7-7 (preserved; excluded from this public cohort)",
+  "replay_record": "8-6-0",
+  "games": [
+    {
+      "game_id": "2026_06_NO_NYG",
+      "away_team": "NO",
+      "home_team": "NYG",
+      "updated_formula_pick": "NYG",
+      "scout_pick": "NO",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_TEN_IND",
+      "away_team": "TEN",
+      "home_team": "IND",
+      "updated_formula_pick": "TEN",
+      "scout_pick": "IND",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_CAR_PHI",
+      "away_team": "CAR",
+      "home_team": "PHI",
+      "updated_formula_pick": "CAR",
+      "scout_pick": "PHI",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_CHI_ATL",
+      "away_team": "CHI",
+      "home_team": "ATL",
+      "updated_formula_pick": "ATL",
+      "scout_pick": "CHI",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_NYJ_NE",
+      "away_team": "NYJ",
+      "home_team": "NE",
+      "updated_formula_pick": "NYJ",
+      "scout_pick": "NE",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_BAL_CLE",
+      "away_team": "BAL",
+      "home_team": "CLE",
+      "updated_formula_pick": "BAL",
+      "scout_pick": "CLE",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_BUF_LV",
+      "away_team": "BUF",
+      "home_team": "LV",
+      "updated_formula_pick": "LV",
+      "scout_pick": "BUF",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_PIT_TB",
+      "away_team": "PIT",
+      "home_team": "TB",
+      "updated_formula_pick": "TB",
+      "scout_pick": "PIT",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_ARI_LA",
+      "away_team": "ARI",
+      "home_team": "LA",
+      "updated_formula_pick": "ARI",
+      "scout_pick": "LA",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_DAL_GB",
+      "away_team": "DAL",
+      "home_team": "GB",
+      "updated_formula_pick": "DAL",
+      "scout_pick": "GB",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_WAS_SF",
+      "away_team": "WAS",
+      "home_team": "SF",
+      "updated_formula_pick": "SF",
+      "scout_pick": "WAS",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_HOU_JAX",
+      "away_team": "HOU",
+      "home_team": "JAX",
+      "updated_formula_pick": "JAX",
+      "scout_pick": "HOU",
+      "expected_result": "Win"
+    },
+    {
+      "game_id": "2026_06_LAC_KC",
+      "away_team": "LAC",
+      "home_team": "KC",
+      "updated_formula_pick": "KC",
+      "scout_pick": "LAC",
+      "expected_result": "Loss"
+    },
+    {
+      "game_id": "2026_06_SEA_DEN",
+      "away_team": "SEA",
+      "home_team": "DEN",
+      "updated_formula_pick": "SEA",
+      "scout_pick": "DEN",
+      "expected_result": "Win"
+    }
+  ]
+}
