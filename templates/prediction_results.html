@@ -14,8 +14,8 @@
     <button type="submit">Show week</button>
   </form>
   {% endif %}
-  {% include '_scout_fade_record.html' %}
   <div class="tf-dynamic-record-grid">
+    {% include '_scout_fade_record.html' %}
     {% if dynamic_record_enabled|default(false) %}
       {% include '_plug_dynamic_record.html' %}
     {% else %}
