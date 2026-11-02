@@ -100,8 +100,8 @@ def _week_six_shadow_totals(root):
     if (config.get('totals_model_file_sha256') is None
             or model.get('version') != 'scout4-totals-1'
             or candidate.get('name') != 'Market + statistics'
-            or candidate.get('target_season') != 2026
-            or candidate.get('first_eligible_week') != 6):
+            or config.get('target_season') != 2026
+            or config.get('first_eligible_week') != 6):
         raise ValueError('Week 6 totals candidate is not the approved frozen model')
     from scout4.shadow import view
     records=[r for r in view(Path(root))['records']
@@ -133,11 +133,14 @@ def _week_six_shadow_totals(root):
 
 def records(root, finals, season, week, *, now=None):
     """One Scout O/U cohort: Week 6 sealed replay plus later live-issued totals."""
-    if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1' or season is None:
+    if season is None:
         return {}
     now=now or datetime.now(timezone.utc)
     rows=[];review=False
-    for path in sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')):
+    live_enabled = os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1'
+    if not live_enabled and int(season) != 2026:
+        return {}
+    for path in (sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')) if live_enabled else []):
         if not path.is_dir():
             continue
         year,number,away,home=path.name.split('_')
@@ -160,6 +163,45 @@ def records(root, finals, season, week, *, now=None):
             replay=_week_six_shadow_totals(root)
             live_ids={r['game_id'] for r in rows}
             rows.extend(r for r in replay if r['game_id'] not in live_ids)
+        except (ValueError,OSError,KeyError,TypeError):
+            review=True
+    # Weeks 7+ use the already-published positive Scout totals lean.
+    # This is intentionally not the ATS fade: totals are graded from the
+    # saved pregame forecast and its frozen O/U quote.
+    if int(season) == 2026 and (week is None or int(week) >= 7):
+        try:
+            import csv
+            from forecast_history import official_sources, total_result
+            schedule_path=Path(root)/'nfl_games.csv'
+            with schedule_path.open(newline='') as handle:
+                games={g['game_id']:g for g in csv.DictReader(handle)}
+            saved=official_sources(Path(root))
+            existing={r['game_id'] for r in rows}
+            for record in saved.values():
+                if (int(record.get('season',0)) != 2026
+                        or int(record.get('week',0)) < 7
+                        or (week is not None and int(record.get('week',0)) != int(week))
+                        or record.get('game_id') in existing):
+                    continue
+                total=record.get('totals') or {}
+                prediction=total.get('prediction') or {}
+                lean=prediction.get('lean')
+                if not total or lean not in ('Over','Under','No Call',None):
+                    continue
+                game=games.get(record.get('game_id'))
+                outcome=total_result(record,game)
+                result={'Correct':'Win','Wrong':'Loss','Win':'Win','Loss':'Loss',
+                        'Push':'Push','Pending':'Pending','No Call':'No Call'}.get(outcome)
+                if result is None:
+                    raise ValueError('Unrecognized saved Scout totals grade')
+                rows.append(dict(
+                    game_id=record['game_id'],season=2026,week=int(record['week']),
+                    away_team=record['away_team'],home_team=record['home_team'],
+                    kickoff_utc=record['kickoff_utc'],ou_side=lean,
+                    total_quote=total.get('quote',{}).get('line'),
+                    grades={'ou':result,'ats':'No Call','su':'No Call'},
+                    source='saved positive Scout totals'))
+                existing.add(record['game_id'])
         except (ValueError,OSError,KeyError,TypeError):
             review=True
     rows.sort(key=lambda r:(int(r.get('week',0)),r.get('kickoff_utc',''),r.get('game_id','')))

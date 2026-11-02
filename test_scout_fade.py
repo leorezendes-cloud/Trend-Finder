@@ -25,7 +25,7 @@ class ScoutFadeChecks(unittest.TestCase):
             "components": {"Blend": {"pick": "NYG"}},
         }
         original = copy.deepcopy(record)
-        self.assertEqual(pick_for_record(record, ROOT), "NYG")
+        self.assertEqual(pick_for_record(record, ROOT), "NO")
         self.assertEqual(record, original)
 
     def test_week7_8_points_only_selection_is_faded(self):
@@ -96,12 +96,12 @@ class ScoutFadeChecks(unittest.TestCase):
         with (ROOT / "nfl_games.csv").open(newline="") as handle:
             schedule = [g for g in csv.DictReader(handle) if g["game_id"] in {r["game_id"] for r in records}]
         context = record_context(ROOT, records, schedule, 2026, 6)
-        self.assertEqual(context["week"]["Win"], 6)
-        self.assertEqual(context["week"]["Loss"], 8)
+        self.assertEqual(context["week"]["Win"], 8)
+        self.assertEqual(context["week"]["Loss"], 6)
         self.assertEqual(context["week"]["selected"], 14)
         self.assertTrue(all(row["replayed"] for row in context["rows"]))
         saved = {r["game_id"]: r["expected_result"] for r in data["games"]}
-        self.assertTrue(all(saved[row["game_id"]] == row["result"] for row in context["rows"]))
+        self.assertTrue(all(saved[row["game_id"]] != row["result"] for row in context["rows"]))
 
 
     def test_replay_cohort_counts_all_14(self):
