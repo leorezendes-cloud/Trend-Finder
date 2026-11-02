@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import patch, MagicMock
 from app import app
-from fan_views import parse_scores, _score_cache, leaders, prediction_performance
+from fan_views import parse_scores, _score_cache, leaders, prediction_performance, combine_plug_record
 from scout4.stats import recent_form, betting_result, team_records, summarize_team
 
 
@@ -10,6 +10,25 @@ class FanViewsTests(unittest.TestCase):
     def setUp(self):
         from fan_views import _score_response
         _score_response.update(key=None, expires=0, body=None)
+
+    def test_plug_record_combines_historical_weeks_six_seven_and_prospective_week_eight(self):
+        historical = [
+            {'game_id':'2026_06_AAA_BBB','season':2026,'week':6,'away_team':'AAA','home_team':'BBB',
+             'ats_side':'AAA','ats_result':'Win','ou_side':'Under','ou_result':'Loss'},
+            {'game_id':'2026_07_CCC_DDD','season':2026,'week':7,'away_team':'CCC','home_team':'DDD',
+             'ats_side':'DDD','ats_result':'Loss','ou_side':None,'ou_result':None},
+        ]
+        prospective = [{
+            'game_id':'2026_08_EEE_FFF','season':2026,'week':8,'away_team':'EEE','home_team':'FFF',
+            'ats_selected':True,'ats_side':'EEE','ats_result':'Pending',
+            'ou_selected':True,'ou_side':'Over','ou_result':'Win',
+        }]
+        combined = combine_plug_record(historical, prospective)
+        self.assertEqual([r['week'] for r in combined['rows']], [6,7,8])
+        self.assertEqual(combined['counts']['ats'],
+                         {'Win':1,'Loss':1,'Push':0,'Pending':1,'selected':3})
+        self.assertEqual(combined['counts']['ou'],
+                         {'Win':1,'Loss':1,'Push':0,'Pending':0,'selected':2})
 
     def test_scheduled_scores_are_not_reported_as_zero(self):
         event = {'date':'2026-10-09T00:15Z', 'competitions':[{

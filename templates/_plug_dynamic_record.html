@@ -1,87 +1,24 @@
 {% if (dynamic_record_enabled|default(false)) or historical_plug_simulation or official_plug_tally is defined %}
-{% if historical_plug_simulation and (all_weeks or selected_week in (6,7)) %}
-<section class="weekly-dynamic-panel" id="dynamic-plug-record">
+<section class="weekly-dynamic-panel" id="plug-combined-record">
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Historical simulation · not issued pregame</p><h2>The Plug · {% if all_weeks %}Weeks 6–7 combined retrospective record{% else %}Week {{ selected_week }} retrospective record{% endif %}</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Combined ATS &amp; O/U record</p><h2>The Plug's Record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
-    <div><span>ATS record</span><strong>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats.Win }}–{{ historical_plug_tally.ats.Loss }}–{{ historical_plug_tally.ats.Push }}{% else %}—{% endif %}</strong><small>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats_selected }} selections{% else %}No qualifying selections{% endif %}</small></div>
-    <div><span>O/U record</span><strong>{{ historical_plug_tally.ou.Win }}–{{ historical_plug_tally.ou.Loss }}–{{ historical_plug_tally.ou.Push }}</strong><small>{{ historical_plug_tally.ou_selected }} selections</small></div>
+    <div><span>ATS record</span><strong>{{ plug_combined_record.counts.ats.Win }}–{{ plug_combined_record.counts.ats.Loss }}–{{ plug_combined_record.counts.ats.Push }}</strong><small>{{ plug_combined_record.counts.ats.Pending }} pending · {{ plug_combined_record.counts.ats.selected }} selections</small></div>
+    <div><span>O/U record</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
   </div>
-  {% if all_weeks %}
   <details class="weekly-dynamic-details">
-    <summary>View each historical week separately</summary>
-    {% for week_num in historical_plug_weeks %}
-      {% set week_tally = historical_plug_tallies_by_week[week_num] %}
-      <div class="weekly-dynamic-game">
-        <strong>Week {{ week_num }}</strong>
-        <span>ATS: {% if week_tally.ats_selected %}{{ week_tally.ats.Win }}–{{ week_tally.ats.Loss }}–{{ week_tally.ats.Push }}{% else %}No qualifying selections{% endif %}</span>
-        <span>O/U: {{ week_tally.ou.Win }}–{{ week_tally.ou.Loss }}–{{ week_tally.ou.Push }} ({{ week_tally.ou_selected }} selections)</span>
-      </div>
-    {% endfor %}
-  </details>
-  {% endif %}
-</section>
-{% endif %}
-{% if official_plug_tally is defined %}
-<section class="weekly-dynamic-panel" id="issued-plug-record">
-  <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Official prospective selections · immutable receipts</p><h2>The Plug · {% if all_weeks|default(false) %}All Weeks issued record{% else %}Week {{ selected_week }} issued record{% endif %}</h2></div>
-  </div>
-  {% if plug_receipts_review %}
-    <p class="weekly-dynamic-caution">ATS receipts need review. The official ATS record is unavailable.</p>
-  {% else %}
-  <div class="weekly-dynamic-stats">
-    <div><span>ATS record</span><strong>{{ official_plug_tally.ats.Win }}–{{ official_plug_tally.ats.Loss }}–{{ official_plug_tally.ats.Push }}</strong><small>{{ official_plug_tally.ats.Pending }} pending · {{ official_plug_tally.ats.selected }} issued selections</small></div>
-    <div><span>O/U record</span><strong>{{ official_plug_tally.ou.Win }}–{{ official_plug_tally.ou.Loss }}–{{ official_plug_tally.ou.Push }}</strong><small>{{ official_plug_tally.ou.Pending }} pending · {{ official_plug_tally.ou.selected }} issued selections</small></div>
-  </div>
-  {% endif %}
-  <details class="weekly-dynamic-details">
-    <summary>View official issued picks</summary>
+    <summary>View Plug selections{% if all_weeks|default(false) %} · All Weeks{% else %} · Week {{ selected_week }}{% endif %}</summary>
     <div class="weekly-dynamic-list">
-      {% for r in plug_week_picks %}
+    {% for r in plug_combined_record.rows if r.ats_selected or r.ou_selected %}
       <div class="weekly-dynamic-game">
         <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
-        <div><span>ATS · Week {{ r.week }}</span><strong>{{ r.side }} {{ '%+g'|format(r.away_line if r.side==r.away_team else -r.away_line) }}</strong><small>{{ r.result }}</small></div>
+        <small>Week {{ r.week }}</small>
+        {% if r.ats_selected %}<div><span>ATS</span><strong>{{ r.ats_side }}</strong><small>{{ r.ats_result }}</small></div>{% endif %}
+        {% if r.ou_selected %}<div><span>O/U</span><strong>{{ r.ou_side }}</strong><small>{{ r.ou_result }}</small></div>{% endif %}
       </div>
-      {% endfor %}
-      {% for r in plug_ou_week_picks + plug_ou_legacy_picks %}
-      <div class="weekly-dynamic-game">
-        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
-        <div><span>O/U · Week {{ r.week }}</span><strong>{{ r.side }} {{ '%g'|format(r.market_total) }}</strong><small>{{ r.result }}</small></div>
-      </div>
-      {% endfor %}
-      {% if not plug_week_picks and not plug_ou_week_picks and not plug_ou_legacy_picks %}
-      <p>No prospective Plug selections were issued in this cohort. Weeks 6–7 are shown separately as retrospective research.</p>
-      {% endif %}
+    {% else %}<p>No qualifying Plug selections for this week.</p>{% endfor %}
     </div>
   </details>
 </section>
-{% endif %}
-{% if dynamic_record_enabled|default(false) %}
-<section class="weekly-dynamic-panel" id="dynamic-plug-official-record">
-  <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Prospective selections</p><h2>The Plug · {% if all_weeks|default(false) %}All Weeks{% else %}Dynamic record{% endif %}</h2></div>
-  </div>
-  {% if dynamic_record_review %}<p class="weekly-dynamic-caution">Dynamic receipts need review. Results unavailable.</p>{% else %}
-  {% if dynamic_record_errors %}<p class="weekly-dynamic-caution">Some game receipts need review and are excluded from these totals: {{ dynamic_record_errors|join(', ') }}.</p>{% endif %}
-  <div class="weekly-dynamic-stats">
-    <div><span>{% if all_weeks|default(false) %}All Weeks ATS record{% else %}ATS record{% endif %}</span><strong>{{ dynamic_record_counts.ats.Win }}–{{ dynamic_record_counts.ats.Loss }}–{{ dynamic_record_counts.ats.Push }}</strong><small>{{ dynamic_record_counts.ats.Pending }} pending</small></div>
-    <div><span>{% if all_weeks|default(false) %}All Weeks O/U record{% else %}O/U record{% endif %}</span><strong>{{ dynamic_record_counts.ou.Win }}–{{ dynamic_record_counts.ou.Loss }}–{{ dynamic_record_counts.ou.Push }}</strong><small>{{ dynamic_record_counts.ou.Pending }} pending</small></div>
-  </div>
-  <details class="weekly-dynamic-details">
-    <summary>View issued Plug selections {% if all_weeks|default(false) %}(All Weeks){% endif %}</summary>
-    <div class="weekly-dynamic-list">
-    {% for r in dynamic_record_rows if r.ats_selected or r.ou_selected %}
-      <div class="weekly-dynamic-game">
-        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
-        {% if r.ats_selected %}<div><span>ATS</span><strong>{{ r.ats_side }} {{ '%+g'|format(r.ats_away_line if r.ats_side==r.away_team else -r.ats_away_line) }}</strong></div>{% endif %}
-        {% if r.ou_selected %}<div><span>O/U</span><strong>{{ r.ou_side }} {{ '%g'|format(r.ou_market_total) }}</strong></div>{% endif %}
-      </div>
-    {% else %}<p>No official dynamic selections for this week.</p>{% endfor %}
-    </div>
-  </details>
-  {% endif %}
-</section>
-{% endif %}
 {% endif %}
