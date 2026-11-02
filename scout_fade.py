@@ -43,7 +43,7 @@ def pick_for_record(record, root):
         if (replay["away_team"], replay["home_team"]) != (
                 record.get("away_team"), record.get("home_team")):
             raise ValueError("Week 6 replay matchup identity differs from its source forecast")
-        return replay["updated_formula_pick"]
+        return replay["scout_pick"]
     if (record.get("version") != FORMULA_VERSION
             or record.get("configuration_sha256") != CONFIGURATION_SHA256
             or record.get("weights") != WEIGHTS):
@@ -108,7 +108,7 @@ def record_context(root, records, schedule, season, selected_week):
                 # for the inverted selection. Do not re-grade it with the original
                 # Blend quote here: that quote's sign convention differs from the
                 # replay's normalized away/home handicap.
-                result = replay["expected_result"]
+                result = {"Win": "Loss", "Loss": "Win"}.get(replay["expected_result"], replay["expected_result"])
             else:
                 result = grade_pick(record, game, pick)
             line = float(record["quote"]["line"])
