@@ -32,6 +32,10 @@ class InjuryImpactFlagTests(unittest.TestCase):
         css = (root / "static/expert_beta.css").read_text()
         self.assertIn(".plug-completed-body * { text-align:left;", css)
         self.assertIn("padding: 16px 20px 20px !important", css)
+        injury_css = (root / "static/injury_impact.css").read_text()
+        self.assertIn(".weekly-injury-impact .weekly-injury-impact-body", injury_css)
+        self.assertIn("padding:20px 24px !important", injury_css)
+        self.assertIn("background-color:#111827 !important", injury_css)
         self.assertIn(".plug-completed-body p,", css)
         self.assertNotIn("plug-completed-details > summary {\n  padding:", css)
 
@@ -48,7 +52,8 @@ class InjuryImpactFlagTests(unittest.TestCase):
         self.assertIn("bottom:9px", css)
         self.assertIn(".tf-board-home .tf-board-item > .tf-board-injury .game-injury-impact-body {", css)
         self.assertIn("background:#111827 !important", css)
-        self.assertIn("padding:18px 20px !important", css)
+        self.assertIn(".weekly-injury-impact .weekly-injury-impact-body", (root / "static/injury_impact.css").read_text())
+        self.assertIn("right:0 !important", css)
         self.assertNotIn(".tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact > summary", css)
 
     def test_unrelated_games_are_not_flagged(self):
