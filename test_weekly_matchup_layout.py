@@ -45,6 +45,13 @@ class WeeklyMatchupTests(unittest.TestCase):
                 self.assertIn('entering Week',response.text)
                 self.assertNotIn('Score / status',response.text)
 
+    def test_weekly_matchup_cards_omit_underdog_ats_tile(self):
+        from pathlib import Path
+        template = (Path(__file__).resolve().parent / "templates/sunday_results.html").read_text()
+        self.assertNotIn('<span>Underdog ATS</span>', template)
+        self.assertIn('<span>Scout ATS</span>', template)
+        self.assertIn('<span>Scout O/U</span>', template)
+
     def test_market_redirects_to_the_plug(self):
         from app import app
         response=app.test_client().get('/market')
