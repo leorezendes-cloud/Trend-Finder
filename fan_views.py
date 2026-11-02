@@ -636,15 +636,27 @@ def prediction_results():
     # v5/v14 retrospective replay used by Weekly Results, never as issued picks.
     historical_plug_rows=[]
     historical_plug_weeks=[]
+    historical_plug_tallies_by_week={}
     try:
         from plug_historical_simulations import historical_simulations
-        replay_weeks = [] if all_weeks else ([selected_week] if selected_week in (6, 7) else [])
+        replay_weeks = [6, 7] if all_weeks else ([selected_week] if selected_week in (6, 7) else [])
         for replay_week in replay_weeks:
-            historical_plug_rows.extend(historical_simulations(ROOT, season, replay_week))
+            week_rows = historical_simulations(ROOT, season, replay_week)
+            historical_plug_rows.extend(week_rows)
             historical_plug_weeks.append(replay_week)
+            tally={
+                market:{outcome:sum(bool(r.get(market+'_side')) and r.get(market+'_result')==outcome
+                                    for r in week_rows)
+                        for outcome in ('Win','Loss','Push')}
+                for market in ('ats','ou')}
+            tally.update({
+                'ats_selected':sum(bool(r.get('ats_side')) for r in week_rows),
+                'ou_selected':sum(bool(r.get('ou_side')) for r in week_rows)})
+            historical_plug_tallies_by_week[replay_week]=tally
     except (OSError, KeyError, ValueError, TypeError, ImportError):
         historical_plug_rows=[]
         historical_plug_weeks=[]
+        historical_plug_tallies_by_week={}
     historical_plug_tally={
         market:{outcome:sum(bool(r.get(market+'_side')) and r.get(market+'_result')==outcome
                             for r in historical_plug_rows)
@@ -672,4 +684,5 @@ def prediction_results():
                            plug_ou_review=plug_ou_review, all_weeks=all_weeks,
                            historical_plug_simulation=bool(historical_plug_weeks),
                            historical_plug_weeks=historical_plug_weeks,
-                           historical_plug_tally=historical_plug_tally)
+                           historical_plug_tally=historical_plug_tally,
+                           historical_plug_tallies_by_week=historical_plug_tallies_by_week)

@@ -1,16 +1,32 @@
-{% if (dynamic_record_enabled|default(false)) or (historical_plug_simulation and selected_week in (6,7) and not all_weeks) %}
+{% if (dynamic_record_enabled|default(false)) or historical_plug_simulation %}
+{% if historical_plug_simulation and (all_weeks or selected_week in (6,7)) %}
 <section class="weekly-dynamic-panel" id="dynamic-plug-record">
-  {% if historical_plug_simulation and selected_week in (6,7) and not all_weeks %}
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Historical simulation · not issued pregame</p><h2>The Plug · Week {{ selected_week }} retrospective record</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Historical simulation · not issued pregame</p><h2>The Plug · {% if all_weeks %}Weeks 6–7 combined retrospective record{% else %}Week {{ selected_week }} retrospective record{% endif %}</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
     <div><span>ATS record</span><strong>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats.Win }}–{{ historical_plug_tally.ats.Loss }}–{{ historical_plug_tally.ats.Push }}{% else %}—{% endif %}</strong><small>{% if historical_plug_tally.ats_selected %}{{ historical_plug_tally.ats_selected }} selections{% else %}No qualifying selections{% endif %}</small></div>
     <div><span>O/U record</span><strong>{{ historical_plug_tally.ou.Win }}–{{ historical_plug_tally.ou.Loss }}–{{ historical_plug_tally.ou.Push }}</strong><small>{{ historical_plug_tally.ou_selected }} selections</small></div>
   </div>
-  {% elif dynamic_record_enabled|default(false) %}
+  {% if all_weeks %}
+  <details class="weekly-dynamic-details">
+    <summary>View each historical week separately</summary>
+    {% for week_num in historical_plug_weeks %}
+      {% set week_tally = historical_plug_tallies_by_week[week_num] %}
+      <div class="weekly-dynamic-game">
+        <strong>Week {{ week_num }}</strong>
+        <span>ATS: {% if week_tally.ats_selected %}{{ week_tally.ats.Win }}–{{ week_tally.ats.Loss }}–{{ week_tally.ats.Push }}{% else %}No qualifying selections{% endif %}</span>
+        <span>O/U: {{ week_tally.ou.Win }}–{{ week_tally.ou.Loss }}–{{ week_tally.ou.Push }} ({{ week_tally.ou_selected }} selections)</span>
+      </div>
+    {% endfor %}
+  </details>
+  {% endif %}
+</section>
+{% endif %}
+{% if dynamic_record_enabled|default(false) %}
+<section class="weekly-dynamic-panel" id="dynamic-plug-official-record">
   <div class="weekly-dynamic-heading">
-    <div><p class="weekly-dynamic-eyebrow">Prospective selections</p><h2>The Plug · Dynamic record</h2></div>
+    <div><p class="weekly-dynamic-eyebrow">Prospective selections</p><h2>The Plug · {% if all_weeks|default(false) %}All Weeks{% else %}Dynamic record{% endif %}</h2></div>
   </div>
   {% if dynamic_record_review %}<p class="weekly-dynamic-caution">Dynamic receipts need review. Results unavailable.</p>{% else %}
   <div class="weekly-dynamic-stats">
@@ -30,6 +46,6 @@
     </div>
   </details>
   {% endif %}
-  {% endif %}
 </section>
+{% endif %}
 {% endif %}
