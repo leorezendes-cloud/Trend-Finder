@@ -1,9 +1,6 @@
-{# Small, non-disruptive marker for a materially injury-distorted final. #}
+{# Compact marker; native title exposes details without nesting an interactive disclosure in a score-card summary. #}
 <link rel="stylesheet" href="{{ url_for('static', filename='injury_impact.css') }}">
 {% set injury_impact = injury_impact_for_game(game.game_id) %}
 {% if injury_impact %}
-<details class="game-injury-impact">
-  <summary title="{{ injury_impact.title }}" aria-label="Injury impact: {{ injury_impact.title }}">⚑ Injury impact</summary>
-  <div class="game-injury-impact-body"><strong>{{ injury_impact.title }}</strong><p>{{ injury_impact.details }}</p><small>Research context only · official score and grades unchanged</small></div>
-</details>
+<span class="game-injury-impact" role="img" aria-label="Injury impact: {{ injury_impact.title }}" title="{{ injury_impact.title }} — {{ injury_impact.details }}">⚑ Injury impact</span>
 {% endif %}
