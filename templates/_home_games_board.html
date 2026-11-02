@@ -39,8 +39,9 @@
             </div>
           </div>
         </details>
-        <div class="tf-board-marks" aria-label="Game trend and anomaly badges"></div>
-        {% if key == 'post' %}{% set game = item %}{% include '_game_injury_impact_flag.html' %}{% endif %}
+        <div class="tf-board-marks" aria-label="Game trend and anomaly badges">
+          {% if key == 'post' %}{% set game = item %}{% include '_game_injury_impact_flag.html' %}{% endif %}
+        </div>
       </div>
     {% endfor %}
     </div>
