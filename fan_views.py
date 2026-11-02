@@ -636,7 +636,7 @@ def prediction_results():
     # Weeks 6–7 retrospective closing-line replay.
     official_ou_rows = plug_ou_week_picks + plug_ou_legacy_picks
     official_plug_tally = {
-        'ats': dict(plug_week_totals),
+        'ats': {**plug_week_totals, 'selected': len(plug_week_picks)},
         'ou': {key: sum(r.get('result') == key for r in official_ou_rows)
                for key in ('Win', 'Loss', 'Push', 'Pending')},
     }
