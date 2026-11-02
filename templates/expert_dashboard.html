@@ -11,7 +11,7 @@
 <div class="plug-final-score" aria-label="Final score">
   <span class="plug-final-label">FINAL</span>
   <div class="plug-final-teams"><span>{{ g.away_team }} <strong>{{ item.final_score.away }}</strong></span><span>{{ g.home_team }} <strong>{{ item.final_score.home }}</strong></span></div>
-<div class="plug-anomaly-slot">{% if item.final_score %}{% set anomalies=saved_anomaly_links('%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)) %}{% include '_game_anomaly_flag.html' %}{% endif %}</div>
+<div class="plug-anomaly-slot">{% if item.final_score %}{% set game = namespace(game_id='%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)) %}{% set anomalies=saved_anomaly_links(game.game_id) %}{% include '_game_anomaly_flag.html' %}{% set game = {'game_id': game.game_id} %}{% include '_game_injury_impact_flag.html' %}{% endif %}</div>
 </div>
 {% else %}<div class="plug-anomaly-slot"></div>{% endif %}
 {% if compact %}<details class="plug-completed-details"><summary>View picks, results &amp; analysis</summary><div class="plug-completed-body">{% endif %}
