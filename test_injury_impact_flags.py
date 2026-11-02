@@ -17,6 +17,7 @@ class InjuryImpactFlagTests(unittest.TestCase):
         root = Path(__file__).resolve().parent
         partial = (root / "templates/_game_injury_impact_flag.html").read_text()
         self.assertIn("injury_impact_for_game(game.game_id)", partial)
+        self.assertNotIn("Research context only. The official score, selections, and grades remain unchanged.", partial)
         for name in ("sunday_results.html", "matchup.html", "_general_games.html",
                      "_home_games_board.html", "games_board.html", "game_center.html"):
             self.assertIn("_game_injury_impact_flag.html",
@@ -55,6 +56,9 @@ class InjuryImpactFlagTests(unittest.TestCase):
         self.assertIn(".weekly-injury-impact .weekly-injury-impact-body", (root / "static/injury_impact.css").read_text())
         self.assertIn("right:0 !important", css)
         self.assertNotIn(".tf-board-home .tf-board-item > .tf-board-injury details.game-injury-impact > summary", css)
+        self.assertIn("@media(max-width:720px)", css)
+        self.assertIn("position:relative", css[css.rfind("@media(max-width:720px)"):])
+        self.assertIn("margin:8px 0 0", css[css.rfind("@media(max-width:720px)"):])
 
     def test_unrelated_games_are_not_flagged(self):
         self.assertIsNone(for_game("2026_08_BUF_BAL"))
