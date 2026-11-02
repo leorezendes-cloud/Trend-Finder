@@ -29,7 +29,7 @@ def underdog_records(rows,season,before_week):
   record[result]+=1
  return records
 
-def build_results(root,week=None,score_updates=None):
+def build_results(root,week=None,score_updates=None,all_weeks=False):
  rows=confirmed_score_rows(list(load_games(root/'nfl_games.csv').values()),score_updates)
  from forecast_history import official_sources
  all_frozen=official_sources(root)
@@ -178,11 +178,12 @@ def build_results(root,week=None,score_updates=None):
  tally=dict(covers=sum(g['ats_result']=='Cover' for g in games),losses=sum(g['ats_result']=='Loss' for g in games),pushes=sum(g['ats_result']=='Push' for g in games),correct=sum(g['scout_result']=='Correct' for g in games),wrong=sum(g['scout_result']=='Wrong' for g in games),pick_pushes=sum(g['scout_result']=='Push' for g in games),finals=sum(g['game_status']=='Final' for g in games),games=len(games))
  tally.update(total_correct=sum(g['total_result']=='Correct' for g in games),total_wrong=sum(g['total_result']=='Wrong' for g in games),total_pushes=sum(g['total_result']=='Push' for g in games))
  from plug_dynamic_official import record_context
- dynamic_context=record_context(root,verified_finals,season,selected)
+ record_week=None if all_weeks else selected
+ dynamic_context=record_context(root,verified_finals,season,record_week)
  from scout_dynamic_public import records as scout_dynamic_records
- scout_context=scout_dynamic_records(root,verified_finals,season,selected)
- fade_context=scout_fade_record_context(root,all_frozen.values(),rows,season,selected)
+ scout_context=scout_dynamic_records(root,verified_finals,season,record_week)
+ fade_context=scout_fade_record_context(root,all_frozen.values(),rows,season,record_week)
  if fade_context:
   model_label='Scout · faded points-only formula'
   model_note='Public Scout selections invert the approved points-for/points-allowed formula; original forecasts remain archived.'
- return dict(**scout_context,**dynamic_context,scout_fade=fade_context,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(**scout_context,**dynamic_context,scout_fade=fade_context,all_weeks=all_weeks,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
