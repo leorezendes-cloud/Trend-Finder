@@ -122,7 +122,7 @@ def combined_cards(records, render_record, now):
         try:
             from scout_fade import pick_for_record
             public_pick = pick_for_record(record, ROOT)
-        except (OSError, ValueError, TypeError, KeyError):
+        except (OSError, ValueError, TypeError, KeyError, ImportError):
             public_pick = None
         selections = {'spread':{'side':public_pick,'label':'Pick'},
                       'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
