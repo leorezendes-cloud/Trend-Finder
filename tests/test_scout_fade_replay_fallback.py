@@ -26,3 +26,16 @@ def test_week_six_replay_counts_do_not_depend_on_forecast_archive(tmp_path):
     assert context["week"]["selected"] == 14
     assert len(context["rows"]) == 14
     assert all(row["replayed"] for row in context["rows"])
+
+
+def test_approved_repository_week_six_receipt_produces_public_8_6_record():
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    context = record_context(root, [], [], 2026, 6)
+
+    assert context["week"]["Win"] == 8
+    assert context["week"]["Loss"] == 6
+    assert context["week"]["Push"] == 0
+    assert context["week"]["selected"] == 14
+    assert all(row["replayed"] for row in context["rows"])
