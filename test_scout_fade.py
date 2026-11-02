@@ -1,4 +1,5 @@
 import copy
+import csv
 import json
 import tempfile
 import unittest
@@ -24,7 +25,7 @@ class ScoutFadeChecks(unittest.TestCase):
             "components": {"Blend": {"pick": "NYG"}},
         }
         original = copy.deepcopy(record)
-        self.assertEqual(pick_for_record(record, ROOT), "NO")
+        self.assertEqual(pick_for_record(record, ROOT), "NYG")
         self.assertEqual(record, original)
 
     def test_week7_8_points_only_selection_is_faded(self):
@@ -80,29 +81,34 @@ class ScoutFadeChecks(unittest.TestCase):
         self.assertEqual(all_weeks["week"]["selected"],2)
         self.assertEqual(all_weeks["overall"]["selected"],2)
 
-    def test_week6_replay_context_uses_verified_saved_grades(self):
+    def test_week6_replay_context_regrades_inverted_side_from_frozen_line(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
         records = []
         for row in data["games"]:
+            source = json.loads((ROOT / "data/scout4/blend/predictions" / f'{row["game_id"]}.json').read_text())
             records.append({
                 "season": 2026, "week": 6, "game_id": row["game_id"],
                 "away_team": row["away_team"], "home_team": row["home_team"],
                 "version": "legacy-scout", "weights": {"scout_scoring": .5, "plug_points_only": .5},
-                "components": {"Blend": {"pick": row["updated_formula_pick"]}},
-                "quote": {"line": 3.5},
-                "kickoff_utc": "2026-10-18T17:00:00+00:00",
+                "components": {"Blend": {"pick": row["scout_pick"]}},
+                "quote": source["quote"], "kickoff_utc": source["kickoff_utc"],
             })
-        context = record_context(ROOT, records, [], 2026, 6)
-        self.assertEqual(context["week"]["Win"], 8)
-        self.assertEqual(context["week"]["Loss"], 6)
+        with (ROOT / "nfl_games.csv").open(newline="") as handle:
+            schedule = [g for g in csv.DictReader(handle) if g["game_id"] in {r["game_id"] for r in records}]
+        context = record_context(ROOT, records, schedule, 2026, 6)
+        self.assertEqual(context["week"]["Win"], 6)
+        self.assertEqual(context["week"]["Loss"], 8)
         self.assertEqual(context["week"]["selected"], 14)
         self.assertTrue(all(row["replayed"] for row in context["rows"]))
+        saved = {r["game_id"]: r["expected_result"] for r in data["games"]}
+        self.assertTrue(all(saved[row["game_id"]] == row["result"] for row in context["rows"]))
+
 
     def test_replay_cohort_counts_all_14(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
         self.assertEqual(len(data["games"]), 14)
-        self.assertEqual(sum(row["expected_result"] == "Win" for row in data["games"]), 8)
-        self.assertEqual(sum(row["expected_result"] == "Loss" for row in data["games"]), 6)
+        self.assertEqual(sum(row["expected_result"] == "Win" for row in data["games"]), 6)
+        self.assertEqual(sum(row["expected_result"] == "Loss" for row in data["games"]), 8)
 
 
 if __name__ == "__main__":
