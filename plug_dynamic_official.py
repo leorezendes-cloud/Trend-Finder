@@ -173,7 +173,7 @@ def record_context(root, finals, season, week, *, as_of_utc=None):
         return {'dynamic_record_enabled':False}
     try:
         rows = history(root, finals, as_of_utc=as_of_utc)
-        selected = [r for r in rows if r['season']==season and r['week']==week]
+        selected = [r for r in rows if r['season']==season and (week is None or r['week']==week)]
         counts = {m:{k:sum(r[m+'_selected'] and r[m+'_result']==k for r in selected)
                      for k in ('Win','Loss','Push','Pending')} for m in ('ats','ou')}
         return dict(dynamic_record_enabled=True, dynamic_record_review=False,
