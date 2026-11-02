@@ -6,7 +6,7 @@
 </p><p>{{ g.season }} · Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p>
 <section class="current-system-selections" aria-label="Current Scout and Plug selections">
   <h3>Current Scout</h3>
-  {% if item.scout_dynamic|default(none) %}
+  {% if item.scout_dynamic|default(none) or item.scout_current_ats|default(none) %}
     {% include '_scout_dynamic.html' %}
   {% else %}
     <p class="scout-pending">Current Scout selection pending verified issuance.</p>
