@@ -92,7 +92,7 @@ def attach(root, item, *, now):
 
 def records(root, finals, season, week, *, now=None):
     """Separate dynamic cohort. Never aggregate with first-issued Scout results."""
-    if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1' or season is None or week is None:
+    if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1' or season is None:
         return {}
     now=now or datetime.now(timezone.utc)
     rows=[];review=False
@@ -100,7 +100,7 @@ def records(root, finals, season, week, *, now=None):
         if not path.is_dir():
             continue
         year,number,away,home=path.name.split('_')
-        if (int(year),int(number)) != (int(season),int(week)):
+        if int(year) != int(season) or (week is not None and int(number) != int(week)):
             continue
         try:
             saved=journal(root,path.name)
