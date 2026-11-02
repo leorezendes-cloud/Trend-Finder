@@ -99,7 +99,16 @@ def record_context(root, records, schedule, season, selected_week):
             if pick is None:
                 continue
             game = games.get(record["game_id"])
-            result = grade_pick(record, game, pick)
+            if int(record.get("season", 0)) == 2026 and int(record.get("week", 0)) == 6:
+                replay = replay_data(root).get(record["game_id"])
+                if (not replay or (replay["away_team"], replay["home_team"]) !=
+                        (record.get("away_team"), record.get("home_team"))):
+                    continue
+                # Week 6 was explicitly replayed and graded as an immutable 14-game cohort.
+                # Use its saved verified outcomes rather than requiring live schedule scores.
+                result = replay["expected_result"]
+            else:
+                result = grade_pick(record, game, pick)
             line = float(record["quote"]["line"])
             signed_line = line if pick == record["away_team"] else -line
             rows.append(dict(
