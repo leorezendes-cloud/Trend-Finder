@@ -488,22 +488,9 @@ def plug_ats_record():
 
 @bp.route('/the-plug/archive')
 def archive():
-    latest = {identity(r['scout']): r for r in records_or_fail()}
-    primary = {}
-    for record in records_or_fail():
-        primary.setdefault((identity(record['scout']), record['kind']), record)
-    cohorts = {}
-    for record in primary.values():
-        result = results_for(record)
-        cohort = cohorts.setdefault(record['kind'], {'recorded': 0, 'graded': 0, 'scout_ats': {'Win': 0, 'Loss': 0, 'Push': 0, 'Unavailable': 0, 'No selection': 0}, 'score_error_sum': 0.0})
-        cohort['recorded'] += 1
-        if result:
-            cohort['graded'] += 1
-            cohort['score_error_sum'] += result['team_score_mae']
-            cohort['scout_ats'][result['scout']['Spread']['result']] += 1
-    for cohort in cohorts.values():
-        cohort['team_score_mae'] = cohort.pop('score_error_sum') / cohort['graded'] if cohort['graded'] else None
-    return render_template('expert_archive.html', games=[public_record(r) for r in latest.values()], cohorts=cohorts)
+    """Legacy archive URL redirects to current selections, not archived Scout picks."""
+    from flask import redirect, url_for
+    return redirect(url_for('expert_beta.dashboard'), code=302)
 
 
 def find_record(season, week, matchup):
