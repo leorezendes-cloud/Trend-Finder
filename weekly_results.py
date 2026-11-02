@@ -29,6 +29,33 @@ def underdog_records(rows,season,before_week):
   record[result]+=1
  return records
 
+def scout_ou_record_context(records, schedule, season, selected_week):
+ """Grade Scout totals from the original saved pregame forecasts, never dynamic Scout or Plug receipts."""
+ from forecast_history import pregame_record, total_result
+ games={row.get('game_id'):row for row in schedule}
+ def tally(rows):
+  counts={key:0 for key in ('Win','Loss','Push','Pending','No Call','Unavailable','Review needed')}
+  selected=0
+  for record in rows:
+   try:
+    pregame_record(record)
+    result=total_result(record,games.get(record['game_id']))
+   except (OSError,KeyError,TypeError,ValueError):
+    result='Review needed'
+   if result not in counts:result='Review needed'
+   counts[result]+=1
+   total=record.get('totals') or {}
+   lean=(total.get('prediction') or {}).get('lean')
+   if lean in ('Over','Under'):selected+=1
+  counts['selected']=selected
+  counts['decisions']=counts['Win']+counts['Loss']
+  counts['win_rate']=round(100*counts['Win']/counts['decisions'],1) if counts['decisions'] else None
+  return counts
+ eligible=[r for r in records if int(r.get('season',0))==int(season or 0) and int(r.get('week',0))>=6]
+ selected=[r for r in eligible if selected_week is None or int(r.get('week',0))==int(selected_week)]
+ return {'scout_ou_record':{'overall':tally(eligible),'week':tally(selected)}}
+
+
 def build_results(root,week=None,score_updates=None,all_weeks=False):
  rows=confirmed_score_rows(list(load_games(root/'nfl_games.csv').values()),score_updates)
  from forecast_history import official_sources
