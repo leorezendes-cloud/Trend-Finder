@@ -100,8 +100,8 @@ def _week_six_shadow_totals(root):
     if (config.get('totals_model_file_sha256') is None
             or model.get('version') != 'scout4-totals-1'
             or candidate.get('name') != 'Market + statistics'
-            or config.get('target_season') != 2026
-            or config.get('first_eligible_week') != 6):
+            or candidate.get('target_season') != 2026
+            or candidate.get('first_eligible_week') != 6):
         raise ValueError('Week 6 totals candidate is not the approved frozen model')
     from scout4.shadow import view
     records=[r for r in view(Path(root))['records']
@@ -125,7 +125,7 @@ def _week_six_shadow_totals(root):
         output.append(dict(
             game_id=gid,season=2026,week=6,away_team=record['away_team'],
             home_team=record['home_team'],kickoff_utc=record['kickoff_utc'],
-            ou_side=record['selected_side'],total_quote=record['quote'],
+            ou_side=record['selected_side'],total_quote={'line': float(record['quote']['line'])},
             grades={'ou':result,'ats':'No Call','su':'No Call'},
             source='sealed historical simulation',model_version=model['version']))
     return output
@@ -198,7 +198,7 @@ def records(root, finals, season, week, *, now=None):
                     game_id=record['game_id'],season=2026,week=int(record['week']),
                     away_team=record['away_team'],home_team=record['home_team'],
                     kickoff_utc=record['kickoff_utc'],ou_side=lean,
-                    total_quote=total.get('quote',{}).get('line'),
+                    total_quote={'line': float(total.get('quote',{}).get('line'))},
                     grades={'ou':result,'ats':'No Call','su':'No Call'},
                     source='saved positive Scout totals'))
                 existing.add(record['game_id'])
