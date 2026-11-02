@@ -58,8 +58,6 @@
     <div class="weekly-matchup-details-body">
       {% if game.score_source %}<p><b>Score source:</b> {{ game.score_source }}</p>{% endif %}
       <p><b>Underdog straight-up:</b> {{ game.pending_note if game.su_result=='Pending' else game.su_result }}</p>
-      <p><b>Scout cushion:</b> {{ game.scout_cushion }}</p>
-      {% if game.forecast_digest %}<p><a href="{{ url_for('fans.matchup',game_id=game.game_id,forecast=game.forecast_digest) }}">View saved Scout forecast ↗</a></p>{% endif %}
       <p><b>Spread source:</b> {{ game.line_source }}{% if game.line_capture %} · {{ game.line_capture }} · {{ game.line_minutes }} minutes before kickoff{% endif %}</p>
       {% if game.has_rankings %}<p><b>Historical rankings:</b> 3Y #{{ game.rank_3y }} · 5Y #{{ game.rank_5y }} · 10Y #{{ game.rank_10y }} · All #{{ game.rank_all }}</p>{% else %}<p>No saved historical rankings.</p>{% endif %}
       {% if game.plug_status=='review' %}<p>Plug selections require review.</p>{% endif %}
