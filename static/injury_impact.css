@@ -7,3 +7,27 @@
 .game-injury-impact-body { padding:0 12px 10px; color:#fecaca; font:13px/1.55 Arial,sans-serif; }
 .game-injury-impact-body p { margin:7px 0; }
 .game-injury-impact-note { color:#fca5a5; font-size:12px; }
+
+
+/* Expanded injury details: solid, bordered panel that opens upward so it
+   remains readable without covering the game card's score and matchup. */
+.game-injury-impact { position:relative; }
+.game-injury-impact-body {
+  position:absolute;
+  z-index:90;
+  left:0;
+  top:auto;
+  bottom:calc(100% + 8px);
+  width:min(340px,calc(100vw - 48px));
+  box-sizing:border-box;
+  padding:13px 15px;
+  border:1px solid #7f1d1d;
+  border-radius:10px;
+  background:#111827;
+  color:#f3f4f6;
+  box-shadow:0 12px 30px rgba(0,0,0,.72);
+  text-align:left;
+}
+.game-injury-impact-body p { margin:8px 0; }
+.game-injury-impact-body strong { color:#fecaca; }
+.game-injury-impact-note { color:#fca5a5; }
