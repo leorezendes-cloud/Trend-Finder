@@ -66,6 +66,20 @@ class ScoutFadeChecks(unittest.TestCase):
             self.assertIsNotNone(context)
             self.assertEqual(context["week"]["selected"], 0)
 
+    def test_week_and_all_weeks_records_are_distinct_scopes(self):
+        records=[];schedule=[]
+        for week, gid, away_score, home_score in ((7,"g7","24","20"),(8,"g8","17","21")):
+            records.append({"season":2026,"week":week,"game_id":gid,"away_team":"A","home_team":"B",
+                "version":FORMULA_VERSION,"configuration_sha256":CONFIGURATION_SHA256,"weights":dict(WEIGHTS),
+                "components":{"Blend":{"pick":"A"}},"quote":{"line":3.5},
+                "kickoff_utc":f"2026-11-{week:02d}T18:00:00+00:00"})
+            schedule.append({"game_id":gid,"away_team":"A","home_team":"B","away_score":away_score,"home_score":home_score})
+        week7=record_context(ROOT,records,schedule,2026,7)
+        all_weeks=record_context(ROOT,records,schedule,2026,None)
+        self.assertEqual(week7["week"]["selected"],1)
+        self.assertEqual(all_weeks["week"]["selected"],2)
+        self.assertEqual(all_weeks["overall"]["selected"],2)
+
     def test_replay_cohort_counts_all_14(self):
         data = json.loads((ROOT / "data/scout4/fade_replay/2026_week6.json").read_text())
         self.assertEqual(len(data["games"]), 14)
