@@ -233,3 +233,22 @@
   background-color:#111827 !important;
   padding:20px 24px !important;
 }
+
+
+/* On mobile, place the injury flag after the expanded card in normal flow.
+   This prevents it from overlapping the Team Comparison button or other links. */
+@media(max-width:720px){
+  .tf-board-home .tf-board-item > .tf-board-injury{
+    position:relative;
+    right:auto;
+    bottom:auto;
+    display:flex;
+    justify-content:flex-end;
+    max-width:100%;
+    margin:8px 0 0;
+    z-index:12;
+  }
+  .tf-board-home .tf-board-item > .tf-board-game[data-state="post"] .tf-board-summary{
+    padding-bottom:16px;
+  }
+}
