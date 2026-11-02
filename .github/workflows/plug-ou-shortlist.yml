@@ -10,6 +10,7 @@ on:
       - 'plug_dynamic_*.py'
       - 'scout_dynamic*.py'
       - 'test_scout_dynamic.py'
+      - 'test_scout_dynamic_coverage.py'
       - 'scripts/benchmark_scout_dynamic.py'
       - 'test_plug_dynamic_*.py'
       - 'test_plug_ats_v5_selection.py'
@@ -64,6 +65,8 @@ jobs:
         run: python -m unittest test_weekly_results test_expert_pipeline_e2e test_prediction_cards test_hosted_updates test_hosted_scheduler test_scheduler_runtime test_plug_dynamic_capture test_plug_dynamic_production test_plug_dynamic_pipeline_regression test_newsletter_official_feature test_storage_maintenance test_prediction_staging -q
       - name: Verify isolated Scout revisions and unchanged Plug integration
         run: python -m unittest test_scout_dynamic -q
+      - name: Verify Scout O/U coverage reporting
+        run: python -m unittest test_scout_dynamic_coverage -q
       - name: Measure bounded Scout worker resource use
         run: /usr/bin/time -v python scripts/benchmark_scout_dynamic.py
       - name: Verify isolated feed and hosted memory guards
