@@ -37,8 +37,11 @@ def historical_simulations(root, season, week):
         try:
             away_score = float(game["away_score"])
             home_score = float(game["home_score"])
-            spread = float(game["spread_line"])
-            total_line = float(game["total_line"])
+            source = forecasts.get(gid) or {}
+            # Use the actual frozen pregame sportsbook quotes from the saved
+            # forecast, never a later closing/current line from the schedule.
+            spread = float(source["quote"]["line"])
+            total_line = float(source["totals"]["quote"]["line"])
             projection = float(ats[gid])
             v14 = float(totals[gid])
             if not all(math.isfinite(v) for v in
@@ -63,7 +66,6 @@ def historical_simulations(root, season, week):
 
         # Below 48, v14 policy deliberately retains the original Scout lean.
         # Require the saved pregame Scout direction; never infer it from the final.
-        source = forecasts.get(gid) or {}
         original = ((source.get("totals") or {}).get("prediction") or {}).get("lean")
         if original not in ("Over", "Under"):
             continue
