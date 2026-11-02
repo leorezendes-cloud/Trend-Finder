@@ -50,12 +50,10 @@ def historical_simulations(root, season, week):
             continue
 
         source = forecasts.get(gid) or {}
-        # ATS v5 projections and classify() use the away team's line
-        # perspective. nfl_games.csv stores spread_line from the home team's
-        # perspective, so invert it before applying the unchanged v5 rule.
+        # nflverse spread_line is the away team's handicap: positive means
+        # the home team is favored, negative means the away team is favored.
+        # v5 projections/classify() use this same away-team perspective.
         away_line = _finite(game.get("spread_line"))
-        if away_line is not None:
-            away_line = -away_line
         projection = _finite(ats.get(gid))
         ats_side = ats_result = ats_pick = None
         if away_line is not None and projection is not None:
