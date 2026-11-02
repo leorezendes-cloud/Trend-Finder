@@ -31,3 +31,37 @@
 .game-injury-impact-body p { margin:8px 0; }
 .game-injury-impact-body strong { color:#fecaca; }
 .game-injury-impact-note { color:#fca5a5; }
+
+
+/* The template's actual detail element is .weekly-injury-impact-body.
+   Earlier rules targeted .game-injury-impact-body, so they never matched. */
+.weekly-injury-impact .weekly-injury-impact-body {
+  position:absolute !important;
+  z-index:140 !important;
+  top:auto !important;
+  bottom:calc(100% + 8px) !important;
+  left:0 !important;
+  width:min(340px,calc(100vw - 44px)) !important;
+  box-sizing:border-box !important;
+  padding:20px 24px !important;
+  margin:0 !important;
+  border:1px solid #7f1d1d !important;
+  border-radius:10px !important;
+  background-color:#111827 !important;
+  color:#f9fafb !important;
+  opacity:1 !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.85) !important;
+  text-align:left !important;
+}
+.weekly-injury-impact .weekly-injury-impact-body p {
+  margin:10px 0 !important;
+  padding:0 2px !important;
+  color:#f9fafb !important;
+}
+.weekly-injury-impact .weekly-injury-impact-body p strong {
+  color:#fecaca !important;
+}
+.weekly-injury-impact .weekly-injury-impact-body .weekly-injury-impact-note {
+  color:#fca5a5 !important;
+  margin-top:14px !important;
+}
