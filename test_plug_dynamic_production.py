@@ -227,6 +227,27 @@ class ProductionIntegration(unittest.TestCase):
             self.assertFalse(result['ready'])
             self.assertIn('Awaiting successful unattended market scheduler tick',result['errors'])
 
+    def test_all_weeks_keeps_valid_week_eight_when_another_week_receipt_needs_review(self):
+        with tempfile.TemporaryDirectory() as root, self.sources():
+            journal = Path(root)/'plug_dynamic_research'
+            journal.mkdir()
+            for gid in ('2026_06_BAL_PIT','2026_07_BAL_PIT','2026_08_BAL_PIT'):
+                (journal/(gid+'.jsonl')).write_text('fixture')
+            def state(_root, gid, *, as_of_utc):
+                if '_07_' in gid:
+                    raise ValueError('bad unrelated receipt')
+                week=int(gid.split('_')[1])
+                return dict(game_id=gid, kickoff_utc='2026-10-30T00:00:00+00:00',
+                    ats_selected=True, ou_selected=(week==8), ats_result='Pending',
+                    ou_result='Pending', ats_side='BAL', ou_side='Under',
+                    ats_away_line=-7.5, ou_market_total=48.5)
+            with patch('plug_dynamic_official.official_state', side_effect=state):
+                ctx=record_context(root, {}, 2026, None, as_of_utc=AT)
+            self.assertEqual([r['week'] for r in ctx['dynamic_record_rows']], [6,8])
+            self.assertEqual(ctx['dynamic_record_counts']['ats']['Pending'], 2)
+            self.assertEqual(ctx['dynamic_record_counts']['ou']['Pending'], 1)
+            self.assertEqual(ctx['dynamic_record_errors'], ['2026_07_BAL_PIT'])
+
 if __name__=='__main__':unittest.main()
 
 class RenderedIntegration(unittest.TestCase):
