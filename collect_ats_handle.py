@@ -69,8 +69,8 @@ def parse_page(html):
             if 'tb-se-head' in classes:
                 cells=[c for c in node.children if isinstance(c,Node)]
                 labels=[' '.join(c.text().split()) for c in cells]
-                if len(labels)!=4 or labels[2:]!=['% Handle','% Bets']:
-                    raise ValueError('Unexpected betting-split columns')
+                if len(labels)!=4 or labels[1:] not in (['Odds','% Handle','% Bets'],['Odds','Handle','Bets']):
+                    raise ValueError(f'Unexpected betting-split columns: {labels}')
                 market=labels[0]
             if 'tb-sodd' in classes and market=='Spread':
                 cells=[c for c in node.children if isinstance(c,Node)]
