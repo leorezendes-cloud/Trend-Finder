@@ -243,6 +243,7 @@ def _personnel_context(scout, root, as_of, player_names=None):
         "age_hours": round(age_hours, 1),
         "freshness": freshness,
         "source": data.get("manifest", {}).get("source", "NFLverse"),
+        "limitations": (data.get("manifest") or {}).get("limitations", []),
         "teams": teams,
     }, sources
 
