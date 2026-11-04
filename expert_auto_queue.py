@@ -15,15 +15,33 @@ from expert_beta import Store, canonical, clock, identity, instant
 
 
 def refresh_expert_evidence(now=None):
-    """Refresh the existing NFLverse depth/injury and weather evidence at most daily.
+    """Refresh existing NFLverse depth/injury and weather evidence at most daily.
 
     This runs only when a real draft is about to be requested. A failed refresh
-    stops before reserving or transmitting an AI request.
+    stops before reserving or transmitting an AI request; a six-hour failure
+    cooldown prevents the five-minute worker from hammering a broken source.
     """
     now = now or clock()
+    source_root = Path(__file__).resolve().parent
+    context = source_root/'data'/'scout4'/'context'
+    context.mkdir(parents=True, exist_ok=True)
+    failure = context/'expert_refresh_failure.json'
+    if failure.exists():
+        saved = json.loads(failure.read_text())
+        failed_at = instant(saved['failed_at'])
+        if now - failed_at < timedelta(hours=6):
+            raise RuntimeError('Previous Expert evidence refresh failed; cooldown remains active')
+        failure.unlink()
     season = now.year if now.month >= 8 else now.year - 1
     from scout4.context_model import refresh_sources
-    return refresh_sources(season, Path(__file__).resolve().parent)
+    try:
+        result = refresh_sources(season, source_root)
+    except Exception as error:
+        from scheduler_runtime import atomic_json
+        atomic_json(failure, {'failed_at': now.isoformat(), 'error_type': type(error).__name__})
+        raise
+    failure.unlink(missing_ok=True)
+    return result
 
 
 def production_queue(store_path, now=None, *, allow_retries=False):
