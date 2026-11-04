@@ -14,6 +14,18 @@ from pathlib import Path
 from expert_beta import Store, canonical, clock, identity, instant
 
 
+def refresh_expert_evidence(now=None):
+    """Refresh the existing NFLverse depth/injury and weather evidence at most daily.
+
+    This runs only when a real draft is about to be requested. A failed refresh
+    stops before reserving or transmitting an AI request.
+    """
+    now = now or clock()
+    season = now.year if now.month >= 8 else now.year - 1
+    from scout4.context_model import refresh_sources
+    return refresh_sources(season, Path(__file__).resolve().parent)
+
+
 def production_queue(store_path, now=None, *, allow_retries=False):
     """Return unhandled production imports with future kickoffs, earliest first."""
     now = now or clock()
@@ -103,6 +115,7 @@ def _gemini_run(store_path, model, *, daily_limit=2, run_limit=1, execute=False)
                   'planned_requests': planned, 'saved_drafts': 0,
                   'state': 'preview' if not execute else 'complete'}
         if execute and planned:
+            refresh_expert_evidence(now)
             from expert_beta_cli import draft
             # Pace multi-game batches (one request every 75s or slower). Automatic
             # default stays at one request; operators may increase it only after
@@ -335,6 +348,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
             weekly_budget_usd=str(budget), weekly_request_limit=weekly_requests,
             saved_drafts=0, state='preview' if not execute else 'nothing_due_or_budget_exhausted')
         if execute and planned:
+            refresh_expert_evidence(clock())
             records = Store(root).records()
             for row in queue[:planned]:
                 try:
