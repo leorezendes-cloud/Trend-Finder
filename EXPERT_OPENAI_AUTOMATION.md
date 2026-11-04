@@ -33,7 +33,7 @@ snapshots older than 24 hours as stale and ignores snapshots older than seven
 days. Depth-chart QB1 is treated as expected, not confirmed; if injury evidence
 marks that player Out or Doubtful, the next available listed quarterback becomes
 the expected option. Explicit operator-recorded expected-QB reports are retained
-as unverified source evidence. A missing injury row never means healthy.
+as unverified source evidence. NFLverse injury publication times and Open-Meteo model issuance times may be unavailable; retrieval timestamps govern what Expert could know. A missing injury row never means healthy.
 
 Expert ATS and O/U choices are independent of Scout's saved selections. Scout
 remains the baseline for comparison; a disagreement requires an explanation.
