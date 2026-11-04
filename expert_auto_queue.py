@@ -14,6 +14,41 @@ from pathlib import Path
 from expert_beta import Store, canonical, clock, identity, instant
 
 
+def refresh_expert_evidence(now=None):
+    """Refresh existing NFLverse depth/injury and weather evidence at most daily.
+
+    This runs only when a real draft is about to be requested. A failed refresh
+    stops before reserving or transmitting an AI request; a six-hour failure
+    cooldown prevents the five-minute worker from hammering a broken source.
+    """
+    now = now or clock()
+    source_root = Path(__file__).resolve().parent
+    context = source_root/'data'/'scout4'/'context'
+    context.mkdir(parents=True, exist_ok=True)
+    failure = context/'expert_refresh_failure.json'
+    if failure.exists():
+        saved = json.loads(failure.read_text())
+        failed_at = instant(saved['failed_at'])
+        marker = context/'collection.json'
+        if marker.exists():
+            completed_at = instant(json.loads(marker.read_text())['completed_at'])
+            if completed_at > failed_at:
+                failure.unlink()
+        if failure.exists() and now - failed_at < timedelta(hours=6):
+            raise RuntimeError('Previous Expert evidence refresh failed; cooldown remains active')
+        failure.unlink(missing_ok=True)
+    season = now.year if now.month >= 8 else now.year - 1
+    from scout4.context_model import refresh_sources
+    try:
+        result = refresh_sources(season, source_root)
+    except Exception as error:
+        from scheduler_runtime import atomic_json
+        atomic_json(failure, {'failed_at': now.isoformat(), 'error_type': type(error).__name__})
+        raise
+    failure.unlink(missing_ok=True)
+    return result
+
+
 def production_queue(store_path, now=None, *, allow_retries=False):
     """Return unhandled production imports with future kickoffs, earliest first."""
     now = now or clock()
@@ -103,6 +138,7 @@ def _gemini_run(store_path, model, *, daily_limit=2, run_limit=1, execute=False)
                   'planned_requests': planned, 'saved_drafts': 0,
                   'state': 'preview' if not execute else 'complete'}
         if execute and planned:
+            refresh_expert_evidence(now)
             from expert_beta_cli import draft
             # Pace multi-game batches (one request every 75s or slower). Automatic
             # default stays at one request; operators may increase it only after
@@ -335,6 +371,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
             weekly_budget_usd=str(budget), weekly_request_limit=weekly_requests,
             saved_drafts=0, state='preview' if not execute else 'nothing_due_or_budget_exhausted')
         if execute and planned:
+            refresh_expert_evidence(clock())
             records = Store(root).records()
             for row in queue[:planned]:
                 try:

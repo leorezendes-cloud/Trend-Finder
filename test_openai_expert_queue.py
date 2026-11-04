@@ -29,6 +29,7 @@ class OpenAIQueueTests(unittest.TestCase):
         self.stack.enter_context(patch('socket.socket.connect',side_effect=AssertionError('Real network prohibited')))
         self.opener=Mock();self.opener.open.side_effect=self.transport
         self.stack.enter_context(patch('expert_provider.build_opener',return_value=self.opener))
+        self.stack.enter_context(patch('expert_auto_queue.refresh_expert_evidence',return_value=None))
         self.calls=[];self.failure_mode=None;self.bad_evidence=False;self.past=False
 
     def add(self, away='BUF', week=1):

@@ -45,6 +45,7 @@ class AutomationTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location('tested_expert_auto_queue', HERE/'expert_auto_queue.py')
         cls.module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.module)
+        cls.module.refresh_expert_evidence = lambda now=None: None
 
     @classmethod
     def tearDownClass(cls):

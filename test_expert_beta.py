@@ -172,6 +172,42 @@ class ExpertBetaTests(unittest.TestCase):
         r=report(self.games[0]);r['scout_sha256']='wrong'
         with self.assertRaises(ValueError):self.store.append(self.games[0],expert=r)
 
+    def test_editorial_personnel_sources_can_be_newer_than_scout_but_not_kickoff(self):
+        from expert_beta import validate_expert
+        s=fixture()
+        r=report(s)
+        observed=(clock()+timedelta(minutes=1)).isoformat()
+        generated=(clock()+timedelta(minutes=2)).isoformat()
+        r["generated_at"]=generated
+        r["editorial_sources"]=[{
+            "name":"nflverse_personnel",
+            "url":"https://github.com/nflverse/nflreadpy",
+            "observed_at":observed,
+        }]
+        r["sections"][0]["evidence_ids"].append("nflverse_personnel")
+        validate_expert(r,s)
+        r["editorial_sources"][0]["observed_at"]=s["game"]["kickoff_utc"]
+        with self.assertRaises(ValueError):
+            validate_expert(r,s)
+
+    def test_total_disagreement_requires_an_explanation(self):
+        from expert_beta import validate_expert
+        s=fixture()
+        r=report(s)
+        r["decision_policy"]="expected-personnel-independent-v1"
+        r["total_side"]="Over"
+        r["disagreement_reason"]=""
+        with self.assertRaisesRegex(ValueError,"disagreement"):
+            validate_expert(r,s)
+        r["disagreement_reason"]="The independent matchup evidence supports a different total."
+        validate_expert(r,s)
+        r["total_side"]=None
+        r["betting_assessment"]="The ATS lean remains defensible; totals Pass because the current injury evidence is incomplete."
+        validate_expert(r,s)
+        r["betting_assessment"]="The ATS lean remains defensible; the total is uncertain."
+        with self.assertRaisesRegex(ValueError,"pass must be explicit"):
+            validate_expert(r,s)
+
     def test_historical_fixture_grading_and_no_backfill(self):
         s=fixture(historical=True)
         with self.assertRaises(ValueError):self.store.append(s,kind='prospective',generated_at=s['cutoff_utc'])
