@@ -376,7 +376,7 @@ def snapshot(scout, root=None, as_of=None):
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
                   cutoff_date_exclusive=cutoff, team_form=teams)
     if not manifest_path.is_file() or not eligible_ids:
-        return _attach_personnel(output, scout, root, decision_time, player_names)
+        return _attach_personnel(output, scout, root, decision_time)
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         player_path = _feed_path(root, season, manifest, "player")
@@ -431,4 +431,4 @@ def snapshot(scout, root=None, as_of=None):
     if len(json.dumps(output)) > 2300:
         output.pop("player_performances", None)
         output.pop("player_source", None)
-    return _attach_personnel(output, scout, root, decision_time)
+    return _attach_personnel(output, scout, root, decision_time, player_names)
