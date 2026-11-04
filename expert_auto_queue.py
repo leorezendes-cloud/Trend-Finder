@@ -459,11 +459,14 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         counts['ready'] = len(queue)
         now = clock()
         used = len(recent_attempts(root, now))
-        planned = min(run_limit, max(0,daily_limit-used),len(queue))
+        spent, weekly_used = week_usage(root, records, (int(season), int(week)))
+        weekly_capacity = max(0, weekly_requests-weekly_used) if spent < budget else 0
+        planned = min(run_limit, max(0,daily_limit-used),len(queue),weekly_capacity)
         output = {'checked_at':now.isoformat(),'provider':'openai','model':model,
                   'season':int(season),'week':int(week),**counts,
                   'attempts_last_24h':used,'daily_limit':daily_limit,
                   'temporary_weekly_budget_usd':str(budget),
+                  'weekly_spent_usd':str(spent),'weekly_requests_used':weekly_used,
                   'weekly_request_limit':weekly_requests,'planned_requests':planned,
                   'saved_drafts':0,'state':'preview' if not execute else 'nothing_due_or_budget_exhausted'}
         if execute and planned:
