@@ -84,8 +84,6 @@ def source_facts(scout):
                    'snapshot_age_hours': personnel.get('age_hours')}
             for team, details in personnel.get('teams', {}).items()
         }
-        facts['personnel_weather_status'] = (
-            'Timestamped pregame personnel evidence supplied; weather remains unknown unless separately sourced.')
     if weather:
         facts['weather_research'] = {
             'observed_at': weather.get('observed_at'),
