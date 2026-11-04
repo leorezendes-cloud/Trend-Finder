@@ -205,10 +205,9 @@ def _personnel_context(scout, root, as_of):
         for injury in injuries:
             player_id = injury.get("gsis_id") or injury.get("player_id")
             name = (injury.get("player_name") or injury.get("full_name")
-                    or injury.get("display_name") or injury.get("name")
-                    or player_names.get(str(player_id)) if player_id else
-                    injury.get("player_name") or injury.get("full_name")
                     or injury.get("display_name") or injury.get("name"))
+            if not name and player_id:
+                name = player_names.get(str(player_id))
             position = injury.get("position") or injury.get("pos_abb")
             report_status = injury.get("report_status")
             practice_status = injury.get("practice_status")
