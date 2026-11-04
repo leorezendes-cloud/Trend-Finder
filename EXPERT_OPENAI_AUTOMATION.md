@@ -22,6 +22,26 @@ The existing editorial review process is still required; no review/approval is
 synthesized or persisted. If review publication is already enabled, only separately
 human-approved review files can be published. Pending drafts never become public.
 
+Before an automatic draft request, the queue refreshes the existing NFLverse
+depth-chart / weekly-injury evidence and weather snapshot through the project's
+daily-cached research collector. A successful collection is reused for up to
+20 hours; a failed collection stops the draft before an AI request is reserved,
+with a six-hour retry cooldown. This is public-data collection, not an additional
+AI request. The Expert evidence reader accepts a timestamped personnel snapshot
+observed after Scout's frozen cutoff only when it is still pre-kickoff. It labels
+snapshots older than 24 hours as stale and ignores snapshots older than seven
+days. Depth-chart QB1 is treated as expected, not confirmed; if injury evidence
+marks that player Out or Doubtful, the next available listed quarterback becomes
+the expected option. Explicit operator-recorded expected-QB reports are retained
+as unverified source evidence. A missing injury row never means healthy.
+
+Expert ATS and O/U choices are independent of Scout's saved selections. Scout
+remains the baseline for comparison; a disagreement requires an explanation.
+New drafts default to a lean on both markets, with Pass allowed only when the
+available evidence leaves neither side defensible and the betting assessment
+explicitly says Pass. Older saved reports remain unchanged under the legacy
+validation policy.
+
 ## Configuration for a later, separately approved deployment
 
 Existing hosted flags and storage paths are retained. Credentials stay solely in
