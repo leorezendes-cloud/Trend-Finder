@@ -252,7 +252,7 @@ def validate_expert(report, scout):
         if disagreement and not report.get('disagreement_reason'):
             raise ValueError('Explain ATS or totals disagreement with Scout')
         assessment = str(report.get('betting_assessment') or '').lower()
-        if scout.get('quotes', {}).get('Spread') and report.get('ats_side') is None and not re.search(r'\\bpass\\b', assessment):
+        if scout.get('quotes', {}).get('Spread') and report.get('ats_side') is None and not re.search(r'\bpass\b', assessment):
             raise ValueError('An ATS pass must be explicit in the betting assessment')
         if scout.get('quotes', {}).get('Total') and report.get('total_side') is None and not re.search(r'\\bpass\\b', assessment):
             raise ValueError('A totals pass must be explicit in the betting assessment')
