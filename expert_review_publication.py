@@ -55,7 +55,7 @@ def candidates(root, now=None):
         # the original draft and all prior replacement versions untouched.
         replacement_paths = sorted(
             (root/'drafts').glob(version+'.replacement-*.json'),
-            key=lambda path: int(path.stem.rsplit('-',1)[1]))
+            key=lambda path: int(path.stem.rsplit('-',1)[1]), reverse=True)
         candidates = [(path, path.with_name(path.stem+'.review.json')) for path in replacement_paths]
         candidates.append((root/'drafts'/(version+'.json'), root/'drafts'/(version+'.review.json')))
         reviewed_pair = next(((draft, review) for draft, review in candidates if review.is_file()), None)
