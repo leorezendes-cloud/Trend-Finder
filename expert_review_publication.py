@@ -51,8 +51,15 @@ def candidates(root, now=None):
             stats['already_published'] += 1
             continue
         version = row['version']
-        draft_path = root/'drafts'/(version+'.json')
-        review_path = root/'drafts'/(version+'.review.json')
+        # Prefer the newest explicitly reviewed replacement, while retaining
+        # the original draft and all prior replacement versions untouched.
+        replacement_paths = sorted(
+            (root/'drafts').glob(version+'.replacement-*.json'),
+            key=lambda path: int(path.stem.rsplit('-',1)[1]))
+        candidates = [(path, path.with_name(path.stem+'.review.json')) for path in replacement_paths]
+        candidates.append((root/'drafts'/(version+'.json'), root/'drafts'/(version+'.review.json')))
+        reviewed_pair = next(((draft, review) for draft, review in candidates if review.is_file()), None)
+        draft_path, review_path = reviewed_pair or candidates[0]
         if not review_path.exists():
             stats['awaiting_review' if draft_path.exists() else 'awaiting_draft'] += 1
             continue
