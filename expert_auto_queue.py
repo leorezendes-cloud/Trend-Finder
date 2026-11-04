@@ -29,9 +29,14 @@ def refresh_expert_evidence(now=None):
     if failure.exists():
         saved = json.loads(failure.read_text())
         failed_at = instant(saved['failed_at'])
-        if now - failed_at < timedelta(hours=6):
+        marker = context/'collection.json'
+        if marker.exists():
+            completed_at = instant(json.loads(marker.read_text())['completed_at'])
+            if completed_at > failed_at:
+                failure.unlink()
+        if failure.exists() and now - failed_at < timedelta(hours=6):
             raise RuntimeError('Previous Expert evidence refresh failed; cooldown remains active')
-        failure.unlink()
+        failure.unlink(missing_ok=True)
     season = now.year if now.month >= 8 else now.year - 1
     from scout4.context_model import refresh_sources
     try:
