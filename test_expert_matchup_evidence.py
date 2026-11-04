@@ -46,6 +46,63 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         self.assertNotIn("player_performances", result)
         self.assertEqual(result["cutoff_date_exclusive"], "2026-10-31")
 
+    def test_expected_qb_uses_next_available_depth_chart_option_and_current_injuries(self):
+        self.scout["game"].update(game_id="2026_09_JAX_BAL",
+                                  kickoff_utc="2026-11-08T18:00:00+00:00")
+        self._schedule([
+            dict(game_id="prior", season=2026, game_type="REG", gameday="2026-10-25",
+                 away_team="PHI", home_team="NYG", away_score="24", home_score="17"),
+        ])
+        folder = self.root / "data" / "scout4" / "personnel" / "2026" / "20261104T120000Z"
+        folder.mkdir(parents=True)
+        observed = "2026-11-04T12:00:00+00:00"
+        game = {
+            "game_id": "2026_09_JAX_BAL",
+            "kickoff_utc": "2026-11-08T18:00:00+00:00",
+            "observed_at": observed,
+            "personnel": {
+                "BAL": {
+                    "qb_depth_order": [
+                        {"player_name": "Lamar Jackson", "gsis_id": "qb1", "pos_rank": 1},
+                        {"player_name": "Tyler Huntley", "gsis_id": "qb2", "pos_rank": 2},
+                        {"player_name": "Joe Fagnano", "gsis_id": "qb3", "pos_rank": 3},
+                    ],
+                    "injury_rows": [
+                        {"player_name": "Lamar Jackson", "position": "QB",
+                         "report_status": "Out", "report_primary_injury": "Thumb"},
+                        {"player_name": "Tyler Huntley", "position": "QB",
+                         "report_status": "Out", "report_primary_injury": "Turf Toe"},
+                    ],
+                    "injury_coverage": "reported rows only",
+                    "depth_updated_at": observed,
+                    "depth_stale": False,
+                },
+                "JAX": {
+                    "qb_depth_order": [
+                        {"player_name": "Trevor Lawrence", "gsis_id": "qb4", "pos_rank": 1},
+                    ],
+                    "injury_rows": [],
+                    "injury_coverage": "unknown",
+                    "depth_updated_at": observed,
+                    "depth_stale": False,
+                },
+            },
+        }
+        (folder / "pregame_evidence.json").write_text(json.dumps({
+            "manifest": {"retrieved_at": observed, "source": "NFLverse via nflreadpy"},
+            "games": [game],
+        }))
+        result = snapshot(self.scout, self.root, as_of="2026-11-04T13:00:00+00:00")
+        bal = result["personnel"]["teams"]["BAL"]
+        self.assertEqual(bal["expected_quarterback"]["name"], "Joe Fagnano")
+        self.assertEqual(bal["expected_quarterback"]["depth_rank"], 3)
+        self.assertIn("Lamar Jackson", [r["player"] for r in bal["key_injuries"]])
+        self.assertIn("Tyler Huntley", [r["player"] for r in bal["key_injuries"]])
+        self.assertEqual(bal["snapshot_freshness"], "current")
+        self.assertEqual(result["sources"][0]["name"], "nflverse_personnel")
+        # Expert research observed after Scout's cutoff is valid when still pre-kickoff.
+        self.assertGreater(result["personnel"]["observed_at"], self.scout["cutoff_utc"])
+
     def test_player_metrics_are_limited_to_historical_games(self):
         self._schedule([
             dict(game_id="prior", season=2026, game_type="REG", gameday="2026-10-20",
