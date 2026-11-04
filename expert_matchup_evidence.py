@@ -44,7 +44,7 @@ def _person_key(value):
     return "".join(ch.lower() for ch in str(value or "") if ch.isalnum())
 
 
-def _personnel_context(scout, root, as_of):
+def _personnel_context(scout, root, as_of, player_names=None):
     """Latest exact-game pregame depth/injury snapshot, plus recorded expected QBs.
 
     Editorial research may be newer than Scout's immutable forecast cutoff, but
@@ -84,18 +84,19 @@ def _personnel_context(scout, root, as_of):
         return {}, []
     freshness = "current" if age_hours <= 24 else "stale"
     teams = {}
-    player_names = {}
-    player_pointer = data.get("player_statistics_manifest") or {}
-    player_path = _feed_path(root, int(game.get("season")), player_pointer, "player")
-    if player_path:
-        try:
-            for player in _rows(player_path):
-                player_id = player.get("player_id")
-                name = player.get("player_display_name") or player.get("player_name")
-                if player_id and name:
-                    player_names[str(player_id)] = name
-        except (OSError, UnicodeError, csv.Error):
-            player_names = {}
+    if player_names is None:
+        player_names = {}
+        player_pointer = data.get("player_statistics_manifest") or {}
+        player_path = _feed_path(root, int(game.get("season")), player_pointer, "player")
+        if player_path:
+            try:
+                for player in _rows(player_path):
+                    player_id = player.get("player_id")
+                    name = player.get("player_display_name") or player.get("player_name")
+                    if player_id and name:
+                        player_names[str(player_id)] = name
+            except (OSError, UnicodeError, csv.Error):
+                player_names = {}
     sources = [{
         "name": "nflverse_personnel",
         "url": "https://github.com/nflverse/nflreadpy",
@@ -299,8 +300,8 @@ def _weather_context(scout, root, as_of):
     return weather, sources
 
 
-def _attach_personnel(output, scout, root, as_of):
-    personnel, personnel_sources = _personnel_context(scout, root, as_of)
+def _attach_personnel(output, scout, root, as_of, player_names=None):
+    personnel, personnel_sources = _personnel_context(scout, root, as_of, player_names)
     weather, weather_sources = _weather_context(scout, root, as_of)
     if personnel:
         output["personnel"] = personnel
@@ -375,13 +376,18 @@ def snapshot(scout, root=None, as_of=None):
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
                   cutoff_date_exclusive=cutoff, team_form=teams)
     if not manifest_path.is_file() or not eligible_ids:
-        return _attach_personnel(output, scout, root, decision_time)
+        return _attach_personnel(output, scout, root, decision_time, player_names)
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         player_path = _feed_path(root, season, manifest, "player")
         if not player_path:
             return _attach_personnel(output, scout, root, decision_time)
         player_rows = _rows(player_path)
+        player_names = {
+            str(player.get("player_id")): (player.get("player_display_name") or player.get("player_name"))
+            for player in player_rows
+            if player.get("player_id") and (player.get("player_display_name") or player.get("player_name"))
+        }
     except (ValueError, OSError, UnicodeError, json.JSONDecodeError, csv.Error):
         return _attach_personnel(output, scout, root, decision_time)
     standouts = []
