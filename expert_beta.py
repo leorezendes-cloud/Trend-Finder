@@ -244,12 +244,20 @@ def validate_expert(report, scout):
         raise ValueError('Invalid Expert side')
     if report.get('total_side') not in (None, 'Over', 'Under'):
         raise ValueError('Invalid Expert total')
-    disagreement = (
-        (report.get('ats_side') is not None and report['ats_side'] != scout.get('spread', {}).get('side'))
-        or (report.get('total_side') is not None and report['total_side'] != scout.get('total', {}).get('side'))
-    )
-    if disagreement and not report.get('disagreement_reason'):
-        raise ValueError('Explain ATS or totals disagreement with Scout')
+    if report.get('decision_policy') == 'expected-personnel-independent-v1':
+        disagreement = (
+            (report.get('ats_side') is not None and report['ats_side'] != scout.get('spread', {}).get('side'))
+            or (report.get('total_side') is not None and report['total_side'] != scout.get('total', {}).get('side'))
+        )
+        if disagreement and not report.get('disagreement_reason'):
+            raise ValueError('Explain ATS or totals disagreement with Scout')
+        assessment = str(report.get('betting_assessment') or '').lower()
+        if scout.get('quotes', {}).get('Spread') and report.get('ats_side') is None and not re.search(r'\\bpass\\b', assessment):
+            raise ValueError('An ATS pass must be explicit in the betting assessment')
+        if scout.get('quotes', {}).get('Total') and report.get('total_side') is None and not re.search(r'\\bpass\\b', assessment):
+            raise ValueError('A totals pass must be explicit in the betting assessment')
+    elif report.get('ats_side') and report['ats_side'] != scout.get('spread', {}).get('side') and not report.get('disagreement_reason'):
+        raise ValueError('Explain disagreement with Scout')
     if not report.get('reviewer') or not report.get('reviewed_at'):
         raise ValueError('Named grounding review required')
     instant(report['reviewed_at'])
@@ -294,7 +302,8 @@ def generate_draft(scout, provider=None, plug_ou=None):
     result.update(ai_assisted=True, review_status='pending',
                   scout_sha256=hashlib.sha256(canonical(scout)).hexdigest(),
                   editorial_sources=copy.deepcopy(editorial_sources),
-                  editorial_as_of=as_of.isoformat())
+                  editorial_as_of=as_of.isoformat(),
+                  decision_policy='expected-personnel-independent-v1')
     return result
 
 
