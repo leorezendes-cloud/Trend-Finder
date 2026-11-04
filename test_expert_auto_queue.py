@@ -124,6 +124,26 @@ class AutomationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'operator review'):
             self.module.bounded_run(self.root, 'gemini-test')
 
+    def test_replacement_preview_targets_only_saved_week_reports(self):
+        a, b = rec('BUF'), rec('MIA')
+        type(self).rows = [a, b]
+        original = self.root/'drafts'/(a['version']+'.json')
+        original.write_text('original report')
+        result = self.module.bounded_replace_week(
+            self.root, 2026, 7, 'gpt-test', execute=False)
+        self.assertEqual(result['target_games'], 2)
+        self.assertEqual(result['existing_drafts'], 1)
+        self.assertEqual(result['ready'], 1)
+        self.assertEqual(result['planned_requests'], 1)
+        self.assertEqual(result['state'], 'preview')
+        self.assertEqual(original.read_text(), 'original report')
+        self.assertFalse(list((self.root/'drafts').glob('*.replacement-*.json')))
+
+    def test_temporary_replacement_budget_cannot_exceed_two_dollars(self):
+        with self.assertRaisesRegex(ValueError, 'no more than'):
+            self.module.bounded_replace_week(
+                self.root, 2026, 7, 'gpt-test', weekly_limit=2.01)
+
 
 if __name__ == '__main__':
     unittest.main()
