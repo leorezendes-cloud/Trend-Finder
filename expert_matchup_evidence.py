@@ -5,7 +5,7 @@ storage writes, or background jobs. Never modifies the original Scout receipt.
 """
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -31,7 +31,195 @@ def _feed_path(root, season, manifest, kind):
     return path if path.is_relative_to(cache) and path.is_file() else None
 
 
-def snapshot(scout, root=None):
+
+
+def _time(value):
+    dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        raise ValueError("Evidence timestamps require a timezone")
+    return dt.astimezone(timezone.utc)
+
+
+def _person_key(value):
+    return "".join(ch.lower() for ch in str(value or "") if ch.isalnum())
+
+
+def _personnel_context(scout, root, as_of):
+    """Latest exact-game pregame depth/injury snapshot, plus recorded expected QBs.
+
+    Editorial research may be newer than Scout's immutable forecast cutoff, but
+    must be observed before this game kicks off and before the Expert decision.
+    """
+    game = scout.get("game", {})
+    game_id = game.get("game_id")
+    if not game_id:
+        return {}, []
+    try:
+        kickoff = _time(game["kickoff_utc"])
+    except (KeyError, TypeError, ValueError):
+        return {}, []
+    if as_of >= kickoff:
+        return {}, []
+
+    candidates = []
+    folder = root / "data" / "scout4" / "personnel" / str(game.get("season"))
+    for path in sorted(folder.glob("*/pregame_evidence.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            observed = _time(data.get("manifest", {}).get("retrieved_at"))
+            if observed > as_of or observed >= kickoff:
+                continue
+            row = next((item for item in data.get("games", [])
+                        if item.get("game_id") == game_id
+                        and _time(item.get("kickoff_utc")) == kickoff), None)
+            if row and _time(row.get("observed_at")) <= as_of:
+                candidates.append((observed, data, row))
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+            continue
+    if not candidates:
+        return {}, []
+    observed, data, row = max(candidates, key=lambda item: item[0])
+    age_hours = max(0.0, (as_of - observed).total_seconds() / 3600)
+    freshness = "current" if age_hours <= 24 else "stale"
+    teams = {}
+    sources = [{
+        "name": "nflverse_personnel",
+        "url": "https://github.com/nflverse/nflreadpy",
+        "observed_at": observed.isoformat(),
+        "description": "NFLverse depth-chart and weekly injury snapshot",
+    }]
+
+    # User-recorded expected starters are useful evidence, but remain explicitly
+    # distinguished from independently verified or officially confirmed starters.
+    reports = {}
+    report_dir = root / "data" / "scout4" / "starter_reports"
+    for path in sorted(report_dir.glob("*.json")):
+        try:
+            report = json.loads(path.read_text(encoding="utf-8"))
+            stamp = _time(report.get("observed_at"))
+            if (report.get("game_id") == game_id and stamp <= as_of
+                    and stamp < kickoff and report.get("team") in (game.get("away_team"), game.get("home_team"))):
+                previous = reports.get(report["team"])
+                if previous is None or stamp > previous[0]:
+                    reports[report["team"]] = (stamp, report)
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+            continue
+
+    for team in (game.get("away_team"), game.get("home_team")):
+        raw = row.get("personnel", {}).get(team, {})
+        injuries = raw.get("injury_rows", []) if isinstance(raw, dict) else []
+        by_player = {}
+        for injury in injuries:
+            key = _person_key(injury.get("player_name") or injury.get("full_name")
+                              or injury.get("display_name") or injury.get("name"))
+            if key:
+                by_player.setdefault(key, []).append(injury)
+
+        depth = sorted(raw.get("qb_depth_order", []),
+                       key=lambda item: (int(item.get("pos_rank", 99)), str(item.get("gsis_id", ""))))
+        def qb_status(player):
+            matches = by_player.get(_person_key(player.get("player_name")), [])
+            return matches[0] if matches else {}
+        def unavailable(status):
+            return str(status or "").strip().lower() in {
+                "out", "injured reserve", "reserve/injured", "ir", "pup",
+                "physically unable to perform", "suspended", "inactive", "doubtful",
+            }
+
+        qb_rows = []
+        for player in depth[:4]:
+            injury = qb_status(player)
+            qb_rows.append({
+                "name": player.get("player_name"),
+                "depth_rank": player.get("pos_rank"),
+                "report_status": injury.get("report_status"),
+                "practice_status": injury.get("practice_status"),
+                "reported_injury": injury.get("report_primary_injury") or injury.get("report_secondary_injury"),
+            })
+
+        expected = None
+        recorded = reports.get(team)
+        if recorded:
+            _, report = recorded
+            match = next((player for player in depth
+                          if player.get("gsis_id") == report.get("expected_qb_id")), None)
+            if match and not unavailable(qb_status(match).get("report_status")):
+                injury = qb_status(match)
+                expected = {
+                    "name": match.get("player_name"), "depth_rank": match.get("pos_rank"),
+                    "status": injury.get("report_status") or injury.get("practice_status"),
+                    "basis": "operator-recorded expected starter; source not independently verified",
+                }
+                source_name = "expected_qb_report_" + team
+                sources.append({
+                    "name": source_name, "url": report["source_url"],
+                    "observed_at": _time(report["observed_at"]).isoformat(),
+                    "description": report.get("source_evidence", "")[:500],
+                })
+        if expected is None:
+            available = [player for player in depth
+                         if not unavailable(qb_status(player).get("report_status"))]
+            if available:
+                player = available[0]
+                injury = qb_status(player)
+                expected = {
+                    "name": player.get("player_name"), "depth_rank": player.get("pos_rank"),
+                    "status": injury.get("report_status") or injury.get("practice_status"),
+                    "basis": ("next listed quarterback after higher depth-chart options were marked unavailable"
+                              if int(player.get("pos_rank", 1)) > 1
+                              else "depth-chart QB1; expected, not officially confirmed"),
+                }
+
+        key_injuries = []
+        for injury in injuries:
+            name = injury.get("player_name") or injury.get("full_name") or injury.get("display_name") or injury.get("name")
+            position = injury.get("position") or injury.get("pos_abb")
+            report_status = injury.get("report_status")
+            practice_status = injury.get("practice_status")
+            if not any((name, report_status, practice_status,
+                        injury.get("report_primary_injury"), injury.get("practice_primary_injury"))):
+                continue
+            key_injuries.append({
+                "player": name, "position": position,
+                "report_status": report_status, "practice_status": practice_status,
+                "reported_injury": injury.get("report_primary_injury") or injury.get("report_secondary_injury"),
+                "practice_injury": injury.get("practice_primary_injury") or injury.get("practice_secondary_injury"),
+            })
+        key_injuries.sort(key=lambda item: (
+            0 if str(item.get("position", "")).upper() == "QB" else 1,
+            0 if str(item.get("report_status", "")).lower() in ("out", "doubtful") else 1,
+            str(item.get("player") or "")))
+        teams[team] = {
+            "expected_quarterback": expected,
+            "quarterback_depth_chart": qb_rows,
+            "key_injuries": key_injuries[:12],
+            "injury_coverage": ("reported rows only; no listed injury does not establish health"
+                               if injuries else "unknown; no injury rows supplied"),
+            "depth_chart_updated_at": raw.get("depth_updated_at"),
+            "depth_chart_stale": raw.get("depth_stale"),
+            "snapshot_observed_at": observed.isoformat(),
+            "snapshot_freshness": freshness,
+        }
+    return {
+        "observed_at": observed.isoformat(),
+        "age_hours": round(age_hours, 1),
+        "freshness": freshness,
+        "source": data.get("manifest", {}).get("source", "NFLverse"),
+        "teams": teams,
+    }, sources
+
+
+def _attach_personnel(output, scout, root, as_of):
+    personnel, sources = _personnel_context(scout, root, as_of)
+    if personnel:
+        output["personnel"] = personnel
+    if sources:
+        output["sources"] = sources
+    output["expert_as_of_utc"] = as_of.isoformat()
+    return output
+
+
+def snapshot(scout, root=None, as_of=None):
     """Bounded, verifiable team form and box-score standouts before kickoff.
 
     Same-day games are excluded because a date alone cannot establish whether
@@ -42,6 +230,11 @@ def snapshot(scout, root=None):
     try:
         season = int(game["season"])
         cutoff = datetime.fromisoformat(scout["cutoff_utc"].replace("Z", "+00:00")).date().isoformat()
+        decision_time = as_of or scout["cutoff_utc"]
+        if isinstance(decision_time, datetime):
+            decision_time = decision_time.astimezone(timezone.utc)
+        else:
+            decision_time = _time(decision_time)
     except (ValueError, TypeError, KeyError, AttributeError):
         return {}
     away, home = game.get("away_team"), game.get("home_team")
@@ -88,7 +281,7 @@ def snapshot(scout, root=None):
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
                   cutoff_date_exclusive=cutoff, team_form=teams)
     if not manifest_path.is_file() or not eligible_ids:
-        return output
+        return _attach_personnel(output, scout, root, decision_time)
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         player_path = _feed_path(root, season, manifest, "player")
@@ -134,8 +327,8 @@ def snapshot(scout, root=None):
     if best:
         output["player_performances"] = best
         output["player_source"] = "Cached Scout 4.0 player box-score feed; observed games, not starter verification or projections"
-    # Hard cap for API token cost. Keep the bounded snapshot factual.
+    # Keep the historical form snapshot bounded; personnel is separately capped.
     if len(json.dumps(output)) > 2300:
         output.pop("player_performances", None)
         output.pop("player_source", None)
-    return output
+    return _attach_personnel(output, scout, root, decision_time)
