@@ -273,18 +273,20 @@ def week_usage(root, records, week):
     return total, requests
 
 
-def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit):
+def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False):
     from expert_beta import generate_draft, validate_expert
     from expert_provider import OpenAIProvider, RateLimited
     from scheduler_runtime import atomic_json
     version, scout = row['version'], row['scout']
     folder = root/'drafts'; folder.mkdir(exist_ok=True)
-    attempts = list(folder.glob(version+'*.attempt.json'))
-    if attempts and (not retry_ready(folder, version, clock())
+    attempts = list(folder.glob(version+'.replacement-*.attempt.json')) if replacement else list(folder.glob(version+'*.attempt.json'))
+    if replacement and attempts:
+        raise ValueError('A replacement attempt already exists; inspect its outcome before retrying')
+    if not replacement and attempts and (not retry_ready(folder, version, clock())
                      or json.loads(attempts[0].read_text()).get('model') != model):
         raise ValueError('Previous request requires operator review')
     number = len(attempts) + 1
-    outcome = folder/(version+'.outcome.json')
+    outcome = folder/(version+('.replacement.outcome.json' if replacement else '.outcome.json'))
     provider = OpenAIProvider(approved=True, model=model)
     if not provider.api_key or not provider.model:
         raise ValueError('OpenAI credentials/model missing; no request reserved')
@@ -301,7 +303,7 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
             raise BudgetExhausted('NFL week budget exhausted')
         if len(recent_attempts(root, clock())) >= daily_limit:
             raise BudgetExhausted('Daily request budget exhausted')
-        name = version + ('' if number == 1 else '.retry-'+str(number)) + '.attempt.json'
+        name = (version + '.replacement-' + str(number) + '.attempt.json') if replacement else (version + ('' if number == 1 else '.retry-'+str(number)) + '.attempt.json')
         immutable_json(folder/name, dict(version=version, started_at=clock().isoformat(),
             model=model, provider='openai', nfl_week=list(week), reserved_usd=str(cost)))
         sent = True
@@ -315,7 +317,8 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
             raise ValueError('Nonempty report summary required')
         if clock() >= instant(scout['game']['kickoff_utc']):
             raise ValueError('Report completed after kickoff; nothing saved')
-        immutable_json(folder/(version+'.json'), result)
+        report_name = version + ('.replacement-' + str(number) if replacement else '') + '.json'
+        immutable_json(folder/report_name, result)
         atomic_json(outcome, dict(state='pending_review', provider='openai', attempts=number))
         return 'saved'
     except RateLimited as error:
@@ -390,6 +393,103 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
         return output
 
 
+
+def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16,
+                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False):
+    """Regenerate only already-drafted production games, preserving originals.
+
+    Operator-only temporary override. Writes separate replacement files and
+    never changes the scheduler's normal weekly allowance.
+    """
+    from decimal import Decimal
+    root = Path(store_path)
+    if not root.is_dir():
+        raise ValueError('Expert store does not exist')
+    if not 2000 <= int(season) <= 2100 or not 1 <= int(week) <= 22:
+        raise ValueError('Invalid NFL season/week')
+    if not 1 <= daily_limit <= 16 or not 1 <= run_limit <= 2:
+        raise ValueError('daily_limit must be 1..16 and run_limit must be 1..2')
+    budget = positive_decimal(weekly_limit)
+    if budget <= 0 or budget > Decimal('2'):
+        raise ValueError('Temporary weekly budget must be greater than $0 and no more than $2')
+    if not 1 <= weekly_requests <= 32:
+        raise ValueError('Weekly request limit must be 1..32')
+    model = model or os.environ.get('EXPERT_AI_MODEL')
+    if not model:
+        raise ValueError('Explicit OpenAI model required')
+    if execute and os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') != '1':
+        raise ValueError('Automatic OpenAI drafting disabled: explicit opt-in required')
+    with (root/'automation.lock').open('a') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return {'state':'lock_busy', 'saved_drafts':0}
+        records = Store(root).records()
+        published = {identity(r['scout']) for r in records if r.get('expert') is not None}
+        latest = {}
+        for row in records:
+            if row.get('kind') != 'production_import':
+                continue
+            scout = row['scout']
+            game = scout['game']
+            if int(game['season']) != int(season) or int(game['week']) != int(week):
+                continue
+            if instant(game['kickoff_utc']) <= clock():
+                continue
+            key = identity(scout)
+            if key not in latest or (row['generated_at'], row['version']) > (latest[key]['generated_at'], latest[key]['version']):
+                latest[key] = row
+        folder = root/'drafts'
+        queue = []
+        counts = {'target_games':len(latest), 'existing_drafts':0, 'already_published':0,
+                  'replacement_already_attempted':0, 'ready':0}
+        for key, row in latest.items():
+            if key in published:
+                counts['already_published'] += 1
+                continue
+            version = row['version']
+            if not (folder/(version+'.json')).is_file():
+                continue
+            counts['existing_drafts'] += 1
+            if list(folder.glob(version+'.replacement-*.attempt.json')) or list(folder.glob(version+'.replacement-*.json')):
+                counts['replacement_already_attempted'] += 1
+                continue
+            queue.append(row)
+        queue.sort(key=lambda r:(instant(r['scout']['game']['kickoff_utc']),identity(r['scout'])))
+        counts['ready'] = len(queue)
+        now = clock()
+        used = len(recent_attempts(root, now))
+        planned = min(run_limit, max(0,daily_limit-used),len(queue))
+        output = {'checked_at':now.isoformat(),'provider':'openai','model':model,
+                  'season':int(season),'week':int(week),**counts,
+                  'attempts_last_24h':used,'daily_limit':daily_limit,
+                  'temporary_weekly_budget_usd':str(budget),
+                  'weekly_request_limit':weekly_requests,'planned_requests':planned,
+                  'saved_drafts':0,'state':'preview' if not execute else 'nothing_due_or_budget_exhausted'}
+        if execute and planned:
+            refresh_expert_evidence(now)
+            records = Store(root).records()
+            for row in queue[:planned]:
+                try:
+                    state = openai_draft(root,row,records,model,budget,weekly_requests,daily_limit,replacement=True)
+                    if state == 'saved':
+                        output['saved_drafts'] += 1
+                        output['state'] = 'complete'
+                    else:
+                        output['state'] = state
+                        break
+                except BudgetExhausted:
+                    output['state'] = 'budget_exhausted'
+                    break
+                except Exception as error:
+                    output.update(state='operator_review_required',error_type=type(error).__name__)
+                    break
+        if execute:
+            from scheduler_runtime import atomic_json
+            atomic_json(root/'replacement_automation_status.json',output)
+        return output
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--store', required=True)
@@ -398,9 +498,22 @@ def main(argv=None):
     parser.add_argument('--daily-limit', type=int, default=16)
     parser.add_argument('--run-limit', type=int, default=1)
     parser.add_argument('--execute', action='store_true')
+    parser.add_argument('--replace-season', type=int)
+    parser.add_argument('--replace-week', type=int)
+    parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
     args = parser.parse_args(argv)
-    print(json.dumps(bounded_run(args.store, args.model, daily_limit=args.daily_limit,
-                                 run_limit=args.run_limit, execute=args.execute, provider_name=args.provider), indent=2))
+    if args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None:
+        if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
+            parser.error('--replace-season, --replace-week and --temporary-weekly-budget must be supplied together')
+        if args.provider not in (None, 'openai'):
+            parser.error('Targeted replacement is OpenAI-only')
+        result = bounded_replace_week(args.store,args.replace_season,args.replace_week,args.model,
+            daily_limit=args.daily_limit,run_limit=args.run_limit,weekly_limit=args.temporary_weekly_budget,
+            execute=args.execute)
+    else:
+        result = bounded_run(args.store, args.model, daily_limit=args.daily_limit,
+            run_limit=args.run_limit, execute=args.execute, provider_name=args.provider)
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == '__main__':
