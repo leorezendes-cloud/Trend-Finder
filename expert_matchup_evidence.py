@@ -224,10 +224,69 @@ def _personnel_context(scout, root, as_of):
     }, sources
 
 
+def _weather_context(scout, root, as_of):
+    """Latest exact-game weather forecast observed before kickoff and Expert review."""
+    game = scout.get("game", {})
+    game_id = game.get("game_id")
+    if not game_id:
+        return {}, []
+    try:
+        kickoff = _time(game["kickoff_utc"])
+    except (KeyError, TypeError, ValueError):
+        return {}, []
+    candidates = []
+    for path in sorted((root / "data" / "scout4" / "weather").glob("*/evidence.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for row in data.get("records", []):
+                if row.get("game_id") != game_id or _time(row.get("kickoff_utc")) != kickoff:
+                    continue
+                observed = _time(row.get("observed_at"))
+                if observed <= as_of and observed < kickoff:
+                    candidates.append((observed, row))
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+            continue
+    if not candidates:
+        return {}, []
+    observed, row = max(candidates, key=lambda item: item[0])
+    age_hours = max(0.0, (as_of - observed).total_seconds() / 3600)
+    if age_hours > 24 * 7:
+        return {}, []
+    weather = {
+        "observed_at": observed.isoformat(),
+        "age_hours": round(age_hours, 1),
+        "freshness": "current" if age_hours <= 24 else "stale",
+        "source": row.get("source", "Open-Meteo live forecast"),
+        "stadium": row.get("stadium"),
+        "roof_context": row.get("roof_context"),
+        "hours": [{
+            "valid_at_utc": hour.get("valid_at_utc"),
+            "temperature_f": hour.get("temperature_2m"),
+            "wind_mph": hour.get("wind_speed_10m"),
+            "wind_gusts_mph": hour.get("wind_gusts_10m"),
+            "precipitation_inches": hour.get("precipitation"),
+            "precipitation_probability_pct": hour.get("precipitation_probability"),
+        } for hour in row.get("hours", [])[:4]],
+        "limitations": row.get("limitations", []),
+    }
+    source_url = row.get("request_url") or row.get("roof_source")
+    sources = ([{
+        "name": "open_meteo_weather",
+        "url": source_url,
+        "observed_at": observed.isoformat(),
+        "description": "Pregame stadium-area weather forecast; roof/exposure caveats retained",
+    }] if isinstance(source_url, str) and source_url.startswith(("https://", "http://")) else [])
+    return weather, sources
+
+
 def _attach_personnel(output, scout, root, as_of):
-    personnel, sources = _personnel_context(scout, root, as_of)
+    personnel, personnel_sources = _personnel_context(scout, root, as_of)
+    weather, weather_sources = _weather_context(scout, root, as_of)
     if personnel:
         output["personnel"] = personnel
+    if weather:
+        output["weather"] = weather
+    sources = personnel_sources + weather_sources
     if sources:
         output["sources"] = sources
     output["expert_as_of_utc"] = as_of.isoformat()
