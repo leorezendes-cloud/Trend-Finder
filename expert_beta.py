@@ -217,6 +217,10 @@ def validate_expert(report, scout):
     editorial_names = set()
     generated_at = report.get('generated_at')
     kickoff = instant(scout['game']['kickoff_utc'])
+    editorial_as_of = instant(report['editorial_as_of']) if report.get('editorial_as_of') else None
+    if editorial_as_of and (editorial_as_of >= kickoff
+                            or (generated_at and editorial_as_of > instant(generated_at))):
+        raise ValueError('Expert research timestamp must be pre-kickoff and pre-generation')
     for source in editorial_sources:
         if not isinstance(source, dict):
             raise ValueError('Malformed editorial source')
@@ -226,8 +230,9 @@ def validate_expert(report, scout):
                 or not observed_at):
             raise ValueError('Malformed editorial source provenance')
         observed = instant(observed_at)
-        if observed >= kickoff or (generated_at and observed > instant(generated_at)):
-            raise ValueError('Editorial evidence was observed after kickoff or report generation')
+        if (observed >= kickoff or (generated_at and observed > instant(generated_at))
+                or (editorial_as_of and observed > editorial_as_of)):
+            raise ValueError('Editorial evidence was observed after kickoff or the Expert research cutoff')
         if not generated_at:
             raise ValueError('Editorial source requires a report generation timestamp')
         editorial_names.add(name)
