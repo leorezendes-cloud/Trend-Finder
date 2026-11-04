@@ -84,6 +84,18 @@ def _personnel_context(scout, root, as_of):
         return {}, []
     freshness = "current" if age_hours <= 24 else "stale"
     teams = {}
+    player_names = {}
+    player_pointer = data.get("player_statistics_manifest") or {}
+    player_path = _feed_path(root, int(game.get("season")), player_pointer, "player")
+    if player_path:
+        try:
+            for player in _rows(player_path):
+                player_id = player.get("player_id")
+                name = player.get("player_display_name") or player.get("player_name")
+                if player_id and name:
+                    player_names[str(player_id)] = name
+        except (OSError, UnicodeError, csv.Error):
+            player_names = {}
     sources = [{
         "name": "nflverse_personnel",
         "url": "https://github.com/nflverse/nflreadpy",
@@ -191,7 +203,12 @@ def _personnel_context(scout, root, as_of):
 
         key_injuries = []
         for injury in injuries:
-            name = injury.get("player_name") or injury.get("full_name") or injury.get("display_name") or injury.get("name")
+            player_id = injury.get("gsis_id") or injury.get("player_id")
+            name = (injury.get("player_name") or injury.get("full_name")
+                    or injury.get("display_name") or injury.get("name")
+                    or player_names.get(str(player_id)) if player_id else
+                    injury.get("player_name") or injury.get("full_name")
+                    or injury.get("display_name") or injury.get("name"))
             position = injury.get("position") or injury.get("pos_abb")
             report_status = injury.get("report_status")
             practice_status = injury.get("practice_status")
