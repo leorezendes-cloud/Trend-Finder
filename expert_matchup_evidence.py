@@ -80,6 +80,8 @@ def _personnel_context(scout, root, as_of):
         return {}, []
     observed, data, row = max(candidates, key=lambda item: item[0])
     age_hours = max(0.0, (as_of - observed).total_seconds() / 3600)
+    if age_hours > 24 * 7:
+        return {}, []
     freshness = "current" if age_hours <= 24 else "stale"
     teams = {}
     sources = [{
@@ -109,15 +111,28 @@ def _personnel_context(scout, root, as_of):
         raw = row.get("personnel", {}).get(team, {})
         injuries = raw.get("injury_rows", []) if isinstance(raw, dict) else []
         by_player = {}
+        by_player_id = {}
         for injury in injuries:
             key = _person_key(injury.get("player_name") or injury.get("full_name")
                               or injury.get("display_name") or injury.get("name"))
             if key:
                 by_player.setdefault(key, []).append(injury)
+            player_id = injury.get("gsis_id") or injury.get("player_id")
+            if player_id:
+                by_player_id[str(player_id)] = injury
+
+        def depth_rank(item):
+            try:
+                return int(item.get("pos_rank", 99))
+            except (TypeError, ValueError):
+                return 99
 
         depth = sorted(raw.get("qb_depth_order", []),
-                       key=lambda item: (int(item.get("pos_rank", 99)), str(item.get("gsis_id", ""))))
+                       key=lambda item: (depth_rank(item), str(item.get("gsis_id", ""))))
         def qb_status(player):
+            player_id = player.get("gsis_id")
+            if player_id and str(player_id) in by_player_id:
+                return by_player_id[str(player_id)]
             matches = by_player.get(_person_key(player.get("player_name")), [])
             return matches[0] if matches else {}
         def unavailable(status):
@@ -166,7 +181,7 @@ def _personnel_context(scout, root, as_of):
                     "name": player.get("player_name"), "depth_rank": player.get("pos_rank"),
                     "status": injury.get("report_status") or injury.get("practice_status"),
                     "basis": ("next listed quarterback after higher depth-chart options were marked unavailable"
-                              if int(player.get("pos_rank", 1)) > 1
+                              if depth_rank(player) > 1
                               else "depth-chart QB1; expected, not officially confirmed"),
                 }
 
@@ -286,10 +301,10 @@ def snapshot(scout, root=None, as_of=None):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         player_path = _feed_path(root, season, manifest, "player")
         if not player_path:
-            return output
+            return _attach_personnel(output, scout, root, decision_time)
         player_rows = _rows(player_path)
     except (ValueError, OSError, UnicodeError, json.JSONDecodeError, csv.Error):
-        return output
+        return _attach_personnel(output, scout, root, decision_time)
     standouts = []
     for p in player_rows:
         if (p.get("game_id") not in eligible_ids
