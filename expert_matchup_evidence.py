@@ -108,8 +108,10 @@ def _personnel_context(scout, root, as_of):
             continue
 
     for team in (game.get("away_team"), game.get("home_team")):
-        raw = row.get("personnel", {}).get(team, {})
-        injuries = raw.get("injury_rows", []) if isinstance(raw, dict) else []
+        personnel_data = row.get("personnel") or {}
+        raw = personnel_data.get(team, {})
+        raw = raw if isinstance(raw, dict) else {}
+        injuries = raw.get("injury_rows", []) or []
         by_player = {}
         by_player_id = {}
         for injury in injuries:
@@ -158,7 +160,9 @@ def _personnel_context(scout, root, as_of):
             _, report = recorded
             match = next((player for player in depth
                           if player.get("gsis_id") == report.get("expected_qb_id")), None)
-            if match and not unavailable(qb_status(match).get("report_status")):
+            source_url = report.get("source_url")
+            if (match and not unavailable(qb_status(match).get("report_status"))
+                    and isinstance(source_url, str) and source_url.startswith(("https://", "http://"))):
                 injury = qb_status(match)
                 expected = {
                     "name": match.get("player_name"), "depth_rank": match.get("pos_rank"),
@@ -167,7 +171,7 @@ def _personnel_context(scout, root, as_of):
                 }
                 source_name = "expected_qb_report_" + team
                 sources.append({
-                    "name": source_name, "url": report["source_url"],
+                    "name": source_name, "url": source_url,
                     "observed_at": _time(report["observed_at"]).isoformat(),
                     "description": report.get("source_evidence", "")[:500],
                 })
@@ -266,7 +270,7 @@ def _weather_context(scout, root, as_of):
             "wind_gusts_mph": hour.get("wind_gusts_10m"),
             "precipitation_inches": hour.get("precipitation"),
             "precipitation_probability_pct": hour.get("precipitation_probability"),
-        } for hour in row.get("hours", [])[:4]],
+        } for hour in (row.get("hours") or [])[:4]],
         "limitations": row.get("limitations", []),
     }
     source_url = row.get("request_url") or row.get("roof_source")
