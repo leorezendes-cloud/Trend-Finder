@@ -150,11 +150,13 @@ def _personnel_context(scout, root, as_of, player_names=None):
                 return by_player_id[str(player_id)]
             matches = by_player.get(_person_key(player.get("player_name")), [])
             return matches[0] if matches else {}
-        def unavailable(status):
-            return str(status or "").strip().lower() in {
+        def unavailable(injury):
+            unavailable_statuses = {
                 "out", "injured reserve", "reserve/injured", "ir", "pup",
                 "physically unable to perform", "suspended", "inactive", "doubtful",
             }
+            return any(str(injury.get(field) or "").strip().lower() in unavailable_statuses
+                       for field in ("report_status", "practice_status"))
 
         qb_rows = []
         for player in depth[:4]:
@@ -174,7 +176,7 @@ def _personnel_context(scout, root, as_of, player_names=None):
             match = next((player for player in depth
                           if player.get("gsis_id") == report.get("expected_qb_id")), None)
             source_url = report.get("source_url")
-            if (match and not unavailable(qb_status(match).get("report_status"))
+            if (match and not unavailable(qb_status(match))
                     and isinstance(source_url, str) and source_url.startswith(("https://", "http://"))):
                 injury = qb_status(match)
                 expected = {
@@ -190,7 +192,7 @@ def _personnel_context(scout, root, as_of, player_names=None):
                 })
         if expected is None:
             available = [player for player in depth
-                         if not unavailable(qb_status(player).get("report_status"))]
+                         if not unavailable(qb_status(player))]
             if available:
                 player = available[0]
                 injury = qb_status(player)
