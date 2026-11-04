@@ -194,12 +194,19 @@ class ExpertBetaTests(unittest.TestCase):
         from expert_beta import validate_expert
         s=fixture()
         r=report(s)
+        r["decision_policy"]="expected-personnel-independent-v1"
         r["total_side"]="Over"
         r["disagreement_reason"]=""
         with self.assertRaisesRegex(ValueError,"disagreement"):
             validate_expert(r,s)
         r["disagreement_reason"]="The independent matchup evidence supports a different total."
         validate_expert(r,s)
+        r["total_side"]=None
+        r["betting_assessment"]="The ATS lean remains defensible; totals Pass because the current injury evidence is incomplete."
+        validate_expert(r,s)
+        r["betting_assessment"]="The ATS lean remains defensible; the total is uncertain."
+        with self.assertRaisesRegex(ValueError,"pass must be explicit"):
+            validate_expert(r,s)
 
     def test_historical_fixture_grading_and_no_backfill(self):
         s=fixture(historical=True)
