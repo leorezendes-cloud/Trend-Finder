@@ -227,7 +227,31 @@ def _personnel_context(scout, root, as_of, player_names=None):
             0 if str(item.get("position", "")).upper() == "QB" else 1,
             0 if str(item.get("report_status", "")).lower() in ("out", "doubtful") else 1,
             str(item.get("player") or "")))
+        # Editorial classification only: no change to the selected QB or frozen Scout.
+        # Routine depth-chart uncertainty should not dominate the football analysis.
+        qb_injury = qb_status(next((p for p in depth if expected and p.get("player_name") == expected.get("name")), {}))
+        practice = str(qb_injury.get("practice_status") or "").lower()
+        designation = str(qb_injury.get("report_status") or "").lower()
+        injury_text = " ".join(str(qb_injury.get(field) or "").lower() for field in (
+            "report_primary_injury", "report_secondary_injury",
+            "practice_primary_injury", "practice_secondary_injury"))
+        material = (unavailable(qb_injury) or "concussion" in injury_text
+                    or any(value in practice for value in ("did not participate", "limited", "dnp"))
+                    or designation in ("questionable", "doubtful", "out"))
+        situation = {
+            "category": ("availability_uncertain" if material else
+                         "sourced_expected" if recorded and expected and
+                         expected["basis"].startswith("operator-recorded") else
+                         "routine_expected" if expected else "unknown"),
+            "explain_availability_risk": bool(material),
+            "evidence_basis": expected.get("basis") if expected else None,
+            "guidance": ("Discuss injury/protocol and alternatives as conditional, not confirmed scratches."
+                         if material else
+                         "Focus on play and matchup; avoid repetitive unconfirmed-starter boilerplate."
+                         if expected else "Do not invent a starter without supporting evidence."),
+        }
         teams[team] = {
+            "quarterback_situation": situation,
             "expected_quarterback": expected,
             "quarterback_depth_chart": qb_rows,
             "key_injuries": key_injuries[:12],
