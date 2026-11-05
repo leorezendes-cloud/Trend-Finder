@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 from ats_money_analysis import load_games
 from score_finals import confirmed_score_rows
-from plug_ats_v5_weekly import for_game, published_history
+from plug_ats_v5_weekly import for_game, published_history, scout_ats_record
 from scout_fade import pick_for_record, grade_pick, safe_record_context as scout_fade_record_context
 from injury_impact_flags import for_game as injury_impact_for_game
 
@@ -272,4 +272,4 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
  if fade_context:
   model_label='Scout · current points-only fade policy'
   model_note='Public Scout selections use the current points-only fade policy.'
- return dict(**scout_context,**dynamic_context,scout_fade=fade_context,plug_combined_record=plug_combined_record,all_weeks=all_weeks,historical_plug_tally=historical_plug_tally,historical_plug_simulation=True,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
+ return dict(**scout_context,**dynamic_context,scout_fade=fade_context,plug_combined_record=plug_combined_record,current_plug_ats=scout_ats_record(verified_finals,season,record_week),all_weeks=all_weeks,historical_plug_tally=historical_plug_tally,historical_plug_simulation=True,plug_ou_tally=plug_ou_tally,plug_tally=plug_tally,plug_receipts_review=plug_receipts_review,model_label=model_label,model_note=model_note,has_blend=has_blend,latest_completed_week=max(completed,default=None),games=games,selected_week=selected,season=season,weeks=weeks,tally=tally,performance=read_csv(root/'sunday_window_performance.csv') if selected==5 and season==2026 else [])
