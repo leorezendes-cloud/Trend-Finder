@@ -105,7 +105,26 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
     picks, expert = [], []
     for game_id, group in by_game.items():
         group.sort(key=lambda r: (r.get('generated_at', ''), r['version']), reverse=True)
-        record = group[0]
+        # Prefer the production seal for which a publicly featured,
+        # approved Expert version actually exists. The latest imported seal
+        # may differ from the seal attached to an immutable Expert review.
+        game = group[0]['scout']['game']
+        try:
+            featured = set(archive.featured(int(game['season']), int(game['week'])))
+        except (OSError, ValueError, TypeError):
+            featured = set()
+            warnings.append('Featured Expert configuration needs review.')
+        published_candidates = sorted(expert_by_game.get(game_id, []),
+                                      key=lambda r: (r.get('generated_at', ''), r['version']),
+                                      reverse=True)
+        matching = next((
+            source for source in group
+            if any(candidate['scout'] == source['scout']
+                   and candidate.get('expert', {}).get('review_status') == 'approved'
+                   and identity(candidate['scout']) in featured
+                   for candidate in published_candidates)
+        ), None)
+        record = matching or group[0]
         game = record['scout']['game']
         kickoff = timestamp(game['kickoff_utc'])
         try:
@@ -126,8 +145,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             continue
         ats_selected = bool(ats and ats.get('selected'))
         ou_selected = bool(ou and ou.get('selected'))
-        if not (ats_selected or ou_selected):
-            continue
+        plug_selected = ats_selected or ou_selected
         ats_side = ats.get('side') if ats_selected else None
         ou_side = ou.get('side') if ou_selected else None
         if ats_side and ats_side not in (game['away_team'], game['home_team']):
@@ -150,18 +168,11 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
-        picks.append((kickoff, f'{label}\nATS: {ats_text} · Total: {ou_text}\n{url}', record['version']))
-
-        # Look across published versions of this same game for approved analysis.
-        # It must still belong to a publicly featured matchup, not private content.
-        try:
-            featured = set(archive.featured(int(game['season']), int(game['week'])))
-        except (OSError, ValueError, TypeError):
-            warnings.append('Featured Expert configuration needs review.')
-            continue
-        for candidate in sorted(expert_by_game.get(game_id, []),
-                                key=lambda r: (r.get('generated_at', ''), r['version']),
-                                reverse=True):
+        # A publicly featured, approved Expert report is eligible even when
+        # Plug ATS and O/U receipts both say Stay Away. Other games still
+        # require a real selected Plug wager to appear in newsletter picks.
+        expert_before = len(expert)
+        for candidate in published_candidates:
             # Keep the Expert report tied to precisely this displayed Scout seal.
             # Do not leak reports from another model version or a private game.
             if candidate['scout'] != record['scout']:
@@ -183,6 +194,8 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
                            f" · Total: {report.get('total_side') or 'No pick'}")
             expert.append((kickoff, f'{label}\n{expert_text}\n{summary}\n{url}'))
             break
+        if plug_selected or len(expert) > expert_before:
+            picks.append((kickoff, f'{label}\nATS: {ats_text} · Total: {ou_text}\n{url}', record['version']))
 
     picks.sort(key=lambda pair: pair[0])
     expert.sort(key=lambda pair: pair[0])
