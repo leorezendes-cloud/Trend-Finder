@@ -100,6 +100,44 @@ def init_newsletter(app):
             issue_id = generate_draft(owner['member_id'], frequency)
         click.echo(f'Draft #{issue_id} ready for review at /newsletter/issues/{issue_id}. No email sent.')
 
+    @app.cli.command('newsletter-refresh-featured')
+    @click.option('--execute', is_flag=True, help='Replace only the featured section of an existing weekly draft')
+    def refresh_featured_command(execute):
+        """Refresh a frozen Wednesday draft after Expert publication; never send."""
+        from newsletter_draft import build_draft, period_key
+        now = datetime.now(timezone.utc)
+        period = period_key('weekly', now)
+        saved = db().execute(
+            "SELECT g.issue_id, i.status, i.sections "
+            "FROM newsletter_generated g JOIN newsletter_issues i ON i.id=g.issue_id "
+            "WHERE g.frequency='weekly' AND g.period=?", (period,)
+        ).fetchone()
+        if not saved:
+            raise click.ClickException('No saved current-week newsletter exists.')
+        if saved['status'] != 'draft':
+            raise click.ClickException('Saved issue is not a draft; refusing to change it.')
+        sections, metadata = build_draft(Path(app.root_path), now, frequency='weekly')
+        featured = sections['predictions']
+        if "Expert's take:" not in featured:
+            raise click.ClickException(
+                'No public featured Expert analysis matched an eligible Plug selection. '
+                'Nothing changed. Warnings: ' + '; '.join(metadata.get('warnings', [])))
+        click.echo(f"Current issue #{saved['issue_id']} (draft) featured section:\\n{featured}")
+        if not execute:
+            click.echo('PREVIEW ONLY. Add --execute to replace just this draft section.')
+            return
+        current = json.loads(saved['sections'])
+        current['predictions'] = featured
+        with db():
+            updated = db().execute(
+                "UPDATE newsletter_issues SET sections=? WHERE id=? AND status='draft'",
+                (json.dumps(current), saved['issue_id'])
+            )
+            if updated.rowcount != 1:
+                raise click.ClickException('Draft changed before update; nothing written.')
+        click.echo(f"Updated featured section in draft #{saved['issue_id']}. "
+                   "Other sections unchanged. No approval or email send.")
+
     @app.before_request
     def protect_newsletter_forms():
         if request.blueprint == 'newsletter' and request.method == 'POST':
