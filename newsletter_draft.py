@@ -88,12 +88,18 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         return [], [], []
 
     by_game = {}
+    expert_by_game = {}
     for record in records:
-        if record.get('kind') not in ('production_import', 'prospective'):
-            continue
         game = record['scout']['game']
         kickoff = timestamp(game['kickoff_utc'])
-        if now < kickoff <= now + timedelta(days=7):
+        if not now < kickoff <= now + timedelta(days=7):
+            continue
+        # Published Expert reviews are separate immutable records (usually kind
+        # 'development'), not production imports. Never treat them as the
+        # authoritative Scout/Plug receipt for newsletter picks.
+        if record.get('expert') is not None:
+            expert_by_game.setdefault(game['game_id'], []).append(record)
+        if record.get('kind') in ('production_import', 'prospective'):
             by_game.setdefault(game['game_id'], []).append(record)
 
     picks, expert = [], []
@@ -153,7 +159,13 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         except (OSError, ValueError, TypeError):
             warnings.append('Featured Expert configuration needs review.')
             continue
-        for candidate in group:
+        for candidate in sorted(expert_by_game.get(game_id, []),
+                                key=lambda r: (r.get('generated_at', ''), r['version']),
+                                reverse=True):
+            # Keep the Expert report tied to precisely this displayed Scout seal.
+            # Do not leak reports from another model version or a private game.
+            if candidate['scout'] != record['scout']:
+                continue
             report = candidate.get('expert') or {}
             if report.get('review_status') != 'approved' or identity(candidate['scout']) not in featured:
                 continue
