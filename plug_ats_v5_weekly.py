@@ -19,6 +19,7 @@ from plug_publication import immutable
 from forecast_history import pregame_record
 
 POLICY='plug-ats-independent-v5-favorite-near-market-v2'
+SCOUT_POLICY='plug-ats-scout-stats-follow-fade-v1'
 
 def _utc(value):
     value=datetime.fromisoformat(str(value).replace('Z','+00:00'))
@@ -31,18 +32,18 @@ def _json(obj):
 def _digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
-def _receipt_path(year,week):
+def _receipt_path(year,week,policy=POLICY):
     if not 2019<=int(year)<=2100 or not 1<=int(week)<=22:raise ValueError('Bad ATS week')
-    return storage_root()/f'{int(year)}_{int(week):02}_{POLICY}.json'
+    return storage_root()/f'{int(year)}_{int(week):02}_{policy}.json'
 
-def read_week(year,week):
-    path=_receipt_path(year,week)
+def read_week(year,week,policy=POLICY):
+    path=_receipt_path(year,week,policy)
     if not path.is_file():return None
     receipt=json.loads(path.read_bytes())
     stamp=receipt.pop('receipt_sha256',None)
     if not stamp or stamp!=hashlib.sha256(_json(receipt)).hexdigest():
         raise ValueError('ATS v5 receipt integrity error')
-    if (receipt.get('policy')!=POLICY or receipt.get('status')!='PUBLISHED_BEFORE_FIRST_KICKOFF'
+    if (receipt.get('policy')!=policy or receipt.get('status')!='PUBLISHED_BEFORE_FIRST_KICKOFF'
         or int(receipt['season'])!=int(year) or int(receipt['week'])!=int(week)):
         raise ValueError('Unrecognized ATS selection receipt')
     rows=receipt['games']
@@ -56,7 +57,8 @@ def read_week(year,week):
             _utc(r['quote_observed_utc'])>issued or
             _utc(r['sealed_at_utc'])>=_utc(r['kickoff_utc'])):
             raise ValueError('Late or unsealed ATS selection')
-        expected=classify(r['model_away_spread'],r['away_line'],
+        selector = classify_scout if policy == SCOUT_POLICY else classify
+        expected=selector(r['model_away_spread'],r['away_line'],
                           r['away_team'],r['home_team'])
         if r['selected']!=bool(expected) or r['side']!=expected:
             raise ValueError('ATS v5 rule disagreeing with receipt')
@@ -72,6 +74,21 @@ def classify(model_away_spread, market_away_spread, away_team, home_team):
     if abs(line)<=7 or not 1e-9<abs(gap)<1:
         return None
     return away_team if gap<0 else home_team
+
+def classify_scout(model_away_spread, market_away_spread, away_team, home_team):
+    """Follow Scout above seven; fade moderate gaps on smaller spreads."""
+    model, line = float(model_away_spread), float(market_away_spread)
+    if not math.isfinite(model) or not math.isfinite(line):
+        raise ValueError('Nonfinite Scout projection or Vegas spread')
+    gap = model - line
+    if abs(gap) <= 1e-9:
+        return None
+    if abs(line) > 7:
+        return away_team if gap < 0 else home_team
+    if 1 <= abs(gap) < 3:
+        return home_team if gap < 0 else away_team
+    return None
+
 
 def _scheduled(root,now):
     with (Path(root)/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as f:
@@ -95,12 +112,16 @@ def _scheduled(root,now):
             if any(kick is not None and now<kick<=now+timedelta(days=10)
                    for _,kick in slate)}
 
-def issue_pending(root,*,now=None):
+def issue_pending(root,*,now=None,policy=POLICY,require_scout_receipt=False):
     """Once-only pregame weekly publication, worker only, never an HTTP request."""
     root=Path(root);now=now or datetime.now(timezone.utc)
     report={'published':0,'preserved':0,'pending':0,'started':0,'selected':0}
     for (year,week),slate in sorted(_scheduled(root,now).items()):
-        previous=read_week(year,week)
+        previous=read_week(year,week,policy)
+        if policy == SCOUT_POLICY and previous is None:
+            previous = read_week(year,week) or _older_week(year,week)
+        if require_scout_receipt and previous is None and read_week(year,week,SCOUT_POLICY) is None:
+            continue
         if previous is not None:
             report['preserved']+=1
             continue
@@ -133,50 +154,66 @@ def issue_pending(root,*,now=None):
                 quote_observed_utc=q['captured_at_utc'],
                 sealed_at_utc=record['sealed_at_utc'],
                 source_sha256=_digest(path)))
+            if policy == SCOUT_POLICY:
+                try:
+                    margin = float(record['scout_scoring']['margin_first'])
+                except (KeyError, TypeError, ValueError):
+                    candidates.pop()
+                    break
+                if not math.isfinite(margin):
+                    candidates.pop()
+                    break
+                candidates[-1]['model_away_spread'] = -margin
         if len(candidates)!=len(slate):
             report['pending']+=1
             continue
-        # An unfinished previous week means QB history and team-form
-        # features are incomplete. Do not silently fit from a partial season.
-        with (root/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as stream:
-            prior=[g for g in csv.DictReader(stream)
-                   if g.get('game_type')=='REG' and str(g.get('season'))==str(year)
-                   and g.get('week') and int(g['week'])<week]
-        if any((g.get('away_score') in ('',None) or
-                g.get('home_score') in ('',None)) for g in prior):
-            report['pending']+=1
-            continue
-        try:
-            pred=projections(root/'nfl_games.csv',year,week)
-        except (OSError,ValueError,KeyError,TypeError):
-            report['pending']+=1
-            continue
-        if set(pred)!={r['game_id'] for r in candidates}:
-            report['pending']+=1
-            continue
+        if policy == POLICY:
+            # An unfinished previous week means QB history and team-form
+            # features are incomplete. Do not silently fit from a partial season.
+            with (root/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as stream:
+                prior=[g for g in csv.DictReader(stream)
+                       if g.get('game_type')=='REG' and str(g.get('season'))==str(year)
+                       and g.get('week') and int(g['week'])<week]
+            if any((g.get('away_score') in ('',None) or
+                    g.get('home_score') in ('',None)) for g in prior):
+                report['pending']+=1
+                continue
+            try:
+                pred=projections(root/'nfl_games.csv',year,week)
+            except (OSError,ValueError,KeyError,TypeError):
+                report['pending']+=1
+                continue
+            if set(pred)!={r['game_id'] for r in candidates}:
+                report['pending']+=1
+                continue
+        selector = classify_scout if policy == SCOUT_POLICY else classify
         for r in candidates:
-            model=float(pred[r['game_id']])
+            model = r['model_away_spread'] if policy == SCOUT_POLICY else float(pred[r['game_id']])
             r['model_away_spread']=model
             r['gap']=round(model-r['away_line'],6)
-            r['side']=classify(model,r['away_line'],r['away_team'],r['home_team'])
+            r['side']=selector(model,r['away_line'],r['away_team'],r['home_team'])
             r['selected']=r['side'] is not None
         # Final cutoff check after expensive fitting, before first-write.
         if any(kick<=datetime.now(timezone.utc) for _,kick in slate):
             report['started']+=1
             continue
-        receipt=dict(policy=POLICY,status='PUBLISHED_BEFORE_FIRST_KICKOFF',
+        receipt=dict(policy=policy,status='PUBLISHED_BEFORE_FIRST_KICKOFF',
                      season=year,week=week,issued_at_utc=datetime.now(timezone.utc).isoformat(),
                      total_games=len(candidates),selected_ids=sorted(r['game_id']
                         for r in candidates if r['selected']),games=candidates,
                      derivation='Follow independent v5 when 0<|v5 away spread - frozen Vegas away spread|<1 and |Vegas away spread|>7. No quota. Exact agreement is Stay Away.',
-                     v5_code_sha256=_digest(Path(__file__).with_name('plug_ats_v5_model.py')))
+                     )
+        if policy == SCOUT_POLICY:
+            receipt['derivation'] = 'Follow Scout stats above seven; fade gaps of one to under three at seven or below.'
+        else:
+            receipt['v5_code_sha256'] = _digest(Path(__file__).with_name('plug_ats_v5_model.py'))
         receipt['receipt_sha256']=hashlib.sha256(_json(receipt)).hexdigest()
-        path=_receipt_path(year,week)
+        path=_receipt_path(year,week,policy)
         try:
             immutable(path,_json(receipt))
         except ValueError:
-            if read_week(year,week) is None:raise
-        verify=read_week(year,week)
+            if read_week(year,week,policy) is None:raise
+        verify=read_week(year,week,policy)
         report['published']+=1
         report['selected']+=len(verify['selected_ids'])
     return report
@@ -186,7 +223,7 @@ def _older_week(year,week):
     return read_legacy(old) if old.is_file() else None
 
 def effective_week(year,week):
-    updated=read_week(year,week)
+    updated=read_week(year,week,SCOUT_POLICY) or read_week(year,week)
     if updated is not None:return updated
     legacy=_older_week(year,week)
     if legacy is None:return None
@@ -232,15 +269,17 @@ def grade(row,scores):
     if abs(edge)<1e-9:return 'Push'
     return 'Win' if (edge>0)==(row['side']==row['away_team']) else 'Loss'
 
-def published_history(final_scores):
+def published_history(final_scores, *, scout_only=False):
     """Separately sourced v1+v2 receipts, newer policy wins only on overlap."""
     receipts={}
     for path in storage_root().glob('*.json'):
-        if not path.name.endswith((POLICY+'.json', LEGACY_POLICY+'.json')):continue
+        if not path.name.endswith((POLICY+'.json', LEGACY_POLICY+'.json', SCOUT_POLICY+'.json')):continue
         try:
             parts=path.stem.split('_')
             year,week=int(parts[0]),int(parts[1])
-            receipt=effective_week(year,week)
+            if scout_only and not path.name.endswith(SCOUT_POLICY+'.json'):
+                continue
+            receipt=read_week(year,week,SCOUT_POLICY) if scout_only else effective_week(year,week)
             if receipt:receipts[(year,week)]=receipt
         except (ValueError,OSError,TypeError,KeyError):
             raise
@@ -261,4 +300,9 @@ if __name__=='__main__':
     parser.add_argument('--once',action='store_true')
     parser.add_argument('--root',default=str(Path('/var/data/site-data') if Path('/var/data/site-data').exists() else Path(__file__).resolve().parent))
     args=parser.parse_args()
-    print(json.dumps(issue_pending(args.root),sort_keys=True))
+    report = {'scout_ats': issue_pending(args.root, policy=SCOUT_POLICY)}
+    if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1' or os.environ.get('TREND_FINDAH_DYNAMIC_RESEARCH') == '1':
+        # Dynamic totals still verify their original v5 source. Its ATS side
+        # does not supersede the new Scout-stats selection.
+        report['dynamic_source'] = issue_pending(args.root, require_scout_receipt=True)
+    print(json.dumps(report, sort_keys=True))
