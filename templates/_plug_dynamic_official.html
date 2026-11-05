@@ -1,5 +1,5 @@
 {% if item.plug_dynamic_official|default(false) %}
-{% set selected_ats = item.plug_ats_status|default('') == 'selected' %}
+{% set selected_ats = item.plug_scout_ats is not defined and item.plug_ats_status|default('') == 'selected' %}
 {% set selected_ou = item.plug_ou_status|default('') == 'selected' %}
 {% set settled = ('Win', 'Loss', 'Push', 'Tie', 'Void') %}
 {% if selected_ats or selected_ou %}
