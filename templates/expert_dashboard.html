@@ -17,6 +17,11 @@
 {% if compact %}{% if item.final_score %}{% set game = {'game_id': '%s_%02d_%s_%s'|format(g.season,g.week|int,g.away_team,g.home_team)} %}{% include '_game_injury_impact_flag.html' %}{% endif %}<details class="plug-completed-details"><summary>View picks, results &amp; analysis</summary><div class="plug-completed-body">{% endif %}
 {% if item.scout_dynamic|default(none) or item.scout_current_ats|default(none) %}{% include '_scout_dynamic.html' %}{% else %}<p class="scout-pending">Current Scout selections pending verified issuance.</p>{% endif %}
 <div class="plug-pick-summary" aria-label="The Plug's current ATS and over/under selections">
+{% if item.plug_scout_ats is defined %}
+{% set ats = item.plug_scout_ats %}
+{% if ats.selected %}<p><strong>Plug ATS:</strong> {{ ats.side }} {{ '%+g'|format(ats.away_line if ats.side == ats.away_team else -ats.away_line) }} · {{ 'Follow Scout stats' if ats.away_line|abs > 7 else 'Fade Scout stats' }}{% if item.plug_scout_ats_result %} · {{ item.plug_scout_ats_result }}{% endif %}</p>
+{% else %}<p>Plug ATS: Stay away</p>{% endif %}
+{% endif %}
 {% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% else %}<p class="plug-market-pending">Current Plug selections pending verified issuance.</p>{% endif %}
 </div>
 <section class="plug-market-context">
@@ -84,6 +89,14 @@
 {% endfor %}</div>{% endmacro %}
 {% block content %}<div id="plug-refresh" data-scores-url="{{ url_for('fans.scores') }}"></div><script src="{{ url_for('static',filename='plug_updates.js') }}" defer></script>
 <div id="plug-weekly-slate">
+{% if plug_scout_ats_record is defined %}
+<section aria-label="Plug Scout stats ATS record">
+<h2>Plug ATS Record · Scout Stats</h2>
+{% for rule, record in plug_scout_ats_record.items() %}
+<p>{{ rule }}: {{ record.Win }} wins, {{ record.Loss }} losses, {{ record.Push }} pushes{% if record.Pending %}, {{ record.Pending }} pending{% endif %}</p>
+{% endfor %}
+</section>
+{% endif %}
 {% if active_slate %}<p class="expert-meta">{{ active_slate[0] }} · {{ 'NFL Week ' ~ active_slate[2] if active_slate[1]=='REG' else active_slate[1] ~ ' · Week ' ~ active_slate[2] }}</p>{% endif %}
 <h2>Upcoming Games</h2>{{ cards(games) }}{% if not games %}<p>No upcoming games in the current scheduled slate.</p>{% endif %}
 {% if underway_games %}<section><h2>Games Underway</h2>{{ cards(underway_games) }}</section>{% endif %}
