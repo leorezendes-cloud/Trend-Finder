@@ -19,7 +19,7 @@
 <div class="plug-pick-summary" aria-label="The Plug's current ATS and over/under selections">
 {% if item.plug_scout_ats is defined %}
 {% set ats = item.plug_scout_ats %}
-{% if ats.selected %}<p><strong>Plug ATS:</strong> {{ ats.side }} {{ '%+g'|format(ats.away_line if ats.side == ats.away_team else -ats.away_line) }} · {{ 'Follow Scout stats' if ats.away_line|abs > 7 else 'Fade Scout stats' }}{% if item.plug_scout_ats_result %} · {{ item.plug_scout_ats_result }}{% endif %}</p>
+{% if ats.selected %}<div class="plug-top-picks"><p class="plug-selected-pick"><strong>Plug ATS:</strong> {{ ats.side }} {{ '%+g'|format(ats.away_line if ats.side == ats.away_team else -ats.away_line) }} · {{ 'Follow Scout stats' if ats.away_line|abs > 7 else 'Fade Scout stats' }}{% if item.plug_scout_ats_result %} <span class="plug-settled-grade plug-grade-{{ item.plug_scout_ats_result|lower }}">· {{ item.plug_scout_ats_result }}</span>{% endif %}</p></div>
 {% else %}<p>Plug ATS: Stay away</p>{% endif %}
 {% endif %}
 {% if item.plug_dynamic_official|default(false) %}{% include '_plug_dynamic_official.html' %}{% else %}<p class="plug-market-pending">Current Plug selections pending verified issuance.</p>{% endif %}
