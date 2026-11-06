@@ -25,6 +25,12 @@
 .issue-controls{margin:26px 0;padding:18px 20px;background:#111b2b;border:1px solid #35445b;border-radius:12px}
 .issue-controls form{margin-top:14px}
 .issue-controls button{cursor:pointer}
+.issue-notice{padding:12px 15px;margin:12px 0;border:1px solid #536781;border-radius:9px;background:#18263a;color:#f8fafc;line-height:1.5}
+.issue-send{margin:18px 0;border-top:1px solid #35445b;padding-top:16px}
+.issue-send label{display:flex;gap:10px;align-items:flex-start;line-height:1.5;margin:12px 0;color:#e2e8f0}
+.issue-send input{margin-top:5px}
+.issue-send button{padding:10px 16px;font-weight:700}
+.issue-sent{color:#86efac;font-weight:700}
 @media(max-width:600px){.newsletter-issue{margin-top:16px}.issue-card,.issue-controls{padding:15px}}
 </style>
 </head>
@@ -33,6 +39,7 @@
 <main class="membership newsletter-issue">
 <h1>{{ issue.subject }}</h1>
 <p class="issue-meta">{{ issue.frequency|capitalize }} subscribers · {{ issue.status|capitalize }}</p>
+{% for notice in get_flashed_messages() %}<p class="issue-notice" role="status">{{ notice }}</p>{% endfor %}
 {% if generated %}
 <p class="issue-help">Automatically prepared from saved evidence at {{ generated.generated_at }}. Review claims and timing before approval.</p>
 {% for warning in generated.warnings %}<p class="issue-help" role="status">{{ warning }}</p>{% endfor %}
@@ -72,6 +79,23 @@
 <p class="issue-help">Approval locks this issue for the delivery command. It does not send email.</p>
 <button>Approve issue</button>
 </form>
+{% endif %}
+{% if issue.status=='approved' %}
+<div class="issue-send">
+<h3>Newsletter delivery</h3>
+{% if sendable > 0 %}
+<p class="issue-help">{{ sendable }} eligible recipient(s) currently available. This sends real email; it does not merely approve the draft.</p>
+<form action="{{ url_for('newsletter.send_approved_issue',issue_id=issue.id) }}" method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label><input type="checkbox" name="confirm_send" value="yes" required> I reviewed the email preview and want to send this approved newsletter now.</label>
+<button type="submit">Send newsletter now</button>
+</form>
+{% elif counts.get('accepted',0) > 0 %}
+<p class="issue-sent">Already delivered: {{ counts.get('accepted',0) }} accepted by the provider. No remaining eligible recipients.</p>
+{% else %}
+<p class="issue-help">No eligible recipients at this time. Nothing to send.</p>
+{% endif %}
+</div>
 {% endif %}
 {% if issue.status!='canceled' %}
 <form action="{{ url_for('newsletter.cancel',issue_id=issue.id) }}" method="post">
