@@ -294,14 +294,37 @@ def published_history(final_scores, *, scout_only=False):
     rows.sort(key=lambda r:(r['kickoff_utc'],r['game_id']),reverse=True)
     return rows,{y:dict(c) for y,c in sorted(seasons.items(),reverse=True)}
 
+def scout_ats_replay(season, week=None):
+    """Read the frozen 2026 replay. A live weekly receipt takes precedence."""
+    if season != 2026:
+        return []
+    path = Path(__file__).with_name('plug_scout_ats_replay_2026.json')
+    replay = json.loads(path.read_text())
+    weeks = [w for w in replay['weeks'] if week is None or w == week]
+    replay_weeks = {w for w in weeks if read_week(season, w, SCOUT_POLICY) is None}
+    rows = []
+    for game in replay['games']:
+        if game['week'] not in replay_weeks:
+            continue
+        side = classify_scout(game['model_away_spread'], game['away_line'],
+                              game['away_team'], game['home_team'])
+        if side is None:
+            raise ValueError('Frozen Scout ATS replay contains a nonqualifying game')
+        row = {**game, 'side': side, 'selected': True, 'replay': True}
+        row['result'] = grade(row, (game['away_score'], game['home_score']))
+        rows.append(row)
+    return rows
+
+
 def scout_ats_record(final_scores, season, week=None):
-    """Settle only issued picks from the current Plug ATS policy."""
+    """Show current-policy live picks and the labeled historical replay."""
     outcomes = ('Win', 'Loss', 'Push', 'Pending')
     tally = {name: dict.fromkeys(outcomes, 0) for name in ('Follow', 'Fade')}
     rows = []
     review = False
     try:
         issued, _ = published_history(final_scores, scout_only=True)
+        issued += scout_ats_replay(season, week)
     except (OSError, ValueError, TypeError, KeyError):
         issued, review = [], True
     for row in issued:
@@ -311,6 +334,7 @@ def scout_ats_record(final_scores, season, week=None):
         line = row['away_line'] if row['side'] == row['away_team'] else -row['away_line']
         tally[rule][row['result']] += 1
         rows.append({**row, 'rule': rule, 'pick': f"{row['side']} {line:+g}"})
+    rows.sort(key=lambda row: (row['week'], row['game_id']), reverse=True)
     combined = {outcome: sum(tally[name][outcome] for name in tally) for outcome in outcomes}
     return dict(rows=rows, rules=tally, combined=combined, review=review)
 

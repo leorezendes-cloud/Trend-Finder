@@ -23,7 +23,7 @@
       <div class="weekly-dynamic-game">
         <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
         <small>Week {{ r.week }}</small>
-        <div><span>ATS · {{ r.rule }}</span><strong>{{ r.pick }}</strong><small>{{ r.result }}</small></div>
+        <div><span>ATS · {{ r.rule }}{% if r.replay %} · Replay{% endif %}</span><strong>{{ r.pick }}</strong><small>{{ r.result }}</small></div>
       </div>
     {% endfor %}
     {% endif %}
