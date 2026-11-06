@@ -138,6 +138,47 @@ def init_newsletter(app):
         click.echo(f"Updated featured section in draft #{saved['issue_id']}. "
                    "Other sections unchanged. No approval or email send.")
 
+    @app.cli.command('newsletter-polish-week9')
+    @click.option('--execute', is_flag=True, help='Apply the approved ARI-SEA newsletter wording to draft #6')
+    def polish_week9_command(execute):
+        """Replace only the Expert teaser in the existing unsent Week 9 draft."""
+        teaser = (
+            "Seattle may have the edge on paper, but Arizona isn't coming into this one "
+            "without a chance to make things interesting. The matchup to watch is up front. "
+            "With several Cardinals offensive linemen dealing with injuries, Gardner Minshew "
+            "could find himself under pressure early. If Arizona can protect him and keep "
+            "drives alive, this game could be a lot more competitive—and entertaining—than "
+            "people expect."
+        )
+        issue = db().execute(
+            "SELECT id, status, frequency, sections FROM newsletter_issues WHERE id=6"
+        ).fetchone()
+        if not issue or issue['status'] != 'draft' or issue['frequency'] != 'weekly':
+            raise click.ClickException('Issue #6 is not an editable weekly draft.')
+        sections = json.loads(issue['sections'])
+        lines = sections.get('predictions', '').splitlines()
+        if not lines or not lines[0].startswith('ARI @ SEA'):
+            raise click.ClickException('Issue #6 does not feature ARI @ SEA; refusing edit.')
+        indices = [i for i, line in enumerate(lines) if line.startswith("Expert's take: ")]
+        if len(indices) != 1:
+            raise click.ClickException('Expected exactly one existing Expert teaser.')
+        lines[indices[0]] = "Expert's take: " + teaser
+        polished = '\\n'.join(lines)
+        if len(polished) > 6000:
+            raise click.ClickException('Polished prediction section exceeds newsletter limit.')
+        click.echo('New Expert teaser for issue #6:\\n' + teaser)
+        if not execute:
+            click.echo('PREVIEW ONLY. Add --execute to update the existing draft.')
+            return
+        with db():
+            updated = db().execute(
+                "UPDATE newsletter_issues SET sections=? WHERE id=6 AND status='draft'",
+                (json.dumps({**sections, 'predictions': polished}),)
+            )
+            if updated.rowcount != 1:
+                raise click.ClickException('Draft is no longer editable.')
+        click.echo('Updated issue #6 Expert teaser. Picks and other sections unchanged; no email sent.')
+
     @app.before_request
     def protect_newsletter_forms():
         if request.blueprint == 'newsletter' and request.method == 'POST':
