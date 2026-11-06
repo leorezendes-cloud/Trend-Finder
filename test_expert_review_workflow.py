@@ -74,8 +74,8 @@ class NewsletterRefreshTests(unittest.TestCase):
         self.context.pop()
 
     def test_refresh_changes_only_untouched_draft_featured_block(self):
-        picks = [f"ARI @ SEA · Sunday\\nATS: ARI +8.5 · Total: Stay Away\\n{URL}"]
-        experts = [f"ARI @ SEA · Sunday\\nATS: ARI · Total: Over\\nFootball matchup story.\\n{URL}"]
+        picks = [f"ARI @ SEA · Sunday\nATS: ARI +8.5 · Total: Stay Away\n{URL}"]
+        experts = [f"ARI @ SEA · Sunday\nATS: ARI · Total: Over\nFootball matchup story.\n{URL}"]
         with patch("newsletter_draft._plug_content", return_value=(picks, experts, [VERSION])):
             status = refresh_unapproved_featured(NOW)
         self.assertEqual(status, "featured-section-refreshed")
