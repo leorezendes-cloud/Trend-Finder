@@ -38,12 +38,33 @@ def _receipt_path(year,week,policy=POLICY):
 
 def read_week(year,week,policy=POLICY):
     path=_receipt_path(year,week,policy)
-    if not path.is_file():return None
+    if path.is_file():
+        return _read_receipt(path, year, week, policy, 'PUBLISHED_BEFORE_FIRST_KICKOFF')
+    if policy != SCOUT_POLICY:
+        return None
+    rows = []
+    for game_path in sorted(_scout_game_dir(year, week).glob('*.json')):
+        receipt = _read_receipt(game_path, year, week, policy, 'PUBLISHED_BEFORE_GAME_KICKOFF')
+        if len(receipt['games']) != 1 or receipt['games'][0]['game_id'] != game_path.stem:
+            raise ValueError('Scout ATS receipt game mismatch')
+        rows.append({**receipt['games'][0], 'issued_at_utc': receipt['issued_at_utc']})
+    if not rows:
+        return None
+    return dict(policy=policy, season=year, week=week, games=rows,
+                issued_at_utc=max(row['issued_at_utc'] for row in rows),
+                selected_ids=sorted(row['game_id'] for row in rows if row['selected']))
+
+
+def _scout_game_dir(year, week):
+    return storage_root() / SCOUT_POLICY / f'{int(year)}_{int(week):02}'
+
+
+def _read_receipt(path, year, week, policy, status):
     receipt=json.loads(path.read_bytes())
     stamp=receipt.pop('receipt_sha256',None)
     if not stamp or stamp!=hashlib.sha256(_json(receipt)).hexdigest():
         raise ValueError('ATS v5 receipt integrity error')
-    if (receipt.get('policy')!=policy or receipt.get('status')!='PUBLISHED_BEFORE_FIRST_KICKOFF'
+    if (receipt.get('policy')!=policy or receipt.get('status')!=status
         or int(receipt['season'])!=int(year) or int(receipt['week'])!=int(week)):
         raise ValueError('Unrecognized ATS selection receipt')
     rows=receipt['games']
@@ -55,7 +76,7 @@ def read_week(year,week,policy=POLICY):
     for r in rows:
         if (issued>=_utc(r['kickoff_utc']) or
             _utc(r['quote_observed_utc'])>issued or
-            _utc(r['sealed_at_utc'])>=_utc(r['kickoff_utc'])):
+            _utc(r['sealed_at_utc'])>issued):
             raise ValueError('Late or unsealed ATS selection')
         selector = classify_scout if policy == SCOUT_POLICY else classify
         expected=selector(r['model_away_spread'],r['away_line'],
@@ -112,14 +133,87 @@ def _scheduled(root,now):
             if any(kick is not None and now<kick<=now+timedelta(days=10)
                    for _,kick in slate)}
 
+def _candidate(root, game, kickoff, year, week, now, *, scout=False):
+    game_id = game['game_id']
+    path = root / 'data/scout4/blend/predictions' / (game_id + '.json')
+    try:
+        raw = path.read_bytes()
+        record = json.loads(raw)
+        pregame_record(record)
+        quote = record['quote']
+        if (record.get('version') != 'plug-points-only-4'
+                or int(record['season']) != year or int(record['week']) != week
+                or any(record[key] != game[key] for key in ('game_id', 'away_team', 'home_team'))
+                or _utc(record['kickoff_utc']) != kickoff
+                or _utc(quote['captured_at_utc']) > now
+                or _utc(record['sealed_at_utc']) > now or quote.get('market') != 'Spread'):
+            return None
+        line = float(quote['line'])
+        if not math.isfinite(line):
+            return None
+        row = dict(game_id=game_id, season=year, week=week, away_team=game['away_team'],
+                   home_team=game['home_team'], kickoff_utc=kickoff.isoformat(),
+                   away_line=line, quote_observed_utc=quote['captured_at_utc'],
+                   sealed_at_utc=record['sealed_at_utc'], source_sha256=hashlib.sha256(raw).hexdigest())
+        if scout:
+            model = -float(record['scout_scoring']['margin_first'])
+            side = classify_scout(model, line, row['away_team'], row['home_team'])
+            row.update(model_away_spread=model, gap=round(model-line, 6), side=side,
+                       selected=side is not None)
+        return row
+    except (OSError, ValueError, TypeError, KeyError):
+        return None
+
+
+def _issue_scout_games(root, now):
+    report = dict(published=0, preserved=0, pending=0, started=0, selected=0)
+    for (year, week), slate in sorted(_scheduled(root, now).items()):
+        existing = read_week(year, week, SCOUT_POLICY)
+        saved = {row['game_id'] for row in existing['games']} if existing else set()
+        for game, kickoff in slate:
+            game_id = game['game_id']
+            if game_id in saved:
+                report['preserved'] += 1
+                continue
+            if kickoff is None or kickoff <= now:
+                report['started'] += 1
+                continue
+            if kickoff > now + timedelta(days=10):
+                continue
+            row = _candidate(root, game, kickoff, year, week, now, scout=True)
+            if row is None:
+                report['pending'] += 1
+                continue
+            path = _scout_game_dir(year, week) / (game_id + '.json')
+            path.parent.mkdir(parents=True, exist_ok=True)
+            issued = datetime.now(timezone.utc)
+            if kickoff <= issued:
+                report['started'] += 1
+                continue
+            status = 'PUBLISHED_BEFORE_GAME_KICKOFF'
+            receipt = dict(policy=SCOUT_POLICY, status=status, season=year, week=week,
+                           issued_at_utc=issued.isoformat(), total_games=1,
+                           selected_ids=[game_id] if row['selected'] else [], games=[row])
+            receipt['receipt_sha256'] = hashlib.sha256(_json(receipt)).hexdigest()
+            try:
+                immutable(path, _json(receipt))
+            except ValueError:
+                _read_receipt(path, year, week, SCOUT_POLICY, status)
+                report['preserved'] += 1
+                continue
+            report['published'] += 1
+            report['selected'] += int(row['selected'])
+    return report
+
+
 def issue_pending(root,*,now=None,policy=POLICY,require_scout_receipt=False):
     """Once-only pregame weekly publication, worker only, never an HTTP request."""
     root=Path(root);now=now or datetime.now(timezone.utc)
+    if policy == SCOUT_POLICY:
+        return _issue_scout_games(root, now)
     report={'published':0,'preserved':0,'pending':0,'started':0,'selected':0}
     for (year,week),slate in sorted(_scheduled(root,now).items()):
         previous=read_week(year,week,policy)
-        if policy == SCOUT_POLICY and previous is None:
-            previous = read_week(year,week) or _older_week(year,week)
         if require_scout_receipt and previous is None and read_week(year,week,SCOUT_POLICY) is None:
             continue
         if previous is not None:
@@ -128,42 +222,12 @@ def issue_pending(root,*,now=None,policy=POLICY,require_scout_receipt=False):
         if not slate or any(kick is None or kick<=now for _,kick in slate):
             report['started']+=1
             continue
-        # Use only complete, verified, sealed production forecasts with the
-        # original observed sportsbook spread. Never substitute closing lines.
-        candidates=[]
-        for g,kick in sorted(slate,key=lambda t:t[0]['game_id']):
-            path=root/'data/scout4/blend/predictions'/(g['game_id']+'.json')
-            if not path.is_file():break
-            record=json.loads(path.read_bytes())
-            pregame_record(record)
-            q=record['quote']
-            if (record.get('version')!='plug-points-only-4' or
-                int(record['season'])!=year or int(record['week'])!=week or
-                record['game_id']!=g['game_id'] or record['away_team']!=g['away_team'] or
-                record['home_team']!=g['home_team'] or
-                _utc(record['kickoff_utc'])!=kick or
-                _utc(q['captured_at_utc'])>now or
-                _utc(record['sealed_at_utc'])>now or
-                q.get('market')!='Spread'):
+        candidates = []
+        for g, kick in sorted(slate, key=lambda item: item[0]['game_id']):
+            candidate = _candidate(root, g, kick, year, week, now)
+            if candidate is None:
                 break
-            line=float(q['line'])
-            if not math.isfinite(line):break
-            candidates.append(dict(game_id=g['game_id'],season=year,week=week,
-                away_team=g['away_team'],home_team=g['home_team'],
-                kickoff_utc=kick.isoformat(),away_line=line,
-                quote_observed_utc=q['captured_at_utc'],
-                sealed_at_utc=record['sealed_at_utc'],
-                source_sha256=_digest(path)))
-            if policy == SCOUT_POLICY:
-                try:
-                    margin = float(record['scout_scoring']['margin_first'])
-                except (KeyError, TypeError, ValueError):
-                    candidates.pop()
-                    break
-                if not math.isfinite(margin):
-                    candidates.pop()
-                    break
-                candidates[-1]['model_away_spread'] = -margin
+            candidates.append(candidate)
         if len(candidates)!=len(slate):
             report['pending']+=1
             continue
@@ -186,12 +250,11 @@ def issue_pending(root,*,now=None,policy=POLICY,require_scout_receipt=False):
             if set(pred)!={r['game_id'] for r in candidates}:
                 report['pending']+=1
                 continue
-        selector = classify_scout if policy == SCOUT_POLICY else classify
         for r in candidates:
-            model = r['model_away_spread'] if policy == SCOUT_POLICY else float(pred[r['game_id']])
+            model = float(pred[r['game_id']])
             r['model_away_spread']=model
             r['gap']=round(model-r['away_line'],6)
-            r['side']=selector(model,r['away_line'],r['away_team'],r['home_team'])
+            r['side']=classify(model,r['away_line'],r['away_team'],r['home_team'])
             r['selected']=r['side'] is not None
         # Final cutoff check after expensive fitting, before first-write.
         if any(kick<=datetime.now(timezone.utc) for _,kick in slate):
@@ -203,10 +266,7 @@ def issue_pending(root,*,now=None,policy=POLICY,require_scout_receipt=False):
                         for r in candidates if r['selected']),games=candidates,
                      derivation='Follow independent v5 when 0<|v5 away spread - frozen Vegas away spread|<1 and |Vegas away spread|>7. No quota. Exact agreement is Stay Away.',
                      )
-        if policy == SCOUT_POLICY:
-            receipt['derivation'] = 'Follow Scout stats above seven; fade gaps of one to under three at seven or below.'
-        else:
-            receipt['v5_code_sha256'] = _digest(Path(__file__).with_name('plug_ats_v5_model.py'))
+        receipt['v5_code_sha256'] = _digest(Path(__file__).with_name('plug_ats_v5_model.py'))
         receipt['receipt_sha256']=hashlib.sha256(_json(receipt)).hexdigest()
         path=_receipt_path(year,week,policy)
         try:
@@ -283,12 +343,18 @@ def published_history(final_scores, *, scout_only=False):
             if receipt:receipts[(year,week)]=receipt
         except (ValueError,OSError,TypeError,KeyError):
             raise
+    for folder in (storage_root() / SCOUT_POLICY).glob('[0-9][0-9][0-9][0-9]_[0-9][0-9]'):
+        year, week = map(int, folder.name.split('_'))
+        if (year, week) not in receipts:
+            receipt = read_week(year, week, SCOUT_POLICY)
+            if receipt:
+                receipts[(year, week)] = receipt
     rows=[];seasons=defaultdict(Counter)
     for receipt in receipts.values():
         for r in receipt['games']:
             if not r['selected']:continue
             result=grade(r,final_scores.get(r['game_id']))
-            row={**r,'policy':receipt['policy'],'issued_at_utc':receipt['issued_at_utc'],
+            row={**r,'policy':receipt['policy'],'issued_at_utc':r.get('issued_at_utc',receipt['issued_at_utc']),
                  'result':result or 'Pending'}
             rows.append(row);seasons[int(r['season'])][row['result']]+=1
     rows.sort(key=lambda r:(r['kickoff_utc'],r['game_id']),reverse=True)
