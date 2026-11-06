@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
 import click
-from flask import Blueprint, abort, current_app, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, g, redirect, render_template, request, session, url_for
 from itsdangerous import URLSafeSerializer, BadSignature
 from membership import db
 
@@ -305,7 +305,19 @@ def issue_page(issue_id):
     issue = get_issue(issue_id)
     counts = {row['state']:row['n'] for row in db().execute('SELECT state,COUNT(*) n FROM newsletter_deliveries WHERE issue_id=? GROUP BY state', (issue_id,))}
     metadata = db().execute('SELECT metadata FROM newsletter_generated WHERE issue_id=?',(issue_id,)).fetchone()
-    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=headings_for_issue(issue),counts=counts,generated=json.loads(metadata['metadata']) if metadata else None)
+    if issue['audience_frozen']:
+        sendable = db().execute(
+            "SELECT COUNT(*) FROM newsletter_deliveries d JOIN members m ON m.id=d.member_id "
+            "WHERE d.issue_id=? AND d.state NOT IN ('accepted','skipped') "
+            "AND m.newsletter_opt_in=1 AND m.newsletter_frequency IN (?,?)",
+            (issue_id, issue['frequency'], 'weekly')
+        ).fetchone()[0]
+    else:
+        sendable = db().execute(
+            "SELECT COUNT(*) FROM members WHERE newsletter_opt_in=1 "
+            "AND newsletter_frequency IN (?,?)", (issue['frequency'], 'weekly')
+        ).fetchone()[0]
+    return render_template('newsletter_issue.html',issue=issue,sections=json.loads(issue['sections']),headings=headings_for_issue(issue),counts=counts,sendable=sendable,generated=json.loads(metadata['metadata']) if metadata else None)
 
 
 @bp.get('/results/<int:year>/<int:month>')
@@ -412,6 +424,33 @@ def approve(issue_id):
     require_owner()
     with db():
         db().execute("UPDATE newsletter_issues SET status='approved',approved_at=CURRENT_TIMESTAMP WHERE id=? AND status='draft'", (get_issue(issue_id)['id'],))
+    return redirect(url_for('newsletter.issue_page', issue_id=issue_id))
+
+
+@bp.post('/issues/<int:issue_id>/send')
+def send_approved_issue(issue_id):
+    """Explicit owner-confirmed delivery, sharing the CLI's idempotent sender."""
+    require_owner()
+    if request.form.get('confirm_send') != 'yes':
+        abort(400, description='Confirm the newsletter delivery before sending.')
+    issue = get_issue(issue_id)
+    if issue['status'] != 'approved':
+        abort(409, description='Only approved newsletters can be sent.')
+    if issue['audience_frozen']:
+        outstanding = db().execute(
+            "SELECT COUNT(*) FROM newsletter_deliveries WHERE issue_id=? "
+            "AND state NOT IN ('accepted','skipped')", (issue_id,)
+        ).fetchone()[0]
+        if not outstanding:
+            flash('This issue has already been sent to all queued recipients. No duplicate emails sent.')
+            return redirect(url_for('newsletter.issue_page', issue_id=issue_id))
+    try:
+        accepted, skipped, failed = send_issue(issue_id)
+    except ValueError as error:
+        flash('Newsletter not sent: ' + str(error))
+    else:
+        flash(f'Delivery finished: {accepted} accepted, {skipped} skipped, '
+              f'{failed} failed/uncertain. Provider acceptance does not guarantee inbox delivery.')
     return redirect(url_for('newsletter.issue_page', issue_id=issue_id))
 
 
