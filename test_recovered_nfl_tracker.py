@@ -75,6 +75,46 @@ class TrackerTests(unittest.TestCase):
         self.report('A','00-0000002',self.now-timedelta(hours=25));capture(self.root,self.now)
         self.assertIsNone(view(self.root,self.now)['rows'][0]['qb_record'])
 
+    def test_saved_personnel_updates_qb_watch_without_inventing_pregame_pick(self):
+        from recovered_qb_watch import watch
+        folder=self.root/'data/scout4/personnel/2026/daily'
+        folder.mkdir(parents=True)
+        observed=self.now-timedelta(hours=2)
+        row={'game_id':self.target['game_id'],
+             'kickoff_utc':kickoff(self.target).isoformat(),
+             'observed_at':observed.isoformat(),
+             'personnel':{
+                 'A':{'qb_depth_order':[{'gsis_id':'00-0000001','player_name':'Away Starter','pos_rank':1}],
+                      'injury_rows':[],'depth_updated_at':observed.isoformat(),'depth_stale':False},
+                 'H':{'qb_depth_order':[{'gsis_id':'00-0000002','player_name':'Home Starter','pos_rank':1}],
+                      'injury_rows':[],'depth_updated_at':observed.isoformat(),'depth_stale':False}}}
+        (folder/'pregame_evidence.json').write_text(json.dumps({
+            'manifest':{'retrieved_at':observed.isoformat(),'source':'NFLverse'},
+            'games':[row]}))
+        seen=watch(self.root,self.target,self.now)
+        self.assertEqual(seen['teams']['A']['name'],'Away Starter')
+        self.assertIn('not a verified starter',seen['teams']['H']['source_status'])
+        capture(self.root,self.now)
+        current=view(self.root,self.now)['rows'][0]
+        self.assertEqual(current['qb_watch']['teams']['A']['name'],'Away Starter')
+        self.assertIsNone(current['qb_record'])
+        # New game reports after kickoff must not create a new locked QB pick.
+        after=kickoff(self.target)+timedelta(hours=1)
+        self.assertEqual(capture(self.root,after),0)
+        self.assertIsNone(view(self.root,after)['rows'][0]['qb_record'])
+
+    def test_qb_watch_ignores_post_kickoff_snapshot(self):
+        from recovered_qb_watch import watch
+        folder=self.root/'data/scout4/personnel/2026/postgame'
+        folder.mkdir(parents=True)
+        observed=kickoff(self.target)+timedelta(minutes=30)
+        (folder/'pregame_evidence.json').write_text(json.dumps({
+            'manifest':{'retrieved_at':observed.isoformat()},
+            'games':[{'game_id':self.target['game_id'],
+                      'kickoff_utc':kickoff(self.target).isoformat(),
+                      'observed_at':observed.isoformat(),'personnel':{}}]}))
+        self.assertIsNone(watch(self.root,self.target,observed+timedelta(hours=1)))
+
     def test_owner_access_and_read_only_page(self):
         app=Flask(__name__,template_folder=str(ROOT/'templates'),static_folder=str(ROOT/'static'))
         app.config.update(TESTING=True,PICKS_SOURCE_ROOT=str(self.root))
