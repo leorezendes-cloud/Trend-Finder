@@ -1,0 +1,322 @@
+{
+  "season": 2026,
+  "weeks": [
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "games_checked": 73,
+  "line_source": "Recorded schedule spreads",
+  "games": [
+    {
+      "game_id": "2026_04_TEN_BAL",
+      "season": 2026,
+      "week": 4,
+      "away_team": "TEN",
+      "home_team": "BAL",
+      "away_line": 11.5,
+      "model_away_spread": 7.332827889458798,
+      "away_score": 18,
+      "home_score": 24
+    },
+    {
+      "game_id": "2026_04_NYJ_CHI",
+      "season": 2026,
+      "week": 4,
+      "away_team": "NYJ",
+      "home_team": "CHI",
+      "away_line": 3.5,
+      "model_away_spread": 4.678330580951666,
+      "away_score": 12,
+      "home_score": 23
+    },
+    {
+      "game_id": "2026_04_MIA_MIN",
+      "season": 2026,
+      "week": 4,
+      "away_team": "MIA",
+      "home_team": "MIN",
+      "away_line": 10,
+      "model_away_spread": 7.825586446672494,
+      "away_score": 10,
+      "home_score": 15
+    },
+    {
+      "game_id": "2026_04_ATL_NO",
+      "season": 2026,
+      "week": 4,
+      "away_team": "ATL",
+      "home_team": "NO",
+      "away_line": 2.5,
+      "model_away_spread": 4.069105143875724,
+      "away_score": 45,
+      "home_score": 24
+    },
+    {
+      "game_id": "2026_05_TB_DAL",
+      "season": 2026,
+      "week": 5,
+      "away_team": "TB",
+      "home_team": "DAL",
+      "away_line": 9.5,
+      "model_away_spread": 9.174407900725509,
+      "away_score": 24,
+      "home_score": 16
+    },
+    {
+      "game_id": "2026_05_CIN_MIA",
+      "season": 2026,
+      "week": 5,
+      "away_team": "CIN",
+      "home_team": "MIA",
+      "away_line": -8.5,
+      "model_away_spread": -2.7546909534086588,
+      "away_score": 31,
+      "home_score": 24
+    },
+    {
+      "game_id": "2026_05_DEN_LAC",
+      "season": 2026,
+      "week": 5,
+      "away_team": "DEN",
+      "home_team": "LAC",
+      "away_line": -2.5,
+      "model_away_spread": -0.006020949951949461,
+      "away_score": 23,
+      "home_score": 17
+    },
+    {
+      "game_id": "2026_05_BUF_LA",
+      "season": 2026,
+      "week": 5,
+      "away_team": "BUF",
+      "home_team": "LA",
+      "away_line": 2.5,
+      "model_away_spread": 1.4434255913706409,
+      "away_score": 37,
+      "home_score": 34
+    },
+    {
+      "game_id": "2026_06_HOU_JAX",
+      "season": 2026,
+      "week": 6,
+      "away_team": "HOU",
+      "home_team": "JAX",
+      "away_line": 2.5,
+      "model_away_spread": 4.124552738522379,
+      "away_score": 34,
+      "home_score": 31
+    },
+    {
+      "game_id": "2026_06_NYJ_NE",
+      "season": 2026,
+      "week": 6,
+      "away_team": "NYJ",
+      "home_team": "NE",
+      "away_line": 7.5,
+      "model_away_spread": 2.9417226536602605,
+      "away_score": 19,
+      "home_score": 26
+    },
+    {
+      "game_id": "2026_06_PIT_TB",
+      "season": 2026,
+      "week": 6,
+      "away_team": "PIT",
+      "home_team": "TB",
+      "away_line": -2.5,
+      "model_away_spread": 0.03627229291629064,
+      "away_score": 26,
+      "home_score": 19
+    },
+    {
+      "game_id": "2026_06_ARI_LA",
+      "season": 2026,
+      "week": 6,
+      "away_team": "ARI",
+      "home_team": "LA",
+      "away_line": 12.5,
+      "model_away_spread": 5.426899667673091,
+      "away_score": 18,
+      "home_score": 16
+    },
+    {
+      "game_id": "2026_06_LAC_KC",
+      "season": 2026,
+      "week": 6,
+      "away_team": "LAC",
+      "home_team": "KC",
+      "away_line": 7.5,
+      "model_away_spread": 10.81623179844529,
+      "away_score": 6,
+      "home_score": 22
+    },
+    {
+      "game_id": "2026_06_WAS_SF",
+      "season": 2026,
+      "week": 6,
+      "away_team": "WAS",
+      "home_team": "SF",
+      "away_line": 7.5,
+      "model_away_spread": 11.2435774144312,
+      "away_score": 17,
+      "home_score": 23
+    },
+    {
+      "game_id": "2026_07_SF_ATL",
+      "season": 2026,
+      "week": 7,
+      "away_team": "SF",
+      "home_team": "ATL",
+      "away_line": -2.5,
+      "model_away_spread": -4.667167361314956,
+      "away_score": 20,
+      "home_score": 29
+    },
+    {
+      "game_id": "2026_07_NYG_HOU",
+      "season": 2026,
+      "week": 7,
+      "away_team": "NYG",
+      "home_team": "HOU",
+      "away_line": 10,
+      "model_away_spread": 7.300331530095388,
+      "away_score": 27,
+      "home_score": 21
+    },
+    {
+      "game_id": "2026_07_MIA_NYJ",
+      "season": 2026,
+      "week": 7,
+      "away_team": "MIA",
+      "home_team": "NYJ",
+      "away_line": 3.5,
+      "model_away_spread": 4.503149293859096,
+      "away_score": 28,
+      "home_score": 25
+    },
+    {
+      "game_id": "2026_07_CLE_TEN",
+      "season": 2026,
+      "week": 7,
+      "away_team": "CLE",
+      "home_team": "TEN",
+      "away_line": -1.5,
+      "model_away_spread": -0.08530273001758815,
+      "away_score": 27,
+      "home_score": 24
+    },
+    {
+      "game_id": "2026_07_GB_DET",
+      "season": 2026,
+      "week": 7,
+      "away_team": "GB",
+      "home_team": "DET",
+      "away_line": 3.5,
+      "model_away_spread": 6.040630576285732,
+      "away_score": 17,
+      "home_score": 20
+    },
+    {
+      "game_id": "2026_07_DAL_PHI",
+      "season": 2026,
+      "week": 7,
+      "away_team": "DAL",
+      "home_team": "PHI",
+      "away_line": -4.5,
+      "model_away_spread": -2.4108295211253505,
+      "away_score": 38,
+      "home_score": 21
+    },
+    {
+      "game_id": "2026_08_BAL_BUF",
+      "season": 2026,
+      "week": 8,
+      "away_team": "BAL",
+      "home_team": "BUF",
+      "away_line": 3,
+      "model_away_spread": 1.6412356401637602,
+      "away_score": 10,
+      "home_score": 36
+    },
+    {
+      "game_id": "2026_08_TEN_CIN",
+      "season": 2026,
+      "week": 8,
+      "away_team": "TEN",
+      "home_team": "CIN",
+      "away_line": 13.5,
+      "model_away_spread": 8.275347498345987,
+      "away_score": 36,
+      "home_score": 43
+    },
+    {
+      "game_id": "2026_08_MIN_DET",
+      "season": 2026,
+      "week": 8,
+      "away_team": "MIN",
+      "home_team": "DET",
+      "away_line": 3,
+      "model_away_spread": 4.726193816766795,
+      "away_score": 15,
+      "home_score": 19
+    },
+    {
+      "game_id": "2026_08_IND_JAX",
+      "season": 2026,
+      "week": 8,
+      "away_team": "IND",
+      "home_team": "JAX",
+      "away_line": 10,
+      "model_away_spread": 11.410982697572297,
+      "away_score": 7,
+      "home_score": 42
+    },
+    {
+      "game_id": "2026_08_LV_NYJ",
+      "season": 2026,
+      "week": 8,
+      "away_team": "LV",
+      "home_team": "NYJ",
+      "away_line": 1.5,
+      "model_away_spread": 2.771155521596821,
+      "away_score": 38,
+      "home_score": 33
+    },
+    {
+      "game_id": "2026_08_ATL_TB",
+      "season": 2026,
+      "week": 8,
+      "away_team": "ATL",
+      "home_team": "TB",
+      "away_line": 2.5,
+      "model_away_spread": 1.132331620450973,
+      "away_score": 0,
+      "home_score": 16
+    },
+    {
+      "game_id": "2026_08_LAC_LA",
+      "season": 2026,
+      "week": 8,
+      "away_team": "LAC",
+      "home_team": "LA",
+      "away_line": 6.5,
+      "model_away_spread": 7.894165850924665,
+      "away_score": 9,
+      "home_score": 24
+    },
+    {
+      "game_id": "2026_08_PHI_WAS",
+      "season": 2026,
+      "week": 8,
+      "away_team": "PHI",
+      "home_team": "WAS",
+      "away_line": 6,
+      "model_away_spread": 3.6834813310565586,
+      "away_score": 10,
+      "home_score": 27
+    }
+  ]
+}
