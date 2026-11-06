@@ -30,11 +30,22 @@
 <td>{{ r.result.season_total }} / {{ r.result.split_total }}</td><td><b>{{ '%+d'|format(r.result.difference) }} · {{ r.result.selection.rule or 'Unclassified' }}</b>{% if r.qb_sensitive %}<small class="rt-gold">QB-sensitive</small>{% endif %}</td>
 <td><b>{{ r.result.selection.pick or 'Undecided' }}</b>{% if r.result.selection.exception %}<small>{{ r.result.selection.exception }}</small>{% endif %}</td>
 <td>{% if r.qb_record %}<b>{{ r.qb_record.pick }}</b><small>{{ r.qb_record.evidence.reason }}</small><small>Saved {{ r.qb_record.saved_at|eastern_time }}</small>{% else %}<b>{{ 'Awaiting starters' if r.qb_sensitive else 'Undecided' }}</b>{% if r.qb_sensitive and r.result.selection.pick %}<small>If a QB changes: {{ 'Under' if r.result.selection.pick=='Over' else 'Over' }}</small>{% endif %}{% endif %}</td>
-<td><small>Previous game: {{ r.away }} {{ r.previous_qbs.away.name or 'Unknown' }}<br>{{ r.home }} {{ r.previous_qbs.home.name or 'Unknown' }}</small><small>Season {{ r.counts[0] }}/{{ r.counts[1] }} · splits {{ r.counts[2] }}/{{ r.counts[3] }}</small></td>
+<td>
+<small>Previous game: {{ r.away }} {{ r.previous_qbs.away.name or 'Unknown' }} · {{ r.home }} {{ r.previous_qbs.home.name or 'Unknown' }}</small>
+<small>Season {{ r.counts[0] }}/{{ r.counts[1] }} · splits {{ r.counts[2] }}/{{ r.counts[3] }}</small>
+{% if r.qb_watch %}
+<small><b>Latest available QB context</b> · {{ r.qb_watch.observed_at|eastern_time }} · {{ r.qb_watch.freshness }}</small>
+{% for team in [r.away, r.home] %}
+{% set qb = r.qb_watch.teams[team] %}
+<small>{{ team }}: <b>{{ qb.name or 'Unknown' }}</b> · {{ qb.source_status }}{% if qb.availability_uncertain %} · availability uncertain{% endif %}{% if qb.depth_stale %} · old depth chart{% endif %}</small>
+{% endfor %}
+{% if r.qb_watch.source_url %}<small><a href="{{ r.qb_watch.source_url }}" target="_blank" rel="noopener noreferrer">Personnel data source</a></small>{% endif %}
+{% else %}<small>QB context not yet available from saved personnel evidence.</small>{% endif %}
+</td>
 <td><small>Original: <b>{{ r.original_grade }}</b><br>QB: <b>{{ r.qb_grade }}</b>{% if r.actual_total is not none %}<br>Final total {{ r.actual_total }}{% endif %}{% if r.review %}<br>{{ r.review }}{% endif %}</small></td>
 {% else %}<td colspan="7">{{ r.reason }}</td>{% endif %}</tr>
 {% else %}<tr><td colspan="8">No eligible games or saved records for the current week.</td></tr>{% endfor %}</tbody></table></div></details>
 <details><summary>A–L forward records</summary><div class="rt-table"><table><thead><tr><th>Category</th><th>Original W–L–P</th><th>QB Edition W–L–P</th></tr></thead><tbody>{% for letter,groups in view.categories.items() %}<tr><td>{{ letter }}</td>{% for key in ['original','qb'] %}{% set s=groups[key] %}<td>{{ s.get('Win',0) }}–{{ s.get('Loss',0) }}–{{ s.get('Push',0) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div></details>
-<p class="rt-note">Background capture checks every five minutes when hosted automatic updates are running. Reload to see saved picks and newly imported finals. A sourced expected-starter report is evidence, not independent confirmation. Pages perform no API calls and do not save picks.</p>
+<p class="rt-note">QB context is read from the latest available pregame NFLverse depth-chart/injury snapshot already collected for Scout/The Expert. A depth-chart candidate is not a verified or confirmed starter and cannot independently trigger a QB flip. Original and QB Edition picks stay frozen. Background capture checks every five minutes when hosted automatic updates are running; the QB context refresh depends on the existing personnel collector. Reload to see saved updates. Pages perform no API calls and do not save picks.</p>
 </section>
 {% endblock %}
