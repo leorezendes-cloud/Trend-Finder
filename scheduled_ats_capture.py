@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """One scheduled capture; safe to run alongside Flask or a manual capture."""
 import csv
+import os
 import fcntl
 import json
 import os
@@ -78,6 +79,13 @@ def _finish_cycle(root, status, code):
     except Exception as error:
         status.update(state='error', message=str(error))
         code = 1
+    if os.environ.get('TREND_FINDAH_AUTO_UPDATE') == '1':
+        try:
+            from plug_ats_v5_weekly import SCOUT_POLICY, issue_pending
+            status['scout_ats'] = issue_pending(root, policy=SCOUT_POLICY)
+        except Exception as error:
+            status['scout_ats_error'] = type(error).__name__ + ': ' + str(error)
+            code = 1
     save_status(root, status)
     return code
 

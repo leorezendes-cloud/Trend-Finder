@@ -38,21 +38,32 @@ def _receipt_path(year,week,policy=POLICY):
 
 def read_week(year,week,policy=POLICY):
     path=_receipt_path(year,week,policy)
-    if path.is_file():
-        return _read_receipt(path, year, week, policy, 'PUBLISHED_BEFORE_FIRST_KICKOFF')
+    weekly = (_read_receipt(path, year, week, policy, 'PUBLISHED_BEFORE_FIRST_KICKOFF')
+              if path.is_file() else None)
     if policy != SCOUT_POLICY:
-        return None
-    rows = []
+        return weekly
+    rows = {row['game_id']: {**row, 'issued_at_utc': weekly['issued_at_utc']}
+            for row in weekly['games']} if weekly else {}
     for game_path in sorted(_scout_game_dir(year, week).glob('*.json')):
         receipt = _read_receipt(game_path, year, week, policy, 'PUBLISHED_BEFORE_GAME_KICKOFF')
-        if len(receipt['games']) != 1 or receipt['games'][0]['game_id'] != game_path.stem:
+        if len(receipt['games']) != 1:
+            raise ValueError('Scout ATS receipt must describe one game')
+        row = receipt['games'][0]
+        game_id = row['game_id']
+        if game_path.stem not in (game_id, _scout_revision_name(game_id, row['quote_observed_utc'])):
             raise ValueError('Scout ATS receipt game mismatch')
-        rows.append({**receipt['games'][0], 'issued_at_utc': receipt['issued_at_utc']})
+        previous = rows.get(game_id)
+        if previous is None or _utc(row['quote_observed_utc']) > _utc(previous['quote_observed_utc']):
+            rows[game_id] = {**row, 'issued_at_utc': receipt['issued_at_utc']}
     if not rows:
         return None
-    return dict(policy=policy, season=year, week=week, games=rows,
-                issued_at_utc=max(row['issued_at_utc'] for row in rows),
-                selected_ids=sorted(row['game_id'] for row in rows if row['selected']))
+    return dict(policy=policy, season=year, week=week, games=list(rows.values()),
+                issued_at_utc=max(row['issued_at_utc'] for row in rows.values()),
+                selected_ids=sorted(game_id for game_id, row in rows.items() if row['selected']))
+
+
+def _scout_revision_name(game_id, observed):
+    return game_id + '__' + _utc(observed).strftime('%Y%m%dT%H%M%S%fZ')
 
 
 def _scout_game_dir(year, week):
@@ -166,15 +177,23 @@ def _candidate(root, game, kickoff, year, week, now, *, scout=False):
 
 
 def _issue_scout_games(root, now):
+    from scout4.shadow import quote as verified_quote
+    schedule = _scheduled(root, now)
+    upcoming = {game['game_id'] for slate in schedule.values() for game, kickoff in slate
+                if kickoff is not None and now < kickoff <= now + timedelta(days=10)}
+    observations = defaultdict(list)
+    source = root / 'public_money_snapshots.csv'
+    if source.is_file():
+        with source.open(newline='', encoding='utf-8-sig') as stream:
+            for observation in csv.DictReader(stream):
+                if observation.get('market') == 'Spread' and observation.get('game_id') in upcoming:
+                    observations[observation['game_id']].append(observation)
     report = dict(published=0, preserved=0, pending=0, started=0, selected=0)
-    for (year, week), slate in sorted(_scheduled(root, now).items()):
+    for (year, week), slate in sorted(schedule.items()):
         existing = read_week(year, week, SCOUT_POLICY)
-        saved = {row['game_id'] for row in existing['games']} if existing else set()
+        saved = {row['game_id']: row for row in existing['games']} if existing else {}
         for game, kickoff in slate:
             game_id = game['game_id']
-            if game_id in saved:
-                report['preserved'] += 1
-                continue
             if kickoff is None or kickoff <= now:
                 report['started'] += 1
                 continue
@@ -184,7 +203,23 @@ def _issue_scout_games(root, now):
             if row is None:
                 report['pending'] += 1
                 continue
-            path = _scout_game_dir(year, week) / (game_id + '.json')
+            quote = verified_quote(observations[game_id], game, 'Spread', now)
+            previous = saved.get(game_id)
+            if quote is None:
+                report['preserved' if previous else 'pending'] += 1
+                continue
+            observed = quote['captured_at_utc']
+            line = quote['line']
+            if previous and (_utc(observed) <= _utc(previous['quote_observed_utc'])
+                             or line == previous['away_line']):
+                report['preserved'] += 1
+                continue
+            model = row['model_away_spread']
+            side = classify_scout(model, line, row['away_team'], row['home_team'])
+            row.update(away_line=line, quote_observed_utc=observed, side=side,
+                       gap=round(model-line, 6), selected=side is not None,
+                       sportsbook=quote['sportsbook'], source_url=quote['source_url'])
+            path = _scout_game_dir(year, week) / (_scout_revision_name(game_id, observed) + '.json')
             path.parent.mkdir(parents=True, exist_ok=True)
             issued = datetime.now(timezone.utc)
             if kickoff <= issued:
