@@ -156,7 +156,10 @@ def approve(version):
         g.pop("_expert_records", None)
         g.pop("_expert_featured", None)
         game = item["game"]
-        _ensure_public_featured(store, int(game["season"]), int(game["week"]))
+        try:
+            _ensure_public_featured(store, int(game["season"]), int(game["week"]))
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            current_app.logger.warning("Featured Expert selection unavailable: %s", type(exc).__name__)
         g.pop("_expert_records", None)
         g.pop("_expert_featured", None)
     # Only the featured text of an unchanged, unapproved newsletter may refresh.
