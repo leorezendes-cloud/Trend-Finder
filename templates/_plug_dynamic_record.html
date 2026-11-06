@@ -4,20 +4,38 @@
     <div><p class="weekly-dynamic-eyebrow">Combined ATS &amp; O/U record</p><h2>The Plug's Record</h2></div>
   </div>
   <div class="weekly-dynamic-stats">
+    {% if current_plug_ats is defined %}
+    {% set current = current_plug_ats.combined %}
+    <div><span>ATS · Scout Stats</span>{% if current_plug_ats.review %}<strong>Awaiting record verification</strong>{% else %}
+      <strong>{{ current.Win }}–{{ current.Loss }}–{{ current.Push }}</strong>
+      <small>{{ current.Pending }} pending · {{ current_plug_ats.rows|length }} selections</small>
+      {% for rule, record in current_plug_ats.rules.items() %}<small>{{ rule }} {{ record.Win }}–{{ record.Loss }}–{{ record.Push }}{% if record.Pending %} · {{ record.Pending }} pending{% endif %}</small>{% endfor %}
+    {% endif %}</div>
+    {% else %}
     <div><span>ATS record</span><strong>{{ plug_combined_record.counts.ats.Win }}–{{ plug_combined_record.counts.ats.Loss }}–{{ plug_combined_record.counts.ats.Push }}</strong><small>{{ plug_combined_record.counts.ats.Pending }} pending · {{ plug_combined_record.counts.ats.selected }} selections</small></div>
+    {% endif %}
     <div><span>O/U record</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
   </div>
   <details class="weekly-dynamic-details">
     <summary>View Plug selections{% if all_weeks|default(false) %} · All Weeks{% else %} · Week {{ selected_week }}{% endif %}</summary>
     <div class="weekly-dynamic-list">
-    {% for r in plug_combined_record.rows if r.ats_selected or r.ou_selected %}
+    {% if current_plug_ats is defined %}
+    {% for r in current_plug_ats.rows %}
       <div class="weekly-dynamic-game">
         <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
         <small>Week {{ r.week }}</small>
-        {% if r.ats_selected %}<div><span>ATS</span><strong>{{ r.ats_side }}</strong><small>{{ r.ats_result }}</small></div>{% endif %}
+        <div><span>ATS · {{ r.rule }}</span><strong>{{ r.pick }}</strong><small>{{ r.result }}</small></div>
+      </div>
+    {% endfor %}
+    {% endif %}
+    {% for r in plug_combined_record.rows if r.ou_selected or (current_plug_ats is not defined and r.ats_selected) %}
+      <div class="weekly-dynamic-game">
+        <a href="{{ url_for('fans.matchup',game_id=r.game_id) }}">{{ r.away_team }} @ {{ r.home_team }}</a>
+        <small>Week {{ r.week }}</small>
+        {% if r.ats_selected and current_plug_ats is not defined %}<div><span>ATS</span><strong>{{ r.ats_side }}</strong><small>{{ r.ats_result }}</small></div>{% endif %}
         {% if r.ou_selected %}<div><span>O/U</span><strong>{{ r.ou_side }}</strong><small>{{ r.ou_result }}</small></div>{% endif %}
       </div>
-    {% else %}<p>No qualifying Plug selections for this week.</p>{% endfor %}
+    {% else %}{% if current_plug_ats is not defined or not current_plug_ats.rows %}<p>No qualifying Plug selections in this view.</p>{% endif %}{% endfor %}
     </div>
   </details>
 </section>

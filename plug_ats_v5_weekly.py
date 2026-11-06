@@ -294,6 +294,27 @@ def published_history(final_scores, *, scout_only=False):
     rows.sort(key=lambda r:(r['kickoff_utc'],r['game_id']),reverse=True)
     return rows,{y:dict(c) for y,c in sorted(seasons.items(),reverse=True)}
 
+def scout_ats_record(final_scores, season, week=None):
+    """Settle only issued picks from the current Plug ATS policy."""
+    outcomes = ('Win', 'Loss', 'Push', 'Pending')
+    tally = {name: dict.fromkeys(outcomes, 0) for name in ('Follow', 'Fade')}
+    rows = []
+    review = False
+    try:
+        issued, _ = published_history(final_scores, scout_only=True)
+    except (OSError, ValueError, TypeError, KeyError):
+        issued, review = [], True
+    for row in issued:
+        if int(row['season']) != season or (week is not None and int(row['week']) != week):
+            continue
+        rule = 'Follow' if abs(row['away_line']) > 7 else 'Fade'
+        line = row['away_line'] if row['side'] == row['away_team'] else -row['away_line']
+        tally[rule][row['result']] += 1
+        rows.append({**row, 'rule': rule, 'pick': f"{row['side']} {line:+g}"})
+    combined = {outcome: sum(tally[name][outcome] for name in tally) for outcome in outcomes}
+    return dict(rows=rows, rules=tally, combined=combined, review=review)
+
+
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser()

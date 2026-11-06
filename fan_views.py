@@ -674,10 +674,12 @@ def prediction_results():
     groups, recent, excluded = prediction_performance(selected_records, schedule)
     # Only actually issued Plug receipts count; never reconstruct issued picks
     # from retrospective edge rankings or current market lines.
-    from plug_ats_v5_weekly import published_history
+    from plug_ats_v5_weekly import published_history, scout_ats_record
     from plug_dashboard import _completed_games
+    finals = _completed_games(ROOT)
+    current_plug_ats = scout_ats_record(finals, season, record_week)
     try:
-        plug_picks, plug_seasons = published_history(_completed_games(ROOT))
+        plug_picks, plug_seasons = published_history(finals)
         plug_receipts_review = False
     except (OSError, TypeError, ValueError, KeyError):
         plug_picks, plug_seasons = [], {}
@@ -748,11 +750,11 @@ def prediction_results():
         'ats_selected':sum(bool(r.get('ats_side')) for r in historical_plug_rows),
         'ou_selected':sum(bool(r.get('ou_side')) for r in historical_plug_rows)})
     from plug_dynamic_official import record_context
-    dynamic_context = record_context(ROOT, _completed_games(ROOT), season, record_week)
+    dynamic_context = record_context(ROOT, finals, season, record_week)
     plug_combined_record = combine_plug_record(
         historical_plug_rows, dynamic_context.get('dynamic_record_rows', []))
     from scout_dynamic_public import records as scout_dynamic_records
-    scout_context=scout_dynamic_records(ROOT, _completed_games(ROOT), season, record_week)
+    scout_context=scout_dynamic_records(ROOT, finals, season, record_week)
     from scout_fade import safe_record_context as scout_fade_context
     fade_context=scout_fade_context(ROOT, records, schedule, season, record_week)
     return render_template('prediction_results.html', **scout_context, **dynamic_context, scout_fade=fade_context, groups=groups,
@@ -771,4 +773,5 @@ def prediction_results():
                            historical_plug_weeks=historical_plug_weeks,
                            historical_plug_tally=historical_plug_tally,
                            historical_plug_tallies_by_week=historical_plug_tallies_by_week,
-                           plug_combined_record=plug_combined_record)
+                           plug_combined_record=plug_combined_record,
+                           current_plug_ats=current_plug_ats)
