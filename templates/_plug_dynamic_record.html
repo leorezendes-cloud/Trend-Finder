@@ -6,14 +6,14 @@
   <div class="weekly-dynamic-stats">
     {% if current_plug_ats is defined %}
     {% set current = current_plug_ats.combined %}
-    <div><span>ATS · Scout Stats</span>{% if current_plug_ats.review %}<strong>Awaiting record verification</strong>{% else %}
+    <div><span>ATS · Scout Stats{% if all_weeks|default(false) %} <small style="font-size:0.75em">(weeks 4–now)</small>{% endif %}</span>{% if current_plug_ats.review %}<strong>Awaiting record verification</strong>{% else %}
       <strong>{{ current.Win }}–{{ current.Loss }}–{{ current.Push }}</strong>
       <small>{{ current.Pending }} pending · {{ current_plug_ats.rows|length }} selections</small>
     {% endif %}</div>
     {% else %}
     <div><span>ATS record</span><strong>{{ plug_combined_record.counts.ats.Win }}–{{ plug_combined_record.counts.ats.Loss }}–{{ plug_combined_record.counts.ats.Push }}</strong><small>{{ plug_combined_record.counts.ats.Pending }} pending · {{ plug_combined_record.counts.ats.selected }} selections</small></div>
     {% endif %}
-    <div><span>O/U record{% if all_weeks|default(false) %} (Weeks 6–now){% endif %}</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
+    <div><span>O/U record</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
   </div>
   <details class="weekly-dynamic-details">
     <summary>View Plug selections{% if all_weeks|default(false) %} · All Weeks{% else %} · Week {{ selected_week }}{% endif %}</summary>
