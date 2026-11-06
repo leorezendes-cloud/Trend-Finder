@@ -9,7 +9,6 @@
     <div><span>ATS · Scout Stats</span>{% if current_plug_ats.review %}<strong>Awaiting record verification</strong>{% else %}
       <strong>{{ current.Win }}–{{ current.Loss }}–{{ current.Push }}</strong>
       <small>{{ current.Pending }} pending · {{ current_plug_ats.rows|length }} selections</small>
-      {% for rule, record in current_plug_ats.rules.items() %}<small>{{ rule }} {{ record.Win }}–{{ record.Loss }}–{{ record.Push }}{% if record.Pending %} · {{ record.Pending }} pending{% endif %}</small>{% endfor %}
     {% endif %}</div>
     {% else %}
     <div><span>ATS record</span><strong>{{ plug_combined_record.counts.ats.Win }}–{{ plug_combined_record.counts.ats.Loss }}–{{ plug_combined_record.counts.ats.Push }}</strong><small>{{ plug_combined_record.counts.ats.Pending }} pending · {{ plug_combined_record.counts.ats.selected }} selections</small></div>
