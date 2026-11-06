@@ -13,7 +13,7 @@
     {% else %}
     <div><span>ATS record</span><strong>{{ plug_combined_record.counts.ats.Win }}–{{ plug_combined_record.counts.ats.Loss }}–{{ plug_combined_record.counts.ats.Push }}</strong><small>{{ plug_combined_record.counts.ats.Pending }} pending · {{ plug_combined_record.counts.ats.selected }} selections</small></div>
     {% endif %}
-    <div><span>O/U record</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
+    <div><span>O/U record{% if all_weeks|default(false) %} (Weeks 6–now){% endif %}</span><strong>{{ plug_combined_record.counts.ou.Win }}–{{ plug_combined_record.counts.ou.Loss }}–{{ plug_combined_record.counts.ou.Push }}</strong><small>{{ plug_combined_record.counts.ou.Pending }} pending · {{ plug_combined_record.counts.ou.selected }} selections</small></div>
   </div>
   <details class="weekly-dynamic-details">
     <summary>View Plug selections{% if all_weeks|default(false) %} · All Weeks{% else %} · Week {{ selected_week }}{% endif %}</summary>
