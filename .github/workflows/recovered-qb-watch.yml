@@ -1,0 +1,34 @@
+name: Recovered NFL QB evidence watch safety
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'recovered_qb_watch.py'
+      - 'recovered_nfl_tracker.py'
+      - 'templates/recovered_nfl_tracker.html'
+      - 'test_recovered_nfl_tracker.py'
+      - '.github/workflows/recovered-qb-watch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qb-watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal app dependencies
+        run: python -m pip install Flask==3.1.3 Werkzeug==3.1.9
+      - name: Check source and template syntax
+        run: |
+          python -m py_compile recovered_qb_watch.py recovered_nfl_tracker.py
+          python - <<'PY'
+          from pathlib import Path
+          from jinja2 import Environment
+          Environment().parse(Path('templates/recovered_nfl_tracker.html').read_text())
+          PY
+      - name: Verify existing picks and pregame QB watch safeguards
+        run: python -m unittest test_recovered_nfl_tracker -v
