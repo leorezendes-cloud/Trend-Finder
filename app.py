@@ -43,6 +43,8 @@ from scout4.web import bp as scout4_bp
 app.register_blueprint(scout4_bp)
 from expert_beta import init_app as init_expert_beta
 init_expert_beta(app)
+from expert_review_web import init_app as init_expert_review
+init_expert_review(app)
 from comeback_leads import init_app as init_comeback_leads
 init_comeback_leads(app)
 
