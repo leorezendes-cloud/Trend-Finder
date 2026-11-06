@@ -31,8 +31,12 @@
       {% if total_pick != 'Stay Away' %}
         <p style="color:#168449;font-size:20px;font-weight:800;line-height:1.35;margin:9px 0">The Plug's Pick · Total: {{ total_pick }}</p>
       {% endif %}
+    {% elif item.startswith('Scout: ') %}
+      <p style="color:#2d3440;font-size:14px;line-height:1.6;margin:16px 0 6px"><strong>Scout:</strong> {{ item.split('Scout: ',1)[1] }}</p>
+    {% elif item.startswith('Expert: ') %}
+      <p style="color:#2d3440;font-size:14px;line-height:1.6;margin:6px 0 14px"><strong>Expert:</strong> {{ item.split('Expert: ',1)[1] }}</p>
     {% elif item.startswith("Expert's take: ") %}
-      <p style="color:#444650;font-size:14px;line-height:1.6;margin:9px 0"><strong>The Expert's quick take:</strong> {{ item.split("Expert's take: ",1)[1] }}</p>
+      <p style="color:#444650;font-size:14px;line-height:1.75;margin:16px 0 18px"><strong>The Expert's quick take:</strong> {{ item.split("Expert's take: ",1)[1] }}</p>
     {% elif item %}<p style="color:#444650;font-size:14px;line-height:1.55;margin:7px 0">{{ item }}</p>{% endif %}
   {% endfor %}
   {% endif %}
