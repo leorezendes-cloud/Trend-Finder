@@ -89,14 +89,6 @@
 {% endfor %}</div>{% endmacro %}
 {% block content %}<div id="plug-refresh" data-scores-url="{{ url_for('fans.scores') }}"></div><script src="{{ url_for('static',filename='plug_updates.js') }}" defer></script>
 <div id="plug-weekly-slate">
-{% if plug_scout_ats_record is defined %}
-<section aria-label="Plug Scout stats ATS record">
-<h2>Plug ATS Record · Scout Stats</h2>
-{% for rule, record in plug_scout_ats_record.items() %}
-<p>{{ rule }}: {{ record.Win }} wins, {{ record.Loss }} losses, {{ record.Push }} pushes{% if record.Pending %}, {{ record.Pending }} pending{% endif %}</p>
-{% endfor %}
-</section>
-{% endif %}
 {% if active_slate %}<p class="expert-meta">{{ active_slate[0] }} · {{ 'NFL Week ' ~ active_slate[2] if active_slate[1]=='REG' else active_slate[1] ~ ' · Week ' ~ active_slate[2] }}</p>{% endif %}
 <h2>Upcoming Games</h2>{{ cards(games) }}{% if not games %}<p>No upcoming games in the current scheduled slate.</p>{% endif %}
 {% if underway_games %}<section><h2>Games Underway</h2>{{ cards(underway_games) }}</section>{% endif %}

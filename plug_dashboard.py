@@ -313,7 +313,7 @@ def weekly_dashboard(records, render_record, now):
     for group in ('games','underway_games','completed_games','awaiting_games','historical_games'):
         for item in sections.get(group, []):
             attach_current_scout(ROOT, item, now=now)
-    from plug_ats_v5_weekly import SCOUT_POLICY, grade, published_history, read_week
+    from plug_ats_v5_weekly import SCOUT_POLICY, grade, read_week
     scout_weeks = {}
     for group in ('games', 'underway_games', 'completed_games', 'awaiting_games', 'historical_games'):
         for item in sections[group]:
@@ -330,13 +330,4 @@ def weekly_dashboard(records, render_record, now):
                 item['plug_scout_ats'] = decision
                 final = item.get('final_score')
                 item['plug_scout_ats_result'] = grade(decision, (final['away'], final['home'])) if final else None
-    try:
-        history, _ = published_history(_completed_games(ROOT), scout_only=True)
-    except (OSError, ValueError, TypeError, KeyError):
-        history = []
-    tally = {rule: dict(Win=0, Loss=0, Push=0, Pending=0) for rule in ('Follow', 'Fade')}
-    for row in history:
-        if row['policy'] == SCOUT_POLICY and active and int(row['season']) == active[0]:
-            tally['Follow' if abs(row['away_line']) > 7 else 'Fade'][row['result']] += 1
-    sections['plug_scout_ats_record'] = tally
     return sections
