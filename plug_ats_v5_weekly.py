@@ -402,7 +402,24 @@ def scout_ats_record(final_scores, season, week=None):
         rows.append({**row, 'rule': rule, 'pick': f"{row['side']} {line:+g}"})
     rows.sort(key=lambda row: (row['week'], row['game_id']), reverse=True)
     combined = {outcome: sum(tally[name][outcome] for name in tally) for outcome in outcomes}
-    return dict(rows=rows, rules=tally, combined=combined, review=review)
+    # Preserve existing display fields, while exposing separate source-of-truth
+    # totals so retrospective rule discovery cannot be mistaken for live picks.
+    cohorts = {}
+    by_week = {}
+    for name, selected_rows in (
+        ('issued', [row for row in rows if not row.get('replay')]),
+        ('replay', [row for row in rows if row.get('replay')]),
+    ):
+        counts = {outcome: sum(row['result'] == outcome for row in selected_rows)
+                  for outcome in outcomes}
+        cohorts[name] = {**counts, 'selections': len(selected_rows)}
+        for row in selected_rows:
+            week_counts = by_week.setdefault(int(row['week']), {}).setdefault(
+                name, dict.fromkeys((*outcomes, 'selections'), 0))
+            week_counts[row['result']] += 1
+            week_counts['selections'] += 1
+    return dict(rows=rows, rules=tally, combined=combined, cohorts=cohorts,
+                by_week=by_week, review=review)
 
 
 if __name__=='__main__':
