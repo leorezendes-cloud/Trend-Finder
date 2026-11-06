@@ -68,6 +68,48 @@ def _side_label(side, quote, market):
     return f'{side} {line:g}' if line is not None else side
 
 
+def _expert_newsletter_story(report):
+    """Extract a football storyline, not another ATS/total recommendation.
+
+    Only uses published Expert narrative; never invents player news. This is a
+    fallback draft teaser for human review, not an independent research system.
+    """
+    import re
+    sections = report.get('sections') or []
+    preferred = ('Offensive and Defensive Analysis',
+                 'Personnel and Injury Considerations', 'Matchup Overview')
+    noise = ('market', 'spread', 'total', 'over', 'under', 'model', 'projection',
+             'scout', 'pick', 'wager', 'betting', 'cover', 'points', 'line ',
+             'expected starter', 'not confirmed', 'snapshot', 'report is current')
+    scored = []
+    for order, heading in enumerate(preferred):
+        entry = next((part for part in sections if part.get('heading') == heading), None)
+        if not entry:
+            continue
+        body = re.sub(r'\\[[^]\\n]{1,90}\\]', '', str(entry.get('text') or ''))
+        for sentence in re.split(r'(?<=[.!?])\\s+', body):
+            sentence = ' '.join(sentence.split())
+            if not 45 <= len(sentence) <= 240:
+                continue
+            lower = sentence.lower()
+            if any(term in lower for term in noise):
+                continue
+            relevance = sum(term in lower for term in (
+                'quarterback', 'pressure', 'protection', 'offense', 'defense',
+                'injur', 'receiver', 'running', 'pass', 'drive', 'front',
+                'secondary', 'matchup', 'rush', 'play', 'weather'))
+            if relevance:
+                scored.append((relevance, -order, sentence))
+    scored.sort(reverse=True)
+    if scored:
+        opening = scored[0][2]
+        next_sentence = next((item[2] for item in scored[1:]
+                              if item[2] != opening and len(opening) + len(item[2]) < 325), None)
+        return opening + (' ' + next_sentence if next_sentence else '')
+    # Editorial fallback rather than repeating selection and mathematical edge.
+    return 'The matchup has more layers than the selections alone. Read the full Expert analysis for the personnel and game-script breakdown.'
+
+
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
     """Newsletter selections come from the same immutable official receipts as The Plug.
 
@@ -185,11 +227,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             except (ValueError, KeyError, TypeError, AttributeError):
                 warnings.append('An Expert report failed published-review validation.')
                 continue
-            summary = ' '.join((report.get('summary') or '').split())
-            if not summary:
-                continue
-            if len(summary) > 350:
-                summary = summary[:350].rsplit(' ', 1)[0].rstrip(' ,;:') + '…'
+            summary = _expert_newsletter_story(report)
             expert_text = (f"ATS: {report.get('ats_side') or 'No pick'}"
                            f" · Total: {report.get('total_side') or 'No pick'}")
             expert.append((kickoff, f'{label}\n{expert_text}\n{summary}\n{url}'))
