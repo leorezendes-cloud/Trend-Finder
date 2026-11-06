@@ -661,3 +661,66 @@ def generate_draft(owner_id, frequency='weekly', now=None, root=None, *, report_
         connection.commit();return issue_id
     except Exception:
         connection.rollback();raise
+
+
+def refresh_unapproved_featured(now=None):
+    """Refresh only the featured block of an untouched, unapproved weekly draft.
+
+    Invoked on an explicit owner Expert approval, never on page view or from
+    background jobs. Ignores approved issues, manual changes, and sent issues.
+    No AI requests, no recipient changes, and no email sending.
+    """
+    from newsletter_draft import (_origin, _plug_content, _weekly_featured_pick,
+                                  period_key)
+    now = now or datetime.now(timezone.utc)
+    period = period_key('weekly', now)
+    connection = db()
+    existing = connection.execute(
+        "SELECT g.issue_id, g.metadata, i.status, i.sections, i.audience_frozen "
+        "FROM newsletter_generated g JOIN newsletter_issues i ON i.id=g.issue_id "
+        "WHERE g.frequency='weekly' AND g.period=?", (period,)
+    ).fetchone()
+    if existing is None:
+        return 'draft-not-yet-created'
+    if existing['status'] != 'draft' or existing['audience_frozen']:
+        return 'approved-or-sent-issue-untouched'
+    current_sections = json.loads(existing['sections'])
+    current_block = current_sections.get('predictions', '')
+    metadata = json.loads(existing['metadata'])
+    baseline = (metadata.get('original_sections') or {}).get('predictions')
+    if baseline is None or current_block != baseline:
+        return 'owner-edits-preserved'
+    if "Expert's take:" in current_block:
+        return 'featured-expert-already-present'
+
+    warnings = []
+    picks, experts, versions = _plug_content(now, _origin(), warnings,
+                                            max_picks=None, root=Path(current_app.root_path))
+    featured, _ = _weekly_featured_pick(picks, experts, versions, warnings)
+    if "Expert's take:" not in featured:
+        return 'awaiting-featured-expert'
+    if current_block == featured:
+        return 'already-current'
+    current_sections['predictions'] = featured
+    metadata['original_sections']['predictions'] = featured
+    metadata['featured_refreshed_at'] = now.isoformat()
+
+    connection.execute('BEGIN IMMEDIATE')
+    try:
+        updated = connection.execute(
+            "UPDATE newsletter_issues SET sections=? "
+            "WHERE id=? AND status='draft' AND audience_frozen=0 AND sections=?",
+            (json.dumps(current_sections), existing['issue_id'], existing['sections'])
+        )
+        if updated.rowcount != 1:
+            connection.rollback()
+            return 'draft-changed-concurrently'
+        connection.execute(
+            "UPDATE newsletter_generated SET metadata=? WHERE issue_id=?",
+            (json.dumps(metadata), existing['issue_id'])
+        )
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    return 'featured-section-refreshed'

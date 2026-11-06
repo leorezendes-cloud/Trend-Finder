@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review Expert Report | Trend Findah</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">
+{% include '_branding_head.html' %}
+<style>
+.expert-review-page{max-width:930px;margin:24px auto 75px;padding:0 18px;text-align:left}
+.expert-review-page p,.expert-review-page h1,.expert-review-page h2{text-align:left}
+.expert-review-panel{background:#111b2b;border:1px solid #35445b;border-radius:12px;padding:19px 22px;margin:15px 0}
+.expert-review-panel p{white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+.expert-review-panel a,.expert-review-page a{color:#fbbf24;overflow-wrap:anywhere}
+.expert-review-confirm{display:flex;align-items:flex-start;gap:12px;line-height:1.5;margin:20px 0}
+.expert-review-confirm input{margin-top:6px}
+.expert-review-panel button{padding:11px 16px;font-weight:700}
+</style></head><body>
+{% include '_site_navigation.html' %}
+<main class="membership expert-review-page">
+<a href="{{ url_for('expert_review.queue') }}">Back to pending reports</a>
+<h1>{{ item.game.away_team }} @ {{ item.game.home_team }} · Expert Review</h1>
+<p>Week {{ item.game.week }}, {{ item.game.season }} · Kickoff {{ item.game.kickoff_utc }}</p>
+<section class="expert-review-panel">
+<h2>Proposed decisions</h2>
+<p><strong>ATS:</strong> {{ item.report.ats_side or 'Pass' }} · <strong>Total:</strong> {{ item.report.total_side or 'Pass' }}</p>
+<p><strong>Expert's summary:</strong> {{ item.report.summary }}</p>
+<p><strong>Betting assessment:</strong> {{ item.report.betting_assessment }}</p>
+<p><strong>Disagreement with Scout:</strong> {{ item.report.disagreement_reason or 'None recorded' }}</p>
+</section>
+{% for section in item.report.sections %}
+<section class="expert-review-panel">
+<h2>{{ section.heading }}</h2>
+<p>{{ section.text }}</p>
+<p><small>Evidence: {{ (section.evidence_ids or [])|join(', ') }}</small></p>
+</section>
+{% endfor %}
+<section class="expert-review-panel"><h2>Counterargument and uncertainty</h2>
+<p>{{ item.report.counterargument }}</p><p>{{ item.report.uncertainty }}</p></section>
+<section class="expert-review-panel">
+<h2>Sources to verify</h2>
+<p>Scout snapshot: {{ item.report.scout_sha256 }} · {{ item.report.editorial_as_of or 'No supplemental evidence cutoff' }}</p>
+{% for source in item.scout.sources or [] %}
+<p><strong>Scout: {{ source.name }}</strong> · {{ source.observed_at }}<br><a href="{{ source.url }}" rel="noopener noreferrer" target="_blank">Open Scout evidence</a></p>
+{% endfor %}
+{% for source in item.report.editorial_sources or [] %}
+<p><strong>{{ source.name }}</strong> · {{ source.observed_at }}<br><a href="{{ source.url }}" rel="noopener noreferrer" target="_blank">Open source</a><br>{{ source.description or '' }}</p>
+{% else %}<p>No supplemental sources. Review the saved Scout evidence and analysis before approving.</p>{% endfor %}
+</section>
+<section class="expert-review-panel">
+<h2>Approve and publish</h2>
+<p>This publishes the immutable Expert report for this exact Scout forecast. It does not regenerate AI, change model picks, send newsletters, or send email. If two approved free featured games become available, the unapproved weekly newsletter's featured section can update automatically.</p>
+<form method="post" action="{{ url_for('expert_review.approve',version=item.version) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label class="expert-review-confirm"><input type="checkbox" name="confirm_review" value="yes" required> I have reviewed the entire report, its key personnel assertions and the cited evidence, and approve publication.</label>
+<button type="submit">Approve and publish Expert report</button>
+</form>
+</section>
+</main></body></html>

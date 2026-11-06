@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Expert Review Queue | Trend Findah</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='membership.css') }}">
+{% include '_branding_head.html' %}
+<style>
+.expert-review-page{max-width:920px;margin:24px auto 70px;padding:0 18px;text-align:left}
+.expert-review-page h1,.expert-review-page h2,.expert-review-page p{text-align:left}
+.expert-review-card{background:#111b2b;border:1px solid #35445b;border-radius:12px;padding:18px;margin:14px 0}
+.expert-review-card p{margin:9px 0;line-height:1.55}
+.expert-review-page a{color:#fbbf24}
+.expert-review-tag{color:#cbd5e1}
+</style></head><body>
+{% include '_site_navigation.html' %}
+<main class="membership expert-review-page">
+<h1>Review The Expert</h1>
+<p>Upcoming generated reports requiring your approval. Reports never publish automatically. Review the complete analysis and sources before approving.</p>
+{% for msg in get_flashed_messages() %}<p role="status" class="expert-review-card">{{ msg }}</p>{% endfor %}
+<p><strong>{{ items|length }} report(s) awaiting review</strong> · <a href="{{ url_for('newsletter.manage') }}">Manage newsletters</a></p>
+{% for item in items %}
+<section class="expert-review-card">
+<h2>{{ item.game.away_team }} @ {{ item.game.home_team }} · Week {{ item.game.week }}</h2>
+<p class="expert-review-tag">Kickoff: {{ item.game.kickoff_utc }} · {{ item.report.model }} · {{ 'Replacement report' if '.replacement-' in item.path.name else 'Original draft' }}</p>
+<p><strong>ATS:</strong> {{ item.report.ats_side or 'Pass' }} · <strong>Total:</strong> {{ item.report.total_side or 'Pass' }}</p>
+<p>{{ item.report.summary }}</p>
+<p><a href="{{ url_for('expert_review.detail',version=item.version) }}">Read full report and review</a></p>
+</section>
+{% else %}
+<p class="expert-review-card">No upcoming Expert drafts are waiting for review. The generation scheduler may still be preparing reports.</p>
+{% endfor %}
+</main></body></html>
