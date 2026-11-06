@@ -39,6 +39,9 @@
 <section class="expert-review-panel">
 <h2>Sources to verify</h2>
 <p>Scout snapshot: {{ item.report.scout_sha256 }} · {{ item.report.editorial_as_of or 'No supplemental evidence cutoff' }}</p>
+{% for source in item.scout.sources or [] %}
+<p><strong>Scout: {{ source.name }}</strong> · {{ source.observed_at }}<br><a href="{{ source.url }}" rel="noopener noreferrer" target="_blank">Open Scout evidence</a></p>
+{% endfor %}
 {% for source in item.report.editorial_sources or [] %}
 <p><strong>{{ source.name }}</strong> · {{ source.observed_at }}<br><a href="{{ source.url }}" rel="noopener noreferrer" target="_blank">Open source</a><br>{{ source.description or '' }}</p>
 {% else %}<p>No supplemental sources. Review the saved Scout evidence and analysis before approving.</p>{% endfor %}
