@@ -156,14 +156,17 @@ def init_newsletter(app):
         if not issue or issue['status'] != 'draft' or issue['frequency'] != 'weekly':
             raise click.ClickException('Issue #6 is not an editable weekly draft.')
         sections = json.loads(issue['sections'])
-        lines = sections.get('predictions', '').splitlines()
+        # Older editorial command saved literal backslash-n separators.
+        # Convert only those separators back into real line breaks.
+        normalized = sections.get('predictions', '').replace(chr(92) + 'n', chr(10))
+        lines = normalized.splitlines()
         if not lines or not lines[0].startswith('ARI @ SEA'):
             raise click.ClickException('Issue #6 does not feature ARI @ SEA; refusing edit.')
         indices = [i for i, line in enumerate(lines) if line.startswith("Expert's take: ")]
         if len(indices) != 1:
             raise click.ClickException('Expected exactly one existing Expert teaser.')
         lines[indices[0]] = "Expert's take: " + teaser
-        polished = '\\n'.join(lines)
+        polished = chr(10).join(lines)
         if len(polished) > 6000:
             raise click.ClickException('Polished prediction section exceeds newsletter limit.')
         click.echo('New Expert teaser for issue #6:\\n' + teaser)
