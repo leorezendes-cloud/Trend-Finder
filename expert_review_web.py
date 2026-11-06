@@ -150,7 +150,12 @@ def approve(version):
         report["review_status"] = "approved"
         report["reviewer"] = "site-owner-" + str(g.member["id"])
         report["reviewed_at"] = clock().isoformat()
-        validate_expert(report, item["scout"])
+        try:
+            validate_expert(report, item["scout"])
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            abort(409, description="Expert review validation failed: " + str(exc))
+        if clock() >= instant(item["game"]["kickoff_utc"]):
+            abort(409, description="Kickoff has started; pregame publication is closed.")
         # Store.append is content-addressed and immutable. No draft is overwritten.
         store.append(item["scout"], expert=report, kind="development")
         g.pop("_expert_records", None)
