@@ -220,6 +220,12 @@ def view(root=ROOT,now=None):
     from site_week import current_site_week
     active=current_site_week(root/'nfl_games.csv',now)
     week_rows=[r for r in rows if active and (str(r.get('season')),str(r.get('week')))==tuple(map(str,active))]
+    # Informational personnel watch comes from the already-collected Scout/Expert
+    # evidence, not from postgame QB verification. It never changes a locked pick.
+    from recovered_qb_watch import watch
+    for row in week_rows:
+        source_game = index.get(row['game_id'])
+        row['qb_watch'] = watch(root, source_game, now) if source_game else None
     from owner_consensus import compare
     consensus=compare(week_rows,root,now)
     return dict(rows=week_rows,summary=summary,categories=categories,consensus=consensus,active_week=active,now=now.isoformat())
