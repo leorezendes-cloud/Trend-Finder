@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 from ats_money_analysis import snapshot_from_row, REQUIRED
+from odds_backup import archive_evidence
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = 'https://dknetwork.draftkings.com/draftkings-sportsbook-betting-splits/?tb_eg=88808&itm_content=NFL&tb_edate=n7days'
@@ -101,7 +102,10 @@ def collect(root=ROOT):
     from public_money import parse_markets, append_market_snapshots
     with (root/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as f:
         games=list(csv.DictReader(f))
-    evidence=root/'logs'/'ats_handle'; evidence.mkdir(parents=True,exist_ok=True)
+    evidence=root/'logs'/'ats_handle'
+    save_evidence = archive_evidence(root)
+    if save_evidence:
+        evidence.mkdir(parents=True,exist_ok=True)
     rows=[]; skipped=[]; captures=[]; market_rows=[]
     # Follow only the observed NFL table's numbered pagination links.
     for page in range(1,21):
@@ -110,8 +114,10 @@ def collect(root=ROOT):
             raw=response.read()
         captured=datetime.now(timezone.utc)
         stamp=captured.strftime('%Y%m%dT%H%M%S%fZ')
-        from archive_storage import save_capture
-        archive=evidence/f'{stamp}-page{page}.html'; save_capture(archive,raw)
+        archive=evidence/f'{stamp}-page{page}.html'
+        if save_evidence:
+            from archive_storage import save_capture
+            save_capture(archive, raw)
         html=raw.decode('utf-8')
         markets_by_game=parse_markets(html)
         captures.append(dict(url=url,captured_at_utc=captured.isoformat(),file=archive.name,sha256=hashlib.sha256(raw).hexdigest()))
@@ -147,12 +153,14 @@ def collect(root=ROOT):
     rows=[r for r in rows if datetime.fromisoformat(r['kickoff_utc'])>now]
     market_rows=[r for r in market_rows if datetime.fromisoformat(r['kickoff_utc'])>now]
     manifest=evidence/f'{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")}-manifest.json'
-    manifest.write_text(json.dumps(dict(captures=captures,rows=rows,market_rows=market_rows,skipped=skipped),indent=2))
+    if save_evidence:
+        manifest.write_text(json.dumps(dict(captures=captures,rows=rows,market_rows=market_rows,skipped=skipped),indent=2))
     if market_rows: append_market_snapshots(root,market_rows)
     print(f'Saved {len(market_rows)} spread, moneyline, and total market observations.')
     with target.open('a',newline='',encoding='utf-8') as f:
         csv.DictWriter(f,fieldnames=header).writerows(rows)
-    print(f'Saved {len(rows)} DraftKings spread-handle snapshots. Evidence: {manifest}')
+    print(f'Saved {len(rows)} DraftKings spread-handle snapshots.')
+    print(f'Evidence: {manifest}' if save_evidence else 'Raw evidence skipped to preserve disk space.')
     for row in rows:
         print(f"{row['away_team']} @ {row['home_team']}: {row['away_spread']} | Handle {row['away_handle_pct']}% / {row['home_handle_pct']}%")
     for reason in skipped: print('Skipped:',reason)

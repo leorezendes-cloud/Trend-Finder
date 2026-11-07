@@ -7,9 +7,17 @@ import csv
 import hashlib
 import json
 import math
+import shutil
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from urllib.request import Request, urlopen
+
+EVIDENCE_RESERVE_BYTES = 192 * 1024 * 1024
+
+
+def archive_evidence(root):
+    return shutil.disk_usage(root).free >= EVIDENCE_RESERVE_BYTES
+
 
 BASE = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
 
@@ -112,7 +120,9 @@ def collect(root, *, clock=None, fetch=None, required=None):
              and not g.get('away_score') and not g.get('home_score')
              and now < kickoff(g) <= now + timedelta(days=8)]
     evidence = root/'logs/odds_backup'
-    evidence.mkdir(parents=True, exist_ok=True)
+    archive = archive_evidence(root)
+    if archive:
+        evidence.mkdir(parents=True, exist_ok=True)
     rows, captures = [], []
     for season, week in sorted({(g['season'], g['week']) for g in games}):
         url = f'{BASE}?dates={int(season)}&seasontype=2&week={int(week)}&limit=100'
@@ -125,8 +135,9 @@ def collect(root, *, clock=None, fetch=None, required=None):
             raise ValueError('Oversized backup response')
         captured = clock()  # Observation is after receipt, never a backdated cutoff.
         filename = captured.strftime('%Y%m%dT%H%M%S%fZ') + f'-{season}-{week}.json'
-        from archive_storage import save_capture
-        save_capture(evidence/filename,raw)
+        if archive:
+            from archive_storage import save_capture
+            save_capture(evidence/filename, raw)
         captures.append(dict(url=url, file=filename, captured_at_utc=captured.isoformat(),
                              sha256=hashlib.sha256(raw).hexdigest()))
         rows.extend(parse(json.loads(raw), [g for g in games if (g['season'], g['week']) == (season, week)], captured, url))
@@ -134,7 +145,8 @@ def collect(root, *, clock=None, fetch=None, required=None):
     rows = [r for r in rows if instant(r['kickoff_utc']) > before_write
             and (required is None or (r['game_id'], r['market']) in required)]
     manifest = dict(captures=captures, rows=rows, splits_available=False)
-    (evidence/(before_write.strftime('%Y%m%dT%H%M%S%fZ')+'-manifest.json')).write_text(json.dumps(manifest, indent=2)+'\n')
+    if archive:
+        (evidence/(before_write.strftime('%Y%m%dT%H%M%S%fZ')+'-manifest.json')).write_text(json.dumps(manifest, indent=2)+'\n')
     if not rows:
         raise ValueError('Backup returned no verified upcoming spread or total prices')
     append_market_snapshots(root, rows)
