@@ -3,6 +3,7 @@
 import csv
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -107,7 +108,7 @@ def collect(root=ROOT):
     with (root/'nfl_games.csv').open(newline='',encoding='utf-8-sig') as f:
         games=list(csv.DictReader(f))
     evidence=root/'logs'/'ats_handle'
-    save_evidence = archive_evidence(root)
+    save_evidence = (os.environ.get('TREND_FINDAH_ARCHIVE_MARKET_EVIDENCE') == '1'\n                     and archive_evidence(root))
     if save_evidence:
         evidence.mkdir(parents=True,exist_ok=True)
     rows=[]; skipped=[]; captures=[]; market_rows=[]
