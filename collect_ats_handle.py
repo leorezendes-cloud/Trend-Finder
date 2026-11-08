@@ -72,7 +72,11 @@ def parse_page(html):
                 labels=[' '.join(c.text().split()) for c in cells]
                 if len(labels)!=4 or labels[1:] not in (['Odds','% Handle','% Bets'],['Odds','Handle','Bets']):
                     raise ValueError(f'Unexpected betting-split columns: {labels}')
-                market=labels[0]
+                market = None if labels[0] == 'Selection' else labels[0]
+            if 'tracking-wide' in classes and 'uppercase' in classes:
+                label = node.text().strip()
+                if label in ('Moneyline', 'Spread', 'Total'):
+                    market = label
             if 'tb-sodd' in classes and market=='Spread':
                 cells=[c for c in node.children if isinstance(c,Node)]
                 if len(cells)!=4: raise ValueError('Unexpected spread row')
@@ -90,9 +94,9 @@ def parse_page(html):
         away,home=team_code(match[1],away_label),team_code(match[2],home_label)
         if len(sides)!=2 or set(sides)!={away,home}: raise ValueError('Missing spread market')
         if abs(sides[away][0]+sides[home][0])>1e-8: raise ValueError('Non-opposing spreads')
-        date_match=re.search(r'(\d{1,2}/\d{1,2}),\s*(\d{1,2}:\d{2}[AP]M)',event.find('tb-se-title')[0].text())
+        date_match=re.search(r'(\d{1,2}/\d{1,2})\s*[,·]\s*(\d{1,2}:\d{2})\s*([AP]M)',event.find('tb-se-title')[0].text())
         if not date_match: raise ValueError('Missing event date/time')
-        event_time=datetime.strptime('2000/'+date_match[1]+' '+date_match[2],'%Y/%m/%d %I:%M%p')
+        event_time=datetime.strptime('2000/'+date_match[1]+' '+date_match[2]+date_match[3],'%Y/%m/%d %I:%M%p')
         events.append((away,home,sides,event_time))
     if not events: raise ValueError('No NFL events found; nothing collected')
     return events
