@@ -23,7 +23,11 @@ def parse_markets(html):
             if 'tb-se-head' in classes:
                 labels=[' '.join(c.text().split()) for c in cells]
                 if labels[1:] not in (['Odds','% Handle','% Bets'],['Odds','Handle','Bets']):raise ValueError(f'Unknown market columns: {labels[1:]}')
-                market=labels[0]
+                market = None if labels[0] == 'Selection' else labels[0]
+            if 'tracking-wide' in classes and 'uppercase' in classes:
+                label = node.text().strip()
+                if label in MARKETS:
+                    market = label
             if 'tb-sodd' in classes and market in MARKETS:
                 if len(cells)!=4:raise ValueError('Unknown selection layout')
                 label=' '.join(cells[0].text().split()).replace('−','-')
