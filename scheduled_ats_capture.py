@@ -106,21 +106,18 @@ def run(root=ROOT, now=None):
                 status.update(state='idle',message='No upcoming games in the next eight days.')
                 print(status['message'])
                 return _finish_cycle(root, status, code)
-            required=None
             try:
                 rows=collect(root)
                 if not rows:
                     raise RuntimeError('No verified pregame handle observations were retrieved')
-                if missing_prices(root,upcoming,datetime.now(timezone.utc)):
-                    required=missing_markets(root,upcoming,datetime.now(timezone.utc))
-                    raise RuntimeError('Primary feed is missing fresh spreads or totals')
             except Exception as primary_error:
-                # Prices have an independent backup; missing splits are never
-                # synthesized or sent through the public-money fade strategy.
-                status.update(primary_state='unavailable', primary_error=type(primary_error).__name__,
+                # Only an actual primary collection failure means splits are unavailable.
+                # A single missing spread/total is a separate pricing warning.
+                status.update(primary_state='unavailable',
+                              primary_error=type(primary_error).__name__,
                               splits_available=False)
                 from odds_backup import collect as backup
-                prices=backup(root,required=required)
+                prices=backup(root)
                 missing=missing_prices(root,upcoming,datetime.now(timezone.utc))
                 if missing:
                     status['missing_games']=missing
@@ -130,6 +127,22 @@ def run(root=ROOT, now=None):
                               message='Backup spreads and totals saved; public betting percentages unavailable.')
                 print(status['message'])
                 return _finish_cycle(root, status, code)
+
+            # Validated, persisted splits remain available even if one upcoming
+            # game has no sportsbook quote. Do not mark the primary unavailable.
+            status.update(primary_state='ok', splits_available=True)
+            required=missing_markets(root,upcoming,datetime.now(timezone.utc))
+            if required:
+                from odds_backup import collect as backup
+                try:
+                    prices=backup(root,required=required)
+                    status['backup_saved']=len(prices)
+                except (ValueError, RuntimeError, OSError) as backup_error:
+                    status['backup_warning']=type(backup_error).__name__+': '+str(backup_error)
+                missing=missing_prices(root,upcoming,datetime.now(timezone.utc))
+                if missing:
+                    status['missing_games']=missing
+                    status['market_warning']='Verified prices are unavailable for some upcoming games.'
             report=analyze(root/'ats_handle_snapshots.csv',root/'nfl_games.csv')
             status.update(state='ok',splits_available=True,saved=len(rows),qualifying=report['all']['qualifying'],pending=report['all']['pending'],latest_capture_utc=max(r['captured_at_utc'] for r in rows))
             print(f"Capture complete: {len(rows)} observations saved; {report['all']['qualifying']} latest qualifying games, {report['all']['pending']} pending.")
