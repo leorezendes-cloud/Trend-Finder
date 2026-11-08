@@ -121,7 +121,8 @@ def collect(root, *, clock=None, fetch=None, required=None):
              and not g.get('away_score') and not g.get('home_score')
              and now < kickoff(g) <= now + timedelta(days=8)]
     evidence = root/'logs/odds_backup'
-    archive = (os.environ.get('TREND_FINDAH_ARCHIVE_MARKET_EVIDENCE') == '1'\n               and archive_evidence(root))
+    archive = (os.environ.get('TREND_FINDAH_ARCHIVE_MARKET_EVIDENCE') == '1'
+               and archive_evidence(root))
     if archive:
         evidence.mkdir(parents=True, exist_ok=True)
     rows, captures = [], []
