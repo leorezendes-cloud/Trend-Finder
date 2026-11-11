@@ -28,6 +28,8 @@ def configure_hosted_app(application):
     @application.before_request
     def protect_research_data():
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):
+            if request.endpoint == 'expert_review.approve':
+                return  # The Expert review blueprint enforces owner access and CSRF.
             # Public analysis is read-only even though it submits a POST form.
             if request.endpoint not in ('home', 'trend_finder') and request.blueprint not in ('membership', 'newsletter', 'member_picks', 'community', 'huddle_leagues'):
                 abort(403, description='Data refresh and research editing are available only in the local research app.')
