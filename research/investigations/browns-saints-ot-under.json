@@ -1,0 +1,81 @@
+{
+  "slug": "browns-saints-ot-under",
+  "title": "Bad Beat of the Week: an Under undone in overtime",
+  "date": "2026-11-08",
+  "season": 2026,
+  "teams": "Browns · Saints",
+  "categories": [
+    "bad-beats"
+  ],
+  "summary": "Tied 6–6 after three quarters, Cleveland and New Orleans finished 23–22 in overtime. The 45 combined points beat a documented pregame Under 42.5 ticket by 2.5 points.",
+  "evidence": "Documented",
+  "featured": true,
+  "preview": "A November 6 snapshot showed just 22% of tickets but 92% of money on Under 42.5; those percentages were not closing splits.",
+  "timeline": [
+    {
+      "label": "After three quarters",
+      "text": "The Browns and Saints were tied 6–6, with only 12 combined points."
+    },
+    {
+      "label": "End of regulation",
+      "text": "Each team scored 10 points in the fourth quarter; the game went to overtime tied 16–16."
+    },
+    {
+      "label": "Overtime",
+      "text": "New Orleans scored seven and Cleveland scored six. The Saints won 23–22 and the final total reached 45."
+    }
+  ],
+  "unusual": "A low-scoring game that had only 12 points through three quarters produced 33 points thereafter. The late scores flipped a documented Under 42.5 outcome.",
+  "explanations": "Football overtime and late-game scoring can abruptly change a total. The large ticket/handle split came from one pregame source and is not evidence of insider knowledge or manipulation.",
+  "questions": [
+    "The 22% tickets / 92% handle snapshot was collected November 6 and may have changed before kickoff.",
+    "Other sportsbooks offered different totals; this brief grades only a documented 42.5 line."
+  ],
+  "sources": [
+    {
+      "label": "NFL official game report: quarter and overtime scores",
+      "url": "https://static.www.nfl.com/image/upload/v1794257318/gamecenter/ab381d58-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "Official game report",
+      "checked": "2026-11-12"
+    },
+    {
+      "label": "CLEATZ: November 6 Under 42.5 betting split",
+      "url": "https://cleatz.beehiiv.com/p/22-of-the-tickets-92-of-the-handle-nfl-week-9-is-getting-strange",
+      "kind": "Pregame betting snapshot",
+      "checked": "2026-11-12"
+    },
+    {
+      "label": "Pro Football Reference: final and quarter scores",
+      "url": "https://www.pro-football-reference.com/boxscores/202611080nor.htm",
+      "kind": "Game record",
+      "checked": "2026-11-12"
+    }
+  ],
+  "statistics": [
+    {
+      "label": "Entering fourth quarter",
+      "value": "6–6 (12 combined)",
+      "method": "Quarter-by-quarter box score"
+    },
+    {
+      "label": "Final",
+      "value": "Saints 23, Browns 22 (45 combined)",
+      "method": "Official game result"
+    }
+  ],
+  "betting": {
+    "market": "Total",
+    "line": "Browns–Saints Under 42.5",
+    "provenance": "CLEATZ published Under 42.5 on November 6, with 22% of tickets and 92% of handle on the Under in its tracked snapshot.",
+    "outcome": "23 + 22 = 45. Under 42.5 loses by 2.5 points.",
+    "caution": "Book, price and timing matter. Percentages are one source's Friday snapshot, not a verified closing-market consensus."
+  },
+  "source_note": null,
+  "reviewed": "2026-11-12",
+  "potential_bets": [
+    {
+      "market": "Under 42.5",
+      "impact": "45 final points means a loss, despite the 6–6 score through three quarters."
+    }
+  ]
+}
