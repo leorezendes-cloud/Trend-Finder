@@ -378,6 +378,29 @@
 
     {% if view.panel == 'primetime' and view.primetime_tracker %}{% include '_primetime_tracker.html' %}{% endif %}
     {% if view.panel == 'money' %}
+    <!-- Editorial Week 9 notes only: no new data reads, stored snapshots, or betting signals. -->
+    <section class="money-scoreboard" aria-label="Week 9 betting investigations">
+        <h2>Week 9, 2026 — Market Case Notes</h2>
+        <p class="active-filters">Historical editorial observations, not Mike's 65% signals. Sources and line timing matter.</p>
+        <div class="money-tally-grid">
+            <article class="stat">
+                <h3>Market Reversal of the Week</h3>
+                <p><strong>Jaguars 33, Ravens 10 · Nov. 5</strong></p>
+                <p>One tracked line history shows Baltimore -3 on Oct. 28, then Jacksonville -9.5 near kickoff: a 12.5-point reversal in the favored side and spread. Jacksonville won by 23.</p>
+                <p><small>This is a line reversal, not confirmed reverse line movement (RLM); corresponding public money splits are not established.</small></p>
+                <p><a href="https://nfl-football.rotodb.com/scores-schedule/0657f13d-2509-4109-be4b-42cfec9a172d" target="_blank" rel="noopener noreferrer">Source: recorded line history</a></p>
+            </article>
+            <article class="stat">
+                <h3>Public vs. Sportsbooks</h3>
+                <p><strong>Week 9 · Nov. 8</strong></p>
+                <p>BetMGM reported difficult results as the Lions, Chiefs, Giants, Rams and Broncos covered. Chicago won outright, helping public moneyline parlays despite Tampa Bay covering.</p>
+                <p><small>This is a retrospective bookmaker report, not a 65%-dollars fade signal or a claim that every bettor won.</small></p>
+                <p><a href="https://sports.betmgm.com/en/blog/nfl/week-9-nfl-action-at-betmgm-best-games-for-bettors-best-games-for-book-bm10/" target="_blank" rel="noopener noreferrer">BetMGM Week 9 review</a> · <a href="https://www.foxsports.com/stories/nfl/nfl-cfb-weekend-recap-bettors-were-praying-day-like-this" target="_blank" rel="noopener noreferrer">Fox Sports recap</a></p>
+            </article>
+        </div>
+    </section>
+    {% endif %}
+    {% if view.panel == 'money' %}
     <section class="money-scoreboard">
         <h2>Mike's Fade the Public — Market Tallies</h2>
         <p class="active-filters" style="font-size: 15px;">
