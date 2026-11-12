@@ -1,14 +1,17 @@
-"""Reclaim duplicate immutable archive blocks without removing any logical file.
+"""Reclaim duplicate immutable archive blocks and compress older completed prediction work folders.
 
 Defaults to a read-only estimate. --apply serializes with hosted updates and
 market capture. Hashing and comparisons stream bounded chunks; no models or AI.
 """
 import argparse
+import hashlib
 import json
 import os
 import re
 import shutil
 import stat
+import tarfile
+import tempfile
 import time
 from pathlib import Path
 
@@ -135,6 +138,63 @@ def compact(root, *, apply=False, min_age=MIN_AGE, now=None):
     return report
 
 
+def archive_completed_runs(root):
+    """Keep three completed work folders and preserve older runs as verified tarballs."""
+    staging = root/'data/scout4/blend/atomic_staging'
+    if not staging.is_dir() or staging.resolve() != staging:
+        return 0
+    with exclusive(staging/'pipeline.lock') as acquired:
+        if not acquired:
+            return 0
+        completed = []
+        for folder in staging.glob('run-*'):
+            if folder.is_symlink() or not re.fullmatch(r'run-[0-9a-f]{32}', folder.name):
+                continue
+            journal = folder/'journal.json'
+            if journal.is_symlink() or not journal.is_file():
+                continue
+            record = json.loads(journal.read_text())
+            if record.get('state') == 'complete' and isinstance(record.get('finished_at'), str):
+                completed.append((record['finished_at'], folder))
+        archived = 0
+        for _, folder in sorted(completed)[:-3]:
+            if any(path.is_symlink() or not (path.is_file() or path.is_dir())
+                   for path in folder.rglob('*')):
+                continue
+            target = staging/('archived-'+folder.name+'.tar.gz')
+            with tempfile.NamedTemporaryFile(dir=staging, prefix='.archive-', delete=False) as stream:
+                partial = Path(stream.name)
+            try:
+                with tarfile.open(partial, 'w:gz', compresslevel=3) as archive:
+                    archive.add(folder, arcname=folder.name)
+                with tarfile.open(partial, 'r:gz') as archive:
+                    expected = {folder, *folder.rglob('*')}
+                    for member in archive:
+                        path = staging/member.name
+                        if path not in expected:
+                            raise ValueError('Unexpected archived staging entry')
+                        expected.remove(path)
+                        if path.is_dir() and member.isdir():
+                            continue
+                        with archive.extractfile(member) as saved:
+                            if hashlib.file_digest(saved, 'sha256').hexdigest() != fingerprint(path):
+                                raise ValueError('Staging archive verification failed')
+                    if expected:
+                        raise ValueError('Staging archive is missing files')
+                with partial.open('rb') as stream:
+                    os.fsync(stream.fileno())
+                os.replace(partial, target)
+                sync_directory(staging)
+                retired = staging/('.retired-'+folder.name)
+                folder.rename(retired)
+                sync_directory(staging)
+                shutil.rmtree(retired)
+                archived += 1
+            finally:
+                partial.unlink(missing_ok=True)
+        return archived
+
+
 def maintain(root, *, force=False):
     """Run once per day, or before a low-space update. Caller holds auto_update.lock."""
     root=Path(root)
@@ -148,7 +208,10 @@ def maintain(root, *, force=False):
     with exclusive(root/'logs/ats_capture.lock') as acquired:
         if not acquired:
             return {'state':'busy'}
-        return compact(root,apply=True)
+        archived = archive_completed_runs(root.resolve())
+        report = compact(root,apply=True)
+        report['archived_prediction_runs'] = archived
+        return report
 
 
 def main():
