@@ -839,8 +839,8 @@ def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
     # do not pretend to score bad-beat severity from final scores alone.
     eligible.sort(key=lambda pair: (bool(pair[1].get('featured')), pair[0], pair[1]['slug']), reverse=True)
     limit = 3 if report_month is not None else 1
-    return '\\n\\n'.join(
-        f"{case['title']}\\n{case['summary']}\\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
+    return '\n\n'.join(
+        f"{case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
         for _, case in eligible[:limit]
         if case.get('title') and case.get('summary')
     )
