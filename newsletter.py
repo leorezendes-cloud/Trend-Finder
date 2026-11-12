@@ -17,7 +17,7 @@ from membership import db
 bp = Blueprint('newsletter', __name__, url_prefix='/newsletter')
 SECTIONS = [('predictions', "The Plug's Picks"), ('trends', 'Hot Right Now'),
             ('expert', "The Expert's Take"), ('matchups', 'Around the League'),
-            ('updates', 'Site Updates')]
+            ('bad_beats', 'Bad Beat of the Week'), ('updates', 'Site Updates')]
 
 
 def plug_email_blocks(value, section, frequency):
@@ -245,7 +245,7 @@ def headings_for_issue(issue):
     if issue['frequency'] == 'monthly':
         return [('predictions', 'Month in Review'), ('trends', 'Trend Spotlight'),
                 ('expert', 'Expert Highlights'), ('matchups', 'Looking Ahead'),
-                ('updates', 'Site Updates')]
+                ('bad_beats', 'Top Bad Beats'), ('updates', 'Site Updates')]
     return SECTIONS
 
 

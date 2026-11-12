@@ -80,8 +80,23 @@
   {% endfor %}
   <p style="margin:13px 0 0"><a href="{{ origin }}/the-plug" style="color:#168449;font-size:13px;font-weight:700;text-decoration:underline">Explore The Plug &rarr;</a></p>
 </td></tr>
+{% if sections.get('bad_beats') %}
+<tr><td style="padding:24px 24px 18px;border-bottom:1px solid #e5e9ee">
+  <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">04 / TOP BAD BEATS</p>
+  <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">The Month's Toughest Tickets</h2>
+  {% for block in sections['bad_beats'].split('\n\n') if block|trim %}
+  {% set lines = block.split('\n') %}
+  <div style="margin:0 0 14px;padding:0 0 12px;border-bottom:1px solid #eceef2">
+    <p style="font-size:15px;font-weight:800;color:#252832;line-height:1.5;margin:0 0 7px">{{ lines[0] }}</p>
+    {% if lines|length > 1 %}<p style="font-size:14px;line-height:1.55;color:#555965;margin:0 0 9px">{{ lines[1] }}</p>{% endif %}
+    {% if lines|length > 2 %}<a href="{{ lines[2] }}" style="font-size:13px;font-weight:700;color:#168449;text-decoration:underline">Read the documented Case File &rarr;</a>{% endif %}
+  </div>
+  {% endfor %}
+  <p style="font-size:12px;color:#667085;line-height:1.5">Historical editorial cases, not betting picks or evidence of manipulation.</p>
+</td></tr>
+{% endif %}
 <tr><td style="padding:24px 24px 27px">
-  <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">04 / THE HUDDLE</p>
+  <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">05 / THE HUDDLE</p>
   <h2 style="margin:0 0 9px;color:#1a1a20;font-size:19px">Think You Know Football? Prove It.</h2>
   <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#555965">Create a free Pick'em league, invite your friends, and compete for bragging rights.</p>
   <a href="{{ origin }}/huddle/leagues/start/create" style="display:inline-block;background:#67ef35;color:#112018;padding:12px 15px;font-size:13px;font-weight:800;text-decoration:none;border-radius:7px">Create a free league &rarr;</a>

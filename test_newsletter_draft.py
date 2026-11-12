@@ -34,6 +34,41 @@ class DraftEvidenceTests(unittest.TestCase):
         self.context.pop()
         self.temp.cleanup()
 
+    def test_bad_beats_use_existing_documented_cases_without_writes(self):
+        from newsletter_draft import _bad_beats_content
+        index = self.root / 'research/investigations/index.json'
+        index.parent.mkdir(parents=True)
+        fixtures = [
+            dict(slug='latest', title='New bad beat', date='2030-10-12',
+                 season=2030, categories=['bad-beats'], evidence='Documented',
+                 featured=True, summary='A verified total flipped.'),
+            dict(slug='older', title='Older bad beat', date='2030-10-05',
+                 season=2030, categories=['bad-beats'], evidence='Documented',
+                 featured=False, summary='A missed kick changed a cover.'),
+            dict(slug='not-a-beat', title='Unrelated case', date='2030-10-13',
+                 season=2030, categories=['calls'], evidence='Documented',
+                 featured=True, summary='Not a betting outcome.'),
+            dict(slug='not-documented', title='Unsupported claim', date='2030-10-14',
+                 season=2030, categories=['bad-beats'], evidence='Unverified',
+                 featured=True, summary='Not documented.'),
+        ]
+        index.write_text(json.dumps(fixtures))
+        before = index.read_bytes()
+        weekly = _bad_beats_content(self.root, self.now, 'https://trendfindah.com', [])
+        self.assertIn('New bad beat', weekly)
+        self.assertIn('/conspiracy-dungeon/investigations/latest', weekly)
+        self.assertNotIn('Older bad beat', weekly)
+        self.assertNotIn('Unsupported claim', weekly)
+
+        month = _bad_beats_content(self.root, self.now, 'https://trendfindah.com', [],
+                                   report_month='2030-10')
+        self.assertIn('New bad beat', month)
+        self.assertIn('Older bad beat', month)
+        self.assertNotIn('Unrelated case', month)
+        self.assertEqual(_bad_beats_content(self.root, self.now,
+                         'https://trendfindah.com', [], report_month='2030-09'), '')
+        self.assertEqual(before, index.read_bytes())
+
     def test_published_scout_snapshot_is_used_without_source_mutation(self):
         url = "https://trendfindah.com/the-plug/2030/7/A-B"
         picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]

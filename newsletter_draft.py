@@ -790,6 +790,62 @@ def _monthly_recap(root, now, origin, sources, warnings, *, report_month=None):
     return '\n\n'.join(lines)
 
 
+
+def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
+    """Read documented Case Files only; never collect odds or create snapshots.
+
+    Weekly: latest case within the preceding seven local dates.
+    Monthly: up to three curated cases from the selected reporting month.
+    Empty months/weeks do not create placeholder betting claims.
+    """
+    index = Path(root) / 'research' / 'investigations' / 'index.json'
+    try:
+        cases = json.loads(index.read_text(encoding='utf-8'))
+    except (OSError, ValueError, TypeError):
+        warnings.append('Bad Beat case index unavailable; editorial section omitted.')
+        return ''
+    local_date = now.astimezone(ET).date()
+    if report_month:
+        try:
+            year, month = map(int, report_month.split('-'))
+            if not 1 <= month <= 12:
+                return ''
+        except (ValueError, AttributeError):
+            return ''
+    else:
+        year, month = local_date.year, local_date.month
+
+    eligible = []
+    for case in cases:
+        if 'bad-beats' not in case.get('categories', ()) or case.get('evidence') != 'Documented':
+            continue
+        slug = case.get('slug')
+        if not isinstance(slug, str) or not slug or any(
+                char not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for char in slug):
+            continue
+        try:
+            case_date = datetime.strptime(case['date'], '%Y-%m-%d').date()
+        except (KeyError, TypeError, ValueError):
+            continue
+        if case_date > local_date:
+            continue
+        if report_month is not None:
+            if (case_date.year, case_date.month) != (year, month):
+                continue
+        elif not 0 <= (local_date - case_date).days <= 7:
+            continue
+        eligible.append((case_date, case))
+    # Editorial featured status and recency are transparent ordering criteria;
+    # do not pretend to score bad-beat severity from final scores alone.
+    eligible.sort(key=lambda pair: (bool(pair[1].get('featured')), pair[0], pair[1]['slug']), reverse=True)
+    limit = 3 if report_month is not None else 1
+    return '\n\n'.join(
+        f"{case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
+        for _, case in eligible[:limit]
+        if case.get('title') and case.get('summary')
+    )
+
+
 def build_draft(root, now, frequency='weekly', *, premium=False, report_month=None):
     """Compose reviewable public issues; premium=True is preview-only.
 
@@ -818,6 +874,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
                     'trends': '\n\n'.join(trends) or 'No featured trends are available.',
                     'expert': '',
                     'matchups': '\n\n'.join(matchups) or 'No games scheduled in the next 30 days.',
+                    'bad_beats': _bad_beats_content(root, now, origin, warnings, report_month=report_month or period_key('monthly', now)),
                     'updates': ''}
         versions = []
     else:
@@ -840,6 +897,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
                     'trends': '\n\n'.join(trends) or 'No current featured trends available.',
                     'expert': expert_content,
                     'matchups': '\n\n'.join(matchups) or 'No upcoming games in the saved schedule.',
+                    'bad_beats': _bad_beats_content(root, now, origin, warnings),
                     'updates': ''}
     if not trends:
         warnings.append('No current featured trends met the criteria.')
