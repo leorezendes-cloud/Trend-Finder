@@ -1,0 +1,36 @@
+{
+  "base_database_sha256": "fdca97627c572b7591ee69a0c7928e915f9b9cf2fad70e3aed9f680f16291a12",
+  "sources": [
+    {
+      "season": 2022,
+      "unchanged": false,
+      "rows": 542,
+      "sha256": "pace-v2:931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09"
+    },
+    {
+      "season": 2023,
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "pace-v2:bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+    },
+    {
+      "season": 2024,
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "pace-v2:3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b"
+    },
+    {
+      "season": 2025,
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "pace-v2:c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+    },
+    {
+      "season": 2026,
+      "unchanged": false,
+      "rows": 158,
+      "sha256": "pace-v2:ee522ed424afebab54c9d2082c2e05173d4cbfa94b55bef41c22999cba11c540"
+    }
+  ],
+  "database_bytes": 22990848
+}

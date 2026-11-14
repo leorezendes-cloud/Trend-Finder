@@ -1,0 +1,125 @@
+{
+  "base_database_sha256": "5eb9ba3bb8f518ae3b5b83dfb161afc44f43a484aba8bda4994db7e1aa31ad74",
+  "sources": [
+    {
+      "kind": "schedule",
+      "season": 2019,
+      "unchanged": false,
+      "rows": 256,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2019,
+      "unchanged": false,
+      "rows": 512,
+      "sha256": "43498f8e4535a680945147f0fbafa55b6ed7ed7e4f39c50c1312079805372468"
+    },
+    {
+      "kind": "player",
+      "season": 2019,
+      "unchanged": false,
+      "rows": 5411,
+      "sha256": "26154fb375ae7d24e037a99cd9d45c0b89992dd3b8995d981f40dd5c31bf836f"
+    },
+    {
+      "kind": "pbp",
+      "season": 2019,
+      "unchanged": false,
+      "rows": 1072,
+      "sha256": "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540"
+    },
+    {
+      "kind": "charting",
+      "season": 2019,
+      "unchanged": false,
+      "rows": 1133,
+      "sha256_pair": "charting-v2:5dd6c4ff1610cd4f100ec6b29dfbea521099eda06fd199902477edf61f334bc0:60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540"
+    },
+    {
+      "kind": "schedule",
+      "season": 2020,
+      "unchanged": false,
+      "rows": 256,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2020,
+      "unchanged": false,
+      "rows": 512,
+      "sha256": "59254b7389912175931e00c9f3172f70b934eedb1815197234503c893cef84ba"
+    },
+    {
+      "kind": "player",
+      "season": 2020,
+      "unchanged": false,
+      "rows": 5543,
+      "sha256": "5c8b9b86d14d2cfb30675a00c7f75eb512b25d4856cce4dce39d51473f34164e"
+    },
+    {
+      "kind": "pbp",
+      "season": 2020,
+      "unchanged": false,
+      "rows": 1082,
+      "sha256": "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60"
+    },
+    {
+      "kind": "charting",
+      "season": 2020,
+      "unchanged": false,
+      "rows": 1162,
+      "sha256_pair": "charting-v2:dbabfbef30c7e1657d566cad44dd1a9db434ae6aab1321b38b6a87f0fd963dba:8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60"
+    },
+    {
+      "kind": "schedule",
+      "season": 2021,
+      "unchanged": false,
+      "rows": 272,
+      "sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6"
+    },
+    {
+      "kind": "team",
+      "season": 2021,
+      "unchanged": false,
+      "rows": 544,
+      "sha256": "e9caf43e82982cc535672b82900bf432713b6f7bbd7a796dd054a55b11d1cb01"
+    },
+    {
+      "kind": "player",
+      "season": 2021,
+      "unchanged": false,
+      "rows": 5866,
+      "sha256": "c515d9f539a147b730d3de4621688792b18d6b050d142fad1a6996b915712934"
+    },
+    {
+      "kind": "pbp",
+      "season": 2021,
+      "unchanged": false,
+      "rows": 1158,
+      "sha256": "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8"
+    },
+    {
+      "kind": "charting",
+      "season": 2021,
+      "unchanged": false,
+      "rows": 1229,
+      "sha256_pair": "charting-v2:bc16b14c7043e780f995f914331e2f7ebd6661d024e61a2c892d560af04d9af1:333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8"
+    },
+    {
+      "kind": "pbp",
+      "season": 2022,
+      "unchanged": false,
+      "rows": 1139,
+      "sha256": "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09"
+    },
+    {
+      "kind": "charting",
+      "season": 2022,
+      "unchanged": false,
+      "rows": 1206,
+      "sha256_pair": "charting-v2:5f8d349316bf68de487ee0eb926706e65f5a8e37078c1faa37cb07cda2bf9e5e:931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09"
+    }
+  ],
+  "database_bytes": 22474752
+}
