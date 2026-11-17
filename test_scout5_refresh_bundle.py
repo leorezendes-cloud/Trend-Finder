@@ -27,6 +27,8 @@ class Scout5RefreshTests(unittest.TestCase):
     def test_refuses_historical_mutation(self):
         new_data = copy.deepcopy(self.old)
         new_data[str(self.latest)]["ARI"][0] += 0.01
+        self.assertIsNone(extend_bundle(self.original, new_data))
+        new_data[str(self.latest + 1)] = copy.deepcopy(self.old[str(self.latest)])
         with self.assertRaisesRegex(ValueError, "historical rating"):
             extend_bundle(self.original, new_data)
 
