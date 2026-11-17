@@ -21,6 +21,22 @@ def activation(root):
     return data
 
 
+def legacy_ats_evidence(root, gid):
+    """Return a checksum-verified ATS-only receipt, without old O/U values."""
+    path=Path(root)/'scout_dynamic/legacy_ats_evidence.json'
+    if not path.is_file():
+        return None
+    from scout_dynamic_store import digest
+    import json
+    data=json.loads(path.read_bytes())
+    if data.get('schema')!='scout5-legacy-ats-evidence-v1' or data.get('sha256')!=digest(
+            {k:v for k,v in data.items() if k!='sha256'}):
+        raise ValueError('Unverified legacy ATS cutover receipt')
+    hits=[g for g in data['games'] if g['game_id']==gid]
+    if len(hits)>1:raise ValueError('Duplicate legacy ATS receipt')
+    return hits[0] if hits else None
+
+
 def enroll(root, gid, row, *, now):
     if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') != '1':
         return
@@ -32,9 +48,17 @@ def enroll(root, gid, row, *, now):
     from plug_publication import immutable
     path=folder(root,gid)/'issued.json'
     if not path.exists():
-        immutable(path,canonical(signed(dict(policy=POLICY,game_id=gid,
-            issued_at=now.isoformat(),kickoff_utc=row['kickoff_utc'],
-            configuration_sha256=row['configuration_sha256']))))
+        receipt=legacy_ats_evidence(root,gid)
+        prior=receipt['issued_at'] if receipt else now.isoformat()
+        if receipt and (receipt['kickoff_utc']!=row['kickoff_utc'] or
+                        not utc(gate['activated_at'])<=utc(prior)<utc(row['kickoff_utc'])):
+            raise ValueError('Legacy ATS issuance cannot be restored for this game')
+        issued=signed(dict(policy=POLICY,game_id=gid,
+            issued_at=prior,kickoff_utc=row['kickoff_utc'],
+            configuration_sha256=row['configuration_sha256']))
+        if receipt and issued['sha256']!=receipt['issued_sha256']:
+            raise ValueError('Restored ATS issuance differs from original signed receipt')
+        immutable(path,canonical(issued))
 
 
 def state(root, game, *, now):
