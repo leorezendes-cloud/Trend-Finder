@@ -91,6 +91,8 @@ def evaluate(root, game, config, config_hash, now, *, cache):
                          target={k:game.get(k) for k in ('game_id','away_team','home_team','location')}))
     previous = journal(root, gid)
     last = previous[-1] if previous else None
+    if last and last.get('totals', {}).get('model') != 'scout5-ou-v1':
+        raise ValueError('Retire legacy Scout journal before Scout 5.0 issuance')
     # ATS still uses its approved configuration. O/U is the independent,
     # fixed-weight Scout 5.0 formula and never uses the market as an input.
     if last and last['inputs_sha256'] == inputs:
