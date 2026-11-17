@@ -21,7 +21,8 @@ class Scout5Replacement(unittest.TestCase):
         self.assertEqual(len(doc['replay_history']), 70)
         count = Counter(x['grades']['ou'] for x in doc['replay_history'])
         self.assertEqual((count['Win'], count['Loss']), (44, 26))
-        self.assertNotIn('11', doc['ratings'])
+        self.assertIn('10', doc['ratings'])
+        self.assertTrue(all(len(teams) == 32 for teams in doc['ratings'].values()))
 
     def test_retirement_archive_and_blocked_game(self):
         from scout5_retire_legacy import snapshot, verify_backup
