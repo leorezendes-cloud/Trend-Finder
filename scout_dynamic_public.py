@@ -154,6 +154,13 @@ def attach(root, item, *, now):
             if row is not None and row.get('totals',{}).get('model')=='scout5-ou-v1':
                 item.setdefault('saved_picks',{}).setdefault('total',{})['side']=row['ou_side']
                 item.setdefault('locked_quotes',{})['Total']={'line_a':row['total_quote']['line']}
+                # A newly issued Scout 5 total cannot inherit an archived
+                # Scout 4 grade from the combined ATS/O/U forecast.
+                grades=item.setdefault('completed_grades',{})
+                grades.pop('scout_total',None)
+                outcome=value.get('grades') if isinstance(value,dict) else None
+                if isinstance(outcome,dict) and outcome.get('ou') in ('Win','Loss','Push','Pending','No Call'):
+                    grades['scout_total']=outcome['ou']
             else:
                 # Do not display legacy O/U from historical combined ATS seals.
                 item.setdefault('saved_picks',{}).setdefault('total',{})['side']=None
