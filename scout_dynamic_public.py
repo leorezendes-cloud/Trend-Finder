@@ -142,47 +142,6 @@ def attach(root, item, *, now):
     return item
 
 
-def _week_six_shadow_totals(root):
-    """Load the sealed Week 6 replay from the frozen Market + statistics candidate."""
-    import hashlib
-    import json
-    config=json.loads((Path(root)/'automatic_model.json').read_text())
-    candidate=config.get('totals_candidate',{})
-    model=candidate.get('model',{})
-    if (config.get('totals_model_file_sha256') is None
-            or model.get('version') != 'scout4-totals-1'
-            or candidate.get('name') != 'Market + statistics'
-            or candidate.get('target_season') != 2026
-            or candidate.get('first_eligible_week') != 6):
-        raise ValueError('Week 6 totals candidate is not the approved frozen model')
-    from scout4.shadow import view
-    records=[r for r in view(Path(root))['records']
-             if r.get('season') == 2026 and r.get('week') == 6 and r.get('market') == 'Total']
-    expected_hash=config['totals_model_file_sha256']
-    if len(records) != 14 or any(r.get('model_sha256') != expected_hash
-                                 or r.get('model_name') != 'Market + statistics'
-                                 for r in records):
-        raise ValueError('Week 6 shadow totals do not match the approved 14-game model cohort')
-    output=[]
-    seen=set()
-    for record in records:
-        gid=record['game_id']
-        if gid in seen or record.get('selected_side') not in ('Over','Under'):
-            raise ValueError('Invalid or duplicate Week 6 shadow total')
-        seen.add(gid)
-        result={'Correct':'Win','Wrong':'Loss','Push':'Push','Pending':'Pending',
-                'No Call':'No Call','Review needed':'Pending'}.get(record.get('result'))
-        if result is None:
-            raise ValueError('Unrecognized Week 6 shadow grade')
-        output.append(dict(
-            game_id=gid,season=2026,week=6,away_team=record['away_team'],
-            home_team=record['home_team'],kickoff_utc=record['kickoff_utc'],
-            ou_side=record['selected_side'],total_quote={'line': float(record['quote']['line'])},
-            grades={'ou':result,'ats':'No Call','su':'No Call'},
-            source='sealed historical simulation',model_version=model['version']))
-    return output
-
-
 def records(root, finals, season, week, *, now=None):
     """Scout 5.0 O/U ONLY: compact historical replay + new live-issued rows.
 
