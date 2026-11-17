@@ -136,7 +136,7 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
    else:item['scout_pick']='No pick recorded';item['scout_result']='Not graded'
   item.update(total_pick='No current pick',total_result='—',model_name=model_label)
   if record:
-   from forecast_history import grade_components,total_result,pregame_record
+   from forecast_history import grade_components,pregame_record
    try:
     pregame_record(record)
     results=grade_components(record,g);component=record['components']['Blend'];team=component['pick']
@@ -146,9 +146,6 @@ def build_results(root,week=None,score_updates=None,all_weeks=False):
     item['scout_cushion']=f"{abs(component['ats_edge']):.1f}"
     item['forecast_digest']=record['_history_digest']
     item['forecast_version']=record.get('version','Unknown version')
-    if record.get('totals'):
-     total=record['totals'];item['total_pick']='No pick recorded' if total['prediction']['lean']=='No Call' else f"{total['prediction']['lean']} {total['quote']['line']:g}"
-     tr=total_result(record,g);item['total_result']={'Win':'Correct','Loss':'Wrong','No Call':'Not graded'}.get(tr,tr)
    except ValueError:
     item['scout_pick']='Review needed';item['scout_result']='Review needed';item['total_result']='Review needed'
   if record:
