@@ -59,6 +59,38 @@ def markets(root, game, now):
     return output
 
 
+def preserve_issued_ats(root, row, *, now):
+    """Keep the final pre-cutover ATS side AND quote for already-issued games.
+
+    Scout 5.0 may update totals independently. A new quote must never rewrite
+    previously issued ATS evidence during the migration.
+    """
+    from scout_dynamic_public import legacy_ats_evidence
+    from scout_dynamic_store import validate
+    original=legacy_ats_evidence(root,row['game_id'])
+    if original is None:
+        return row
+    if (original['game_id']!=row['game_id']
+            or original['kickoff_utc']!=row['kickoff_utc']
+            or original['away_team']!=row['away_team']
+            or original['home_team']!=row['home_team']
+            or utc(original['issued_at'])>=utc(row['kickoff_utc'])):
+        raise ValueError('Migrated ATS game identity differs')
+    revisions=original.get('ats_revisions') or []
+    if not revisions:
+        raise ValueError('Migrated ATS has no signed revisions')
+    prior=revisions[-1]
+    if (utc(prior['evaluated_at'])>now
+            or utc(prior['spread']['captured_at_utc'])>now
+            or prior['spread']['kickoff_utc']!=row['kickoff_utc']):
+        raise ValueError('Migrated ATS evidence is after current evaluation')
+    result=dict(row,ats_side=prior['ats_side'],spread=dict(prior['spread']),
+                projection=dict(prior['projection']),
+                model_as_of=prior['model_as_of'])
+    validate(result,result['game_id'])
+    return result
+
+
 def evaluate(root, game, config, config_hash, now, *, cache):
     from forecast_history import pregame_record
     from scout4.shadow import load_stats, statistics_gate
@@ -140,6 +172,7 @@ def evaluate(root, game, config, config_hash, now, *, cache):
                totals=dict(total=predicted, market_anchored=False, model='scout5-ou-v1'),
                ats_side=side, ou_side=total_side,
                spread=q['Spread'], total_quote=q['Total'])
+    row = preserve_issued_ats(root,row,now=now)
     # Observation timestamps/provenance refresh without duplicating identical
     # model inputs, projected values, selections and lines.
     row['decision_id'] = digest({k:v for k,v in row.items() if k not in (
