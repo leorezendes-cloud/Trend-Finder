@@ -2,6 +2,7 @@
 import json
 import unittest
 import tempfile
+import tarfile
 import os
 from unittest.mock import patch
 from collections import Counter
@@ -21,6 +22,24 @@ class Scout5Replacement(unittest.TestCase):
         count = Counter(x['grades']['ou'] for x in doc['replay_history'])
         self.assertEqual((count['Win'], count['Loss']), (44, 26))
         self.assertNotIn('11', doc['ratings'])
+
+    def test_retirement_archive_and_blocked_game(self):
+        from scout5_retire_legacy import snapshot, verify_backup
+        with tempfile.TemporaryDirectory() as scratch:
+            root=Path(scratch)
+            game=root/'scout_dynamic'/'2026_11_IND_HOU'
+            game.mkdir(parents=True)
+            (game/'revisions.json').write_text('not a signed journal')
+            report=snapshot(root)
+            self.assertEqual(report['blocked_count'],1)
+            self.assertEqual(report['retirable_count'],0)
+            archive=root/'backup.tar'
+            with tarfile.open(archive,'w') as stream:
+                stream.add(root/'scout_dynamic',arcname='scout_dynamic')
+            self.assertEqual(len(verify_backup(archive,report)),64)
+            (game/'revisions.json').write_text('changed')
+            with self.assertRaises(ValueError):
+                verify_backup(archive,snapshot(root))
 
     def test_public_record_uses_only_compact_replay(self):
         from scout_dynamic_public import records
