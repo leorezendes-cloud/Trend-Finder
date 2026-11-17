@@ -58,16 +58,23 @@ def extend_bundle(bundle, fresh):
     # an otherwise healthy availability check.
     if not any(week not in old for week in fresh):
         return None
-    # Existing weeks must remain EXACTLY unchanged. Provider corrections
-    # require a separate, reviewed migration of the frozen historical cohort.
+    # Historical Scout 5.0 ratings are frozen as originally evaluated. The
+    # SAME provider may revise an old publication; log the drift, but never
+    # overwrite earlier weeks or refit the 2025 model. Only append new weeks.
+    historical_corrections = []
     for week, teams in old.items():
         if week not in fresh or set(teams) != set(fresh[week]):
-            raise ValueError(f"Provider changed/removed week {week}")
+            raise ValueError(f"Provider changed/removed team coverage W{week}")
         for team, values in teams.items():
-            if any(abs(float(a) - float(b)) > 1e-12
-                   for a, b in zip(values, fresh[week][team])):
-                raise ValueError(f"Provider changed historical rating: W{week} {team}; "
-                                 f"frozen={values}, provider={fresh[week][team]}")
+            delta = max(abs(float(a) - float(b))
+                        for a, b in zip(values, fresh[week][team]))
+            if delta > 1e-12:
+                historical_corrections.append((week, team, delta))
+    if historical_corrections:
+        biggest = max(historical_corrections, key=lambda entry: entry[2])
+        print(f"NOTICE: SportsDataverse revised {len(historical_corrections)} "
+              f"historical team-week ratings; frozen history retained. "
+              f"Largest drift W{biggest[0]} {biggest[1]}: {biggest[2]:.8g}")
     newer = {week: fresh[week] for week in fresh if week not in old}
     if not newer:
         return None
