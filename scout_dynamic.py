@@ -65,7 +65,7 @@ def evaluate(root, game, config, config_hash, now, *, cache):
     from scout4.stats import eligible
     from scout4.blend import plug_prediction, combine, plug_ats_pick, plug_total_pick
     from scout4.ratings import build_ratings, matchup
-    from scout4.totals import profiles, features, predict
+    from scout5_totals import load_bundle, projected_total, side as ou_side
     gid = game['game_id'];year,week = int(game['season']),int(game['week'])
     # Existing official seals admit the game but are never rewritten or replaced
     # as model sources for The Plug or the Expert.
@@ -91,9 +91,8 @@ def evaluate(root, game, config, config_hash, now, *, cache):
                          target={k:game.get(k) for k in ('game_id','away_team','home_team','location')}))
     previous = journal(root, gid)
     last = previous[-1] if previous else None
-    total_model = config['totals_candidate']['model']
-    # Market+statistics totals are genuinely market-anchored in the unchanged
-    # frozen model. A line change never shifts the independent score projection.
+    # ATS still uses its approved configuration. O/U is the independent,
+    # fixed-weight Scout 5.0 formula and never uses the market as an input.
     if last and last['inputs_sha256'] == inputs:
         projection = last['projection']; scoring = last['scout_scoring']
         values = dict(last['total_features']); model_as_of = last['model_as_of']
@@ -102,25 +101,31 @@ def evaluate(root, game, config, config_hash, now, *, cache):
         key = (year,week)
         if key not in cache:
             ratings,_ = build_ratings(schedule, feed, year, week)
-            teams,league = profiles(schedule, feed, year, week)
-            cache[key] = ratings,teams,league
-        ratings,teams,league = cache[key]
+            cache[key] = ratings
+        ratings = cache[key]
         scout = matchup(config['score_model'], ratings, game['away_team'], game['home_team'],
                         'Neutral' if game.get('location') == 'Neutral' else 'Away')
         if not projection or not scout or not scout['first_estimate']['plausible'] or not scout['second_estimate']['plausible']:
             raise ValueError('Missing plausible Scout projections')
         scoring = dict(model_family='Scout 4.0', version=config['score_model']['version'],
                        away_margin=scout['margin_first'], total=scout['total'])
-        values = features(teams, league, game['away_team'], game['home_team'],
-                          game.get('location') == 'Neutral', q['Total']['line'])
-        if values is None:
-            raise ValueError('Scout total features unavailable')
+        values = {}
         model_as_of = now.isoformat()
-    values['market_total'] = q['Total']['line']
-    total = predict(total_model, values, q['Total']['line'])
-    if total is None or not total['plausible']:
-        raise ValueError('Scout totals unavailable')
-    total = plug_total_pick(total, config.get('always_pick',False))
+    # Strict week matching: missing Week 11 EPA is unavailable, never stale W10.
+    bundle=cache.get('scout5_bundle')
+    if bundle is None:
+        bundle=load_bundle(SOURCE/'scout5_ou_bundle.json')
+        cache['scout5_bundle']=bundle
+    # ATS must still be issued if the next week's EPA snapshot has not arrived.
+    # Only an actually available, week-matched rating can produce a Scout 5 O/U.
+    if str(week) not in bundle['ratings']:
+        predicted=None
+        total_side=None
+    else:
+        predicted=projected_total(bundle, Path(root)/'nfl_games.csv', year, week,
+                                  game['away_team'], game['home_team'])
+        total_side=ou_side(predicted, q['Total']['line'])
+    values={'model':'scout5-ou-v1', 'ratings_week':week if predicted is not None else None}
     side = plug_ats_pick(combine(projection['away_margin'],projection['away_margin'],q['Spread']['line'],config['weights']),
                          game, q['Spread']['line'], config.get('always_pick',False))
     row = dict(policy=POLICY, model_family='Scout 4.0', model_version=config['version'],
@@ -130,8 +135,8 @@ def evaluate(root, game, config, config_hash, now, *, cache):
                kickoff_utc=game['kickoff_utc'], evaluated_at=now.isoformat(),
                projection={k:projection[k] for k in ('away_points','home_points','away_margin')},
                scout_scoring=scoring, total_features=values,
-               totals=dict(total=total['total'], market_anchored='market_total' in total_model['columns']),
-               ats_side=side, ou_side=total['lean'] if total['lean'] in ('Over','Under') else None,
+               totals=dict(total=predicted, market_anchored=False, model='scout5-ou-v1'),
+               ats_side=side, ou_side=total_side,
                spread=q['Spread'], total_quote=q['Total'])
     # Observation timestamps/provenance refresh without duplicating identical
     # model inputs, projected values, selections and lines.

@@ -107,6 +107,38 @@ def attach(root, item, *, now):
     except (ValueError,OSError,KeyError,TypeError):
         if os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1':
             item['scout_dynamic']=dict(status='review',message='Scout update awaiting verified evidence.')
+    # Keep the previous signed ATS journal available, but never expose its
+    # retired O/U projection in the public Scout card.
+    value=item.get('scout_dynamic')
+    if isinstance(value,dict) and isinstance(value.get('row'),dict) and value['row'].get('totals',{}).get('model')!='scout5-ou-v1':
+        item.pop('scout_dynamic',None)
+    # Existing archived Scout O/U fields are obsolete. The new compact replay
+    # replaces the public O/U side and grade without touching any ATS fields.
+    try:
+        from scout5_totals import load_bundle
+        game=item['scout']['game']
+        bundle=load_bundle(Path(__file__).resolve().parent/'scout5_ou_bundle.json')
+        replay=next((r for r in bundle.get('replay_history',[])
+                     if r['game_id']==game['game_id']),None)
+        if replay is not None:
+            item.setdefault('saved_picks',{}).setdefault('total',{})['side']=replay['ou_side']
+            item.setdefault('locked_quotes',{})['Total']={'line_a':replay['total_quote']['line']}
+            item.setdefault('completed_grades',{})['scout_total']=replay['grades']['ou']
+        else:
+            value=item.get('scout_dynamic')
+            row=value.get('row') if isinstance(value,dict) else None
+            if row is not None and row.get('totals',{}).get('model')=='scout5-ou-v1':
+                item.setdefault('saved_picks',{}).setdefault('total',{})['side']=row['ou_side']
+                item.setdefault('locked_quotes',{})['Total']={'line_a':row['total_quote']['line']}
+            else:
+                # Do not display legacy O/U from historical combined ATS seals.
+                item.setdefault('saved_picks',{}).setdefault('total',{})['side']=None
+                item.setdefault('locked_quotes',{}).pop('Total',None)
+                item.setdefault('completed_grades',{}).pop('scout_total',None)
+    except (OSError,ValueError,KeyError,TypeError):
+        item.setdefault('saved_picks',{}).setdefault('total',{})['side']=None
+        item.setdefault('locked_quotes',{}).pop('Total',None)
+        item.setdefault('completed_grades',{}).pop('scout_total',None)
     return item
 
 
@@ -152,92 +184,67 @@ def _week_six_shadow_totals(root):
 
 
 def records(root, finals, season, week, *, now=None):
-    """One Scout O/U cohort: Week 6 sealed replay plus later live-issued totals."""
+    """Scout 5.0 O/U ONLY: compact historical replay + new live-issued rows.
+
+    Never consults archived Scout 4 totals or duplicates its history on disk.
+    ATS remains independently owned by existing readers.
+    """
+    import csv
+    from scout5_totals import load_bundle
     if season is None:
         return {}
     now=now or datetime.now(timezone.utc)
+    root=Path(root)
     rows=[];review=False
-    live_enabled = os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC') == '1'
-    if not live_enabled and int(season) != 2026:
-        return {}
-    for path in (sorted((Path(root)/'scout_dynamic').glob('*_*_*_*')) if live_enabled else []):
-        if not path.is_dir():
-            continue
-        year,number,away,home=path.name.split('_')
-        if int(year) != int(season) or (week is not None and int(number) != int(week)):
-            continue
-        try:
-            saved=journal(root,path.name)
-            if not saved:
+    try:
+        bundle=load_bundle(Path(__file__).resolve().parent/'scout5_ou_bundle.json')
+        if int(season)==int(bundle['season']):
+            for old in bundle.get('replay_history',[]):
+                if week is not None and int(old['week'])!=int(week):
+                    continue
+                row=dict(old)
+                row['source']='Scout 5.0 reconstructed historical replay'
+                rows.append(row)
+    except (ValueError,OSError,KeyError,TypeError):
+        review=True
+    existing={r['game_id'] for r in rows}
+    live_enabled=os.environ.get('TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC')=='1'
+    if live_enabled:
+        for path in sorted((root/'scout_dynamic').glob('*_*_*_*')):
+            if not path.is_dir() or path.name in existing:
                 continue
-            game={k:saved[-1][k] for k in ('game_id','away_team','home_team','kickoff_utc')}
-            value=state(root,game,now=now)
-            if value:
+            try:
+                parts=path.name.split('_')
+                if int(parts[0])!=int(season) or (week is not None and int(parts[1])!=int(week)):
+                    continue
+                saved=journal(root,path.name)
+                if not saved:
+                    continue
+                game={k:saved[-1][k] for k in ('game_id','away_team','home_team','kickoff_utc')}
+                value=state(root,game,now=now)
+                if value is None:
+                    continue
                 row=value['row']
-                result=grade(row,finals.get(path.name) if value['status']=='locked' else None)
-                rows.append(dict(row,grades=result,source='live-issued Dynamic Scout'))
-        except (ValueError,OSError,KeyError,TypeError):
-            review=True
-    if int(season) == 2026 and (week is None or int(week) == 6):
-        try:
-            replay=_week_six_shadow_totals(root)
-            live_ids={r['game_id'] for r in rows}
-            rows.extend(r for r in replay if r['game_id'] not in live_ids)
-        except (ValueError,OSError,KeyError,TypeError):
-            review=True
-    # Weeks 7+ use the already-published positive Scout totals lean.
-    # This is intentionally not the ATS fade: totals are graded from the
-    # saved pregame forecast and its frozen O/U quote.
-    if int(season) == 2026 and (week is None or int(week) >= 7):
-        try:
-            import csv
-            from forecast_history import official_sources, total_result
-            schedule_path=Path(root)/'nfl_games.csv'
-            with schedule_path.open(newline='') as handle:
-                games={g['game_id']:g for g in csv.DictReader(handle)}
-            saved=official_sources(Path(root))
-            existing={r['game_id'] for r in rows}
-            for record in saved.values():
-                if (int(record.get('season',0)) != 2026
-                        or int(record.get('week',0)) < 7
-                        or (week is not None and int(record.get('week',0)) != int(week))
-                        or record.get('game_id') in existing):
-                    continue
-                total=record.get('totals') or {}
-                prediction=total.get('prediction') or {}
-                lean=prediction.get('lean')
-                if not total or lean not in ('Over','Under','No Call',None):
-                    continue
-                game=games.get(record.get('game_id'))
-                outcome=total_result(record,game)
-                result={'Correct':'Win','Wrong':'Loss','Win':'Win','Loss':'Loss',
-                        'Push':'Push','Pending':'Pending','No Call':'No Call'}.get(outcome)
-                if result is None:
-                    raise ValueError('Unrecognized saved Scout totals grade')
-                rows.append(dict(
-                    game_id=record['game_id'],season=2026,week=int(record['week']),
-                    away_team=record['away_team'],home_team=record['home_team'],
-                    kickoff_utc=record['kickoff_utc'],ou_side=lean,
-                    total_quote={'line': float(total.get('quote',{}).get('line'))},
-                    grades={'ou':result,'ats':'No Call','su':'No Call'},
-                    source='saved positive Scout totals'))
-                existing.add(record['game_id'])
-        except (ValueError,OSError,KeyError,TypeError):
-            review=True
+                if row.get('totals',{}).get('model')!='scout5-ou-v1':
+                    continue  # Reject old Scout totals; never publish old O/U
+                outcome=grade(row,finals.get(path.name) if value['status']=='locked' else None)
+                rows.append(dict(row,grades=outcome,source='issued Scout 5.0'))
+                existing.add(path.name)
+            except (ValueError,OSError,KeyError,TypeError):
+                review=True
     rows.sort(key=lambda r:(int(r.get('week',0)),r.get('kickoff_utc',''),r.get('game_id','')))
     counts={m:{outcome:sum(r['grades'][m]==outcome for r in rows)
-               for outcome in ('Win','Loss','Push','Pending','No Call','Tie')} for m in ('ats','ou','su')}
-    # Make cohort coverage visible: an empty/missing receipt set is not a 0-0-0 record.
-    import csv
-    schedule_path=Path(root)/'nfl_games.csv'
+               for outcome in ('Win','Loss','Push','Pending','No Call','Tie')}
+            for m in ('ats','ou','su')}
     expected_ids=set()
+    schedule_path=root/'nfl_games.csv'
     if schedule_path.exists():
         with schedule_path.open(newline='') as handle:
             for game in csv.DictReader(handle):
                 try:
                     if (int(game.get('season',0))==int(season)
                             and game.get('game_type')=='REG'
-                            and int(game.get('week',0)) >= 6
+                            and int(game.get('week',0))>=6
                             and (week is None or int(game.get('week',0))==int(week))):
                         expected_ids.add(game['game_id'])
                 except (TypeError,ValueError,KeyError):

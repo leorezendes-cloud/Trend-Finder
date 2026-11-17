@@ -73,10 +73,17 @@ def validate(row, gid):
     if (row['away_team'], row['home_team']) != (away, home):
         raise ValueError('Scout team identity mismatch')
     numbers = [row['projection'][k] for k in ('away_points', 'home_points', 'away_margin')]
-    numbers += [row['totals']['total'], row['spread']['line'], row['total_quote']['line']]
+    numbers += [row['spread']['line'], row['total_quote']['line']]
+    projected_ou=row['totals']['total']
+    # Preserve ATS issuance with a genuine O/U No Call when an EPA week is missing.
+    # Legacy Scout journals still require their original finite numeric O/U.
+    absent_scout5=(row['totals'].get('model')=='scout5-ou-v1'
+                   and projected_ou is None and row['ou_side'] is None)
+    if not absent_scout5:
+        numbers.append(projected_ou)
     if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in numbers):
         raise ValueError('Nonfinite Scout prediction or market')
-    if any(row['projection'][k] < 0 for k in ('away_points', 'home_points')) or row['totals']['total'] < 0:
+    if any(row['projection'][k] < 0 for k in ('away_points', 'home_points')) or (not absent_scout5 and projected_ou < 0):
         raise ValueError('Negative projected score')
     if row['ats_side'] not in (None, away, home) or row['ou_side'] not in (None, 'Over', 'Under'):
         raise ValueError('Invalid Scout selection')
