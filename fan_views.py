@@ -499,7 +499,12 @@ def data_freshness():
 
 def prediction_performance(records, schedule):
     """Evaluate only verifiably saved pre-kickoff picks, separated by model version."""
-    from forecast_history import grade_components, total_result, pregame_record, record_digest
+    from forecast_history import grade_components, pregame_record, record_digest
+    from scout5_totals import load_bundle
+    # ATS continues to use its signed historical cohort; O/U comes solely
+    # from Scout 5.0's compact retrospective replay.
+    replay = {r['game_id']: r for r in load_bundle(
+        ROOT / 'scout5_ou_bundle.json')['replay_history']}
     groups = {}
     games = {g['game_id']:g for g in schedule}
     excluded = 0
@@ -512,7 +517,8 @@ def prediction_performance(records, schedule):
             pregame_record(record)
             game = games.get(record['game_id'])
             ats = grade_components(record, game)['Blend']
-            total = total_result(record, game)
+            scout5 = replay.get(record['game_id'])
+            total = scout5['grades']['ou'] if scout5 else 'No Call'
         except (KeyError, TypeError, ValueError):
             excluded += 1
             continue
@@ -524,7 +530,7 @@ def prediction_performance(records, schedule):
                        'date':record['kickoff_utc'], 'saved':record['sealed_at_utc'],
                        'pick':record['components']['Blend']['pick'], 'ats':ats,'total':total,
                        'line':record['quote']['line'] if record['components']['Blend']['pick']==record['away_team'] else -record['quote']['line'],
-                       'total_pick': (str(record['totals']['prediction']['lean'])+' '+format(float(record['totals']['quote']['line']),'g')) if record.get('totals') and record['totals']['prediction'].get('lean') in ('Over','Under') else None,
+                        'total_pick': (f"{scout5['ou_side']} {float(scout5['total_quote']['line']):g}" if scout5 else None),
                        'model_version':record.get('version','Unknown version'),
                        'forecast_digest':record.get('_history_digest') or record_digest(record)})
     for group in groups.values():
