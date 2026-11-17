@@ -32,7 +32,7 @@ jobs:
         run: python scout5_refresh_bundle.py
       - name: Validate Scout 5 replay, ratings and runtime
         run: |
-          python -m unittest -q test_scout5_replacement
+          python -m unittest -q test_scout5_replacement test_scout5_refresh_bundle
           python - <<'PY'
           from scout5_totals import load_bundle
           doc = load_bundle("scout5_ou_bundle.json")
