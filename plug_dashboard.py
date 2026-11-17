@@ -111,11 +111,11 @@ def combined_cards(records, render_record, now):
             except (KeyError, TypeError, ValueError):
                 continue
         game = {key:record[key] for key in ('game_id','away_team','home_team','season','week','kickoff_utc')}
-        total = record.get('totals')
+        # Archived O/U in a shared ATS seal is retired for public Scout.
+        # Scout 5.0 supplies O/U independently in attach().
         pick = record['components']['Blend']
         quotes = {'Spread':{'side_a':game['away_team'],'side_b':game['home_team'],
                             'line_a':record['quote']['line'],'line_b':-record['quote']['line']}}
-        if total:quotes['Total']={'line_a':total['quote']['line']}
         # A missing or malformed replay receipt must never take down The Plug.
         # Fail closed for this one public selection while leaving all other cards available.
         public_pick = None
@@ -125,7 +125,7 @@ def combined_cards(records, render_record, now):
         except (OSError, ValueError, TypeError, KeyError, ImportError):
             public_pick = None
         selections = {'spread':{'side':public_pick,'label':'Pick'},
-                      'total':{'side':total['prediction']['lean'] if total else None,'label':'Pick'}}
+                      'total':{'side':None,'label':'Pick'}}
         archive_item = items.get(game['game_id'])
         approved = next((r for r in records if r['version']==record.get('_archive_version')),None)
         if approved:
