@@ -41,6 +41,45 @@ class Scout5Replacement(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify_backup(archive,snapshot(root))
 
+    def test_cutover_preserves_ats_and_restores_original_issuance(self):
+        from scout_dynamic_store import signed
+        from scout5_export_ats_evidence import export
+        from scout5_cutover import cutover
+        from scout_dynamic_public import legacy_ats_evidence
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as scratch:
+            root=Path(scratch)
+            (root/'scout5_totals.py').write_text('present')
+            directory=root/'scout_dynamic'/'2026_11_IND_HOU'
+            directory.mkdir(parents=True)
+            kickoff='2026-11-19T20:00:00+00:00'
+            q=lambda line: {'line':line,'captured_at_utc':'2026-11-17T12:00:00+00:00','kickoff_utc':kickoff}
+            row=dict(policy='scout-dynamic-v1',model_family='Scout 4.0',
+                     game_id='2026_11_IND_HOU',away_team='IND',home_team='HOU',
+                     model_as_of='2026-11-17T11:00:00+00:00',
+                     evaluated_at='2026-11-17T13:00:00+00:00',
+                     kickoff_utc=kickoff,revision=1,configuration_sha256='config',
+                     inputs_sha256='inputs',decision_id='decision',
+                     projection={'away_points':21,'home_points':23,'away_margin':-2},
+                     totals={'total':44},ats_side='IND',ou_side='Under',
+                     spread=q(3),total_quote=q(45))
+            (directory/'revisions.json').write_bytes(
+                json.dumps(signed({'rows':[signed(row)]})).encode())
+            original_issued=signed(dict(policy='scout-dynamic-v1',
+                game_id='2026_11_IND_HOU',issued_at='2026-11-17T13:01:00+00:00',
+                kickoff_utc=kickoff,configuration_sha256='config'))
+            (directory/'issued.json').write_bytes(json.dumps(original_issued).encode())
+            exported=export(root)
+            with patch('scout5_cutover.load_bundle',return_value={'replay_history':[None]*70}):
+                checked=cutover(root,exported,apply=False)
+                self.assertEqual(checked['games'],1)
+                self.assertTrue(directory.exists())
+                completed=cutover(root,exported,apply=True)
+            self.assertEqual(completed['directories_removed'],1)
+            self.assertFalse(directory.exists())
+            self.assertEqual(legacy_ats_evidence(root,'2026_11_IND_HOU')['issued_sha256'],
+                             original_issued['sha256'])
+
     def test_public_record_uses_only_compact_replay(self):
         from scout_dynamic_public import records
         with tempfile.TemporaryDirectory() as scratch:
