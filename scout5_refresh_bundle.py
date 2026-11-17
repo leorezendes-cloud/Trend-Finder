@@ -53,6 +53,11 @@ def extend_bundle(bundle, fresh):
         raise ValueError("Existing bundle has missing ratings weeks")
     if max(map(int, fresh)) < max(map(int, old)):
         raise ValueError("Remote ratings are older than deployed bundle")
+    # When the provider has not published a NEW week, there is nothing to
+    # import. Do not turn historical provider corrections into a failure of
+    # an otherwise healthy availability check.
+    if not any(week not in old for week in fresh):
+        return None
     # Existing weeks must remain EXACTLY unchanged. Provider corrections
     # require a separate, reviewed migration of the frozen historical cohort.
     for week, teams in old.items():
@@ -61,7 +66,8 @@ def extend_bundle(bundle, fresh):
         for team, values in teams.items():
             if any(abs(float(a) - float(b)) > 1e-12
                    for a, b in zip(values, fresh[week][team])):
-                raise ValueError(f"Provider changed historical rating: W{week} {team}")
+                raise ValueError(f"Provider changed historical rating: W{week} {team}; "
+                                 f"frozen={values}, provider={fresh[week][team]}")
     newer = {week: fresh[week] for week in fresh if week not in old}
     if not newer:
         return None
