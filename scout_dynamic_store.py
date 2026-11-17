@@ -134,6 +134,8 @@ def append(root, gid, decision, *, clock=None):
         if (path / 'closing.json').exists():
             raise ValueError('Scout game already closed')
         rows = journal(root, gid)
+        if rows and any(r.get('totals',{}).get('model') != 'scout5-ou-v1' for r in rows):
+            raise ValueError('Legacy Scout journal must be retired before new Scout 5.0 writes')
         row = dict(decision)
         now = clock() if clock else datetime.now(timezone.utc)
         # Validate again after acquiring the lock: no backdated live writes.
