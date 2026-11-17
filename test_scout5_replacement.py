@@ -1,6 +1,9 @@
 """Scout 5.0 compact artifact and backward-compatible signed journal validation."""
 import json
 import unittest
+import tempfile
+import os
+from unittest.mock import patch
 from collections import Counter
 from pathlib import Path
 
@@ -18,6 +21,17 @@ class Scout5Replacement(unittest.TestCase):
         count = Counter(x['grades']['ou'] for x in doc['replay_history'])
         self.assertEqual((count['Win'], count['Loss']), (44, 26))
         self.assertNotIn('11', doc['ratings'])
+
+    def test_public_record_uses_only_compact_replay(self):
+        from scout_dynamic_public import records
+        with tempfile.TemporaryDirectory() as scratch:
+            with patch.dict(os.environ, {'TREND_FINDAH_SCOUT_DYNAMIC_PUBLIC': '0'}):
+                result = records(Path(scratch), {}, 2026, None)
+        rows = result['scout_dynamic_records']
+        self.assertEqual(len(rows), 70)
+        self.assertEqual(result['scout_dynamic_counts']['ou']['Win'], 44)
+        self.assertEqual(result['scout_dynamic_counts']['ou']['Loss'], 26)
+        self.assertTrue(all(r['source'] == 'Scout 5.0 reconstructed historical replay' for r in rows))
 
     def test_missing_next_week_ou_does_not_block_ats(self):
         kickoff = '2026-11-19T20:00:00+00:00'
