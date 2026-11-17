@@ -11,7 +11,7 @@ import os
 import shutil
 
 from scout_dynamic_store import (POLICY, append, closing, digest, finalize,
-                                 folder, journal, utc)
+                                 folder, journal, locked, utc)
 
 SOURCE = Path(__file__).resolve().parent
 
@@ -148,7 +148,7 @@ def evaluate(root, game, config, config_hash, now, *, cache):
     return row
 
 
-def cycle(root, *, now=None, source=SOURCE, clock=None):
+def _cycle_under_lock(root, *, now=None, source=SOURCE, clock=None):
     """One bounded existing-worker cycle. Closing never depends on new markets."""
     if not enabled():
         return {'state':'disabled'}
@@ -200,3 +200,11 @@ def cycle(root, *, now=None, source=SOURCE, clock=None):
     report['state']='review' if report['errors'] else 'partial' if report['pending'] else 'ok'
     atomic_json(base/'status.json', dict(report, checked_at=datetime.now(timezone.utc).isoformat()))
     return report
+
+
+def cycle(root, *, now=None, source=SOURCE, clock=None):
+    """Serialize the worker with the one-time ATS-preserving journal cutover."""
+    if not enabled():
+        return {'state':'disabled'}
+    with locked(Path(root)/'scout_dynamic'):
+        return _cycle_under_lock(root, now=now, source=source, clock=clock)
