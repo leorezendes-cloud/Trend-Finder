@@ -69,7 +69,9 @@ def verify_backup(archive,report):
             if name.is_absolute() or '..' in name.parts:raise ValueError('Unsafe tar archive path')
             if name.parts[0]=='scout_dynamic':
                 name=PurePosixPath(*name.parts[1:])
-            if len(name.parts) < 2:\n                continue  # Root-level activation/status are backed up but not retired\n            stream=tar.extractfile(member)
+            if len(name.parts) < 2:
+                continue  # Root-level activation/status are backed up but not retired
+            stream=tar.extractfile(member)
             if not stream:raise ValueError('Unreadable tar member')
             rel=str(name)
             if rel in actual:raise ValueError('Duplicate tar member: '+rel)
