@@ -29,8 +29,10 @@ class Scout5RefreshTests(unittest.TestCase):
         new_data[str(self.latest)]["ARI"][0] += 0.01
         self.assertIsNone(extend_bundle(self.original, new_data))
         new_data[str(self.latest + 1)] = copy.deepcopy(self.old[str(self.latest)])
-        with self.assertRaisesRegex(ValueError, "historical rating"):
-            extend_bundle(self.original, new_data)
+        updated = extend_bundle(self.original, new_data)
+        self.assertEqual(updated["ratings"][str(self.latest)]["ARI"],
+                         self.old[str(self.latest)]["ARI"])
+        self.assertEqual(updated["ratings_latest_week"], self.latest + 1)
 
     def test_refuses_incomplete_new_week(self):
         rows = []
