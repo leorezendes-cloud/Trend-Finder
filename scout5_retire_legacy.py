@@ -6,7 +6,6 @@ the activation gate, or a legacy journal containing a future pregame issuance.
 """
 import argparse
 import hashlib
-import io
 import json
 from pathlib import Path, PurePosixPath
 import shutil
@@ -70,7 +69,7 @@ def verify_backup(archive,report):
             if name.is_absolute() or '..' in name.parts:raise ValueError('Unsafe tar archive path')
             if name.parts[0]=='scout_dynamic':
                 name=PurePosixPath(*name.parts[1:])
-            stream=tar.extractfile(member)
+            if len(name.parts) < 2:\n                continue  # Root-level activation/status are backed up but not retired\n            stream=tar.extractfile(member)
             if not stream:raise ValueError('Unreadable tar member')
             rel=str(name)
             if rel in actual:raise ValueError('Duplicate tar member: '+rel)
@@ -85,6 +84,8 @@ def verify_backup(archive,report):
 def retire(root,report,expected_digest,backup_digest):
     if digest(report['manifest'])!=expected_digest:
         raise ValueError('Manifest digest mismatch')
+    if not (Path(root).resolve()/'scout5_totals.py').exists():
+        raise ValueError('Scout 5.0 release not deployed')
     if len(backup_digest)!=64 or any(c not in '0123456789abcdef' for c in backup_digest):
         raise ValueError('Verified local backup SHA-256 required')
     current=snapshot(root)
