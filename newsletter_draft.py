@@ -86,8 +86,8 @@ def _expert_newsletter_story(report):
         entry = next((part for part in sections if part.get('heading') == heading), None)
         if not entry:
             continue
-        body = re.sub(r'\\[[^]\\n]{1,90}\\]', '', str(entry.get('text') or ''))
-        for sentence in re.split(r'(?<=[.!?])\\s+', body):
+        body = re.sub(r'\[[^\[\]\n]{1,90}\]', '', str(entry.get('text') or ''))
+        for sentence in re.split(r'(?<=[.!?])\s+', body):
             sentence = ' '.join(sentence.split())
             if not 45 <= len(sentence) <= 240:
                 continue

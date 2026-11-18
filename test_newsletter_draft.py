@@ -130,6 +130,22 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertEqual(selected_versions, ['sealed'])
         self.assertTrue(any('receipt review' in warning for warning in warnings))
 
+
+    def test_expert_newsletter_teaser_extracts_football_sentence(self):
+        from newsletter_draft import _expert_newsletter_story
+        report = {'sections': [
+            {'heading':'Offensive and Defensive Analysis',
+             'text': ("Houston's pass protection has struggled against pressure from aggressive fronts. "
+                      "Indianapolis can challenge that protection with its defensive front and force hurried throws. "
+                      "[nflverse_personnel]")},
+            {'heading':'Personnel and Injury Considerations',
+             'text': 'The defensive front could determine how the passing game unfolds.'},
+        ]}
+        teaser = _expert_newsletter_story(report)
+        self.assertIn("Houston's pass protection", teaser)
+        self.assertNotIn('The matchup has more layers', teaser)
+        self.assertNotIn('[nflverse_personnel]', teaser)
+
     def test_unmatched_public_expert_cannot_be_featured(self):
         url = "https://trendfindah.com/the-plug/2030/7/A-B"
         picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]
