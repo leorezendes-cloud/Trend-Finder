@@ -286,7 +286,8 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
         prior_outcome = folder / (version + '.replacement.outcome.json')
         if not prior_outcome.is_file() or json.loads(prior_outcome.read_text()).get('state') != 'uncertain':
             raise ValueError('Controlled retry requires an uncertain outcome')
-        if any(folder.glob(version + '.replacement-[0-9]*.json')):
+        if any(path.stem.rsplit('-', 1)[-1].isdigit()
+               for path in folder.glob(version + '.replacement-*.json')):
             raise ValueError('A replacement response already exists; retry blocked')
     elif replacement and attempts:
         raise ValueError('A replacement attempt already exists; inspect its outcome before retrying')
