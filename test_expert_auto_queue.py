@@ -159,6 +159,53 @@ class AutomationTests(unittest.TestCase):
         self.assertEqual((drafts/(version+'.json')).read_text(), 'original draft')
         self.assertFalse((drafts/(version+'.replacement-2.attempt.json')).exists())
 
+
+    def test_uncertain_retry_ignores_attempt_metadata_and_saves_second_response(self):
+        from decimal import Decimal
+        row = rec('LV')
+        type(self).rows = [row]
+        version = row['version']
+        drafts = self.root/'drafts'
+        (drafts/(version+'.json')).write_text('original')
+        (drafts/(version+'.replacement-1.attempt.json')).write_text(json.dumps({
+            'version':version,'started_at':NOW.isoformat(),'model':'gpt-test',
+            'provider':'openai','nfl_week':[2026,7],'reserved_usd':'0.10'}))
+        (drafts/(version+'.replacement.outcome.json')).write_text(json.dumps({
+            'state':'uncertain','provider':'openai','attempts':1}))
+
+        class Provider:
+            def __init__(self, approved, model):
+                self.api_key = 'test'
+                self.model = model
+            def request_body(self, packet):
+                return {'max_output_tokens': 100, 'input': 'stub'}
+            def __call__(self, packet):
+                return {'summary': 'Grounded football opinion'}
+
+        fake_provider = types.ModuleType('expert_provider')
+        fake_provider.OpenAIProvider = Provider
+        fake_provider.RateLimited = type('RateLimited', (RuntimeError,), {})
+        fake_scheduler = types.ModuleType('scheduler_runtime')
+        fake_scheduler.atomic_json = lambda path, data: Path(path).write_text(json.dumps(data))
+        beta = sys.modules['expert_beta']
+        def generate(scout, provider):
+            return provider({'instruction':'test','evidence':scout})
+        with patch.object(beta, 'generate_draft', generate, create=True), \
+             patch.object(beta, 'validate_expert', lambda report, scout: None, create=True), \
+             patch.dict(sys.modules, {'expert_provider':fake_provider,
+                                      'scheduler_runtime':fake_scheduler}), \
+             patch.object(self.module, 'request_reserve', return_value=Decimal('0.10')), \
+             patch.object(self.module, 'week_usage', return_value=(Decimal('0.10'),1)), \
+             patch.object(self.module, 'recent_attempts', return_value=[]):
+            state = self.module.openai_draft(
+                self.root,row,[row],'gpt-test',Decimal('2.50'),32,16,
+                replacement=True,retry_uncertain=True)
+        self.assertEqual(state, 'saved')
+        self.assertTrue((drafts/(version+'.replacement-2.json')).is_file())
+        self.assertTrue((drafts/(version+'.replacement-1.attempt.json')).is_file())
+        self.assertTrue((drafts/(version+'.replacement-2.attempt.json')).is_file())
+        self.assertEqual(json.loads((drafts/(version+'.replacement.outcome.json')).read_text())['state'], 'pending_review')
+
     def test_uncertain_replacement_retry_fails_closed_for_saved_report(self):
         row = rec('LV')
         type(self).rows = [row]
