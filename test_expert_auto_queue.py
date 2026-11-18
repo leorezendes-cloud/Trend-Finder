@@ -139,6 +139,41 @@ class AutomationTests(unittest.TestCase):
         self.assertEqual(original.read_text(), 'original report')
         self.assertFalse(list((self.root/'drafts').glob('*.replacement-*.json')))
 
+
+    def test_uncertain_replacement_retry_preview_preserves_original(self):
+        row = rec('LV')
+        type(self).rows = [row]
+        version = row['version']
+        drafts = self.root/'drafts'
+        (drafts/(version+'.json')).write_text('original draft')
+        (drafts/(version+'.replacement-1.attempt.json')).write_text(json.dumps({
+            'version':version,'started_at':NOW.isoformat(),'model':'gpt-test',
+            'provider':'openai','nfl_week':[2026,7],'reserved_usd':'0.10'}))
+        (drafts/(version+'.replacement.outcome.json')).write_text(json.dumps({
+            'state':'uncertain','provider':'openai','attempts':1}))
+        result = self.module.bounded_retry_uncertain(
+            self.root, 2026, 7, version, model='gpt-test', execute=False)
+        self.assertEqual(result['state'], 'preview')
+        self.assertEqual(result['game'], 'LV @ NE')
+        self.assertEqual(result['planned_requests'], 1)
+        self.assertEqual((drafts/(version+'.json')).read_text(), 'original draft')
+        self.assertFalse((drafts/(version+'.replacement-2.attempt.json')).exists())
+
+    def test_uncertain_replacement_retry_fails_closed_for_saved_report(self):
+        row = rec('LV')
+        type(self).rows = [row]
+        version = row['version']
+        drafts = self.root/'drafts'
+        (drafts/(version+'.json')).write_text('original')
+        (drafts/(version+'.replacement-1.attempt.json')).write_text(json.dumps({
+            'version':version,'started_at':NOW.isoformat(),'model':'gpt-test',
+            'provider':'openai','nfl_week':[2026,7],'reserved_usd':'0.10'}))
+        (drafts/(version+'.replacement.outcome.json')).write_text(json.dumps({'state':'uncertain'}))
+        (drafts/(version+'.replacement-1.json')).write_text('saved report')
+        with self.assertRaisesRegex(ValueError, 'already retried or saved'):
+            self.module.bounded_retry_uncertain(
+                self.root,2026,7,version,model='gpt-test',execute=False)
+
     def test_temporary_replacement_budget_cannot_exceed_two_dollars(self):
         with self.assertRaisesRegex(ValueError, 'no more than'):
             self.module.bounded_replace_week(
