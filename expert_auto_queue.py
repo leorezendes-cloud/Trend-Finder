@@ -273,14 +273,22 @@ def week_usage(root, records, week):
     return total, requests
 
 
-def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False):
+def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False, retry_uncertain=False):
     from expert_beta import generate_draft, validate_expert
     from expert_provider import OpenAIProvider, RateLimited
     from scheduler_runtime import atomic_json
     version, scout = row['version'], row['scout']
     folder = root/'drafts'; folder.mkdir(exist_ok=True)
     attempts = list(folder.glob(version+'.replacement-*.attempt.json')) if replacement else list(folder.glob(version+'*.attempt.json'))
-    if replacement and attempts:
+    if retry_uncertain:
+        if not replacement or len(attempts) != 1 or not attempts[0].name.endswith('.replacement-1.attempt.json'):
+            raise ValueError('Controlled retry requires exactly one original replacement attempt')
+        prior_outcome = folder / (version + '.replacement.outcome.json')
+        if not prior_outcome.is_file() or json.loads(prior_outcome.read_text()).get('state') != 'uncertain':
+            raise ValueError('Controlled retry requires an uncertain outcome')
+        if any(folder.glob(version + '.replacement-[0-9]*.json')):
+            raise ValueError('A replacement response already exists; retry blocked')
+    elif replacement and attempts:
         raise ValueError('A replacement attempt already exists; inspect its outcome before retrying')
     if not replacement and attempts and (not retry_ready(folder, version, clock())
                      or json.loads(attempts[0].read_text()).get('model') != model):
@@ -291,8 +299,9 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
     if not provider.api_key or not provider.model:
         raise ValueError('OpenAI credentials/model missing; no request reserved')
     sent = False
+    stage = 'pre_request'
     def reserved_provider(packet):
-        nonlocal sent
+        nonlocal sent, stage
         if (instant(scout['game']['kickoff_utc'])-clock()).total_seconds() <= 125:
             raise ValueError('Insufficient pre-kickoff request window')
         body = provider.request_body(packet)
@@ -307,7 +316,10 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
         immutable_json(folder/name, dict(version=version, started_at=clock().isoformat(),
             model=model, provider='openai', nfl_week=list(week), reserved_usd=str(cost)))
         sent = True
-        return provider(packet)
+        stage = 'provider_request'
+        response = provider(packet)
+        stage = 'response_validation'
+        return response
     try:
         result = generate_draft(scout, reserved_provider)
         # Pure validation envelope only: these approval fields are NEVER persisted.
@@ -326,9 +338,13 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
             provider='openai', attempts=number,
             retry_at=(clock()+timedelta(seconds=error.retry_after)).isoformat()))
         return 'retry_wait' if number < 2 else 'operator_review_required'
-    except Exception:
+    except Exception as error:
         if sent:
-            atomic_json(outcome, dict(state='uncertain', provider='openai', attempts=number))
+            # Keep only the error class and coarse phase. Raw provider messages
+            # can contain user data and must not enter persistent logs.
+            atomic_json(outcome, dict(state='uncertain', provider='openai',
+                attempts=number, error_type=type(error).__name__, failure_stage=stage,
+                previous_attempt_preserved=bool(retry_uncertain)))
         raise
 
 
@@ -493,6 +509,88 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         return output
 
 
+
+def bounded_retry_uncertain(store_path, season, week, version, model=None, *,
+                            weekly_limit=2.50, daily_limit=16,
+                            weekly_requests=32, execute=False):
+    """One manual, budgeted second attempt for an exact uncertain replacement.
+
+    Never discards the first attempt, alters an approved report, or enters the
+    automatic queue. The operator must supply the full immutable source version.
+    """
+    from decimal import Decimal
+    if not isinstance(version, str) or len(version) != 64 or any(c not in '0123456789abcdef' for c in version):
+        raise ValueError('Full 64-character lowercase forecast version required')
+    if not 2000 <= int(season) <= 2100 or not 1 <= int(week) <= 22:
+        raise ValueError('Invalid season/week')
+    budget = positive_decimal(weekly_limit)
+    if budget <= 0 or budget > Decimal('2.50'):
+        raise ValueError('Temporary weekly budget exceeds operator-only maximum')
+    if not 1 <= daily_limit <= 16 or not 1 <= weekly_requests <= 32:
+        raise ValueError('Request quota outside safe range')
+    root = Path(store_path)
+    if not root.is_dir():
+        raise ValueError('Expert store does not exist')
+    model = model or os.environ.get('EXPERT_AI_MODEL')
+    if not model:
+        raise ValueError('Explicit OpenAI model required')
+    if execute and os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') != '1':
+        raise ValueError('Automatic OpenAI drafting disabled')
+    with (root/'automation.lock').open('a') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return {'state':'lock_busy','saved_drafts':0}
+        records = Store(root).records()
+        matches = [r for r in records if r['version'] == version and r['kind'] == 'production_import']
+        if len(matches) != 1:
+            raise ValueError('Exact production import not found')
+        row = matches[0]
+        game = row['scout']['game']
+        if (int(game['season']), int(game['week'])) != (int(season), int(week)):
+            raise ValueError('Forecast belongs to a different NFL week')
+        if instant(game['kickoff_utc']) <= clock():
+            raise ValueError('Kickoff already reached')
+        if any(identity(r['scout']) == identity(row['scout']) and r.get('expert') is not None
+               for r in records):
+            raise ValueError('Expert already published; cannot retry')
+        folder = root/'drafts'
+        if not (folder/(version+'.json')).is_file():
+            raise ValueError('Original Expert draft missing')
+        prior = folder/(version+'.replacement-1.attempt.json')
+        outcome = folder/(version+'.replacement.outcome.json')
+        if not prior.is_file() or not outcome.is_file():
+            raise ValueError('Original uncertain replacement evidence missing')
+        if json.loads(outcome.read_text()).get('state') != 'uncertain':
+            raise ValueError('Replacement not in uncertain state')
+        if list(folder.glob(version+'.replacement-2*')) or any(
+            p.name.endswith('.json') and not p.name.endswith('.attempt.json')
+            for p in folder.glob(version+'.replacement-[0-9]*.json')):
+            raise ValueError('Replacement already retried or saved')
+        used = len(recent_attempts(root, clock()))
+        spent, requests = week_usage(root, records, (int(season),int(week)))
+        capacity = daily_limit-used > 0 and requests < weekly_requests and spent < budget
+        result = {'state':'preview' if not execute else 'budget_exhausted',
+                  'game':game['away_team']+' @ '+game['home_team'],
+                  'version':version, 'original_attempt_preserved':True,
+                  'prior_outcome':'uncertain','reserved_weekly_usd':str(spent),
+                  'daily_attempts':used,'planned_requests':int(capacity),
+                  'saved_drafts':0}
+        if not execute or not capacity:
+            return result
+        try:
+            refresh_expert_evidence(clock())
+            state = openai_draft(root,row,records,model,budget,weekly_requests,
+                                 daily_limit,replacement=True,retry_uncertain=True)
+            result['state'] = 'complete' if state == 'saved' else state
+            result['saved_drafts'] = int(state == 'saved')
+        except BudgetExhausted:
+            result['state'] = 'budget_exhausted'
+        except Exception as error:
+            result.update(state='operator_review_required', error_type=type(error).__name__)
+        return result
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--store', required=True)
@@ -504,8 +602,17 @@ def main(argv=None):
     parser.add_argument('--replace-season', type=int)
     parser.add_argument('--replace-week', type=int)
     parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
+    parser.add_argument('--retry-uncertain-version', help='Exact 64-character production version; one operator-only retry')
     args = parser.parse_args(argv)
-    if args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None:
+    if args.retry_uncertain_version is not None:
+        if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
+            parser.error('Retry needs --replace-season, --replace-week and --temporary-weekly-budget')
+        if args.provider not in (None, 'openai'):
+            parser.error('Replacement retry is OpenAI-only')
+        result = bounded_retry_uncertain(args.store,args.replace_season,args.replace_week,
+            args.retry_uncertain_version,args.model,weekly_limit=args.temporary_weekly_budget,
+            daily_limit=args.daily_limit,execute=args.execute)
+    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None:
         if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
             parser.error('--replace-season, --replace-week and --temporary-weekly-budget must be supplied together')
         if args.provider not in (None, 'openai'):
