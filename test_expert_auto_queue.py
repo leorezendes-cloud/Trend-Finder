@@ -174,10 +174,10 @@ class AutomationTests(unittest.TestCase):
             self.module.bounded_retry_uncertain(
                 self.root,2026,7,version,model='gpt-test',execute=False)
 
-    def test_temporary_replacement_budget_cannot_exceed_two_dollars(self):
+    def test_temporary_replacement_budget_cannot_exceed_two_fifty(self):
         with self.assertRaisesRegex(ValueError, 'no more than'):
             self.module.bounded_replace_week(
-                self.root, 2026, 7, 'gpt-test', weekly_limit=2.01)
+                self.root, 2026, 7, 'gpt-test', weekly_limit=2.51)
 
 
 if __name__ == '__main__':
