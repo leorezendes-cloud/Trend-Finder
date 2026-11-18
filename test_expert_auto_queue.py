@@ -195,7 +195,7 @@ class AutomationTests(unittest.TestCase):
              patch.dict(sys.modules, {'expert_provider':fake_provider,
                                       'scheduler_runtime':fake_scheduler}), \
              patch.object(self.module, 'request_reserve', return_value=Decimal('0.10')), \
-             patch.object(self.module, 'week_usage', return_value=(Decimal('0.10'),1)), \\
+             patch.object(self.module, 'week_usage', return_value=(Decimal('0.10'),1)), \
              patch.object(self.module, 'recent_attempts', return_value=[]):
             state = self.module.openai_draft(
                 self.root,row,[row],'gpt-test',Decimal('2.50'),32,16,
