@@ -88,6 +88,48 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertIn("nfl_games.csv", metadata["sources"])
         self.assertEqual(before, {p: p.read_bytes() for p in before})
 
+
+    def test_public_expert_survives_dynamic_plug_receipt_review(self):
+        from types import SimpleNamespace
+        from newsletter_draft import _plug_content, _weekly_featured_pick
+        game = dict(game_id='2030_07_A_B', season=2030, week=7,
+                    away_team='A', home_team='B',
+                    kickoff_utc=(self.now + timedelta(days=1)).isoformat())
+        scout = {'game': game}
+        source = dict(kind='production_import', scout=scout, version='sealed',
+                      generated_at=self.now.isoformat(), expert=None)
+        published = dict(kind='development', scout=scout, version='published',
+                         generated_at=self.now.isoformat(),
+                         expert={'review_status':'approved', 'ats_side':'A',
+                                 'total_side':'Under', 'sections':[]})
+        archive = SimpleNamespace(records=lambda: [source, published],
+                                  featured=lambda season, week: ['2030/7/A-B', '2030/7/C-D'])
+        def mark_receipt_for_review(root, item, as_of_utc=None):
+            item['plug_dynamic_official'] = True
+            item['plug_dynamic_review'] = True
+
+        with patch.dict('os.environ', {'TREND_FINDAH_DYNAMIC_OFFICIAL':'1'}), \
+             patch('expert_beta.store', return_value=archive), \
+             patch('expert_beta.identity', return_value='2030/7/A-B'), \
+             patch('expert_beta.validate_expert', return_value=None), \
+             patch('plug_ats_v5_weekly.for_game', return_value={'selected':True,'side':'A','away_line':3}), \
+             patch('plug_ou_weekly_v3.read_effective', return_value={'selected':False}), \
+             patch('plug_dynamic_official.apply', side_effect=mark_receipt_for_review), \
+             patch('newsletter_draft._expert_newsletter_story', return_value='Verified matchup analysis.'):
+            warnings = []
+            picks, experts, versions = _plug_content(
+                self.now, 'https://trendfindah.com', warnings, root=self.root)
+
+        self.assertEqual(versions, ['sealed'])
+        self.assertEqual(len(picks), 1)
+        self.assertEqual(len(experts), 1)
+        self.assertIn('Unavailable (receipt pending)', picks[0])
+        self.assertNotIn('A +3', picks[0])
+        featured, selected_versions = _weekly_featured_pick(picks, experts, versions, warnings)
+        self.assertIn("Expert's take: Verified matchup analysis.", featured)
+        self.assertEqual(selected_versions, ['sealed'])
+        self.assertTrue(any('receipt review' in warning for warning in warnings))
+
     def test_unmatched_public_expert_cannot_be_featured(self):
         url = "https://trendfindah.com/the-plug/2030/7/A-B"
         picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]
