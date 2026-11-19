@@ -110,8 +110,21 @@ def attach(root, item, *, now):
                     final={'away':scores[0],'home':scores[1]} if scores else None
                 value['grades']=grade(value['row'], (final['away'],final['home']) if final else None)
             item['scout_dynamic']=value
+        # A current, verified Scout journal revision is the live ATS source.
+        # Do not substitute an earlier sealed selection after a newer quote,
+        # or revive it when the latest dynamic revision is No Call.
+        live = value and value.get('status') in ('pregame', 'locked')
+        if live:
+            row = value['row']
+            side = row['ats_side']
+            if side:
+                away_line = float(row['spread']['line'])
+                signed_line = away_line if side == game['away_team'] else -away_line
+                outcome = value.get('grades', {}).get('ats', 'Pending')
+                item['scout_current_ats'] = dict(
+                    side=side, pick=f'{side} {signed_line:+g}', result=outcome)
         from forecast_history import official_sources
-        source=official_sources(Path(root)).get(game['game_id'])
+        source=official_sources(Path(root)).get(game['game_id']) if not live and value is None else None
         if source:
             from scout_fade import pick_for_record, grade_pick
             side=pick_for_record(source,root)

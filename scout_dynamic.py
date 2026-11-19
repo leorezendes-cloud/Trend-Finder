@@ -172,7 +172,10 @@ def evaluate(root, game, config, config_hash, now, *, cache):
                totals=dict(total=predicted, market_anchored=False, model='scout5-ou-v1'),
                ats_side=side, ou_side=total_side,
                spread=q['Spread'], total_quote=q['Total'])
-    row = preserve_issued_ats(root,row,now=now)
+    # Keep migrated ATS issuance and original signed evidence immutable, but
+    # allow NEW pre-kickoff Scout 5.0 journal revisions to use verified current
+    # spread quotes. The public reader and closing grade use this journal,
+    # while archived pre-cutover evidence remains separately available.
     # Observation timestamps/provenance refresh without duplicating identical
     # model inputs, projected values, selections and lines.
     row['decision_id'] = digest({k:v for k,v in row.items() if k not in (
