@@ -110,7 +110,7 @@ class ScoutDynamicTests(unittest.TestCase):
         self.activate()
         self.cycle()
         self.now += timedelta(minutes=15)
-        with patch('scout_dynamic.plug_ats_pick',return_value=None):
+        with patch('scout4.blend.plug_ats_pick',return_value=None):
             self.cycle()
         # The final prospective revision explicitly says No Call.
         self.assertIsNone(journal(self.root,GID)[-1]['ats_side'])
