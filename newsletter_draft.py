@@ -133,7 +133,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
     try:
         from flask import current_app
         from expert_beta import store, identity, validate_expert
-        from plug_ats_v5_weekly import for_game
+        from plug_ats_v5_weekly import SCOUT_POLICY, read_week
         from plug_ou_weekly_v3 import read_effective
         archive = store()
         records = archive.records()
@@ -185,28 +185,25 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         # Plug receipt eligibility is independent of a reviewed, publicly
         # featured Expert report. Never present an unverified Plug wager, but
         # do not suppress a separately approved Expert analysis either.
+        # Match the public Plug dashboard: Scout-stats Follow/Fade ATS and
+        # the separately published O/U shortlist. Independent dynamic v5
+        # research must not replace these public-facing selections.
         plug_verified = True
         try:
-            ats = for_game(game_id)
+            weekly = read_week(int(game['season']), int(game['week']),
+                               policy=SCOUT_POLICY)
+            ats = next((row for row in weekly['games']
+                        if row['game_id'] == game_id), None) if weekly else None
             ou = read_effective(root, game_id)
-            if os.environ.get('TREND_FINDAH_DYNAMIC_OFFICIAL') == '1':
-                from plug_dynamic_official import apply
-                item = {'scout':record['scout']}
-                apply(root, item, as_of_utc=now.isoformat())
-                if item.get('plug_dynamic_official'):
-                    if item.get('plug_dynamic_review'):
-                        warnings.append('Dynamic Plug selection needs receipt review; Plug picks omitted.')
-                        plug_verified = False
-                    else:
-                        ats = item['plug_ats_decision']
-                        ou = item['plug_ou_receipt']
         except (OSError, ValueError, KeyError, TypeError):
-            warnings.append('One official Plug receipt could not be validated; Plug picks omitted.')
+            warnings.append('One public Plug receipt could not be validated; Plug picks omitted.')
             plug_verified = False
-        if not plug_verified:
-            if matching is None:
-                continue
             ats = ou = None
+        if not plug_verified and matching is None:
+            continue
+        ats_available = plug_verified and ats is not None
+        ou_available = (plug_verified and ou is not None
+                        and ou.get('selection_status') != 'awaiting_weekly_selection')
         ats_selected = bool(ats and ats.get('selected'))
         ou_selected = bool(ou and ou.get('selected'))
         plug_selected = ats_selected or ou_selected
@@ -228,9 +225,9 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             warnings.append('One O/U receipt has no valid published line.')
             continue
         ats_text = (f'{ats_side} {ats_line:+g}' if ats_selected else
-                    'Stay Away' if plug_verified else 'Unavailable (receipt pending)')
+                    'Stay Away' if ats_available else 'Unavailable (receipt pending)')
         ou_text = (f'{ou_side} {ou_line:g}' if ou_selected else
-                   'Stay Away' if plug_verified else 'Unavailable (receipt pending)')
+                   'Stay Away' if ou_available else 'Unavailable (receipt pending)')
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
