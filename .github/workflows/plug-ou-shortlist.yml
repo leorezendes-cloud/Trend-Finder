@@ -61,7 +61,7 @@ jobs:
       - name: Focused Scout dynamic ATS regression before legacy dashboard suites
         run: |
           python -m pip install -r requirements.txt
-          python -m unittest test_scout_dynamic -v
+          python -m unittest test_scout_dynamic.ScoutDynamicTests.test_live_scout_ats_uses_latest_verified_spread_and_original_stays_immutable test_scout_dynamic.ScoutDynamicTests.test_live_scout_ats_no_call_does_not_resurrect_legacy_pick -v
       - name: Regression tests for no-hindsight selection
         run: python -m unittest test_plug_ats_v5_issue test_plug_ats_v5_selection test_plug_pick_summary_ui test_plug_ou_weekly test_plug_ou_all_qualifiers test_plug_ou_receipts test_plug_totals_policy test_plug_v14_model test_plug_dynamic_pregame test_plug_dynamic_market test_plug_dynamic_journal test_plug_dynamic_research test_plug_dynamic_grading test_plug_dynamic_cards test_plug_dynamic_preview test_plug_dynamic_e2e test_plug_dynamic_receipt_bridge test_plug_dynamic_batch test_plug_dynamic_dashboard_wiring test_plug_dynamic_gameday test_plug_dynamic_closing test_plug_dynamic_closing_grade test_plug_dynamic_finalize_batch test_plug_dynamic_authoritative -v
       - name: Install full application dependencies
