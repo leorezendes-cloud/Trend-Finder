@@ -146,6 +146,27 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertNotIn('The matchup has more layers', teaser)
         self.assertNotIn('[nflverse_personnel]', teaser)
 
+
+    def test_expert_teaser_keeps_one_contiguous_football_passage(self):
+        from newsletter_draft import _expert_newsletter_story
+        report = {'sections': [
+            {'heading':'Matchup Overview',
+             'text': ('The weather forecast is mild and light wind should help normal passing conditions. '
+                      'That does not automatically mean a disaster, but the defensive front is tricky.')},
+            {'heading':'Offensive and Defensive Analysis',
+             'text': ('Houston has struggled when pressure reaches the quarterback before routes develop. '
+                      'The Indianapolis defensive front can disrupt the pocket and force hurried throws. '
+                      'Those chances depend on whether Houston improves its protection.')},
+            {'heading':'Personnel and Injury Considerations',
+             'text': 'The running backs can influence how each side approaches the rushing game.'},
+        ]}
+        teaser = _expert_newsletter_story(report)
+        self.assertIn('Houston has struggled', teaser)
+        self.assertIn('The Indianapolis defensive front', teaser)
+        self.assertNotIn('weather forecast', teaser)
+        self.assertNotIn('That does not automatically', teaser)
+        self.assertNotIn('Those chances', teaser)
+
     def test_unmatched_public_expert_cannot_be_featured(self):
         url = "https://trendfindah.com/the-plug/2030/7/A-B"
         picks = ["A @ B · Thursday\nATS: A +3 · Total: Under 40\n" + url]
