@@ -81,7 +81,7 @@ class DraftEvidenceTests(unittest.TestCase):
              patch("newsletter_draft._trends_content", return_value=([], [])):
             sections, metadata = build_draft(self.root, self.now)
 
-        self.assertIn("Scout: ATS: A +3", sections["predictions"])
+        self.assertIn("Plug: ATS: A +3", sections["predictions"])
         self.assertIn("Expert's take:", sections["predictions"])
         self.assertNotIn("A +99", sections["predictions"])
         self.assertEqual(metadata["published_forecast_versions"], ["saved-v1"])
@@ -126,6 +126,7 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertIn('Unavailable (receipt pending)', picks[0])
         self.assertNotIn('A +3', picks[0])
         featured, selected_versions = _weekly_featured_pick(picks, experts, versions, warnings)
+        self.assertIn("Plug: ATS: Unavailable (receipt pending)", featured)
         self.assertIn("Expert's take: Verified matchup analysis.", featured)
         self.assertEqual(selected_versions, ['sealed'])
         self.assertTrue(any('receipt review' in warning for warning in warnings))

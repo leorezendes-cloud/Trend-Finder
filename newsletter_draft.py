@@ -398,10 +398,11 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
         if len(lines) < 4 or lines[-1] not in indexed:
             continue
         scout, version = indexed[lines[-1]]
-        # Label the two decision sources separately (they may disagree).
+        # These are Plug receipt selections, not Scout model forecasts.
+        # Label the independently approved Expert opinion separately.
         featured = '\n'.join([
             scout[0],
-            'Scout: ' + scout[1],
+            'Plug: ' + scout[1],
             'Expert: ' + lines[1],
             "Expert's take: " + ' '.join(lines[2:-1]),
             lines[-1],
