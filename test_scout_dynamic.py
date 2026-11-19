@@ -84,7 +84,8 @@ class ScoutDynamicTests(unittest.TestCase):
         self.assertEqual(old['scout_scoring'],new['scout_scoring'])
         self.assertEqual(new['revision'],2)
 
-    def test_live_scout_ats_uses_latest_verified_spread_and_original_stays_immutable(self):
+    @patch('scout5_totals.projected_total', return_value=44.0)
+    def test_live_scout_ats_uses_latest_verified_spread_and_original_stays_immutable(self, _projection):
         self.activate()
         self.cycle()
         original_bytes = self.seed.read_bytes()
@@ -106,7 +107,8 @@ class ScoutDynamicTests(unittest.TestCase):
         self.assertEqual(final['sha256'],new['sha256'])
         self.assertEqual(final['spread']['line'],20)
 
-    def test_live_scout_ats_no_call_does_not_resurrect_legacy_pick(self):
+    @patch('scout5_totals.projected_total', return_value=44.0)
+    def test_live_scout_ats_no_call_does_not_resurrect_legacy_pick(self, _projection):
         self.activate()
         self.cycle()
         self.now += timedelta(minutes=15)
