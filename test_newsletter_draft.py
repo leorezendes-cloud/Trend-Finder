@@ -89,7 +89,7 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertEqual(before, {p: p.read_bytes() for p in before})
 
 
-    def test_public_expert_survives_dynamic_plug_receipt_review(self):
+    def test_newsletter_preserves_public_plug_pick_when_dynamic_v5_stays_away(self):
         from types import SimpleNamespace
         from newsletter_draft import _plug_content, _weekly_featured_pick
         game = dict(game_id='2030_07_A_B', season=2030, week=7,
@@ -104,17 +104,13 @@ class DraftEvidenceTests(unittest.TestCase):
                                  'total_side':'Under', 'sections':[]})
         archive = SimpleNamespace(records=lambda: [source, published],
                                   featured=lambda season, week: ['2030/7/A-B', '2030/7/C-D'])
-        def mark_receipt_for_review(root, item, as_of_utc=None):
-            item['plug_dynamic_official'] = True
-            item['plug_dynamic_review'] = True
-
         with patch.dict('os.environ', {'TREND_FINDAH_DYNAMIC_OFFICIAL':'1'}), \
              patch('expert_beta.store', return_value=archive), \
              patch('expert_beta.identity', return_value='2030/7/A-B'), \
              patch('expert_beta.validate_expert', return_value=None), \
-             patch('plug_ats_v5_weekly.for_game', return_value={'selected':True,'side':'A','away_line':3}), \
-             patch('plug_ou_weekly_v3.read_effective', return_value={'selected':False}), \
-             patch('plug_dynamic_official.apply', side_effect=mark_receipt_for_review), \
+             patch('plug_ats_v5_weekly.read_week', return_value={'games':[{'game_id':'2030_07_A_B','selected':True,'side':'A','away_line':3}]}), \
+             patch('plug_ou_weekly_v3.read_effective', return_value={'selected':False,'selection_status':'stay_away'}), \
+             patch('plug_dynamic_official.apply', side_effect=AssertionError('Independent v5 must not replace public pick')), \
              patch('newsletter_draft._expert_newsletter_story', return_value='Verified matchup analysis.'):
             warnings = []
             picks, experts, versions = _plug_content(
@@ -123,13 +119,12 @@ class DraftEvidenceTests(unittest.TestCase):
         self.assertEqual(versions, ['sealed'])
         self.assertEqual(len(picks), 1)
         self.assertEqual(len(experts), 1)
-        self.assertIn('Unavailable (receipt pending)', picks[0])
-        self.assertNotIn('A +3', picks[0])
+        self.assertIn('ATS: A +3 · Total: Stay Away', picks[0])
         featured, selected_versions = _weekly_featured_pick(picks, experts, versions, warnings)
-        self.assertIn("Plug: ATS: Unavailable (receipt pending)", featured)
+        self.assertIn("Plug: ATS: A +3", featured)
         self.assertIn("Expert's take: Verified matchup analysis.", featured)
         self.assertEqual(selected_versions, ['sealed'])
-        self.assertTrue(any('receipt review' in warning for warning in warnings))
+        self.assertFalse(any('receipt review' in warning for warning in warnings))
 
 
     def test_expert_newsletter_teaser_extracts_football_sentence(self):
