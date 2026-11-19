@@ -84,6 +84,40 @@ class ScoutDynamicTests(unittest.TestCase):
         self.assertEqual(old['scout_scoring'],new['scout_scoring'])
         self.assertEqual(new['revision'],2)
 
+    def test_live_scout_ats_uses_latest_verified_spread_and_original_stays_immutable(self):
+        self.activate()
+        self.cycle()
+        original_bytes = self.seed.read_bytes()
+        old = journal(self.root,GID)[-1]
+        self.quotes['Spread']['line'] = 20
+        self.now += timedelta(minutes=15)
+        self.cycle()
+        new = journal(self.root,GID)[-1]
+        self.assertNotEqual(old['ats_side'],new['ats_side'])
+        self.assertEqual(new['spread']['line'],20)
+        obj=self.item()
+        attach(self.root,obj,now=self.now)
+        expected_side=new['ats_side']
+        expected_line=20 if expected_side==self.game['away_team'] else -20
+        self.assertEqual(obj['scout_current_ats']['pick'],f'{expected_side} {expected_line:+g}')
+        self.assertEqual(self.seed.read_bytes(),original_bytes)
+        finalize(self.root,GID,now=self.kick)
+        final=closing(self.root,GID)
+        self.assertEqual(final['sha256'],new['sha256'])
+        self.assertEqual(final['spread']['line'],20)
+
+    def test_live_scout_ats_no_call_does_not_resurrect_legacy_pick(self):
+        self.activate()
+        self.cycle()
+        self.now += timedelta(minutes=15)
+        with patch('scout_dynamic.plug_ats_pick',return_value=None):
+            self.cycle()
+        # The final prospective revision explicitly says No Call.
+        self.assertIsNone(journal(self.root,GID)[-1]['ats_side'])
+        obj=self.item()
+        attach(self.root,obj,now=self.now)
+        self.assertNotIn('scout_current_ats',obj)
+
     def test_totals_follow_unchanged_market_anchored_formula(self):
         self.cycle();first=journal(self.root,GID)[-1]
         self.quotes['Total']['line']=20;self.now+=timedelta(minutes=15);self.cycle()
