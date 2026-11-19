@@ -58,6 +58,43 @@ class NewsletterTests(unittest.TestCase):
         return BytesIO(b'{"id":"provider-123"}')
 
 
+
+    def test_editorial_revision_preserves_sent_issue_and_avoids_duplicates(self):
+        issue_id = self.approved_issue()
+        with self.app.app_context():
+            original = db().execute(
+                'SELECT sections, subject FROM newsletter_issues WHERE id=?',
+                (issue_id,)).fetchone()
+            with db():
+                db().execute(
+                    'INSERT INTO newsletter_generated(frequency,period,issue_id,metadata) '
+                    'VALUES(?,?,?,?)',
+                    ('weekly','test-week',issue_id,'{}'))
+        featured = ('IND @ HOU\\nScout: receipt pending\\nExpert: ATS: IND · Total: Over\\n'
+                    "Expert's take: Indianapolis can pressure Houston's quarterback "
+                    'while the Texans protect the pocket.\\nhttps://trendfindah.com/the-plug/2026/11/IND-HOU')
+        with patch('newsletter_draft.period_key',return_value='test-week'), \
+             patch('newsletter_draft.build_draft',
+                   return_value=({'predictions':featured},{})):
+            preview = self.app.test_cli_runner().invoke(args=['newsletter-editorial-revision'])
+            self.assertEqual(preview.exit_code,0,preview.output)
+            self.assertIn('PREVIEW ONLY',preview.output)
+            with self.app.app_context():
+                self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_issues').fetchone()[0],1)
+            saved = self.app.test_cli_runner().invoke(args=['newsletter-editorial-revision','--execute'])
+            self.assertEqual(saved.exit_code,0,saved.output)
+            repeat = self.app.test_cli_runner().invoke(args=['newsletter-editorial-revision','--execute'])
+            self.assertEqual(repeat.exit_code,0,repeat.output)
+            self.assertIn('no duplicate created',repeat.output)
+        with self.app.app_context():
+            rows = db().execute('SELECT * FROM newsletter_issues ORDER BY id').fetchall()
+            self.assertEqual(len(rows),2)
+            self.assertEqual(rows[0]['sections'],original['sections'])
+            self.assertEqual(rows[0]['status'],'approved')
+            self.assertEqual(rows[1]['status'],'draft')
+            self.assertEqual(json.loads(rows[1]['sections'])['predictions'],featured)
+            self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],1)
+
     def test_weekly_preview_clickable_legacy_and_modern_links(self):
         origin = self.app.config['PUBLIC_ORIGIN'].rstrip('/')
         old_url = origin + '/matchup/2026_07_NE_CHI'
