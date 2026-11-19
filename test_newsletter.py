@@ -95,6 +95,27 @@ class NewsletterTests(unittest.TestCase):
             self.assertEqual(json.loads(rows[1]['sections'])['predictions'],featured)
             self.assertEqual(db().execute('SELECT COUNT(*) FROM newsletter_generated').fetchone()[0],1)
 
+
+    def test_weekly_preview_formats_plug_and_expert_consistently(self):
+        sections = {
+            'predictions': (
+                'IND @ HOU · Thu Nov 19, 08:15 PM ET\\n'
+                'Plug: ATS: Unavailable (receipt pending) · Total: Unavailable (receipt pending)\\n'
+                'Expert: ATS: IND · Total: Over\\n'
+                "Expert's take: The Colts can keep the chains moving.\\n"
+                'https://trendfindah.com/the-plug/2026/11/IND-HOU'
+            ),
+            'trends':'', 'matchups':'', 'expert':'', 'updates':''
+        }
+        response = self.draft(**sections)
+        self.assertEqual(response.status_code,302)
+        preview = self.client.get(response.location+'/preview')
+        self.assertEqual(preview.status_code,200)
+        self.assertIn('<strong>Plug:</strong>',preview.text)
+        self.assertIn('<strong>Expert:</strong>',preview.text)
+        self.assertNotIn('>Plug: ATS:',preview.text)
+        self.assertNotIn('font-size:14px;line-height:1.55;margin:7px 0">Plug:',preview.text)
+
     def test_weekly_preview_clickable_legacy_and_modern_links(self):
         origin = self.app.config['PUBLIC_ORIGIN'].rstrip('/')
         old_url = origin + '/matchup/2026_07_NE_CHI'
