@@ -138,6 +138,62 @@ def init_newsletter(app):
         click.echo(f"Updated featured section in draft #{saved['issue_id']}. "
                    "Other sections unchanged. No approval or email send.")
 
+    @app.cli.command('newsletter-editorial-revision')
+    @click.option('--execute', is_flag=True, help='Save a separate draft; never approve or send')
+    def editorial_revision_command(execute):
+        """Preview an improved current-week feature as a new unsent editorial draft.
+
+        Preserve the frozen weekly issue, all delivery receipts and every other
+        section. This separate draft is not registered in newsletter_generated,
+        so the weekly scheduler can never treat it as the official issue.
+        """
+        from newsletter_draft import build_draft, period_key
+        now = datetime.now(timezone.utc)
+        period = period_key('weekly', now)
+        source = db().execute(
+            "SELECT i.* FROM newsletter_generated g "
+            "JOIN newsletter_issues i ON i.id=g.issue_id "
+            "WHERE g.frequency='weekly' AND g.period=?", (period,)
+        ).fetchone()
+        if source is None:
+            raise click.ClickException('No saved current-week newsletter exists.')
+        if source['status'] == 'draft':
+            raise click.ClickException('Official weekly issue is still editable; use newsletter-refresh-featured.')
+        if source['status'] != 'approved':
+            raise click.ClickException('Only an approved frozen issue can be revised this way.')
+        generated, _ = build_draft(Path(app.root_path), now, frequency='weekly')
+        featured = generated.get('predictions') or ''
+        if "Expert's take:" not in featured:
+            raise click.ClickException('No eligible approved featured Expert; nothing created.')
+        sections = json.loads(source['sections'])
+        sections['predictions'] = featured
+        subject = source['subject'] + ' · Editorial Revision'
+        if len(subject) > 150:
+            raise click.ClickException('Editorial revision subject exceeds the allowed length.')
+        existing = db().execute(
+            "SELECT id,status FROM newsletter_issues WHERE subject=? AND "
+            "frequency='weekly' AND owner_id=? ORDER BY id DESC LIMIT 1",
+            (subject,source['owner_id'])
+        ).fetchone()
+        click.echo('Source issue #%s (unchanged)\nFeatured revision:\n%s' %
+                   (source['id'], featured))
+        if existing:
+            click.echo('Existing editorial revision #%s (%s); no duplicate created.' %
+                       (existing['id'], existing['status']))
+            return
+        if not execute:
+            click.echo('PREVIEW ONLY. Add --execute to save an unsent separate draft.')
+            return
+        with db():
+            issue_id = db().execute(
+                "INSERT INTO newsletter_issues(subject,frequency,sections,owner_id) "
+                "VALUES(?,?,?,?)",
+                (subject,'weekly',json.dumps(sections),source['owner_id'])
+            ).lastrowid
+        click.echo('Editorial revision draft #%s saved at /newsletter/issues/%s. '
+                   'Official issue #%s unchanged; no email sent.' %
+                   (issue_id,issue_id,source['id']))
+
     @app.cli.command('newsletter-polish-week9')
     @click.option('--execute', is_flag=True, help='Apply the approved ARI-SEA newsletter wording to draft #6')
     def polish_week9_command(execute):
