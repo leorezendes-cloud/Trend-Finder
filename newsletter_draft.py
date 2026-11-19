@@ -69,45 +69,58 @@ def _side_label(side, quote, market):
 
 
 def _expert_newsletter_story(report):
-    """Extract a football storyline, not another ATS/total recommendation.
+    """Select one coherent, directly quoted football excerpt from an approved report.
 
-    Only uses published Expert narrative; never invents player news. This is a
-    fallback draft teaser for human review, not an independent research system.
+    Keep adjacent sentences in their original order and section; never stitch
+    distant topics together or generate unsupported editorial claims.
     """
     import re
     sections = report.get('sections') or []
     preferred = ('Offensive and Defensive Analysis',
-                 'Personnel and Injury Considerations', 'Matchup Overview')
-    noise = ('market', 'spread', 'total', 'over', 'under', 'model', 'projection',
-             'scout', 'pick', 'wager', 'betting', 'cover', 'points', 'line ',
-             'expected starter', 'not confirmed', 'snapshot', 'report is current')
-    scored = []
-    for order, heading in enumerate(preferred):
+                 'Matchup Overview', 'Personnel and Injury Considerations')
+    football = ('quarterback', 'pressure', 'protection', 'offense', 'defense',
+                'injur', 'receiver', 'running', 'pass', 'drive', 'front',
+                'secondary', 'rush', 'play', 'pocket', 'coverage', 'blocking',
+                'run game', 'passing', 'rush', 'turnover', 'tackle', 'blitz')
+    noise = ('projection', 'scout', 'model', 'betting', 'wager',
+             'market', 'spread', 'total', 'over ', 'under ', 'pick ')
+    orphan = ('that ', 'this ', 'those ', 'these ', 'it ', 'they ',
+              'he ', 'she ', 'his ', 'their ', 'therefore ', 'however ',
+              'but ', 'also ', 'and ', 'because ', 'so ')
+    candidates = []
+    for priority, heading in enumerate(preferred):
         entry = next((part for part in sections if part.get('heading') == heading), None)
         if not entry:
             continue
         body = re.sub(r'\[[^\[\]\n]{1,90}\]', '', str(entry.get('text') or ''))
-        for sentence in re.split(r'(?<=[.!?])\s+', body):
-            sentence = ' '.join(sentence.split())
-            if not 45 <= len(sentence) <= 240:
+        sentences = [' '.join(part.split()) for part in re.split(r'(?<=[.!?])\s+', body)]
+        for idx, first in enumerate(sentences):
+            lower = first.lower()
+            if not 50 <= len(first) <= 245 or lower.startswith(orphan):
                 continue
-            lower = sentence.lower()
             if any(term in lower for term in noise):
                 continue
-            relevance = sum(term in lower for term in (
-                'quarterback', 'pressure', 'protection', 'offense', 'defense',
-                'injur', 'receiver', 'running', 'pass', 'drive', 'front',
-                'secondary', 'matchup', 'rush', 'play', 'weather'))
-            if relevance:
-                scored.append((relevance, -order, sentence))
-    scored.sort(reverse=True)
-    if scored:
-        opening = scored[0][2]
-        next_sentence = next((item[2] for item in scored[1:]
-                              if item[2] != opening and len(opening) + len(item[2]) < 325), None)
-        return opening + (' ' + next_sentence if next_sentence else '')
-    # Editorial fallback rather than repeating selection and mathematical edge.
-    return 'The matchup has more layers than the selections alone. Read the full Expert analysis for the personnel and game-script breakdown.'
+            score = sum(term in lower for term in football)
+            if not score:
+                continue
+            # Only add the immediately following sentence, never one from
+            # another section or an unrelated passage later in this section.
+            passage = first
+            if idx + 1 < len(sentences):
+                second = sentences[idx + 1]
+                second_lower = second.lower()
+                if (40 <= len(second) <= 200 and len(first) + len(second) < 340
+                        and not any(term in second_lower for term in noise)
+                        and sum(term in second_lower for term in football)):
+                    passage += ' ' + second
+                    score += sum(term in second_lower for term in football)
+            # Stronger football detail wins over generic weather; tie-break
+            # toward the designated primary analysis section and earlier text.
+            candidates.append((score, -priority, -idx, passage))
+    if candidates:
+        return max(candidates)[3]
+    return ('Read the full approved Expert analysis for the matchup breakdown '
+            'and independent ATS and total selections.')
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
