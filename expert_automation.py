@@ -20,12 +20,27 @@ def _execute_once(source=None, root=None, archive=None, *, publish_reports=None)
 
     from expert_beta import clock
     from plug_publication import publish
-    status = {'checked_at': clock().isoformat(), 'state': 'ok'}
+    from scheduler_runtime import atomic_json
+    target = root/'logs'/'expert_automation_status.json'
+    target.parent.mkdir(parents=True, exist_ok=True)
+    status = {'checked_at': clock().isoformat(), 'state': 'running'}
+    def stage(name):
+        status['active_stage'] = name
+        status['stage_started_at'] = clock().isoformat()
+        # A tiny cgroup reading includes the web worker and sibling jobs.
+        # It is an observation at stage entry, not a peak-memory claim.
+        try:
+            status['stage_entry_memory_bytes'] = int(Path('/sys/fs/cgroup/memory.current').read_text())
+        except (OSError, ValueError):
+            status.pop('stage_entry_memory_bytes', None)
+        atomic_json(target, status)
     try:
         # Idempotent, strictly provenance-checked; no forecasts computed.
+        stage('production_import')
         status['production_import'] = publish(root, archive, source/'automatic_model.json')
         # Missing env flag means zero provider calls, not a dummy provider.
         if os.environ.get('TREND_FINDAH_EXPERT_AUTO_DRAFT') == '1':
+            stage('drafts')
             from expert_auto_queue import bounded_run
             draft = bounded_run(archive,
                 None,
@@ -38,19 +53,20 @@ def _execute_once(source=None, root=None, archive=None, *, publish_reports=None)
         else:
             status['drafts'] = 'disabled'
         if publish_reports:
+            stage('review_publication')
             from expert_review_publication import run
             status['review_publication'] = run(archive, execute=True, auto_feature=True)
         else:
             status['review_publication'] = 'disabled'
+        if status['state'] == 'running':
+            status['state'] = 'ok'
+        status['active_stage'] = 'complete'
     except Exception as error:
         status['state'] = 'failed'
         status['error_type'] = type(error).__name__
         # Don't leak provider keys, prompts, or private reports into logs.
         raise
     finally:
-        target = root/'logs'/'expert_automation_status.json'
-        target.parent.mkdir(parents=True, exist_ok=True)
-        from scheduler_runtime import atomic_json
         atomic_json(target, status)
     return status
 

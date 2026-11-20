@@ -47,7 +47,7 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         self.assertEqual(result["cutoff_date_exclusive"], "2026-10-31")
 
     def test_expected_qb_uses_next_available_depth_chart_option_and_current_injuries(self):
-        self.scout["game"].update(game_id="2026_09_JAX_BAL",
+        self.scout["game"].update(game_id="2026_09_JAX_BAL", away_team="JAX", home_team="BAL",
                                   kickoff_utc="2026-11-08T18:00:00+00:00")
         self._schedule([
             dict(game_id="prior", season=2026, game_type="REG", gameday="2026-10-25",
@@ -153,6 +153,35 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         result = snapshot(self.scout, self.root)
         self.assertEqual(len(result["player_performances"]), 1)
         self.assertEqual(result["player_performances"][0]["player"], "Sample Player")
+
+
+    def test_large_unrelated_feeds_do_not_accumulate_in_memory(self):
+        import gc
+        import tracemalloc
+        self.test_player_metrics_are_limited_to_historical_games()
+        expected = snapshot(self.scout, self.root)
+        player_path = self.root / 'data/scout4/players.csv'
+        with player_path.open() as stream:
+            fields = next(csv.reader(stream))
+        with player_path.open('a', newline='') as stream:
+            writer = csv.DictWriter(stream, fieldnames=fields)
+            for i in range(15000):
+                writer.writerow(dict(game_id='irrelevant', season=2026, season_type='REG',
+                    team='NYG', player_id=str(i % 500), player_display_name='Other '+str(i % 500),
+                    passing_yards='1234567890'*20))
+        with (self.root/'nfl_games.csv').open('a', newline='') as stream:
+            writer = csv.writer(stream)
+            for i in range(15000):
+                writer.writerow([str(i), 2019, 'REG', '2019-10-01', 'NYG', 'DAL', 21, 17])
+        gc.collect()
+        tracemalloc.start()
+        try:
+            actual = snapshot(self.scout, self.root)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        self.assertEqual(actual, expected)
+        self.assertLess(peak, 3*1024*1024, 'Unrelated CSV rows must not accumulate')
 
 
 if __name__ == "__main__":
