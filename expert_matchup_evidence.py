@@ -9,9 +9,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-def _rows(path):
+def _rows(path, *, keep=None, player_names=None):
+    """Scan CSV once, retaining only needed rows and compact player identities."""
+    rows = []
     with path.open(encoding="utf-8-sig", newline="") as stream:
-        return list(csv.DictReader(stream))
+        for row in csv.DictReader(stream):
+            if player_names is not None:
+                player_id = row.get("player_id")
+                name = row.get("player_display_name") or row.get("player_name")
+                if player_id and name:
+                    player_names[str(player_id)] = name
+            if keep is None or keep(row):
+                rows.append(row)
+    return rows
 
 
 def _number(value):
@@ -90,11 +100,7 @@ def _personnel_context(scout, root, as_of, player_names=None):
         player_path = _feed_path(root, int(game.get("season")), player_pointer, "player")
         if player_path:
             try:
-                for player in _rows(player_path):
-                    player_id = player.get("player_id")
-                    name = player.get("player_display_name") or player.get("player_name")
-                    if player_id and name:
-                        player_names[str(player_id)] = name
+                _rows(player_path, keep=lambda row: False, player_names=player_names)
             except (OSError, UnicodeError, csv.Error):
                 player_names = {}
     sources = [{
@@ -367,7 +373,11 @@ def snapshot(scout, root=None, as_of=None):
         return {}
     manifest_path = root / "data" / "scout4" / str(season) / "latest.json"
     try:
-        schedule = _rows(schedule_path)
+        schedule = _rows(schedule_path, keep=lambda row: (
+            str(row.get("season")) == str(season) and row.get("game_type") == "REG"
+            and row.get("gameday") and row["gameday"] < cutoff
+            and (away in (row.get("away_team"), row.get("home_team"))
+                 or home in (row.get("away_team"), row.get("home_team")))))
     except (OSError, UnicodeError, csv.Error):
         return {}
     history = []
@@ -409,12 +419,11 @@ def snapshot(scout, root=None, as_of=None):
         player_path = _feed_path(root, season, manifest, "player")
         if not player_path:
             return _attach_personnel(output, scout, root, decision_time)
-        player_rows = _rows(player_path)
-        player_names = {
-            str(player.get("player_id")): (player.get("player_display_name") or player.get("player_name"))
-            for player in player_rows
-            if player.get("player_id") and (player.get("player_display_name") or player.get("player_name"))
-        }
+        player_names = {}
+        player_rows = _rows(player_path, player_names=player_names, keep=lambda row: (
+            row.get("game_id") in eligible_ids and str(row.get("season")) == str(season)
+            and row.get("season_type") == "REG" and row.get("team") in (away, home)
+            and row.get("player_id")))
     except (ValueError, OSError, UnicodeError, json.JSONDecodeError, csv.Error):
         return _attach_personnel(output, scout, root, decision_time)
     standouts = []

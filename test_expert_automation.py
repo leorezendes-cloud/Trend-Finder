@@ -62,7 +62,11 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(r['state'],'ok')
 
     def test_provider_failure_is_not_silently_swallowed(self):
-        def fail(*args,**kwargs):raise RuntimeError('Provider not available')
+        def fail(*args,**kwargs):
+            saved=json.loads((self.root/'logs/expert_automation_status.json').read_text())
+            self.assertEqual(saved['state'],'running')
+            self.assertEqual(saved['active_stage'],'drafts')
+            raise RuntimeError('Provider not available')
         self.mods['expert_auto_queue'].bounded_run=fail
         with patch.dict(sys.modules,self.mods):
             with patch.dict(os.environ,{'TREND_FINDAH_EXPERT_AUTO_DRAFT':'1'}):
@@ -71,6 +75,7 @@ class WorkerTests(unittest.TestCase):
         saved=json.loads((self.root/'logs/expert_automation_status.json').read_text())
         self.assertEqual(saved['state'],'failed')
         self.assertEqual(saved['error_type'],'RuntimeError')
+        self.assertEqual(saved['active_stage'],'drafts')
 
 
 if __name__=='__main__':unittest.main()
