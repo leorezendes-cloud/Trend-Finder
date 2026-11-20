@@ -1,0 +1,28 @@
+name: Player and scheme research
+on:
+  pull_request:
+    paths:
+      - 'research/player_scheme/**'
+      - '.github/workflows/player-scheme-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install polars==2.0.0
+      - run: python -m compileall -q research/player_scheme
+      - run: python -m unittest research.player_scheme.test_engine research.player_scheme.test_ats research.player_scheme.test_full_ats research.player_scheme.test_score_bands research.player_scheme.test_pace research.player_scheme.test_v5_matchup research.player_scheme.test_v5_full -v
+      - name: Verify research imports never load application pipelines
+        run: |
+          python - <<'PY'
+          import sys
+          from research.player_scheme import store, features, evaluate
+          assert not any(x in sys.modules for x in ('app','scout_dynamic','plug_dynamic_official','hosted_updates','polars'))
+          PY
