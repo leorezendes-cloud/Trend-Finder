@@ -35,6 +35,14 @@
     {
       "label": "Other disputed decisions",
       "text": "Reports also questioned the Giants' Jameis Winston quarterback-sneak touchdown and a first-down spot reversed by replay assist before Jacksonville successfully challenged."
+    },
+    {
+      "label": "Hours later · Sunday Night Football",
+      "text": "San Francisco's Mike Evans was credited with a one-handed touchdown against Minnesota despite NBC rules analyst Terry McAulay questioning whether Evans controlled the ball before going out of bounds. The on-field ruling differed from Washington's, and both stood; the plays are a comparison of officiating consistency, not proof of a coordinated fix."
+    },
+    {
+      "label": "A Giant raises the Vegas question",
+      "text": "Giants safety Jevón Holland said he thought Washington might have caught the ball and jokingly said 'Shoutout Vegas' after the game. The remark was not an allegation backed by evidence."
     }
   ],
   "unusual": "A potentially comeback-changing touchdown was denied despite a national broadcast rules analyst disagreeing; other rulings during the same game also drew scrutiny.",
@@ -42,7 +50,8 @@
   "questions": [
     "Was Washington in control before he went out of bounds?",
     "Why did the broadcast analyst and replay office interpret the same video differently?",
-    "Did the sequence of rulings disproportionately hurt Jacksonville, or were these independent judgments?"
+    "Did the sequence of rulings disproportionately hurt Jacksonville, or were these independent judgments?",
+    "Why did similar-looking catches involving Washington and Evans receive different on-field rulings that both survived replay?"
   ],
   "sources": [
     {
@@ -67,6 +76,24 @@
       "label": "NFL official game play-by-play",
       "url": "https://static.www.nfl.com/image/upload/v1795395578/gamecenter/ab999b80-4feb-11f1-abca-2c54536568a9.pdf",
       "kind": "Official play-by-play",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "NBC Sports: Evans and Washington rulings compared, with both rules analysts",
+      "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/mike-evans-td-and-parker-washington-non-td-raise-more-questions-about-nfl-catch-rules",
+      "kind": "Independent analysis",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "49ers: official video of Mike Evans touchdown",
+      "url": "https://www.49ers.com/video/purdy-lofts-it-to-evans-for-a-one-handed-touchdown-catch",
+      "kind": "Video",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "CBS Sports: Jevón Holland's 'Shoutout Vegas' remark and league explanation",
+      "url": "https://www.cbssports.com/nfl/news/parker-washington-non-catch-controversy-jevon-holland-vegas-nfl-call-correct/",
+      "kind": "Independent reporting",
       "checked": "2026-11-24"
     }
   ]
