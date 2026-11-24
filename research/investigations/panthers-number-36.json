@@ -1,0 +1,66 @@
+{
+  "season": 2026,
+  "evidence": "Documented",
+  "featured": false,
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-11-24",
+  "slug": "panthers-number-36",
+  "title": "The No. 36 Files: did someone not want Carolina to cover?",
+  "date": "2026-11-22",
+  "teams": "Ravens · Panthers",
+  "categories": [
+    "blunders",
+    "bad-beats"
+  ],
+  "summary": "Carolina beat Baltimore 35–33, but a documented Panthers −2.5 line did not cover. A video compilation spotlights a string of questionable special-teams plays involving No. 36.",
+  "preview": "Four plays, one player, and a two-point margin. Watch the compilation and decide what is coincidence versus evidence.",
+  "timeline": [
+    {
+      "label": "Pregame market",
+      "text": "A documented November 19 half-point parlay card listed Carolina −2.5. This was one available line, not proof every bettor held that number."
+    },
+    {
+      "label": "Special-teams sequence",
+      "text": "The submitted video compilation highlights No. 36 on a kickoff-return breakdown, a loose punt, another muffed-punt recovery chance, and a punt downing/touchback sequence. These are the video's claims, not independently adjudicated findings."
+    },
+    {
+      "label": "Final score",
+      "text": "Carolina won 35–33. At −2.5, Carolina failed to cover by half a point."
+    }
+  ],
+  "unusual": "Multiple conspicuous special-teams moments involving one player invite a question: did someone not want Carolina to cover?",
+  "explanations": "A compilation can highlight genuine mistakes without demonstrating intent. Special-teams execution is chaotic, and there is no established evidence of manipulation or a player's motive. Review the complete broadcast before attributing responsibility for each play.",
+  "questions": [
+    "Do the original broadcasts support the video's account of all four plays?",
+    "Were any of the mistakes misattributed or taken out of context?",
+    "How would each incident affect the game and the documented −2.5 spread?"
+  ],
+  "sources": [
+    {
+      "label": "Viewer-submitted video compilation: No. 36 special-teams sequence",
+      "url": "https://www.youtube.com/watch?v=k8S6_fMrNxA",
+      "kind": "Video lead; independently verify individual plays",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "Delaware Lottery: Nov. 19 parlay card lists Panthers −2.5",
+      "url": "https://delotterywebcontent.blob.core.windows.net/delottery-site-assets/assets/sports/988ec319-6ec7-413d-92ee-302b7252148c_Delaware%20-%20Half%20Pt%20%2011.19.2026.pdf",
+      "kind": "Pregame betting line",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "LineSmart: final score and saved pregame lines",
+      "url": "https://linesmart.app/nfl/games/baltimore-ravens-at-carolina-panthers-2026-11-22/",
+      "kind": "Game and market record",
+      "checked": "2026-11-24"
+    }
+  ],
+  "potential_bets": [
+    {
+      "market": "Carolina −2.5",
+      "impact": "Carolina won by two; a −2.5 ticket lost by half a point. Other spreads may have produced different outcomes."
+    }
+  ]
+}

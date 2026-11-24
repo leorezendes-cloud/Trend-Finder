@@ -1,0 +1,100 @@
+{
+  "season": 2026,
+  "evidence": "Documented",
+  "featured": true,
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-11-24",
+  "slug": "jacksonville-job",
+  "title": "The Jacksonville Job: a touchdown that wasn't",
+  "date": "2026-11-22",
+  "teams": "Jaguars · Giants",
+  "categories": [
+    "calls"
+  ],
+  "summary": "Down 20–6 with 12:26 left, Jacksonville appeared to score on Parker Washington’s end-zone catch. Officials ruled it incomplete and upheld the call; the Jaguars settled for three and ultimately lost 23–18.",
+  "preview": "CBS rules analyst Gene Steratore thought Washington had a touchdown. The NFL said control was not established until out of bounds.",
+  "timeline": [
+    {
+      "label": "Early fourth quarter · 12:26 left",
+      "text": "Trailing 20–6, Jacksonville faced third-and-9 at the Giants' 12. Trevor Lawrence found Parker Washington at the back of the end zone; the on-field ruling was incomplete."
+    },
+    {
+      "label": "Replay review",
+      "text": "Liam Coen challenged. Replay upheld the incompletion. CBS rules analyst Gene Steratore said he believed Washington maintained control."
+    },
+    {
+      "label": "League explanation",
+      "text": "NFL VP of instant replay Mark Butterworth said the ball shifted when Washington hit the ground and control was not established in bounds."
+    },
+    {
+      "label": "What it changed",
+      "text": "A touchdown plus extra point would have cut the deficit to 20–13. Jacksonville kicked a field goal instead, making it 20–9; the Giants eventually won 23–18."
+    },
+    {
+      "label": "Other disputed decisions",
+      "text": "Reports also questioned the Giants' Jameis Winston quarterback-sneak touchdown and a first-down spot reversed by replay assist before Jacksonville successfully challenged."
+    },
+    {
+      "label": "Hours later · Sunday Night Football",
+      "text": "San Francisco's Mike Evans was credited with a one-handed touchdown against Minnesota despite NBC rules analyst Terry McAulay questioning whether Evans controlled the ball before going out of bounds. The on-field ruling differed from Washington's, and both stood; the plays are a comparison of officiating consistency, not proof of a coordinated fix."
+    },
+    {
+      "label": "A Giant raises the Vegas question",
+      "text": "Giants safety Jevón Holland said he thought Washington might have caught the ball and jokingly said 'Shoutout Vegas' after the game. The remark was not an allegation backed by evidence."
+    }
+  ],
+  "unusual": "A potentially comeback-changing touchdown was denied despite a national broadcast rules analyst disagreeing; other rulings during the same game also drew scrutiny.",
+  "explanations": "The league defended its interpretation of possession and the standard for overturning the on-field ruling. Jacksonville also committed turnovers and missed other opportunities, so the disputed call cannot by itself establish who would have won.",
+  "questions": [
+    "Was Washington in control before he went out of bounds?",
+    "Why did the broadcast analyst and replay office interpret the same video differently?",
+    "Did the sequence of rulings disproportionately hurt Jacksonville, or were these independent judgments?",
+    "Why did similar-looking catches involving Washington and Evans receive different on-field rulings that both survived replay?"
+  ],
+  "sources": [
+    {
+      "label": "NFL: league replay explanation and game context",
+      "url": "https://amp.nfl.com/news/nfl-says-wr-parker-washington-didn-t-control-catch-on-controversial-non-td-in-jaguars-loss-to-giants",
+      "kind": "League reporting",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "CBS: disputed calls and comeback recap",
+      "url": "https://www.cbssports.com/nfl/news/giants-vs-jaguars-live-updates-score-highlights/live/",
+      "kind": "Game reporting",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "Sports Illustrated: additional officiating disputes",
+      "url": "https://www.si.com/nfl/jaguars/onsi/7-instant-observations-on-jacksonville-letdown-vs-giants-parker-washington-s-non-td-looms-large",
+      "kind": "Reporting",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "NFL official game play-by-play",
+      "url": "https://static.www.nfl.com/image/upload/v1795395578/gamecenter/ab999b80-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "Official play-by-play",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "NBC Sports: Evans and Washington rulings compared, with both rules analysts",
+      "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/mike-evans-td-and-parker-washington-non-td-raise-more-questions-about-nfl-catch-rules",
+      "kind": "Independent analysis",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "49ers: official video of Mike Evans touchdown",
+      "url": "https://www.49ers.com/video/purdy-lofts-it-to-evans-for-a-one-handed-touchdown-catch",
+      "kind": "Video",
+      "checked": "2026-11-24"
+    },
+    {
+      "label": "CBS Sports: Jevón Holland's 'Shoutout Vegas' remark and league explanation",
+      "url": "https://www.cbssports.com/nfl/news/parker-washington-non-catch-controversy-jevon-holland-vegas-nfl-call-correct/",
+      "kind": "Independent reporting",
+      "checked": "2026-11-24"
+    }
+  ]
+}
