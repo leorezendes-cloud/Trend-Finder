@@ -1,0 +1,46 @@
+{
+  "season": 2026,
+  "evidence": "Documented",
+  "featured": false,
+  "statistics": [],
+  "betting": null,
+  "source_note": null,
+  "reviewed": "2026-11-24",
+  "slug": "tom-jackson-tribute",
+  "title": "The Orange Crush tribute, and one last pick-six",
+  "date": "2026-11-22",
+  "teams": "Raiders · Broncos",
+  "categories": [
+    "coincidences"
+  ],
+  "summary": "Denver honored late Broncos great Tom Jackson before beating rival Las Vegas 38–24. With the Broncos ahead by seven late, Ja’Quan McMillian returned an interception for a touchdown.",
+  "preview": "A tribute to a franchise legend, a division rival, and a one-handed interception return that turned a seven-point lead into a 14-point win.",
+  "timeline": [
+    {
+      "label": "Before kickoff",
+      "text": "Denver paid tribute to late Ring of Famer Tom Jackson, including a moment of silence and recognition of his No. 57 legacy."
+    },
+    {
+      "label": "Late fourth quarter",
+      "text": "With Denver leading by seven, Ja’Quan McMillian made a one-handed interception and returned it for a touchdown with 1:52 remaining."
+    },
+    {
+      "label": "Final",
+      "text": "Denver defeated Las Vegas 38–24."
+    }
+  ],
+  "unusual": "The tribute came against a historic division rival, and a dramatic late defensive touchdown punctuated the victory—an echo of the existing Mike Ditka memorial-game case.",
+  "explanations": "A moving tribute and a win can coexist without proving that the tribute caused the result. This is a documented coincidence, not evidence of orchestration.",
+  "questions": [
+    "How often do teams win their first tribute game following a franchise legend's death?",
+    "Does any pattern remain after accounting for opponent strength and home-field advantage?"
+  ],
+  "sources": [
+    {
+      "label": "Broncos: Tom Jackson tribute and McMillian pick-six",
+      "url": "https://www.denverbroncos.com/news/cover-4-broncos-channel-coleman-s-3-touchdowns-mcmillian-s-pick-six-into-38-24-win-over-raiders",
+      "kind": "Team game report",
+      "checked": "2026-11-24"
+    }
+  ]
+}
