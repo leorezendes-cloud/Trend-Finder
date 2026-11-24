@@ -37,7 +37,7 @@ def library_view(args):
     if category not in {'all', *CATEGORIES}:
         abort(400, description='Unknown investigation category.')
     query = args.get('q', '').strip()[:120]
-    sort = args.get('sort', 'featured')
+    sort = args.get('sort', 'newest')
     if sort not in {'featured', 'newest', 'oldest'}:
         abort(400, description='Unknown investigation sort.')
     selected = [c for c in rows if season == 'all' or
@@ -46,7 +46,7 @@ def library_view(args):
     selected = [c for c in selected if (category == 'all' or category in c['categories']) and
                 (not query or query.casefold() in (' '.join([c['title'], c['teams'], c['summary']])).casefold())]
     selected.sort(key=lambda c: (bool(c['featured']) if sort == 'featured' else False, c['date'], c['slug']), reverse=sort != 'oldest')
-    featured = next((c for c in selected if c['featured']), None) if sort == 'featured' else None
+    featured = next((c for c in selected if c['featured']), None) if sort in {'featured', 'newest'} else None
     def link(**changes):
         values = dict(panel='anomalies', case_season=season, case_category=category, q=query,
                       sort=sort, mobile_results=args.get('mobile_results'), tool=tool or None)
