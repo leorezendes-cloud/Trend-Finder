@@ -91,8 +91,8 @@
 </td></tr>
 {% if sections.get('bad_beats') %}
 <tr><td style="padding:24px 24px 18px;border-bottom:1px solid #e5e9ee">
-  <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">04 / BAD BEAT OF THE WEEK</p>
-  <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">The Week's Wildest Finish</h2>
+  <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">04 / THE CASE FILES</p>
+  <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">This Week's Featured Investigation</h2>
   {% for block in sections['bad_beats'].split('\n\n') if block|trim %}
   {% set lines = block.split('\n') %}
   <div style="margin:0 0 14px;padding:0 0 12px;border-bottom:1px solid #eceef2">
@@ -101,7 +101,7 @@
     {% if lines|length > 2 %}<a href="{{ lines[2] }}" style="font-size:13px;font-weight:700;color:#a36a00;text-decoration:underline">Read the documented Case File &rarr;</a>{% endif %}
   </div>
   {% endfor %}
-  <p style="font-size:12px;color:#667085;line-height:1.5">Historical editorial cases, not betting picks or evidence of manipulation.</p>
+  <p style="font-size:12px;color:#667085;line-height:1.5">Documented NFL events and open questions, not betting picks or proof of manipulation.</p>
 </td></tr>
 {% endif %}
 <tr><td style="padding:24px 24px 27px">
