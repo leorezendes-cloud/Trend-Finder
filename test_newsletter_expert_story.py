@@ -32,7 +32,7 @@ class ExpertNewsletterStoryTests(unittest.TestCase):
         story = _expert_newsletter_story(report)
         self.assertIn('physical game', story)
         self.assertIn('passing on the spread', story)
-        self.assertIn('likes Under', story)
+        self.assertIn('likes the Under', story)
 
 
 if __name__ == '__main__':
