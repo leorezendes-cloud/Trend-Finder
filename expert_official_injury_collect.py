@@ -6,6 +6,7 @@ An operator must verify and save individual game records before Expert uses them
 import argparse
 import json
 from pathlib import Path
+import os
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
@@ -299,15 +300,40 @@ def preflight_game(snapshot, game, as_of):
     }
 
 
+def save_observation(snapshot, destination):
+    """Opt-in immutable research capture; never enters Expert verified store."""
+    path = Path(destination)
+    if path.suffix != ".json" or path.is_symlink():
+        raise ValueError("Observation destination must be a new .json file")
+    if snapshot.get("verified_player_records") is not False:
+        raise ValueError("Only unverified observations may be captured")
+    if "game_preflight" not in snapshot:
+        raise ValueError("Exact-game preflight required before saving")
+    if not snapshot["game_preflight"].get("structural_preflight_passed"):
+        raise ValueError("Failed preflight; observation not saved")
+    data = json.dumps(snapshot, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    if len(data) > 131072:
+        raise ValueError("Observation exceeds 128 KiB")
+    # Exclusive creation prevents silently rewriting the first-observed evidence.
+    with path.open("xb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", type=int, required=True)
     parser.add_argument("--week", type=int, required=True)
     parser.add_argument("--game-json", help="Local Scout game JSON with exact game_id, teams, kickoff")
     parser.add_argument("--as-of", help="Expert cutoff ISO timestamp (timezone required)")
+    parser.add_argument("--save-observation", help="Save immutable unverified exact-game evidence to a new JSON path")
     parser.add_argument("--compact", action="store_true",
                         help="Show team counts and provenance instead of all player rows")
     args = parser.parse_args()
+    if args.save_observation and (not args.game_json or not args.as_of):
+        parser.error("--save-observation requires --game-json and --as-of")
     if bool(args.game_json) != bool(args.as_of):
         parser.error("--game-json and --as-of must be provided together")
     if args.as_of:
@@ -330,6 +356,9 @@ def main():
     if args.game_json:
         audit = preflight_game(snapshot, game, args.as_of)
         snapshot["game_preflight"] = audit
+    if args.save_observation:
+        # Store the complete candidate rows before compact output removes them.
+        save_observation(snapshot, args.save_observation)
     if args.compact:
         snapshot.pop("preview", None)
         snapshot["candidate_summary"] = [
