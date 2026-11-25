@@ -69,44 +69,52 @@ def _side_label(side, quote, market):
 
 
 def _expert_newsletter_story(report):
-    """Write a self-contained teaser from the approved Expert's own words.
+    """Build a compact football-column teaser using only approved Expert prose.
 
-    Prefer the report's reviewed summary over a sentence torn out of context.
-    No new facts, invented personnel, or generated opinions are introduced.
+    No AI call, new claims, changed picks, or isolated context-free sentences.
     """
     import re
-    summary = str(report.get('summary') or '').strip()
+
+    def clean(value):
+        return ' '.join(re.sub(r'\\[[^\\[\\]\\n]{1,90}\\]', '', str(value or '')).split())
+
+    summary = clean(report.get('summary'))
     sections = report.get('sections') or []
-    texts = [summary] + [
-        str(section.get('text') or '').strip() for section in sections
-        if section.get('heading') in ('Matchup Overview',
-                                      'Offensive and Defensive Analysis',
-                                      'Final Verdict')
-    ]
-    process = ('according to', 'not verified', 'unverified', 'not confirmed',
-               'fully confirmed', 'listed as expected', 'injury coverage',
-               'injury rows', 'source', 'evidence id', 'missing data',
-               'no usable', 'no confirmed', 'cannot confirm', 'unknown for both')
-    transitions = ('on the other side', 'on the other hand', 'by contrast',
-                   'in contrast', 'meanwhile', 'conversely', 'furthermore',
-                   'however', 'also', 'and', 'but', 'so', 'therefore',
-                   'as noted', 'as mentioned', 'this', 'that', 'these', 'those')
-    for text in texts:
-        text = re.sub(r'\\[[^\\[\\]\\n]{1,90}\\]', '', text)
-        sentences = [' '.join(x.split()) for x in re.split(r'(?<=[.!?])\\s+', text)]
-        for sentence in sentences:
-            low = sentence.lower().lstrip()
-            if not 55 <= len(sentence) <= 250:
-                continue
-            if low.startswith(transitions) or any(word in low for word in process):
-                continue
-            if not any(word in low for word in ('offense', 'defense', 'quarterback',
-                       'pass', 'rush', 'run game', 'receiver', 'protection',
-                       'pressure', 'turnover', 'touchdown', 'drive', 'secondary')):
-                continue
-            return sentence
-    return ('Read The Expert’s full football take on the matchup, '
-            'the key players, and where the game could turn.')
+    final = next((clean(section.get('text')) for section in sections
+                  if section.get('heading') in ("The Expert’s Final Verdict",
+                                                "The Expert's Final Verdict")), '')
+    overview = next((clean(section.get('text')) for section in sections
+                     if section.get('heading') == 'Matchup Overview'), '')
+    # A complete reviewed summary is the most reliable standalone football story.
+    story = summary if len(summary) >= 65 else overview
+    if not story:
+        story = final or clean(report.get('betting_assessment'))
+    if not story:
+        return 'The Expert’s full matchup breakdown is ready to read.'
+
+    # Avoid repeating a long article in the newsletter. Cut at sentence boundaries.
+    sentences = re.split(r'(?<=[.!?])\\s+', story)
+    excerpt = ''
+    for sentence in sentences:
+        if excerpt and len(excerpt) + len(sentence) + 1 > 440:
+            break
+        excerpt = (excerpt + ' ' + sentence).strip()
+    if not excerpt:
+        excerpt = story
+
+    # The published side is authoritative; never derive a different pick from prose.
+    ats = report.get('ats_side')
+    total = report.get('total_side')
+    closing = []
+    if ats:
+        closing.append(f"The Expert is backing {ats} against the spread.")
+    else:
+        closing.append("The Expert is passing on the spread.")
+    if total:
+        closing.append(f"On the total, The Expert likes {total}.")
+    else:
+        closing.append("On the total, The Expert is passing.")
+    return excerpt + '\\n' + ' '.join(closing)
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
