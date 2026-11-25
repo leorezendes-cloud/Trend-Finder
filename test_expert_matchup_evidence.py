@@ -46,6 +46,28 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         self.assertNotIn("player_performances", result)
         self.assertEqual(result["cutoff_date_exclusive"], "2026-10-31")
 
+    def test_five_recent_games_and_season_scoring_observations_are_pregame_only(self):
+        dates = ["2026-09-01", "2026-09-08", "2026-09-15",
+                 "2026-09-22", "2026-10-06", "2026-10-20"]
+        rows = [
+            dict(game_id=str(i), season=2026, game_type="REG",
+                 gameday=date, away_team="PHI", home_team="NYG",
+                 away_score=str(10 + i), home_score="10")
+            for i, date in enumerate(dates)
+        ]
+        rows.append(dict(game_id="future", season=2026, game_type="REG",
+                         gameday="2026-11-03", away_team="PHI", home_team="NYG",
+                         away_score="99", home_score="0"))
+        self._schedule(rows)
+        result = snapshot(self.scout, self.root)
+        team = result["team_form"][0]
+        self.assertEqual(len(team["recent"]), 5)
+        self.assertEqual(team["recent"][0]["score"], "15-10")
+        self.assertEqual(team["recent_five_scores"]["games"], 5)
+        self.assertEqual(team["season_to_date_scores"]["games"], 6)
+        self.assertEqual(team["season_to_date_scores"]["points_for_per_game"], 12.5)
+        self.assertNotIn("99-0", str(result))
+
     def test_expected_qb_uses_next_available_depth_chart_option_and_current_injuries(self):
         self.scout["game"].update(game_id="2026_09_JAX_BAL", away_team="JAX", home_team="BAL",
                                   kickoff_utc="2026-11-08T18:00:00+00:00")
