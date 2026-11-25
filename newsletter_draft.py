@@ -868,6 +868,36 @@ def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
     )
 
 
+def _weekly_case_spotlight(root, now, origin, warnings):
+    """One documented recent Case File, favoring editorial featured status."""
+    index = Path(root) / 'research' / 'investigations' / 'index.json'
+    try:
+        cases = json.loads(index.read_text(encoding='utf-8'))
+    except (OSError, ValueError, TypeError):
+        warnings.append('Case Files index unavailable; weekly spotlight omitted.')
+        return ''
+    local_date = now.astimezone(ET).date()
+    eligible = []
+    for case in cases:
+        if case.get('evidence') != 'Documented':
+            continue
+        slug = case.get('slug')
+        if not isinstance(slug, str) or not slug or any(
+                char not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for char in slug):
+            continue
+        try:
+            case_date = datetime.strptime(case['date'], '%Y-%m-%d').date()
+        except (KeyError, TypeError, ValueError):
+            continue
+        if 0 <= (local_date - case_date).days <= 7 and case.get('title') and case.get('summary'):
+            eligible.append((case_date, case))
+    eligible.sort(key=lambda pair: (bool(pair[1].get('featured')), pair[0], pair[1]['slug']), reverse=True)
+    if not eligible:
+        return ''
+    case = eligible[0][1]
+    return f"{case['title']}\\n{case['summary']}\\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
+
+
 def build_draft(root, now, frequency='weekly', *, premium=False, report_month=None):
     """Compose reviewable public issues; premium=True is preview-only.
 
@@ -919,7 +949,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
                     'trends': '\n\n'.join(trends) or 'No current featured trends available.',
                     'expert': expert_content,
                     'matchups': '\n\n'.join(matchups) or 'No upcoming games in the saved schedule.',
-                    'bad_beats': _bad_beats_content(root, now, origin, warnings),
+                    'bad_beats': _weekly_case_spotlight(root, now, origin, warnings),
                     'updates': ''}
     if not trends:
         warnings.append('No current featured trends met the criteria.')
