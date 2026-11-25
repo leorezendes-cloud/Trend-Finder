@@ -186,6 +186,8 @@ def fetch_official_injury_page(season, week, *, opener=None):
                                      "Accept": "text/html"})
     client = opener or build_opener(_NoRedirect())
     with client.open(request, timeout=12) as response:
+        page_last_modified = response.headers.get("Last-Modified")
+        page_date = response.headers.get("Date")
         if response.geturl() != url:
             raise ValueError("Unexpected source redirect")
         content_type = response.headers.get("Content-Type", "")
@@ -205,6 +207,8 @@ def fetch_official_injury_page(season, week, *, opener=None):
             "season": season, "week": week, "verified_player_records": False,
             "note": "Read-only source preview. Do not treat as verified injury statuses.",
             "preview": lines[:120],
+            "http_page_metadata": {"last_modified": page_last_modified, "date": page_date,
+                                   "note": "HTTP headers describe the page response, not individual injury-report publication times"},
             "publication_provenance": {
                 "published_at": None,
                 "status": "not_established_from_week_page",
@@ -217,6 +221,81 @@ def fetch_official_injury_page(season, week, *, opener=None):
                 ],
             },
             "unverified_table_candidates": label_team_candidates(injury_table_candidates(html))}
+
+
+
+def preflight_game(snapshot, game, as_of):
+    """Read-only exact-game eligibility audit; NEVER verifies or imports players.
+
+    The first observed timestamp proves availability no earlier than that moment.
+    HTTP Last-Modified, page headings and retrieval time are not publication dates.
+    """
+    def stamp(value):
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            raise ValueError("Timezone required")
+        return parsed.astimezone(timezone.utc)
+
+    issues = []
+    if not isinstance(snapshot, dict) or not isinstance(game, dict):
+        raise ValueError("Expected snapshot and Scout game objects")
+    if (snapshot.get("season") != game.get("season")
+            or snapshot.get("week") != game.get("week")):
+        issues.append("season_week_mismatch")
+    game_id = game.get("game_id")
+    if not isinstance(game_id, str) or not game_id:
+        issues.append("missing_exact_game_id")
+    teams = (game.get("away_team"), game.get("home_team"))
+    if any(not isinstance(t, str) or not t for t in teams) or teams[0] == teams[1]:
+        issues.append("missing_matchup_teams")
+    try:
+        observed = stamp(snapshot["retrieved_at"])
+        kickoff = stamp(game["kickoff_utc"])
+        cutoff = stamp(as_of)
+        if not observed < kickoff:
+            issues.append("observed_at_or_after_kickoff")
+        if not observed <= cutoff:
+            issues.append("observed_after_analysis_cutoff")
+        if not cutoff < kickoff:
+            issues.append("analysis_at_or_after_kickoff")
+        if observed > datetime.now(timezone.utc):
+            issues.append("future_observation")
+    except (KeyError, TypeError, ValueError):
+        issues.append("missing_or_invalid_timestamps")
+    if snapshot.get("verified_player_records") is not False:
+        issues.append("unexpected_verified_flag")
+    source = snapshot.get("source_url")
+    expected_url = (f"https://www.nfl.com/injuries/league/"
+                    f"{snapshot.get('season')}/REG{snapshot.get('week')}")
+    if source != expected_url:
+        issues.append("unexpected_official_source")
+    rows = snapshot.get("unverified_table_candidates")
+    if not isinstance(rows, list):
+        rows = []
+        issues.append("missing_candidate_tables")
+    matched = {}
+    for team in teams:
+        candidates = [r for r in rows if isinstance(r, dict) and r.get("team") == team
+                      and r.get("team_label_confidence") == "exact_unique_heading"
+                      and r.get("verified") is False]
+        if len(candidates) != 1:
+            issues.append("missing_or_ambiguous_team_" + str(team))
+        else:
+            matched[team] = len(candidates[0].get("players", []))
+            if not 1 <= matched[team] <= 60:
+                issues.append("invalid_player_count_" + team)
+    return {
+        "game_id": game_id, "teams": list(teams),
+        "candidate_player_counts": matched,
+        "structural_preflight_passed": not issues,
+        "issues": issues,
+        "eligible_for_automatic_import": False,
+        "publication_time_verified": False,
+        "review_required": ["independent report publication evidence",
+                            "human review of player statuses and exact matchup",
+                            "reviewed importer validation"],
+        "note": "Observed availability is not the report's original publication timestamp.",
+    }
 
 
 def main():
