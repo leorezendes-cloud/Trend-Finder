@@ -817,7 +817,7 @@ def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
     """Read documented Case Files only; never collect odds or create snapshots.
 
     Weekly: latest case within the preceding seven local dates.
-    Monthly: up to three curated cases from the selected reporting month.
+    Monthly: one documented bad beat from the selected reporting month.
     Empty months/weeks do not create placeholder betting claims.
     """
     index = Path(root) / 'research' / 'investigations' / 'index.json'
@@ -860,7 +860,7 @@ def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
     # Editorial featured status and recency are transparent ordering criteria;
     # do not pretend to score bad-beat severity from final scores alone.
     eligible.sort(key=lambda pair: (bool(pair[1].get('featured')), pair[0], pair[1]['slug']), reverse=True)
-    limit = 3 if report_month is not None else 1
+    limit = 1
     return '\n\n'.join(
         f"{case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
         for _, case in eligible[:limit]
