@@ -230,8 +230,10 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             warnings.append('One O/U receipt has no valid published line.')
             continue
         # An unavailable receipt is not a public pick or a newsletter headline.
-        ats_text = f'{ats_side} {ats_line:+g}' if ats_selected else 'Stay Away'
-        ou_text = f'{ou_side} {ou_line:g}' if ou_selected else 'Stay Away'
+        ats_text = (f'{ats_side} {ats_line:+g}' if ats_selected else
+                    'Stay Away' if ats_available else 'No pick')
+        ou_text = (f'{ou_side} {ou_line:g}' if ou_selected else
+                   'Stay Away' if ou_available else 'No pick')
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
@@ -401,9 +403,9 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
         scout, version = indexed[lines[-1]]
         # Never headline a featured Expert game with no actual Plug selection.
         if not any(part.startswith('ATS: ') and
-                   (part.split('ATS: ', 1)[1].split(' · Total:', 1)[0] != 'Stay Away'
+                   (part.split('ATS: ', 1)[1].split(' · Total:', 1)[0] not in ('Stay Away', 'No pick')
                     or (' · Total: ' in part and
-                        part.split(' · Total: ', 1)[1] != 'Stay Away'))
+                        part.split(' · Total: ', 1)[1] not in ('Stay Away', 'No pick')))
                    for part in scout):
             continue
         # These are Plug receipt selections, not Scout model forecasts.
@@ -422,9 +424,9 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
     selected = [(block, versions[i] if i < len(versions) else None)
                 for i, block in enumerate(picks)
                 if any(line.startswith('ATS: ') and
-                       (line.split('ATS: ', 1)[1].split(' · Total:', 1)[0] != 'Stay Away'
+                       (line.split('ATS: ', 1)[1].split(' · Total:', 1)[0] not in ('Stay Away', 'No pick')
                         or (' · Total: ' in line and
-                            line.split(' · Total: ', 1)[1] != 'Stay Away'))
+                            line.split(' · Total: ', 1)[1] not in ('Stay Away', 'No pick')))
                        for line in block.splitlines())]
     if selected:
         return '\n\n'.join(block for block, _ in selected), [v for _, v in selected if v]
