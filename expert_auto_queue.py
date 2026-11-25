@@ -421,7 +421,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
 
 
 def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16,
-                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None, allow_second_replacement=False, owner_daily_override=False):
+                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None, allow_second_replacement=False, owner_daily_override=False, owner_final_published=False):
     """Regenerate only already-drafted production games, preserving originals.
 
     Operator-only temporary override. Writes separate replacement files and
@@ -440,9 +440,13 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         raise ValueError(f'daily_limit must be 1..{maximum_daily} and run_limit must be 1..2')
     if allow_second_replacement and run_limit != 1:
         raise ValueError('Second replacement requires --run-limit 1')
+    if owner_final_published and ((int(season), int(week)) != (2026, 12)
+                                  or run_limit != 1 or allow_second_replacement):
+        raise ValueError('Published exception is one Week 12 first replacement only')
     budget = positive_decimal(weekly_limit)
-    if budget <= 0 or budget > Decimal('2.50'):
-        raise ValueError('Temporary weekly budget must be greater than $0 and no more than $2.50')
+    ceiling = Decimal('2.75') if owner_final_published else Decimal('2.50')
+    if budget <= 0 or budget > ceiling:
+        raise ValueError(f'Temporary weekly budget must be greater than $0 and no more than {ceiling}')
     if not 1 <= weekly_requests <= 32:
         raise ValueError('Weekly request limit must be 1..32')
     model = model or os.environ.get('EXPERT_AI_MODEL')
@@ -477,6 +481,9 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         for key, row in latest.items():
             if key in published:
                 counts['already_published'] += 1
+                if not owner_final_published:
+                    continue
+            elif owner_final_published:
                 continue
             version = row['version']
             if not (folder/(version+'.json')).is_file():
@@ -493,6 +500,8 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         queue.sort(key=lambda r:(instant(r['scout']['game']['kickoff_utc']),identity(r['scout'])))
         if allow_second_replacement and matchup is None:
             raise ValueError('Second replacement requires explicit --replace-game')
+        if owner_final_published and matchup is None and len(queue) != 1:
+            raise ValueError('Expected exactly one published game without a replacement; specify --replace-game')
         if matchup is not None:
             matchup = matchup.upper().replace(' ', '')
             if not re.fullmatch(r'[A-Z]{2,3}@[A-Z]{2,3}', matchup):
@@ -633,6 +642,7 @@ def main(argv=None):
     parser.add_argument('--replace-week', type=int)
     parser.add_argument('--replace-game', help='Optional exact AWAY@HOME game for replacement, e.g. GB@LA')
     parser.add_argument('--second-replacement', action='store_true', help='Explicit one-time regeneration of an existing successful replacement; preserves both originals')
+    parser.add_argument('--owner-final-published-week12', action='store_true', help='One-time Week 12 published game replacement; preserve live article, allow $2.75 total ceiling')
     parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
     parser.add_argument('--retry-uncertain-version', help='Exact 64-character production version; one operator-only retry')
     args = parser.parse_args(argv)
@@ -646,7 +656,7 @@ def main(argv=None):
         result = bounded_retry_uncertain(args.store,args.replace_season,args.replace_week,
             args.retry_uncertain_version,args.model,weekly_limit=args.temporary_weekly_budget,
             daily_limit=args.daily_limit,execute=args.execute)
-    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None or args.replace_game is not None or args.second_replacement:
+    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None or args.replace_game is not None or args.second_replacement or args.owner_final_published_week12:
         if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
             parser.error('--replace-season, --replace-week and --temporary-weekly-budget must be supplied together')
         if args.provider not in (None, 'openai'):
@@ -654,6 +664,7 @@ def main(argv=None):
         result = bounded_replace_week(args.store,args.replace_season,args.replace_week,args.model,
             daily_limit=args.daily_limit,run_limit=args.run_limit,weekly_limit=args.temporary_weekly_budget,
             execute=args.execute,matchup=args.replace_game,allow_second_replacement=args.second_replacement,
+            owner_final_published=args.owner_final_published_week12,
             owner_daily_override=args.owner_week12_daily_override)
     else:
         result = bounded_run(args.store, args.model, daily_limit=args.daily_limit,
