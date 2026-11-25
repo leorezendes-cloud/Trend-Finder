@@ -85,6 +85,9 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
                 dict(game_id="prior", season=2026, season_type="REG",
                      team="PHI", passing_epa="8", rushing_epa="-2",
                      passing_yards="250", rushing_yards="110", sacks_suffered="2"),
+                dict(game_id="prior", season=2026, season_type="REG",
+                     team="NYG", passing_epa="-5", rushing_epa="3",
+                     passing_yards="175", rushing_yards="80", sacks_suffered="4"),
                 dict(game_id="future", season=2026, season_type="REG",
                      team="PHI", passing_epa="999", rushing_epa="999",
                      passing_yards="999", rushing_yards="999", sacks_suffered="0")])
@@ -94,6 +97,9 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         result = _observed_team_efficiency(
             self.root, 2026, manifest, history, "PHI", "WAS")
         self.assertEqual(result["PHI"]["season_to_date"]["passing_epa_per_game"], 8)
+        self.assertEqual(result["PHI"]["opponent_production_allowed_season_to_date"]["passing_epa_per_game"], -5)
+        self.assertEqual(result["PHI"]["opponent_production_allowed_season_to_date"]["passing_epa_sample_games"], 1)
+        self.assertEqual(result["PHI"]["recent_opponents"], ["NYG"])
         self.assertEqual(result["PHI"]["season_to_date"]["passing_epa_sample_games"], 1)
         self.assertEqual(result["WAS"]["season_to_date"]["games_with_feed"], 0)
         self.assertNotIn("999", str(result))
