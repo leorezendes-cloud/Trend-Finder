@@ -44,6 +44,16 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(candidates[0]["players"][0]["game_status"], "Questionable")
         self.assertEqual(candidates[0]["players"][1]["game_status"], "Not Reported")
 
+    def test_source_heading_is_preserved_without_team_guessing(self):
+        html = """<h3>Packers</h3><table><tr><th>Player</th><th>Position</th>
+        <th>Injuries</th><th>Practice Status</th><th>Game Status</th></tr>
+        <tr><td>Example Player</td><td>RB</td><td>Finger</td>
+        <td>Limited Participation in Practice</td><td>Questionable</td></tr></table>"""
+        rows = injury_table_candidates(html)
+        self.assertEqual(rows[0]["source_heading"], "Packers")
+        self.assertIsNone(rows[0]["team"])
+        self.assertFalse(rows[0]["verified"])
+
     def test_ignore_unrecognized_tables(self):
         self.assertEqual(injury_table_candidates(
             "<table><tr><th>Player</th></tr><tr><td>Unknown</td></tr></table>"), [])
