@@ -72,6 +72,12 @@ def inspect(store, season, week, game, root=None, now=None):
             for team, data in efficiency.items()},
         "efficiency_metrics": {
             team: data.get("season_to_date") for team, data in efficiency.items()},
+        "defensive_opponent_production": {
+            team: {
+                "season_to_date": data.get("opponent_production_allowed_season_to_date"),
+                "recent_five": data.get("opponent_production_allowed_recent_five"),
+            } for team, data in efficiency.items()},
+        "personnel_source_snapshots": source_snapshots,
         "personnel_injury_coverage": {
             team: data.get("injury_coverage") for team, data in personnel.items()},
         "provider_receives_efficiency": bool(facts.get("observed_team_efficiency")),
