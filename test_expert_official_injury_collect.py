@@ -1,12 +1,12 @@
 import io
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 from expert_official_injury_collect import fetch_official_injury_page
 
 
 class CollectorTests(unittest.TestCase):
     def test_bounded_read_only_week_preview(self):
-        response = Mock()
+        response = MagicMock()
         response.headers = {"Content-Type": "text/html; charset=utf-8"}
         response.geturl.return_value = "https://www.nfl.com/injuries/league/2026/REG12"
         response.read.return_value = b"<html><h1>Injuries - WEEK 12</h1><p>Packers</p></html>"
@@ -19,7 +19,7 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(result["week"], 12)
 
     def test_reject_wrong_week(self):
-        response = Mock()
+        response = MagicMock()
         response.headers = {"Content-Type": "text/html"}
         response.geturl.return_value = "https://www.nfl.com/injuries/league/2026/REG12"
         response.read.return_value = b"<h1>Injuries - WEEK 11</h1>"
