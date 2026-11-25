@@ -347,8 +347,85 @@ def _official_injury_context(scout, root, as_of):
             [item[2] for item in candidates.values()])
 
 
+def _observed_injury_context(scout, root, as_of):
+    """Consume only saved official page observations, never live page contents.
+
+    Original publication time is unknown. Rows remain explicitly unverified.
+    """
+    game = scout.get("game", {})
+    try:
+        kickoff = _time(game["kickoff_utc"])
+        if not as_of < kickoff:
+            return {}, []
+        season, week = int(game["season"]), int(game["week"])
+        game_id = game["game_id"]
+    except (KeyError, TypeError, ValueError):
+        return {}, []
+    path = (root / "data" / "expert_official_observations" /
+            str(season) / f"{week:02d}" / (str(game_id) + ".json"))
+    try:
+        if not path.is_file() or path.is_symlink() or path.stat().st_size > 65536:
+            return {}, []
+        record = json.loads(path.read_text(encoding="utf-8"))
+        observed = _time(record["observed_at"])
+        stored_game = record["game"]
+        if (record.get("schema") != 1 or record.get("verified_player_records") is not False
+                or record.get("publication_time_verified") is not False
+                or record.get("published_at") is not None
+                or record.get("source_url") != f"https://www.nfl.com/injuries/league/{season}/REG{week}"
+                or not observed <= as_of or not observed < kickoff
+                or any(stored_game.get(k) != game.get(k) for k in (
+                    "season", "week", "game_id", "away_team", "home_team"))
+                or _time(stored_game["kickoff_utc"]) != kickoff
+                or not record["game_preflight"]["structural_preflight_passed"]
+                or record["game_preflight"]["game_id"] != game_id
+                or record["game_preflight"]["teams"] != [game["away_team"], game["home_team"]]):
+            return {}, []
+        rows = record["unverified_table_candidates"]
+        if not isinstance(rows, list) or len(rows) != 2:
+            return {}, []
+        result, sources = {}, []
+        for team in (game["away_team"], game["home_team"]):
+            matches = [r for r in rows if r.get("team") == team
+                       and r.get("team_label_confidence") == "exact_unique_heading"
+                       and r.get("verified") is False]
+            if len(matches) != 1:
+                return {}, []
+            players = matches[0].get("players")
+            if not isinstance(players, list) or not 1 <= len(players) <= 60:
+                return {}, []
+            clean = []
+            for player in players:
+                if not isinstance(player, dict) or not isinstance(player.get("name"), str):
+                    return {}, []
+                if player.get("game_status") not in ("Out", "Doubtful", "Questionable", "Not Reported"):
+                    return {}, []
+                clean.append({k: player.get(k) for k in (
+                    "name", "position", "practice_status", "game_status", "injury")})
+            result[team] = {
+                "injury_coverage": "Observed official NFL injury page; candidate rows not independently verified; unlisted players not confirmed healthy",
+                "key_injuries": clean[:30],
+                "snapshot_observed_at": observed.isoformat(),
+                "snapshot_freshness": "current" if (as_of-observed).total_seconds() <= 86400 else "stale",
+                "source_published_at": None,
+                "verification_status": "observed_official_page_unverified",
+            }
+            sources.append({"name": "official_injury_" + team,
+                            "url": record["source_url"], "observed_at": observed.isoformat(),
+                            "description": "Observed official NFL injury page; original publication time unknown; player rows unverified"})
+        return result, sources
+    except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+        return {}, []
+
+
 def _merge_official_injuries(output, scout, root, as_of):
     official, sources = _official_injury_context(scout, root, as_of)
+    observed, observed_sources = _observed_injury_context(scout, root, as_of)
+    for team, record in observed.items():
+        if team not in official:
+            official[team] = record
+            sources.extend(source for source in observed_sources
+                           if source["name"] == "official_injury_" + team)
     if not official:
         return output
     personnel = output.setdefault("personnel", {"teams": {}})
