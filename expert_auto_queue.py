@@ -430,6 +430,8 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         raise ValueError('Invalid NFL season/week')
     if not 1 <= daily_limit <= 16 or not 1 <= run_limit <= 2:
         raise ValueError('daily_limit must be 1..16 and run_limit must be 1..2')
+    if allow_second_replacement and run_limit != 1:
+        raise ValueError('Second replacement requires --run-limit 1')
     budget = positive_decimal(weekly_limit)
     if budget <= 0 or budget > Decimal('2.50'):
         raise ValueError('Temporary weekly budget must be greater than $0 and no more than $2.50')
@@ -481,6 +483,8 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
                 continue
             queue.append(row)
         queue.sort(key=lambda r:(instant(r['scout']['game']['kickoff_utc']),identity(r['scout'])))
+        if allow_second_replacement and matchup is None:
+            raise ValueError('Second replacement requires explicit --replace-game')
         if matchup is not None:
             matchup = matchup.upper().replace(' ', '')
             if not re.fullmatch(r'[A-Z]{2,3}@[A-Z]{2,3}', matchup):
