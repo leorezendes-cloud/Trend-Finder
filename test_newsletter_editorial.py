@@ -4,7 +4,7 @@ from unittest.mock import patch
 from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from newsletter_draft import _trend_copy, _weekly_featured_pick, _matchups
+from newsletter_draft import _trend_copy, _weekly_featured_pick, _matchups, _expert_newsletter_story, period_key
 
 class WeeklyEditorialTests(unittest.TestCase):
     def test_minnesota_natural_language(self):
@@ -35,6 +35,36 @@ class WeeklyEditorialTests(unittest.TestCase):
         pending, versions = _weekly_featured_pick(p,[],['abc'],[])
         self.assertIn('being prepared',pending)
         self.assertEqual(versions,[])
+
+    def test_weekly_period_uses_current_calendar_week_before_site_rollover(self):
+        self.assertEqual(period_key('weekly', datetime(2026, 11, 25, 12, 41, tzinfo=timezone.utc)), '2026-W48')
+
+    def test_featured_skips_expert_without_plug_pick(self):
+        url_a = 'https://t.com/a'
+        url_b = 'https://t.com/b'
+        picks = [
+            'GB @ LA\\nATS: Stay Away · Total: Stay Away\\n' + url_a,
+            'DEN @ PIT\\nATS: DEN -3 · Total: Stay Away\\n' + url_b,
+        ]
+        experts = [
+            'GB @ LA\\nATS: GB · Total: Under\\nGeneric injury coverage.\\n' + url_a,
+            'DEN @ PIT\\nATS: DEN · Total: Pass\\nProtection matchup matters.\\n' + url_b,
+        ]
+        featured, versions = _weekly_featured_pick(picks, experts, ['old', 'new'], [])
+        self.assertIn('DEN @ PIT', featured)
+        self.assertNotIn('GB @ LA', featured)
+        self.assertEqual(versions, ['new'])
+
+    def test_expert_teaser_avoids_injury_data_disclaimer(self):
+        report = {'sections': [
+            {'heading': 'Matchup Overview', 'text':
+             'Injury coverage is explicitly unknown for both teams because no usable injury rows were supplied.'},
+            {'heading': 'Offensive and Defensive Analysis', 'text':
+             'The defensive front can pressure the quarterback while the offensive line struggles with pass protection.'}
+        ]}
+        teaser = _expert_newsletter_story(report)
+        self.assertIn('defensive front', teaser)
+        self.assertNotIn('coverage is', teaser)
 
     def test_marquee_roundup_selects_across_windows(self):
         with TemporaryDirectory() as folder:
