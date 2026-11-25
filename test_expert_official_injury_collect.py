@@ -56,15 +56,30 @@ class CollectorTests(unittest.TestCase):
 
     def test_only_unique_exact_headings_receive_candidate_team(self):
         rows = [
-            {"source_heading": "Packers", "team": None, "verified": False},
-            {"source_heading": "Rams", "team": None, "verified": False},
-            {"source_heading": "Packers injury news", "team": None, "verified": False},
+            {"source_team_label": "Packers", "team": None, "verified": False},
+            {"source_team_label": "Rams", "team": None, "verified": False},
+            {"source_team_label": "Packers injury news", "team": None, "verified": False},
         ]
         result = label_team_candidates(rows)
         self.assertEqual([row["team"] for row in result], ["GB", "LA", None])
         self.assertTrue(all(not row["verified"] for row in result))
         duplicate = label_team_candidates([rows[0], rows[0]])
         self.assertEqual([row["team"] for row in duplicate], [None, None])
+
+    def test_date_heading_with_adjacent_team_labels(self):
+        header = ("<tr><th>Player</th><th>Position</th><th>Injuries</th>"
+                  "<th>Practice Status</th><th>Game Status</th></tr>")
+        player = ("<tr><td>Example Player</td><td>RB</td><td>Finger</td>"
+                  "<td>Limited Participation in Practice</td><td>Questionable</td></tr>")
+        html = ("<h3>WEDNESDAY, NOVEMBER 25TH</h3>"
+                "<div>GB Packers</div><span>Packers</span><table>" + header + player + "</table>"
+                "<span>Rams</span><table>" + header + player + "</table>")
+        rows = label_team_candidates(injury_table_candidates(html))
+        self.assertEqual([r["source_heading"] for r in rows],
+                         ["WEDNESDAY, NOVEMBER 25TH"] * 2)
+        self.assertEqual([r["source_team_label"] for r in rows], ["Packers", "Rams"])
+        self.assertEqual([r["team"] for r in rows], ["GB", "LA"])
+        self.assertTrue(all(not r["verified"] for r in rows))
 
     def test_ignore_unrecognized_tables(self):
         self.assertEqual(injury_table_candidates(

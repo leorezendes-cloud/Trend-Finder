@@ -55,12 +55,16 @@ class _InjuryTableParser(HTMLParser):
         self.heading = None
         self.heading_parts = None
         self.table_heading = None
+        self.recent_text = []
+        self.table_label = None
 
     def handle_starttag(self, tag, attrs):
         if tag in ("h2", "h3", "h4"):
             self.heading_parts = []
         if tag == "table":
             self.table_heading = self.heading
+            self.table_label = next((v for v in reversed(self.recent_text[-12:])
+                                     if v in _NFL_TEAM_LABELS), None)
             self.table = []
         elif tag == "tr" and self.table is not None:
             self.row = []
@@ -72,6 +76,11 @@ class _InjuryTableParser(HTMLParser):
     def handle_data(self, data):
         if self.heading_parts is not None:
             self.heading_parts.append(data)
+        if self.cell is None and self.table is None and not self.hidden:
+            cleaned = " ".join(data.split())
+            if cleaned:
+                self.recent_text.append(cleaned)
+                self.recent_text = self.recent_text[-24:]
         if self.cell is not None and not self.hidden:
             self.cell.append(data)
 
@@ -89,7 +98,7 @@ class _InjuryTableParser(HTMLParser):
                 self.table.append(self.row)
             self.row = None
         elif tag == "table" and self.table is not None:
-            self.tables.append((self.table_heading, self.table))
+            self.tables.append((self.table_heading, self.table_label, self.table))
             self.table = None
 
 
@@ -101,7 +110,7 @@ def injury_table_candidates(html):
     parser = _InjuryTableParser()
     parser.feed(html)
     candidates = []
-    for heading, table in parser.tables:
+    for heading, label, table in parser.tables:
         if not table:
             continue
         headers = [column.lower() for column in table[0]]
@@ -120,6 +129,7 @@ def injury_table_candidates(html):
         if rows:
             candidates.append({"verified": False, "team": None,
                                "source_heading": heading,
+                               "source_team_label": label,
                                "players": rows[:60]})
     return candidates[:32]
 
@@ -147,12 +157,12 @@ def label_team_candidates(candidates):
     The returned team is still unverified, and cannot be imported automatically.
     """
     from collections import Counter
-    headings = [item.get("source_heading") for item in candidates]
+    headings = [item.get("source_team_label") for item in candidates]
     counts = Counter(headings)
     result = []
     for item in candidates:
         entry = dict(item)
-        heading = item.get("source_heading")
+        heading = item.get("source_team_label")
         code = _NFL_TEAM_LABELS.get(heading)
         entry["team"] = code if code and counts[heading] == 1 else None
         entry["team_label_confidence"] = (
