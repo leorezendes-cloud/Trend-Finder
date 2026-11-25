@@ -82,7 +82,7 @@
   {% for block in (sections.get('matchups') or '').split('\n\n')[:8] %}
     {% set lines = block.split('\n') %}
     {% if lines[0]|trim %}
-    <p style="font-size:15px;font-weight:800;color:#252832;margin:12px 0 4px">{{ lines[0] }}</p>
+    <p style="font-size:15px;font-weight:800;color:#252832;margin:12px 0 4px"><strong style="font-weight:800">{{ lines[0] }}</strong></p>
     {% for line in lines[1:] %}
       {% if line.startswith(origin ~ '/') and line|length < 2000 %}<p style="margin:6px 0 13px"><a href="{{ line }}" style="color:#a36a00;font-size:13px;font-weight:700;text-decoration:underline">Explore matchup &rarr;</a></p>
       {% elif loop.first %}<p style="font-size:12px;color:#667085;margin:4px 0">{{ line }}</p>
