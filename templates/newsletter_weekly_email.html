@@ -79,7 +79,23 @@
   <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">03 / AROUND THE LEAGUE</p>
   <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">{{ 'Thanksgiving & Black Friday Football 🦃' if 'Thu, Nov 26' in (sections.get('matchups') or '') and 'Fri, Nov 27' in (sections.get('matchups') or '') else 'Marquee Matchups' }}</h2>
   <p style="color:#555965;font-size:14px;line-height:1.55;margin:0 0 15px">A few featured games across this week's kickoff windows.</p>
-  {% for block in (sections.get('matchups') or '').split('\n\n')[:8] %}
+  {# A saved issue may have consecutive matchup entries without blank lines.
+     Split on each matchup URL so every heading receives the same bold markup. #}
+  {% set matchup_groups = namespace(blocks=[], pending=[]) %}
+  {% for raw_line in (sections.get('matchups') or '').split('\n') %}
+    {% set match_line = raw_line|trim %}
+    {% if match_line %}
+      {% set matchup_groups.pending = matchup_groups.pending + [match_line] %}
+      {% if '/matchup/' in match_line and match_line.startswith(origin ~ '/') %}
+        {% set matchup_groups.blocks = matchup_groups.blocks + [matchup_groups.pending|join('\n')] %}
+        {% set matchup_groups.pending = [] %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if matchup_groups.pending %}
+    {% set matchup_groups.blocks = matchup_groups.blocks + [matchup_groups.pending|join('\n')] %}
+  {% endif %}
+  {% for block in matchup_groups.blocks[:8] %}
     {% set lines = block.split('\n') %}
     {% if lines[0]|trim %}
     <p style="font-size:15px;font-weight:800;color:#252832;margin:12px 0 4px"><strong style="font-weight:800">{{ lines[0] }}</strong></p>
