@@ -114,6 +114,26 @@ def collect(schedule, destination, now=None, fetch=fetch_official_injury_page):
             if os.path.exists(temporary):
                 os.unlink(temporary)
         results.append({"game_id": game["game_id"], "saved": str(path)})
+    # Retain a short audit window while keeping Render's 1 GB disk bounded.
+    # Only prune files produced by this collector, never verified injury reports.
+    if destination.is_dir() and not destination.is_symlink():
+        cutoff = now - timedelta(days=21)
+        for path in destination.glob("*/*/*.json"):
+            if path.is_symlink() or not path.is_file():
+                continue
+            try:
+                if path.stat().st_size > 65536:
+                    continue
+                old = json.loads(path.read_text(encoding="utf-8"))
+                if (old.get("schema") != 1 or old.get("verified_player_records") is not False
+                        or not isinstance(old.get("game"), dict)
+                        or path.stem != old["game"].get("game_id")):
+                    continue
+                kickoff = datetime.fromisoformat(old["game"]["kickoff_utc"].replace("Z", "+00:00"))
+                if kickoff.tzinfo is not None and kickoff < cutoff:
+                    path.unlink()
+            except (OSError, ValueError, KeyError, TypeError):
+                continue
     return results
 
 
