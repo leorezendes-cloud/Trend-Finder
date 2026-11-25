@@ -52,9 +52,15 @@ class _InjuryTableParser(HTMLParser):
         self.row = None
         self.cell = None
         self.hidden = 0
+        self.heading = None
+        self.heading_parts = None
+        self.table_heading = None
 
     def handle_starttag(self, tag, attrs):
+        if tag in ("h2", "h3", "h4"):
+            self.heading_parts = []
         if tag == "table":
+            self.table_heading = self.heading
             self.table = []
         elif tag == "tr" and self.table is not None:
             self.row = []
@@ -64,10 +70,15 @@ class _InjuryTableParser(HTMLParser):
             self.hidden += 1
 
     def handle_data(self, data):
+        if self.heading_parts is not None:
+            self.heading_parts.append(data)
         if self.cell is not None and not self.hidden:
             self.cell.append(data)
 
     def handle_endtag(self, tag):
+        if tag in ("h2", "h3", "h4") and self.heading_parts is not None:
+            self.heading = " ".join("".join(self.heading_parts).split())[:100]
+            self.heading_parts = None
         if tag in ("script", "style"):
             self.hidden = max(0, self.hidden - 1)
         elif tag in ("td", "th") and self.cell is not None:
@@ -78,7 +89,7 @@ class _InjuryTableParser(HTMLParser):
                 self.table.append(self.row)
             self.row = None
         elif tag == "table" and self.table is not None:
-            self.tables.append(self.table)
+            self.tables.append((self.table_heading, self.table))
             self.table = None
 
 
@@ -90,7 +101,7 @@ def injury_table_candidates(html):
     parser = _InjuryTableParser()
     parser.feed(html)
     candidates = []
-    for table in parser.tables:
+    for heading, table in parser.tables:
         if not table:
             continue
         headers = [column.lower() for column in table[0]]
@@ -108,6 +119,7 @@ def injury_table_candidates(html):
                          "game_status": cells[4] or "Not Reported"})
         if rows:
             candidates.append({"verified": False, "team": None,
+                               "source_heading": heading,
                                "players": rows[:60]})
     return candidates[:32]
 
