@@ -299,6 +299,10 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
     if not replacement and attempts and (not retry_ready(folder, version, clock())
                      or json.loads(attempts[0].read_text()).get('model') != model):
         raise ValueError('Previous request requires operator review')
+    if second_replacement and not replacement:
+        raise ValueError('Second replacement only applies to replacement mode')
+    if second_replacement and len(attempts) != 1:
+        raise ValueError('Second replacement requires one completed first replacement')
     number = len(attempts) + 1
     outcome = folder/(version+('.replacement.outcome.json' if replacement else '.outcome.json'))
     provider = OpenAIProvider(approved=True, model=model)
