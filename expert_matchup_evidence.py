@@ -262,7 +262,7 @@ def _personnel_context(scout, root, as_of, player_names=None):
             "quarterback_depth_chart": qb_rows,
             "key_injuries": key_injuries[:12],
             "injury_coverage": ("reported rows only; no listed injury does not establish health"
-                               if injuries else "unknown; no injury rows supplied"),
+                               if injuries else "UNKNOWN: no usable injury report rows supplied; no claim of a clean or healthy roster is supported"),
             "depth_chart_updated_at": raw.get("depth_updated_at"),
             "depth_chart_stale": raw.get("depth_stale"),
             "snapshot_observed_at": observed.isoformat(),
@@ -395,7 +395,7 @@ def snapshot(scout, root=None, as_of=None):
         recent = [(g, a, h) for g, a, h in history
                   if team in (g.get("away_team"), g.get("home_team"))]
         recent.sort(key=lambda item: (item[0]["gameday"], item[0].get("game_id", "")), reverse=True)
-        recent = recent[:3]
+        recent = recent[:5]
         games = []
         for g, a, h in recent:
             is_away = team == g["away_team"]
@@ -411,7 +411,8 @@ def snapshot(scout, root=None, as_of=None):
                                             f"{sum(g['outcome']=='L' for g in games)}"
                                             f"{'-'+str(sum(g['outcome']=='T' for g in games)) if any(g['outcome']=='T' for g in games) else ''}"))
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
-                  cutoff_date_exclusive=cutoff, team_form=teams)
+                  cutoff_date_exclusive=cutoff, team_form=teams,
+                  limitations=["Recent final scores and isolated box-score standouts do not establish pace, efficiency, offensive-line matchups, defensive tendencies, or injury availability. Do not infer these metrics."])
     if not manifest_path.is_file() or not eligible_ids:
         return _attach_personnel(output, scout, root, decision_time)
     try:
@@ -458,13 +459,12 @@ def snapshot(scout, root=None, as_of=None):
             continue
         seen.add(key)
         best.append(item)
-        if len(best) == 3:
+        if len(best) == 6:
             break
     if best:
         output["player_performances"] = best
         output["player_source"] = "Cached Scout 4.0 player box-score feed; observed games, not starter verification or projections"
     # Keep the historical form snapshot bounded; personnel is separately capped.
-    if len(json.dumps(output)) > 2300:
-        output.pop("player_performances", None)
-        output.pop("player_source", None)
+    if len(json.dumps(output)) > 10000:
+        output["player_performances"] = output.get("player_performances", [])[:3]
     return _attach_personnel(output, scout, root, decision_time, player_names)
