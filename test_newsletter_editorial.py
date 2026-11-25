@@ -33,8 +33,8 @@ class WeeklyEditorialTests(unittest.TestCase):
         self.assertIn("Expert's take:",block)
         self.assertEqual(versions,['abc'])
         pending, versions = _weekly_featured_pick(p,[],['abc'],[])
-        self.assertIn('being prepared',pending)
-        self.assertEqual(versions,[])
+        self.assertIn('ATS: MIN +3',pending)
+        self.assertEqual(versions,['abc'])
 
     def test_weekly_period_uses_current_calendar_week_before_site_rollover(self):
         self.assertEqual(period_key('weekly', datetime(2026, 11, 25, 12, 41, tzinfo=timezone.utc)), '2026-W48')
