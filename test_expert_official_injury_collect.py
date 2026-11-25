@@ -1,7 +1,8 @@
 import io
+from datetime import datetime, timedelta, timezone
 import unittest
 from unittest.mock import Mock, MagicMock
-from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates
+from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates, preflight_game
 
 
 class CollectorTests(unittest.TestCase):
@@ -87,6 +88,32 @@ class CollectorTests(unittest.TestCase):
     def test_ignore_unrecognized_tables(self):
         self.assertEqual(injury_table_candidates(
             "<table><tr><th>Player</th></tr><tr><td>Unknown</td></tr></table>"), [])
+
+    def test_exact_game_preflight_is_never_auto_importable(self):
+        now = datetime.now(timezone.utc)
+        observed = now - timedelta(minutes=5)
+        game = {"season": 2026, "week": 12, "game_id": "2026_12_GB_LA",
+                "away_team": "GB", "home_team": "LA",
+                "kickoff_utc": (now + timedelta(hours=3)).isoformat()}
+        snapshot = {"season": 2026, "week": 12,
+                    "source_url": "https://www.nfl.com/injuries/league/2026/REG12",
+                    "retrieved_at": observed.isoformat(), "verified_player_records": False,
+                    "unverified_table_candidates": [
+                        {"team": team, "team_label_confidence": "exact_unique_heading",
+                         "verified": False, "players": [{"name": "Example"}]}
+                        for team in ("GB", "LA")]}
+        result = preflight_game(snapshot, game, now.isoformat())
+        self.assertTrue(result["structural_preflight_passed"])
+        self.assertFalse(result["eligible_for_automatic_import"])
+        self.assertFalse(result["publication_time_verified"])
+        snapshot["retrieved_at"] = (now + timedelta(hours=4)).isoformat()
+        late = preflight_game(snapshot, game, now.isoformat())
+        self.assertFalse(late["structural_preflight_passed"])
+        self.assertIn("observed_at_or_after_kickoff", late["issues"])
+        snapshot["retrieved_at"] = observed.isoformat()
+        snapshot["unverified_table_candidates"][1]["team"] = "CHI"
+        missing = preflight_game(snapshot, game, now.isoformat())
+        self.assertIn("missing_or_ambiguous_team_LA", missing["issues"])
 
     def test_reject_invalid_week(self):
         with self.assertRaises(ValueError):
