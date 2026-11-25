@@ -862,7 +862,7 @@ def _bad_beats_content(root, now, origin, warnings, *, report_month=None):
     eligible.sort(key=lambda pair: (bool(pair[1].get('featured')), pair[0], pair[1]['slug']), reverse=True)
     limit = 1
     return '\n\n'.join(
-        f"{case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
+        f"{case['title'].replace('Bad Beat of the Week:', 'Bad Beat of the Month:', 1) if report_month is not None else case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
         for _, case in eligible[:limit]
         if case.get('title') and case.get('summary')
     )
