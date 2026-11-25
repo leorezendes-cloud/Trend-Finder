@@ -88,28 +88,71 @@ def _rank(trend):
             trend['latest'], -trend['pushes'], trend['title'])
 
 
+def _same_result_story(left, right):
+    """Detect headlines describing the same underlying results, not just titles."""
+    if (left.get('kind') == right.get('kind') == 'su'
+            and left.get('outcome') == right.get('outcome') == 'Win'
+            and {left.get('scope'), right.get('scope')} == {'team', 'qb'}):
+        a = tuple(e.get('game_id') for e in left.get('evidence', [])[:left.get('streak', 0)])
+        b = tuple(e.get('game_id') for e in right.get('evidence', [])[:right.get('streak', 0)])
+        return len(a) >= 5 and a == b
+    if (left.get('kind') == right.get('kind') == 'ats'
+            and left.get('scope') == right.get('scope') == 'situational'
+            and {left.get('outcome'), right.get('outcome')} == {'Cover', 'Loss'}):
+        a, b = left.get('params') or {}, right.get('params') or {}
+        opposite = {'favorite': 'underdog', 'underdog': 'favorite'}
+        locations = {'home': 'away', 'away': 'home'}
+        if (a.get('research_role') not in opposite
+                or b.get('research_role') != opposite[a['research_role']]
+                or a.get('research_location') not in locations
+                or b.get('research_location') != locations[a['research_location']]
+                or a.get('primetime') != b.get('primetime')):
+            return False
+        ea, eb = left.get('evidence', [])[:7], right.get('evidence', [])[:7]
+        return (len(ea) == len(eb) == 7
+                and all(x.get('game_id') == y.get('game_id')
+                        and {x.get('result'), y.get('result')} == {'Cover', 'Loss'}
+                        for x, y in zip(ea, eb)))
+    return False
+
+
 def _feature(all_trends, limit=MAX_FEATURED):
-    """Limit repetition: two per category, at most one card per team/QB."""
+    """Choose distinct, balanced stories before filling the homepage's eight slots."""
+    ranked = sorted(all_trends, key=_rank, reverse=True)
+    # Prefer the team headline for identical QB/team SU streaks, and
+    # favorites for equivalent favorite-cover / underdog-non-cover stories.
+    unique = []
+    for trend in ranked:
+        duplicate = next((i for i, prior in enumerate(unique)
+                          if _same_result_story(prior, trend)), None)
+        if duplicate is not None:
+            prior = unique[duplicate]
+            prefer = ((trend.get('scope') == 'team' and prior.get('scope') == 'qb')
+                      or ((trend.get('params') or {}).get('research_role') == 'favorite'
+                          and (prior.get('params') or {}).get('research_role') == 'underdog'))
+            if prefer:
+                unique[duplicate] = trend
+            continue
+        unique.append(trend)
+
     featured = []
     category_counts = defaultdict(int)
     subjects = set()
-    for trend in sorted(all_trends, key=_rank, reverse=True):
+    for trend in unique:
         if trend['subject'] in subjects or category_counts[trend['category']] >= 2:
             continue
         featured.append(trend)
         subjects.add(trend['subject'])
         category_counts[trend['category']] += 1
         if len(featured) == limit:
+            return featured
+    for trend in unique:
+        if trend in featured or trend['subject'] in subjects:
+            continue
+        featured.append(trend)
+        subjects.add(trend['subject'])
+        if len(featured) == limit:
             break
-    # Backfill if fewer than eight unique subjects/category-balanced results exist.
-    if len(featured) < limit:
-        for trend in sorted(all_trends, key=_rank, reverse=True):
-            if trend in featured or trend['subject'] in subjects:
-                continue
-            featured.append(trend)
-            subjects.add(trend['subject'])
-            if len(featured) == limit:
-                break
     return featured
 
 
