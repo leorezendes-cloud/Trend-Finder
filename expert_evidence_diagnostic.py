@@ -38,6 +38,27 @@ def inspect(store, season, week, game, root=None, now=None):
     facts = source_facts(independent)
     efficiency = context.get("observed_team_efficiency", {})
     personnel = (context.get("personnel") or {}).get("teams", {})
+    # Report source coverage without treating missing injury rows as healthy.
+    personnel_root = Path(root or Path(__file__).resolve().parent) / "data" / "scout4" / "personnel"
+    source_snapshots = []
+    for path in sorted((personnel_root / str(season)).glob("*/pregame_evidence.json"))[-8:]:
+        try:
+            data = json.loads(path.read_text())
+            source_snapshots.append({
+                "snapshot": path.parent.name,
+                "retrieved_at": data.get("manifest", {}).get("retrieved_at"),
+                "injury_feed_rows": data.get("manifest", {}).get("files", {}).get("injuries", {}).get("rows"),
+                "game_in_snapshot": any(
+                    g.get("game_id") == scout["game"].get("game_id")
+                    for g in data.get("games", [])),
+                "game_injury_rows": {
+                    team: len((g.get("personnel", {}).get(team) or {}).get("injury_rows", []))
+                    for g in data.get("games", [])
+                    if g.get("game_id") == scout["game"].get("game_id")
+                    for team in (away, home)},
+            })
+        except (OSError, ValueError, TypeError, AttributeError):
+            continue
     result = {
         "status": "ready_for_review" if efficiency else "missing_team_efficiency",
         "game": game, "checked_at": now.isoformat(),
