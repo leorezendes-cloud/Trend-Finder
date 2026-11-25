@@ -208,6 +208,19 @@ class ExpertBetaTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"pass must be explicit"):
             validate_expert(r,s)
 
+    def test_independent_v2_requires_explicit_pass_at_publication(self):
+        from expert_beta import validate_expert
+        scout = fixture()
+        draft = report(scout)
+        draft["decision_policy"] = "independent-before-scout-v2"
+        draft["ats_side"] = None
+        draft["total_side"] = None
+        draft["betting_assessment"] = "Markets uncertain."
+        with self.assertRaisesRegex(ValueError, "pass must be explicit"):
+            validate_expert(draft, scout)
+        draft["betting_assessment"] = "ATS Pass and Total Pass: evidence incomplete."
+        validate_expert(draft, scout)
+
     def test_historical_fixture_grading_and_no_backfill(self):
         s=fixture(historical=True)
         with self.assertRaises(ValueError):self.store.append(s,kind='prospective',generated_at=s['cutoff_utc'])

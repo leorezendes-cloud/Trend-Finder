@@ -65,6 +65,8 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         self.assertEqual(team["recent"][0]["score"], "15-10")
         self.assertEqual(team["recent_five_scores"]["games"], 5)
         self.assertEqual(team["season_to_date_scores"]["games"], 6)
+        self.assertEqual(team["away_scores"]["games"], 6)
+        self.assertIsNone(team["home_scores"])
         self.assertEqual(team["season_to_date_scores"]["points_for_per_game"], 12.5)
         self.assertNotIn("99-0", str(result))
 
