@@ -27,7 +27,7 @@ def run(root, execute=False):
         raise ValueError("Expected exactly one sealed production import")
     source = imports[0]["scout"]
     game = source["game"]
-    if (int(game["season"]), int(game["week"]), game["away_team"], game["home_team"]) != (2026, 12, "TB", "CAR"):
+    if (int(game["season"]), int(game["week"]), game["away_team"], game["home_team"]) != (2026, 12, "CAR", "TB"):
         raise ValueError("Unexpected game; refuse publication")
     if hashlib.sha256(canonical(source)).hexdigest() != original.get("scout_sha256"):
         raise ValueError("Draft is not attached to expected Scout snapshot")
