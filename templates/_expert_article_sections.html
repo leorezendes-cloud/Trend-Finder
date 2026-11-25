@@ -1,0 +1,29 @@
+{# Reader-facing presentation only. Original archived Expert and Scout records stay unchanged. #}
+{% if item.expert %}
+  {% set expert = item.expert %}
+  {% for section in expert.sections %}
+    {% if section.heading == 'What Scout Sees' %}
+      <section class="expert-scout-comparison">
+        <h3>Where Scout and The Expert Stand</h3>
+        <p>The Expert likes {{ expert.ats_side or 'neither side' }} against the spread.
+        {% if item.scout_current_ats|default(none) %}
+          The current Scout selection is shown above.
+        {% else %}
+          Scout's current spread selection is pending.
+        {% endif %}
+        {% if expert.total_side %}
+          The Expert favors {{ expert.total_side }} on the total.
+        {% else %}
+          The Expert is passing on the total.
+        {% endif %}
+        Check the Current Scout section above for its latest verified selections; older Scout picks in the saved report may differ.</p>
+      </section>
+    {% else %}
+      <section>
+        <h3>{{ section.heading|expert_prose(s.sources) }}</h3>
+        {% set prose = section.text|expert_prose(s.sources) %}
+        {% if prose %}<p>{{ prose }}</p>{% endif %}
+      </section>
+    {% endif %}
+  {% endfor %}
+{% endif %}

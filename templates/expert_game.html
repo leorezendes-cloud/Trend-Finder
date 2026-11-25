@@ -29,6 +29,6 @@
 </section>
 
 {% include '_plug_line_movement.html' %}
-{% if item.expert %}{% for section in item.expert.sections %}<section><h3>{{ section.heading|expert_prose(s.sources) }}</h3>{% set prose=section.text|expert_prose(s.sources) %}{% if prose %}<p>{{ prose }}</p>{% endif %}</section>{% endfor %}<h3>Final verdict</h3><p>Expert’s preferred ATS side: {{ item.expert.ats_side or 'Unavailable — insufficient evidence' }}</p><p>Totals opinion: {{ item.expert.total_side or 'No supported opinion' }}</p><p>Betting assessment: {{ item.expert.betting_assessment|expert_prose(s.sources) }}</p><p>Uncertainty: {{ item.expert.uncertainty|expert_prose(s.sources) }}</p>{% if item.expert.disagreement_reason %}<p>Why the Expert differs from The Plug: {{ item.expert.disagreement_reason|expert_prose(s.sources) }}</p>{% endif %}
+{% if item.expert %}{% include '_expert_article_sections.html' %}
 {% elif not item.expert_access and item.expert_available %}<section class="expert-notice"><h3>Expert analysis</h3><p>{% if g.member %}This Expert report requires premium beta access.{% else %}Sign in to view this analysis.{% endif %}</p>{% if g.member %}<p>Your account is signed in. This report is reserved for premium beta access or a featured free Expert review.</p>{% else %}<a href="{{ url_for('membership.login') }}">Sign in</a>{% endif %}</section>{% else %}<section class="expert-notice"><h3>The Expert is pending</h3></section>{% endif %}
 <a href="/the-plug">← Back to The Plug</a></article>{% endblock %}
