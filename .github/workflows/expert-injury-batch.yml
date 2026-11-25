@@ -1,0 +1,24 @@
+name: Expert injury batch tests
+on:
+  pull_request:
+    paths:
+      - 'expert_official_injury_batch.py'
+      - 'expert_matchup_evidence.py'
+      - 'test_expert_official_injury_batch.py'
+      - '.github/workflows/expert-injury-batch.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'expert_official_injury_batch.py'
+      - 'expert_matchup_evidence.py'
+      - 'test_expert_official_injury_batch.py'
+      - '.github/workflows/expert-injury-batch.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest test_expert_official_injury_batch test_expert_matchup_evidence test_expert_official_injury_collect
