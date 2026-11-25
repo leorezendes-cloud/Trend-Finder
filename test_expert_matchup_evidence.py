@@ -70,6 +70,34 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         self.assertEqual(team["season_to_date_scores"]["points_for_per_game"], 12.5)
         self.assertNotIn("99-0", str(result))
 
+    def test_team_epa_uses_only_completed_pregame_games(self):
+        from expert_matchup_evidence import _observed_team_efficiency
+        folder = self.root / "data" / "scout4" / "2026"
+        folder.mkdir(parents=True)
+        path = folder / "team.csv"
+        with path.open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=[
+                "game_id", "season", "season_type", "team",
+                "passing_epa", "rushing_epa", "passing_yards",
+                "rushing_yards", "sacks_suffered"])
+            writer.writeheader()
+            writer.writerows([
+                dict(game_id="prior", season=2026, season_type="REG",
+                     team="PHI", passing_epa="8", rushing_epa="-2",
+                     passing_yards="250", rushing_yards="110", sacks_suffered="2"),
+                dict(game_id="future", season=2026, season_type="REG",
+                     team="PHI", passing_epa="999", rushing_epa="999",
+                     passing_yards="999", rushing_yards="999", sacks_suffered="0")])
+        manifest = {"files": {"team": {"path": "2026/team.csv"}}}
+        history = [({"game_id": "prior", "gameday": "2026-10-20",
+                    "away_team": "PHI", "home_team": "NYG"}, 24, 17)]
+        result = _observed_team_efficiency(
+            self.root, 2026, manifest, history, "PHI", "WAS")
+        self.assertEqual(result["PHI"]["season_to_date"]["passing_epa_per_game"], 8)
+        self.assertEqual(result["PHI"]["season_to_date"]["passing_epa_sample_games"], 1)
+        self.assertEqual(result["WAS"]["season_to_date"]["games_with_feed"], 0)
+        self.assertNotIn("999", str(result))
+
     def test_expected_qb_uses_next_available_depth_chart_option_and_current_injuries(self):
         self.scout["game"].update(game_id="2026_09_JAX_BAL", away_team="JAX", home_team="BAL",
                                   kickoff_utc="2026-11-08T18:00:00+00:00")
