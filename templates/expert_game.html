@@ -4,6 +4,15 @@
         View Team Comparison
     </a>
 </p><p>{{ g.season }} · Week {{ g.week }} · {{ g.kickoff_utc|eastern_time }}</p>
+{% if item.kind == 'historical_reconstruction' %}
+<section class="expert-notice" aria-label="Historical reconstruction">
+  <h3>Historical reconstruction</h3>
+  <p>Archive type: historical_reconstruction — reconstructed after the original pregame window; not a prospective pick.</p>
+  {% if item.grading and item.grading.final %}
+  <p>Verified final: {{ g.away_team }} {{ item.grading.final.away_score }}–{{ item.grading.final.home_score }} {{ g.home_team }}</p>
+  {% endif %}
+</section>
+{% endif %}
 <section class="current-system-selections" aria-label="Current Scout and Plug selections">
   <h3>Current Scout</h3>
   {% if item.scout_dynamic|default(none) or item.scout_current_ats|default(none) %}
