@@ -7,6 +7,7 @@ import argparse
 import fcntl
 import json
 import os
+import re
 import time
 from datetime import timedelta
 from pathlib import Path
@@ -412,7 +413,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
 
 
 def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16,
-                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False):
+                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None):
     """Regenerate only already-drafted production games, preserving originals.
 
     Operator-only temporary override. Writes separate replacement files and
@@ -473,6 +474,14 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
                 continue
             queue.append(row)
         queue.sort(key=lambda r:(instant(r['scout']['game']['kickoff_utc']),identity(r['scout'])))
+        if matchup is not None:
+            matchup = matchup.upper().replace(' ', '')
+            if not re.fullmatch(r'[A-Z]{2,3}@[A-Z]{2,3}', matchup):
+                raise ValueError('matchup must be AWAY@HOME (e.g. GB@LA)')
+            away, home = matchup.split('@')
+            queue = [row for row in queue if (
+                row['scout']['game']['away_team'] == away
+                and row['scout']['game']['home_team'] == home)]
         counts['ready'] = len(queue)
         now = clock()
         used = len(recent_attempts(root, now))
@@ -602,6 +611,7 @@ def main(argv=None):
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--replace-season', type=int)
     parser.add_argument('--replace-week', type=int)
+    parser.add_argument('--replace-game', help='Optional exact AWAY@HOME game for replacement, e.g. GB@LA')
     parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
     parser.add_argument('--retry-uncertain-version', help='Exact 64-character production version; one operator-only retry')
     args = parser.parse_args(argv)
@@ -613,14 +623,14 @@ def main(argv=None):
         result = bounded_retry_uncertain(args.store,args.replace_season,args.replace_week,
             args.retry_uncertain_version,args.model,weekly_limit=args.temporary_weekly_budget,
             daily_limit=args.daily_limit,execute=args.execute)
-    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None:
+    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None or args.replace_game is not None:
         if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
             parser.error('--replace-season, --replace-week and --temporary-weekly-budget must be supplied together')
         if args.provider not in (None, 'openai'):
             parser.error('Targeted replacement is OpenAI-only')
         result = bounded_replace_week(args.store,args.replace_season,args.replace_week,args.model,
             daily_limit=args.daily_limit,run_limit=args.run_limit,weekly_limit=args.temporary_weekly_budget,
-            execute=args.execute)
+            execute=args.execute,matchup=args.replace_game)
     else:
         result = bounded_run(args.store, args.model, daily_limit=args.daily_limit,
             run_limit=args.run_limit, execute=args.execute, provider_name=args.provider)
