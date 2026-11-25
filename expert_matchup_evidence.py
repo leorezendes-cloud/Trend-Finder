@@ -348,51 +348,70 @@ def _attach_personnel(output, scout, root, as_of, player_names=None):
 
 
 def _observed_team_efficiency(root, season, manifest, history, away, home):
-    """Pregame-only descriptive EPA from existing nflverse team-week cache.
+    """Descriptive pregame offense and opponent production allowed.
 
-    Never infer missing metrics or use target/future games. EPA is not opponent
-    adjusted, and passing/rushing EPA are components rather than per-play rates.
+    Opponent weekly offensive totals against the subject team are descriptive
+    defensive outcomes, NOT opponent-adjusted EPA or EPA per play.
     """
     path = _feed_path(root, season, manifest, "team")
     if path is None:
         return {}
     eligible = {str(game["game_id"]): game for game, _, _ in history}
-    by_team = {away: [], home: []}
+    by_game = {}
     try:
         with path.open(encoding="utf-8-sig", newline="") as stream:
             for row in csv.DictReader(stream):
                 game = eligible.get(str(row.get("game_id")))
-                team = row.get("team")
-                if not game or team not in by_team or row.get("season_type") != "REG":
+                if not game or row.get("season_type") != "REG":
                     continue
                 if str(row.get("season")) != str(season):
                     continue
-                if team not in (game.get("away_team"), game.get("home_team")):
+                if row.get("team") not in (game.get("away_team"), game.get("home_team")):
                     continue
-                opponent = (game.get("home_team") if team == game.get("away_team")
-                            else game.get("away_team"))
-                by_team[team].append((game["gameday"], str(game["game_id"]), row, opponent))
+                key = (str(row["game_id"]), row["team"])
+                if key in by_game:
+                    # Duplicate weekly rows must not silently double count.
+                    return {}
+                by_game[key] = row
     except (OSError, UnicodeError, csv.Error):
         return {}
+
+    metrics = ("passing_epa", "rushing_epa", "passing_yards",
+               "rushing_yards", "sacks_suffered")
     output = {}
-    for team, records in by_team.items():
+    for team in (away, home):
+        records = []
+        for game in eligible.values():
+            if team not in (game.get("away_team"), game.get("home_team")):
+                continue
+            opponent = (game["home_team"] if team == game["away_team"]
+                        else game["away_team"])
+            own = by_game.get((str(game["game_id"]), team))
+            other = by_game.get((str(game["game_id"]), opponent))
+            records.append((game["gameday"], str(game["game_id"]), own, other, opponent))
         records.sort(key=lambda item: (item[0], item[1]), reverse=True)
-        def aggregate(sample):
-            result = {"games_with_feed": len(sample)}
-            for metric in ("passing_epa", "rushing_epa", "passing_yards",
-                           "rushing_yards", "sacks_suffered"):
-                values = [_number(row.get(metric)) for _, _, row, _ in sample]
+
+        def aggregate(sample, index):
+            result = {"scheduled_completed_games": len(sample),
+                      "games_with_feed": sum(row[index] is not None for row in sample)}
+            for metric in metrics:
+                values = [_number(row[index].get(metric)) for row in sample
+                          if row[index] is not None]
                 valid = [value for value in values if value is not None]
-                result[metric + "_per_game"] = (round(sum(valid) / len(valid), 2)
-                                                if valid else None)
+                result[metric + "_per_game"] = (
+                    round(sum(valid) / len(valid), 2) if valid else None)
                 result[metric + "_sample_games"] = len(valid)
             return result
+
         output[team] = {
-            "season_to_date": aggregate(records),
-            "recent_five": aggregate(records[:5]),
-            "limitations": ("Unadjusted weekly team totals, not EPA/play or opponent-adjusted "
-                            "efficiency. No possession, snap or success-rate denominator. "
-                            "Missing feed values remain null."),
+            "season_to_date": aggregate(records, 2),
+            "recent_five": aggregate(records[:5], 2),
+            "opponent_production_allowed_season_to_date": aggregate(records, 3),
+            "opponent_production_allowed_recent_five": aggregate(records[:5], 3),
+            "recent_opponents": [r[4] for r in records[:5]],
+            "limitations": ("Unadjusted weekly team totals and opponent offensive totals "
+                            "allowed, not EPA/play, defensive EPA/play or opponent-adjusted "
+                            "efficiency. Missing opponent feed rows and metrics remain null."),
         }
     return output
 
