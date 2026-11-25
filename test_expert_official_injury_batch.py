@@ -53,7 +53,7 @@ class InjuryBatchTests(unittest.TestCase):
             scout, self.root, datetime(2026, 11, 25, 11, tzinfo=timezone.utc))
         self.assertFalse(hidden)
         hidden, _ = _observed_injury_context(
-            scout, self.root, datetime(2026, 11, 27, tzinfo=timezone.utc))
+            scout, self.root, datetime(2026, 11, 27, 2, tzinfo=timezone.utc))
         self.assertFalse(hidden)
 
     def test_duplicate_schedule_rejected(self):
