@@ -69,72 +69,44 @@ def _side_label(side, quote, market):
 
 
 def _expert_newsletter_story(report):
-    """Select one coherent, directly quoted football excerpt from an approved report.
+    """Write a self-contained teaser from the approved Expert's own words.
 
-    Keep adjacent sentences in their original order and section; never stitch
-    distant topics together or generate unsupported editorial claims.
+    Prefer the report's reviewed summary over a sentence torn out of context.
+    No new facts, invented personnel, or generated opinions are introduced.
     """
     import re
+    summary = str(report.get('summary') or '').strip()
     sections = report.get('sections') or []
-    preferred = ('Offensive and Defensive Analysis',
-                 'Matchup Overview', 'Personnel and Injury Considerations')
-    football = ('quarterback', 'pressure', 'protection', 'offense', 'defense',
-                'injur', 'receiver', 'running', 'pass', 'drive', 'front',
-                'secondary', 'rush', 'play', 'pocket', 'coverage', 'blocking',
-                'run game', 'passing', 'rush', 'turnover', 'tackle', 'blitz')
-    noise = ('projection', 'scout', 'model', 'betting', 'wager',
-             'market', 'spread', 'total', 'over ', 'under ', 'pick ',
-             'coverage is', 'coverage remains', 'coverage was',
-             'injury coverage', 'injury rows', 'missing injury',
-             'no usable injury', 'unknown for both', 'not going to pretend',
-             'no confirmed', 'cannot confirm', 'unable to verify',
-             'not verified', 'not supplied', 'no evidence supplied')
-    # A teaser must stand alone: reject transitions and references to prior text.
-    orphan = ('that ', 'this ', 'those ', 'these ', 'it ', 'they ',
-              'he ', 'she ', 'his ', 'their ', 'therefore ', 'however ',
-              'but ', 'also ', 'and ', 'because ', 'so ',
-              'on the other side', 'on the flip side', 'on the other hand',
-              'by contrast', 'in contrast', 'conversely', 'meanwhile',
-              'similarly', 'likewise', 'in addition', 'furthermore',
-              'moreover', 'as noted', 'as mentioned', 'for that reason',
-              'in that sense', 'the other ', 'another ', 'even so')
-    candidates = []
-    for priority, heading in enumerate(preferred):
-        entry = next((part for part in sections if part.get('heading') == heading), None)
-        if not entry:
-            continue
-        body = re.sub(r'\[[^\[\]\n]{1,90}\]', '', str(entry.get('text') or ''))
-        sentences = [' '.join(part.split()) for part in re.split(r'(?<=[.!?])\s+', body)]
-        for idx, first in enumerate(sentences):
-            lower = first.lower()
-            if not 50 <= len(first) <= 245 or lower.startswith(orphan):
+    texts = [summary] + [
+        str(section.get('text') or '').strip() for section in sections
+        if section.get('heading') in ('Matchup Overview',
+                                      'Offensive and Defensive Analysis',
+                                      'Final Verdict')
+    ]
+    process = ('according to', 'not verified', 'unverified', 'not confirmed',
+               'fully confirmed', 'listed as expected', 'injury coverage',
+               'injury rows', 'source', 'evidence id', 'missing data',
+               'no usable', 'no confirmed', 'cannot confirm', 'unknown for both')
+    transitions = ('on the other side', 'on the other hand', 'by contrast',
+                   'in contrast', 'meanwhile', 'conversely', 'furthermore',
+                   'however', 'also', 'and', 'but', 'so', 'therefore',
+                   'as noted', 'as mentioned', 'this', 'that', 'these', 'those')
+    for text in texts:
+        text = re.sub(r'\\[[^\\[\\]\\n]{1,90}\\]', '', text)
+        sentences = [' '.join(x.split()) for x in re.split(r'(?<=[.!?])\\s+', text)]
+        for sentence in sentences:
+            low = sentence.lower().lstrip()
+            if not 55 <= len(sentence) <= 250:
                 continue
-            if any(term in lower for term in noise):
+            if low.startswith(transitions) or any(word in low for word in process):
                 continue
-            # Avoid standalone excerpts that presuppose an earlier comparison.
-            if re.search(r'\b(?:also|again|instead|either|too)\b', lower):
+            if not any(word in low for word in ('offense', 'defense', 'quarterback',
+                       'pass', 'rush', 'run game', 'receiver', 'protection',
+                       'pressure', 'turnover', 'touchdown', 'drive', 'secondary')):
                 continue
-            score = sum(term in lower for term in football)
-            if not score:
-                continue
-            # Only add the immediately following sentence, never one from
-            # another section or an unrelated passage later in this section.
-            passage = first
-            if idx + 1 < len(sentences):
-                second = sentences[idx + 1]
-                second_lower = second.lower()
-                if (40 <= len(second) <= 200 and len(first) + len(second) < 340
-                        and not any(term in second_lower for term in noise)
-                        and sum(term in second_lower for term in football)):
-                    passage += ' ' + second
-                    score += sum(term in second_lower for term in football)
-            # Stronger football detail wins over generic weather; tie-break
-            # toward the designated primary analysis section and earlier text.
-            candidates.append((score, -priority, -idx, passage))
-    if candidates:
-        return max(candidates)[3]
-    return ('Explore the Expert’s independent matchup breakdown and '
-            'the evidence behind its ATS and total decisions.')
+            return sentence
+    return ('Read The Expert’s full football take on the matchup, '
+            'the key players, and where the game could turn.')
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
