@@ -75,14 +75,18 @@ class ExpertEditorialTests(unittest.TestCase):
         scout=fixture();original=copy.deepcopy(scout);packets=[]
         def provider(packet):
             packets.append(packet)
-            return report(packet['evidence'])
+            return report(scout)
         with patch('expert_provider.build_opener') as network:
             draft=generate_draft(scout,provider)
         network.assert_not_called();self.assertEqual(scout,original)
         text=packets[0]['instruction']
-        for expected in ['sports fans','actual closing totals','Never invent or force a trend','may disagree with Scout','Works Cited','85 words']:
+        for expected in ['independent', 'without access to Scout or Plug picks', 'injury coverage is unknown']:
             self.assertIn(expected,text)
         self.assertEqual(draft['review_status'],'pending')
+        self.assertNotIn('scores', packets[0]['evidence'])
+        self.assertNotIn('spread', packets[0]['evidence'])
+        self.assertNotIn('total', packets[0]['evidence'])
+        self.assertNotIn('plug_final_selection', packets[0]['evidence'])
 
 
     def test_desktop_mobile_reports_have_equivalent_core_functionality(self):
