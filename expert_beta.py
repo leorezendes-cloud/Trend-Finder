@@ -333,9 +333,9 @@ def generate_draft(scout, provider=None, plug_ou=None):
             + [str(section.get('text') or '')
                for section in result.get('sections', [])])
         unsupported = (
-            r'\\b(?:no|without) (?:verified |meaningful |major |significant |key )*(?:injur(?:y|ies)|absence(?:s)?|personnel (?:issue|surprise|problem))\\b'
-            r'|\\b(?:personnel|injury) (?:snapshot|picture|situation) is (?:pretty |fairly )?clean\\b'
-            r'|\\bno (?:major |meaningful )?injury surprise\\b'
+            r'\b(?:no|without) (?:verified |meaningful |major |significant |key )*(?:injur(?:y|ies)|absence(?:s)?|personnel (?:issue|surprise|problem))\b'
+            r'|\b(?:personnel|injury) (?:snapshot|picture|situation) is (?:pretty |fairly )?clean\b'
+            r'|\bno (?:major |meaningful )?injury surprise\b'
         )
         if re.search(unsupported, article, flags=re.IGNORECASE):
             raise ValueError('Expert falsely describes unknown injury coverage as clear')
