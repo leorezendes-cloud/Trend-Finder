@@ -1,6 +1,10 @@
 import io
 from datetime import datetime, timedelta, timezone
 import unittest
+import json
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
 from unittest.mock import Mock, MagicMock
 from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates, preflight_game
 
@@ -114,6 +118,38 @@ class CollectorTests(unittest.TestCase):
         snapshot["unverified_table_candidates"][1]["team"] = "CHI"
         missing = preflight_game(snapshot, game, now.isoformat())
         self.assertIn("missing_or_ambiguous_team_LA", missing["issues"])
+
+    def test_compact_cli_exact_game_audit(self):
+        from expert_official_injury_collect import main
+        now = datetime.now(timezone.utc)
+        game = {"game": {"season": 2026, "week": 12, "game_id": "2026_12_GB_LA",
+                         "away_team": "GB", "home_team": "LA",
+                         "kickoff_utc": (now + timedelta(hours=3)).isoformat()}}
+        snapshot = {"season": 2026, "week": 12,
+                    "source_url": "https://www.nfl.com/injuries/league/2026/REG12",
+                    "retrieved_at": (now - timedelta(minutes=2)).isoformat(),
+                    "verified_player_records": False,
+                    "preview": ["large preview"],
+                    "unverified_table_candidates": [
+                        {"team": team, "source_team_label": label,
+                         "team_label_confidence": "exact_unique_heading",
+                         "verified": False, "players": [{"name": "Example"}]}
+                        for team, label in (("GB", "Packers"), ("LA", "Rams"))]}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "game.json"
+            path.write_text(json.dumps(game))
+            import io
+            with patch("sys.argv", ["collector", "--season", "2026", "--week", "12",
+                                    "--game-json", str(path), "--as-of", now.isoformat(),
+                                    "--compact"]), patch("expert_official_injury_collect.fetch_official_injury_page",
+                                                        return_value=snapshot), patch("sys.stdout", new_callable=io.StringIO) as output:
+                main()
+            result = json.loads(output.getvalue())
+        self.assertTrue(result["game_preflight"]["structural_preflight_passed"])
+        self.assertFalse(result["game_preflight"]["eligible_for_automatic_import"])
+        self.assertEqual(len(result["candidate_summary"]), 2)
+        self.assertNotIn("unverified_table_candidates", result)
+        self.assertNotIn("preview", result)
 
     def test_reject_invalid_week(self):
         with self.assertRaises(ValueError):
