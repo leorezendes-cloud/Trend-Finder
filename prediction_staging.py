@@ -3,6 +3,8 @@
 No network, grading, Expert operations, or automatic repair of existing records.
 Caller must hold auto_update.lock; this wrapper also serializes its own journal.
 """
+import csv
+import io
 import hashlib
 import json
 import math
@@ -18,6 +20,27 @@ from scheduler_runtime import atomic_json, exclusive
 
 class StagingError(RuntimeError):
     pass
+
+
+class ExpiredPublicationQuote(StagingError):
+    """Verified candidate cannot meet the existing 15-minute publication policy."""
+
+
+def publication_market_snapshot(raw, cutoff):
+    """Keep only quotes publishable at this run's cutoff; primary CSV is untouched."""
+    from scout4.shadow import aware
+    reader = csv.DictReader(io.StringIO(raw.decode('utf-8-sig')))
+    output = io.StringIO(newline='')
+    writer = csv.DictWriter(output, fieldnames=reader.fieldnames)
+    writer.writeheader()
+    for row in reader:
+        try:
+            age = (cutoff - aware(row.get('captured_at_utc'))).total_seconds()
+        except ValueError:
+            continue
+        if 0 <= age <= 900:
+            writer.writerow(row)
+    return output.getvalue().encode()
 
 
 def digest(raw):
@@ -121,7 +144,14 @@ def validate(candidate, stage, journal, config, clock):
     if record.get('totals') and record['totals']['quote'] != quote(quotes, game, 'Total', cutoff):
         raise StagingError('Forecast total provenance mismatch')
     # Existing production validator checks original pregame seal and public schema.
-    convert(record, journal['configuration_sha256'])
+    try:
+        convert(record, journal['configuration_sha256'])
+    except ValueError as error:
+        # Provenance and candidate hashes were already checked above. Never
+        # publish or edit a stale candidate; retain it for audit and regenerate.
+        if str(error) == 'Quote outside pregame cutoff window':
+            raise ExpiredPublicationQuote(str(error)) from error
+        raise
     return record, digest(raw)
 
 
@@ -166,9 +196,11 @@ def snapshot(root, source, stage, config_path, cutoff):
     from scout4.shadow import kickoff
     from scout4.stats import read_csv
     fingerprints = {}
-    def copy(path, relative, expected=None):
+    def copy(path, relative, expected=None, transform=None):
         relative = safe_relative(relative)
         raw = path.read_bytes()
+        if transform is not None:
+            raw = transform(raw)
         if expected is not None and digest(raw) != expected:
             raise StagingError('Snapshot fingerprint mismatch: '+str(relative))
         target = stage/relative
@@ -183,7 +215,8 @@ def snapshot(root, source, stage, config_path, cutoff):
         copy(source/name, name, config['code_sha256'][name])
     # Configuration identity is unchanged; no model fitting or config creation.
     for name in ('nfl_games.csv','public_money_snapshots.csv'):
-        copy(root/name, name)
+        copy(root/name, name, transform=(lambda raw: publication_market_snapshot(raw, cutoff))
+             if name == 'public_money_snapshots.csv' else None)
     years = {g['season'] for g in read_csv(stage/'nfl_games.csv')
              if g['game_type']=='REG' and g.get('gameday') and g.get('gametime')
              and 0 < (kickoff(g)-cutoff).total_seconds() <= 7*86400}
@@ -255,7 +288,18 @@ def recover(stage, final, config_path, clock):
             expected = journal.get('candidates', {}).get(candidate.name)
             if expected is not None and digest(candidate.read_bytes()) != expected:
                 raise StagingError('Completed candidate fingerprint changed')
-            record, fingerprint = validate(candidate, stage, journal, config, clock)
+            try:
+                record, fingerprint = validate(candidate, stage, journal, config, clock)
+            except ExpiredPublicationQuote:
+                if (final/candidate.name).exists():
+                    checked_existing(final/candidate.name)
+                    if (final/candidate.name).read_bytes() != candidate.read_bytes():
+                        raise StagingError('Rejected candidate conflicts with existing forecast')
+                    continue
+                journal.setdefault('rejected', {})[candidate.name] = {
+                    'sha256': digest(candidate.read_bytes()), 'reason': 'stale publication quote'}
+                atomic_json(path, journal)
+                continue
             result = install(candidate, final/candidate.name, record, clock, fingerprint)
             journal.setdefault('records', {})[candidate.name] = {
                 'sha256':digest(candidate.read_bytes()), 'result':result}
@@ -325,6 +369,7 @@ def run_staged(root, source=None, configuration=None, *, clock=None):
             raise StagingError('Prediction staging already active; retry later')
         # Complete earlier attempts before any new generation.
         recovered = False
+        rejected = False
         for stage in sorted(staging.glob('run-*')):
             no_links(stage)
             journal_path = stage/'journal.json'
@@ -334,7 +379,8 @@ def run_staged(root, source=None, configuration=None, *, clock=None):
             before = strict_json(journal_path.read_bytes())['state']
             result = recover(stage, final, configuration, clock)
             recovered |= (result['state'] == 'complete' and before != 'complete')
-        if recovered:
+            rejected |= bool(result.get('rejected'))
+        if recovered and not rejected:
             return {'state':'ok', 'recovered':True}
         if all_upcoming_sealed(root, final, source, configuration, clock()):
             return {'state':'ok', 'records':{}, 'preserved':len(list(final.glob('*.json'))),

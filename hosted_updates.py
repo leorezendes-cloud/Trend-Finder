@@ -134,6 +134,8 @@ def update_once(root, feed_lock_fd=None):
         else:
             from scout4.collect import collect
             collect(season, root/'data/scout4')
+    from week12_kickoff_repair import repair as repair_kickoffs
+    attempt('Week 12 kickoff correction', lambda: repair_kickoffs(root, apply=True))
     attempt('finals', lambda: feed('finals'))
     from qb_verification import refresh_qbs
     def verify_qbs_nonblocking():
@@ -259,6 +261,8 @@ def dynamic_enabled():
 def refresh_scheduled_market(root, now=None):
     """All-week quotes, including Tuesday/Wednesday; no model or AI workers."""
     from scheduled_ats_capture import run
+    from week12_kickoff_repair import repair as repair_kickoffs
+    repair_kickoffs(Path(root), apply=True, now=now)
     try:
         if run(Path(root), now) != 0:
             raise RuntimeError('Scheduled market/dynamic refresh failed; see ats_capture_status.json')
