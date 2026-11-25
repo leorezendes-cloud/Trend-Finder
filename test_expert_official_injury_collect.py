@@ -17,6 +17,9 @@ class CollectorTests(unittest.TestCase):
         result = fetch_official_injury_page(2026, 12, opener=opener)
         self.assertFalse(result["verified_player_records"])
         self.assertEqual(result["week"], 12)
+        self.assertIsNone(result["publication_provenance"]["published_at"])
+        self.assertEqual(result["publication_provenance"]["status"], "not_established_from_week_page")
+        self.assertTrue(result["publication_provenance"]["retrieved_at_is_not_publication_time"])
 
     def test_reject_wrong_week(self):
         response = MagicMock()
