@@ -392,10 +392,11 @@ def snapshot(scout, root=None, as_of=None):
     teams = []
     eligible_ids = set()
     for team in (away, home):
-        recent = [(g, a, h) for g, a, h in history
-                  if team in (g.get("away_team"), g.get("home_team"))]
-        recent.sort(key=lambda item: (item[0]["gameday"], item[0].get("game_id", "")), reverse=True)
-        recent = recent[:5]
+        all_team_games = [(g, a, h) for g, a, h in history
+                          if team in (g.get("away_team"), g.get("home_team"))]
+        all_team_games.sort(
+            key=lambda item: (item[0]["gameday"], item[0].get("game_id", "")), reverse=True)
+        recent = all_team_games[:5]
         games = []
         for g, a, h in recent:
             is_away = team == g["away_team"]
@@ -406,10 +407,21 @@ def snapshot(scout, root=None, as_of=None):
                               outcome="W" if own > opp else "L" if own < opp else "T"))
             eligible_ids.add(g["game_id"])
         if games:
+            def score_summary(sample):
+                n = len(sample)
+                pf = sum((a if team == g["away_team"] else h) for g, a, h in sample)
+                pa = sum((h if team == g["away_team"] else a) for g, a, h in sample)
+                return dict(games=n, points_for_per_game=round(pf/n, 1),
+                            points_allowed_per_game=round(pa/n, 1),
+                            point_margin_per_game=round((pf-pa)/n, 1),
+                            combined_points_per_game=round((pf+pa)/n, 1))
+            # Observed score aggregates, not a predicted total or model edge.
             teams.append(dict(team=team, recent=games,
                               recent_record=f"{sum(g['outcome']=='W' for g in games)}-"
                                             f"{sum(g['outcome']=='L' for g in games)}"
-                                            f"{'-'+str(sum(g['outcome']=='T' for g in games)) if any(g['outcome']=='T' for g in games) else ''}"))
+                                            f"{'-'+str(sum(g['outcome']=='T' for g in games)) if any(g['outcome']=='T' for g in games) else ''}",
+                              recent_five_scores=score_summary(recent),
+                              season_to_date_scores=score_summary(all_team_games)))
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
                   cutoff_date_exclusive=cutoff, team_form=teams,
                   limitations=["Recent final scores and isolated box-score standouts do not establish pace, efficiency, offensive-line matchups, defensive tendencies, or injury availability. Do not infer these metrics."])
