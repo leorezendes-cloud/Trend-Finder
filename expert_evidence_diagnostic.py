@@ -11,6 +11,8 @@ from pathlib import Path
 from expert_beta import Store, clock, instant
 from expert_matchup_evidence import snapshot
 from expert_provider import source_facts
+from scout4.personnel import _json_rows
+from scout4.stats import team_code
 
 
 def inspect(store, season, week, game, root=None, now=None):
@@ -59,6 +61,49 @@ def inspect(store, season, week, game, root=None, now=None):
             })
         except (OSError, ValueError, TypeError, AttributeError):
             continue
+    # Aggregate the latest archived injury feed; never print player identities.
+    injury_match_diagnostic = {"status": "no_saved_feed"}
+    manifests = sorted((personnel_root / str(season)).glob("*/manifest.json"))
+    if manifests:
+        manifest_path = manifests[-1]
+        try:
+            manifest = json.loads(manifest_path.read_text())
+            injury_path = Path(manifest["files"]["injuries"]["path"])
+            if not injury_path.is_absolute():
+                injury_path = Path(root or Path(__file__).resolve().parent) / injury_path
+            counts = {team: {"team_rows": 0, "season_rows": 0,
+                             "week_rows": 0, "season_type_rows": 0,
+                             "observed_weeks": {}, "observed_season_types": {},
+                             "observed_team_codes": {}} for team in (away, home)}
+            for injury in _json_rows(injury_path):
+                raw_team = str(injury.get("team", ""))
+                normalized = team_code(raw_team)
+                if normalized not in counts:
+                    continue
+                c = counts[normalized]
+                c["team_rows"] += 1
+                c["observed_team_codes"][raw_team] = c["observed_team_codes"].get(raw_team, 0) + 1
+                if str(injury.get("season")) != str(season):
+                    continue
+                c["season_rows"] += 1
+                w = str(injury.get("week"))
+                c["observed_weeks"][w] = c["observed_weeks"].get(w, 0) + 1
+                typ = str(injury.get("season_type"))
+                c["observed_season_types"][typ] = c["observed_season_types"].get(typ, 0) + 1
+                if w != str(week):
+                    continue
+                c["week_rows"] += 1
+                if injury.get("season_type") == scout["game"].get("game_type", "REG"):
+                    c["season_type_rows"] += 1
+            injury_match_diagnostic = {
+                "status": "inspected", "snapshot": manifest_path.parent.name,
+                "expected_season": season, "expected_week": week,
+                "expected_season_type": scout["game"].get("game_type", "REG"),
+                "team_counts": counts,
+                "note": "Aggregated archived feed only; no names or injury claims."}
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            injury_match_diagnostic = {"status": "inspection_error",
+                                       "error_type": type(exc).__name__}
     result = {
         "status": "ready_for_review" if efficiency else "missing_team_efficiency",
         "game": game, "checked_at": now.isoformat(),
@@ -78,6 +123,7 @@ def inspect(store, season, week, game, root=None, now=None):
                 "recent_five": data.get("opponent_production_allowed_recent_five"),
             } for team, data in efficiency.items()},
         "personnel_source_snapshots": source_snapshots,
+        "injury_match_diagnostic": injury_match_diagnostic,
         "personnel_injury_coverage": {
             team: data.get("injury_coverage") for team, data in personnel.items()},
         "provider_receives_efficiency": bool(facts.get("observed_team_efficiency")),
