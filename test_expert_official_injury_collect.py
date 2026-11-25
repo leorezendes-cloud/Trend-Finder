@@ -1,7 +1,7 @@
 import io
 import unittest
 from unittest.mock import Mock, MagicMock
-from expert_official_injury_collect import fetch_official_injury_page
+from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates
 
 
 class CollectorTests(unittest.TestCase):
@@ -29,6 +29,24 @@ class CollectorTests(unittest.TestCase):
         opener.open.return_value = response
         with self.assertRaises(ValueError):
             fetch_official_injury_page(2026, 12, opener=opener)
+
+    def test_extract_table_without_fabricating_team_or_status(self):
+        html = """<table><tr><th>Player</th><th>Position</th><th>Injuries</th>
+        <th>Practice Status</th><th>Game Status</th></tr>
+        <tr><td>Example Player</td><td>QB</td><td>Ankle</td>
+        <td>Limited Participation in Practice</td><td>Questionable</td></tr>
+        <tr><td>Another Player</td><td>WR</td><td></td>
+        <td>Full Participation in Practice</td><td></td></tr></table>"""
+        candidates = injury_table_candidates(html)
+        self.assertEqual(len(candidates), 1)
+        self.assertIsNone(candidates[0]["team"])
+        self.assertFalse(candidates[0]["verified"])
+        self.assertEqual(candidates[0]["players"][0]["game_status"], "Questionable")
+        self.assertEqual(candidates[0]["players"][1]["game_status"], "Not Reported")
+
+    def test_ignore_unrecognized_tables(self):
+        self.assertEqual(injury_table_candidates(
+            "<table><tr><th>Player</th></tr><tr><td>Unknown</td></tr></table>"), [])
 
     def test_reject_invalid_week(self):
         with self.assertRaises(ValueError):
