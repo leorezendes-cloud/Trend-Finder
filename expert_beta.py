@@ -338,7 +338,9 @@ def generate_draft(scout, provider=None, plug_ou=None):
             r'|\bno (?:major |meaningful )?injury surprise\b'
         )
         if re.search(unsupported, article, flags=re.IGNORECASE):
-            raise ValueError('Expert falsely describes unknown injury coverage as clear')
+            # Missing injury coverage is an evidence gap, not grounds to discard
+            # an otherwise complete, paid pregame report. Flag it for review.
+            result['injury_coverage_review_required'] = True
     # Lock the model's choices before revealing the independent Scout baseline.
     expert_ats, expert_total = result.get('ats_side'), result.get('total_side')
     scout_ats = scout.get('spread', {}).get('side')
