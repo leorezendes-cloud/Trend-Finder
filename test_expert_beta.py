@@ -34,8 +34,8 @@ class ExpertBetaTests(unittest.TestCase):
         legacy=patch('plug_dashboard.legacy_records',return_value=[])
         legacy.start();self.addCleanup(legacy.stop)
         self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name)
-        self.old={key:app.config.get(key) for key in ('EXPERT_BETA_ENABLED','EXPERT_BETA_STORE','EXPERT_PREMIUM_MEMBER_IDS','MEMBERSHIP_DATABASE','TESTING')}
-        app.config.update(EXPERT_BETA_ENABLED=True,EXPERT_BETA_STORE=str(self.root),EXPERT_PREMIUM_MEMBER_IDS=['1'],MEMBERSHIP_DATABASE=str(self.root/'members.db'),TESTING=True)
+        self.old={key:app.config.get(key) for key in ('EXPERT_BETA_ENABLED','EXPERT_BETA_STORE','EXPERT_PREMIUM_MEMBER_IDS','MEMBERSHIP_DATABASE','TESTING','EXPERT_BETA_ALL_FREE')}
+        app.config.update(EXPERT_BETA_ENABLED=True,EXPERT_BETA_STORE=str(self.root),EXPERT_PREMIUM_MEMBER_IDS=['1'],MEMBERSHIP_DATABASE=str(self.root/'members.db'),TESTING=True,EXPERT_BETA_ALL_FREE=False)
         with app.app_context():
             migrate()
             with db():
