@@ -292,7 +292,8 @@ def scheduler_event(root, job, state, **details):
         logs = Path(root)/'logs'
         logs.mkdir(parents=True, exist_ok=True)
         with (logs/(job + '_scheduler.jsonl')).open('a') as stream:
-            stream.write(json.dumps(event) + '\n')
+            stream.write(json.dumps(event) + '
+')
     except Exception:
         LOGGER.exception('Cannot persist scheduler event for %s', job)
 
@@ -483,7 +484,10 @@ def run_leader(root, stop):
     jobs = (
         ('recovered-nfl-tracker', lambda: run_worker('recovered_nfl_tracker.py', ['--root', str(root)]), 300),
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
-        ('official-injury-observations', lambda: run_worker('expert_official_injury_batch.py',\n            ['--schedule', str(root/'nfl_games.csv'), '--destination',\n             str(root/'data/expert_official_observations')], 180), 1800),\n        ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
+        ('official-injury-observations', lambda: run_worker('expert_official_injury_batch.py',
+            ['--schedule', str(root/'nfl_games.csv'), '--destination',
+             str(root/'data/expert_official_observations')], 180), 1800),
+        ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('plug-ou-qualifiers', lambda: run_worker('plug_ou_weekly_v3.py', ['--once'], 90), 300),
         ('plug-ats-v5-qualifiers', lambda: run_worker('plug_ats_v5_weekly.py', ['--once'], 90), 300),
         ('game-day-market', lambda: run_worker('hosted_updates.py', ['--game-day-market']), 900),
