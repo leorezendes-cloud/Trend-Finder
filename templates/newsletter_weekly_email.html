@@ -28,7 +28,7 @@
       {% if ats_pick != 'Stay Away' %}
         <p style="color:#168449;font-size:20px;font-weight:800;line-height:1.35;margin:9px 0">The Plug's Pick · ATS: {{ ats_pick }}</p>
       {% endif %}
-      {% if total_pick != 'Stay Away' %}
+      {% if total_pick and total_pick != 'Stay Away' and not total_pick.startswith('Unavailable') and total_pick != 'No pick' %}
         <p style="color:#168449;font-size:20px;font-weight:800;line-height:1.35;margin:9px 0">The Plug's Pick · Total: {{ total_pick }}</p>
       {% endif %}
     {% elif item.startswith('Plug: ') or item.startswith('Scout: ') %}
