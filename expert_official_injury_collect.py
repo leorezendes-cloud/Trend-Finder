@@ -205,6 +205,17 @@ def fetch_official_injury_page(season, week, *, opener=None):
             "season": season, "week": week, "verified_player_records": False,
             "note": "Read-only source preview. Do not treat as verified injury statuses.",
             "preview": lines[:120],
+            "publication_provenance": {
+                "published_at": None,
+                "status": "not_established_from_week_page",
+                "retrieved_at_is_not_publication_time": True,
+                "required_before_import": [
+                    "independently documented publication timestamp",
+                    "exact game_id and kickoff_utc from Scout",
+                    "team and player-status review",
+                    "published_at <= observed_at < kickoff_utc",
+                ],
+            },
             "unverified_table_candidates": label_team_candidates(injury_table_candidates(html))}
 
 
