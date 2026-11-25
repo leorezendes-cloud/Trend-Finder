@@ -292,6 +292,7 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
             raise ValueError('A replacement response already exists; retry blocked')
     elif replacement and attempts and not (
             len(attempts) == 1
+            and attempts[0].name.endswith('.replacement-1.attempt.json')
             and (folder/(version+'.replacement-1.json')).is_file()
             and not (folder/(version+'.replacement-2.attempt.json')).exists()):
         raise ValueError('A replacement attempt already exists; inspect its outcome before retrying')
