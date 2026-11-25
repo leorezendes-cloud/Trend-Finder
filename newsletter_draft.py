@@ -89,9 +89,15 @@ def _expert_newsletter_story(report):
              'no usable injury', 'unknown for both', 'not going to pretend',
              'no confirmed', 'cannot confirm', 'unable to verify',
              'not verified', 'not supplied', 'no evidence supplied')
+    # A teaser must stand alone: reject transitions and references to prior text.
     orphan = ('that ', 'this ', 'those ', 'these ', 'it ', 'they ',
               'he ', 'she ', 'his ', 'their ', 'therefore ', 'however ',
-              'but ', 'also ', 'and ', 'because ', 'so ')
+              'but ', 'also ', 'and ', 'because ', 'so ',
+              'on the other side', 'on the flip side', 'on the other hand',
+              'by contrast', 'in contrast', 'conversely', 'meanwhile',
+              'similarly', 'likewise', 'in addition', 'furthermore',
+              'moreover', 'as noted', 'as mentioned', 'for that reason',
+              'in that sense', 'the other ', 'another ', 'even so')
     candidates = []
     for priority, heading in enumerate(preferred):
         entry = next((part for part in sections if part.get('heading') == heading), None)
@@ -104,6 +110,9 @@ def _expert_newsletter_story(report):
             if not 50 <= len(first) <= 245 or lower.startswith(orphan):
                 continue
             if any(term in lower for term in noise):
+                continue
+            # Avoid standalone excerpts that presuppose an earlier comparison.
+            if re.search(r'\b(?:also|again|instead|either|too)\b', lower):
                 continue
             score = sum(term in lower for term in football)
             if not score:
