@@ -5,6 +5,7 @@ An operator must verify and save individual game records before Expert uses them
 """
 import argparse
 import json
+from pathlib import Path
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
@@ -302,8 +303,41 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", type=int, required=True)
     parser.add_argument("--week", type=int, required=True)
+    parser.add_argument("--game-json", help="Local Scout game JSON with exact game_id, teams, kickoff")
+    parser.add_argument("--as-of", help="Expert cutoff ISO timestamp (timezone required)")
+    parser.add_argument("--compact", action="store_true",
+                        help="Show team counts and provenance instead of all player rows")
     args = parser.parse_args()
-    print(json.dumps(fetch_official_injury_page(args.season, args.week), indent=2))
+    if bool(args.game_json) != bool(args.as_of):
+        parser.error("--game-json and --as-of must be provided together")
+    if args.as_of:
+        try:
+            cutoff = datetime.fromisoformat(args.as_of.replace("Z", "+00:00"))
+            if cutoff.tzinfo is None:
+                raise ValueError("Timezone required")
+            if cutoff.astimezone(timezone.utc) > datetime.now(timezone.utc):
+                raise ValueError("Cutoff cannot be in the future")
+            game = json.loads(Path(args.game_json).read_text(encoding="utf-8"))
+            if isinstance(game, dict) and isinstance(game.get("game"), dict):
+                game = game["game"]
+        except (OSError, ValueError, TypeError) as exc:
+            parser.error("Invalid game JSON or as-of: " + str(exc))
+        if not isinstance(game, dict):
+            parser.error("Game JSON must contain a game object")
+        if game.get("season") != args.season or game.get("week") != args.week:
+            parser.error("Game season/week differs from requested source")
+    snapshot = fetch_official_injury_page(args.season, args.week)
+    if args.game_json:
+        audit = preflight_game(snapshot, game, args.as_of)
+        snapshot["game_preflight"] = audit
+    if args.compact:
+        snapshot.pop("preview", None)
+        snapshot["candidate_summary"] = [
+            {"team": r.get("team"), "source_team_label": r.get("source_team_label"),
+             "player_count": len(r.get("players", [])),
+             "team_label_confidence": r.get("team_label_confidence")}
+            for r in snapshot.pop("unverified_table_candidates", [])]
+    print(json.dumps(snapshot, indent=2))
 
 
 if __name__ == "__main__":
