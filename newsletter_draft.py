@@ -39,9 +39,9 @@ def period_key(frequency, now):
     local = now.astimezone(ET)
     if frequency == 'monthly':
         return local.strftime('%Y-%m')
-    from site_week import week_window
-    start, _ = week_window(now)
-    year, week, _ = start.isocalendar()
+    # Newsletter issues describe the current Monday-Sunday calendar week.
+    # The site's Wednesday 8 AM rollover applies to picks, not email dates.
+    year, week, _ = local.isocalendar()
     return f'{year}-W{week:02d}'
 
 
@@ -83,7 +83,12 @@ def _expert_newsletter_story(report):
                 'secondary', 'rush', 'play', 'pocket', 'coverage', 'blocking',
                 'run game', 'passing', 'rush', 'turnover', 'tackle', 'blitz')
     noise = ('projection', 'scout', 'model', 'betting', 'wager',
-             'market', 'spread', 'total', 'over ', 'under ', 'pick ')
+             'market', 'spread', 'total', 'over ', 'under ', 'pick ',
+             'coverage is', 'coverage remains', 'coverage was',
+             'injury coverage', 'injury rows', 'missing injury',
+             'no usable injury', 'unknown for both', 'not going to pretend',
+             'no confirmed', 'cannot confirm', 'unable to verify',
+             'not verified', 'not supplied', 'no evidence supplied')
     orphan = ('that ', 'this ', 'those ', 'these ', 'it ', 'they ',
               'he ', 'she ', 'his ', 'their ', 'therefore ', 'however ',
               'but ', 'also ', 'and ', 'because ', 'so ')
@@ -119,8 +124,8 @@ def _expert_newsletter_story(report):
             candidates.append((score, -priority, -idx, passage))
     if candidates:
         return max(candidates)[3]
-    return ('Read the full approved Expert analysis for the matchup breakdown '
-            'and independent ATS and total selections.')
+    return ('Explore the Expert’s independent matchup breakdown and '
+            'the evidence behind its ATS and total decisions.')
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
@@ -224,10 +229,9 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         if ou_selected and ou_line is None:
             warnings.append('One O/U receipt has no valid published line.')
             continue
-        ats_text = (f'{ats_side} {ats_line:+g}' if ats_selected else
-                    'Stay Away' if ats_available else 'Unavailable (receipt pending)')
-        ou_text = (f'{ou_side} {ou_line:g}' if ou_selected else
-                   'Stay Away' if ou_available else 'Unavailable (receipt pending)')
+        # An unavailable receipt is not a public pick or a newsletter headline.
+        ats_text = f'{ats_side} {ats_line:+g}' if ats_selected else 'Stay Away'
+        ou_text = f'{ou_side} {ou_line:g}' if ou_selected else 'Stay Away'
         url = (f"{origin}/the-plug/{int(game['season'])}/"
                f"{int(game['week'])}/{game['away_team']}-{game['home_team']}")
         label = _event_label(game, kickoff)
@@ -395,6 +399,13 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
         if len(lines) < 4 or lines[-1] not in indexed:
             continue
         scout, version = indexed[lines[-1]]
+        # Never headline a featured Expert game with no actual Plug selection.
+        if not any(part.startswith('ATS: ') and
+                   (part.split('ATS: ', 1)[1].split(' · Total:', 1)[0] != 'Stay Away'
+                    or (' · Total: ' in part and
+                        part.split(' · Total: ', 1)[1] != 'Stay Away'))
+                   for part in scout):
+            continue
         # These are Plug receipt selections, not Scout model forecasts.
         # Label the independently approved Expert opinion separately.
         featured = '\n'.join([
@@ -408,9 +419,16 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
     warnings.append('No approved publicly featured Expert pick matched an eligible saved Scout pick; Expert analysis remains pending.')
     # Never hide legitimately published Plug selections simply because the
     # separately approved Expert report has not become available yet.
-    if picks:
-        return '\n\n'.join(picks), [v for v in versions if v]
-    return 'The featured Expert pick is being prepared. Check The Plug for published picks.', []
+    selected = [(block, versions[i] if i < len(versions) else None)
+                for i, block in enumerate(picks)
+                if any(line.startswith('ATS: ') and
+                       (line.split('ATS: ', 1)[1].split(' · Total:', 1)[0] != 'Stay Away'
+                        or (' · Total: ' in line and
+                            line.split(' · Total: ', 1)[1] != 'Stay Away'))
+                       for line in block.splitlines())]
+    if selected:
+        return '\n\n'.join(block for block, _ in selected), [v for _, v in selected if v]
+    return 'No published Plug selections are available for this week yet.', []
 
 
 def _trends_content(origin, warnings, limit=MAX_TRENDS):
