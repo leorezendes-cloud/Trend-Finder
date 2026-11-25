@@ -301,7 +301,8 @@ def _official_injury_context(scout, root, as_of):
             if path.stat().st_size > 32768:
                 continue
             record = json.loads(path.read_text(encoding="utf-8"))
-            if record.get("game_id") != game_id or record.get("week") != int(game["week"]):
+            if (record.get("game_id") != game_id or record.get("week") != int(game["week"])
+                    or record.get("season") != int(game["season"])):
                 continue
             team = record.get("team")
             if team not in (game.get("away_team"), game.get("home_team")):
@@ -312,8 +313,8 @@ def _official_injury_context(scout, root, as_of):
             from urllib.parse import urlsplit
             host = (urlsplit(source_url).hostname or "").lower()
             if not (host == "nfl.com" or host.endswith(".nfl.com")
-                    or host.endswith(".com") and host in {
-                        "packers.com", "therams.com", "rams.com"}):
+                    or host in {"packers.com", "www.packers.com",
+                                "therams.com", "www.therams.com"}):
                 # Unknown domains require review before being treated as official.
                 continue
             observed = _time(record["observed_at"])
@@ -321,7 +322,7 @@ def _official_injury_context(scout, root, as_of):
             if not (published <= observed <= as_of and observed < kickoff):
                 continue
             players = record.get("players")
-            if not isinstance(players, list) or len(players) > 60:
+            if not isinstance(players, list) or not players or len(players) > 60:
                 continue
             clean = []
             for player in players:
@@ -362,6 +363,7 @@ def _merge_official_injuries(output, scout, root, as_of):
             except (TypeError, ValueError):
                 pass
         existing.update(report)
+        existing["official_report_source"] = "official_injury_" + team
     output.setdefault("sources", []).extend(sources)
     return output
 
