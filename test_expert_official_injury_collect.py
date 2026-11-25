@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 from unittest.mock import Mock, MagicMock
-from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates, preflight_game
+from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates, preflight_game, save_observation
 
 
 class CollectorTests(unittest.TestCase):
@@ -150,6 +150,26 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(len(result["candidate_summary"]), 2)
         self.assertNotIn("unverified_table_candidates", result)
         self.assertNotIn("preview", result)
+
+    def test_immutable_observation_is_unverified_and_never_overwritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "capture.json"
+            snapshot = {"verified_player_records": False,
+                        "game_preflight": {"structural_preflight_passed": True},
+                        "unverified_table_candidates": [{"team": "GB", "players": [{"name": "Example"}]}]}
+            save_observation(snapshot, path)
+            self.assertEqual(json.loads(path.read_text())["verified_player_records"], False)
+            with self.assertRaises(FileExistsError):
+                save_observation(snapshot, path)
+            with self.assertRaises(ValueError):
+                save_observation({**snapshot, "verified_player_records": True},
+                                 Path(directory) / "bad.json")
+            with self.assertRaises(ValueError):
+                save_observation({**snapshot, "game_preflight": {"structural_preflight_passed": False}},
+                                 Path(directory) / "failed.json")
+            with self.assertRaises(ValueError):
+                save_observation({**snapshot, "padding": "x" * 131072},
+                                 Path(directory) / "huge.json")
 
     def test_reject_invalid_week(self):
         with self.assertRaises(ValueError):
