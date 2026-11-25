@@ -416,7 +416,28 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
 def _trends_content(origin, warnings, limit=MAX_TRENDS):
     try:
         from active_trends import load_highlights
-        trends = load_highlights()[:limit]
+        trends = load_highlights()
+        # A QB's identical straight-up streak and his team's streak should
+        # not occupy two newsletter slots. Prefer the team headline.
+        chosen = []
+        for trend in trends:
+            if (trend.get('kind') == 'su' and trend.get('outcome') == 'Win'
+                    and trend.get('scope') in ('team', 'qb')):
+                games = tuple(item.get('game_id') for item in
+                              trend.get('evidence', [])[:trend.get('streak', 0)])
+                duplicate = next((i for i, prior in enumerate(chosen)
+                                  if prior.get('kind') == 'su'
+                                  and prior.get('outcome') == 'Win'
+                                  and prior.get('scope') != trend.get('scope')
+                                  and tuple(item.get('game_id') for item in
+                                            prior.get('evidence', [])[:prior.get('streak', 0)]) == games
+                                  and len(games) >= 5), None)
+                if duplicate is not None:
+                    if trend['scope'] == 'team':
+                        chosen[duplicate] = trend
+                    continue
+            chosen.append(trend)
+        trends = chosen[:limit]
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
         warnings.append('Hot Right Now highlights were unavailable; no trends were invented.')
         return [], []
@@ -934,7 +955,8 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
         # report AND its matching Scout snapshot for the free weekly newsletter.
         picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None, root=root)
         matchups = _matchups(root, now, origin, sources, warnings,
-                            max_games=5 if not premium else 8, editorial=not premium)
+                            max_games=5 if not premium else 8, editorial=not premium,
+                             active_only=False)
         if premium:
             if len(picks) < 13:
                 warnings.append(f'Premium preview contains {len(picks)} published games, not a full 13-game slate.')
