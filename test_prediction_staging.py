@@ -360,4 +360,41 @@ class AtomicPipelineTests(unittest.TestCase):
             hosted.update_once(self.root)
         wrapper.assert_called_once_with(self.root, hosted.SOURCE, hosted.SOURCE/'automatic_model.json')
 
+    def test_stale_quote_review_does_not_block_fresh_missing_forecast(self):
+        with (self.root/'public_money_snapshots.csv').open() as stream:
+            rows=list(csv.DictReader(stream))
+        rows[1]['captured_at_utc']=(NOW-timedelta(minutes=30)).isoformat()
+        csv_file(self.root/'public_money_snapshots.csv',rows)
+        real_validate=staging.validate
+        def legacy_validate(*args):
+            try:return real_validate(*args)
+            except staging.ExpiredPublicationQuote as error:raise ValueError(str(error))
+        with patch.object(staging,'publication_market_snapshot',side_effect=lambda raw,cutoff:raw), patch.object(staging,'validate',side_effect=legacy_validate):
+            with self.assertRaisesRegex(ValueError,'Quote outside'):self.run_pipeline()
+        rejected=self.latest()
+        candidate=rejected/'data/scout4/blend/predictions'/self.target().name
+        original=candidate.read_bytes()
+        rows[1]['captured_at_utc']=NOW.isoformat()
+        csv_file(self.root/'public_money_snapshots.csv',rows)
+        self.run_pipeline()
+        self.assertTrue(self.target().exists())
+        self.assertEqual(candidate.read_bytes(),original)
+        journal=json.loads((rejected/'journal.json').read_text())
+        self.assertEqual(journal['state'],'complete')
+        self.assertIn(self.target().name,journal['rejected'])
+        self.assertNotEqual(self.target().read_bytes(),original)
+
+    def test_isolated_snapshot_excludes_stale_and_future_market_rows(self):
+        with (self.root/'public_money_snapshots.csv').open() as stream:
+            rows=list(csv.DictReader(stream))
+        stale=dict(rows[0],captured_at_utc=(NOW-timedelta(minutes=16)).isoformat())
+        future=dict(rows[0],captured_at_utc=(NOW+timedelta(seconds=1)).isoformat())
+        csv_file(self.root/'public_money_snapshots.csv',[*rows,stale,future])
+        raw=(self.root/'public_money_snapshots.csv').read_bytes()
+        self.run_pipeline()
+        self.assertEqual((self.root/'public_money_snapshots.csv').read_bytes(),raw)
+        with (self.latest()/'public_money_snapshots.csv').open() as stream:
+            staged=list(csv.DictReader(stream))
+        self.assertEqual(staged,rows)
+
 if __name__ == '__main__': unittest.main()
