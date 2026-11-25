@@ -171,6 +171,25 @@ class CollectorTests(unittest.TestCase):
                 save_observation({**snapshot, "padding": "x" * 131072},
                                  Path(directory) / "huge.json")
 
+    def test_exact_scout_schedule_resolution(self):
+        from expert_official_injury_collect import scout_game_from_schedule
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "nfl_games.csv"
+            path.write_text("game_id,season,week,game_type,gameday,gametime,away_team,home_team\\n"
+                            "2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\\n")
+            game = scout_game_from_schedule(path, "2026_12_GB_LA", 2026, 12)
+            self.assertEqual(game["away_team"], "GB")
+            self.assertEqual(game["home_team"], "LA")
+            self.assertEqual(game["kickoff_utc"], "2026-11-22T21:25:00+00:00")
+            with self.assertRaises(ValueError):
+                scout_game_from_schedule(path, "2026_12_GB_LA", 2026, 11)
+            with self.assertRaises(ValueError):
+                scout_game_from_schedule(path, "wrong", 2026, 12)
+            with path.open("a") as stream:
+                stream.write("2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\\n")
+            with self.assertRaises(ValueError):
+                scout_game_from_schedule(path, "2026_12_GB_LA", 2026, 12)
+
     def test_reject_invalid_week(self):
         with self.assertRaises(ValueError):
             fetch_official_injury_page(2026, 0)
