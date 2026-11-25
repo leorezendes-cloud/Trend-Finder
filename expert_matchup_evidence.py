@@ -421,10 +421,18 @@ def snapshot(scout, root=None, as_of=None):
                                             f"{sum(g['outcome']=='L' for g in games)}"
                                             f"{'-'+str(sum(g['outcome']=='T' for g in games)) if any(g['outcome']=='T' for g in games) else ''}",
                               recent_five_scores=score_summary(recent),
-                              season_to_date_scores=score_summary(all_team_games)))
+                              season_to_date_scores=score_summary(all_team_games),
+                              home_scores=score_summary([
+                                  item for item in all_team_games
+                                  if item[0].get("home_team") == team]) if any(
+                                      item[0].get("home_team") == team for item in all_team_games) else None,
+                              away_scores=score_summary([
+                                  item for item in all_team_games
+                                  if item[0].get("away_team") == team]) if any(
+                                      item[0].get("away_team") == team for item in all_team_games) else None))
     output = dict(source="Saved NFL schedule/final scores (pregame cutoff)",
                   cutoff_date_exclusive=cutoff, team_form=teams,
-                  limitations=["Recent final scores and isolated box-score standouts do not establish pace, efficiency, offensive-line matchups, defensive tendencies, or injury availability. Do not infer these metrics."])
+                  limitations=["Recent final scores and isolated box-score standouts do not establish pace, efficiency, offensive-line matchups, defensive tendencies, or injury availability. Home/away splits are descriptive only and may have small sample sizes. Do not infer these metrics."])
     if not manifest_path.is_file() or not eligible_ids:
         return _attach_personnel(output, scout, root, decision_time)
     try:
