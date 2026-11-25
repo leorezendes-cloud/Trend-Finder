@@ -895,7 +895,7 @@ def _weekly_case_spotlight(root, now, origin, warnings):
     if not eligible:
         return ''
     case = eligible[0][1]
-    return f"{case['title']}\\n{case['summary']}\\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
+    return f"{case['title']}\n{case['summary']}\n{origin}/conspiracy-dungeon/investigations/{case['slug']}"
 
 
 def build_draft(root, now, frequency='weekly', *, premium=False, report_month=None):
