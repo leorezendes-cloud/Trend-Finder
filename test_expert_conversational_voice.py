@@ -10,7 +10,7 @@ class ExpertConversationalVoiceTests(unittest.TestCase):
         voice = EXPERT_VOICE.lower()
         for expected in ("owner review cards", "recent-performance", "game script",
                          "never invent", "model scores", "sources",
-                         "independent ats and o/u", "what scout sees"):
+                         "independent ats and o/u", "after your selections are locked"):
             self.assertIn(expected, voice)
 
     def test_structured_evidence_and_six_sections_preserved(self):
