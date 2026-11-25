@@ -1,4 +1,4 @@
-"""One-time owner review/publish of the final 2026 Week 12 TB@CAR Expert replacement.
+"""One-time owner review/publish of the final 2026 Week 12 CAR@TB Expert replacement.
 
 Default is read-only. --approve-and-publish requires explicit owner action.
 """
@@ -35,7 +35,7 @@ def run(root, execute=False):
     if not approved:
         raise ValueError("No previously published Expert report to preserve")
     if any(r["expert"].get("provider_response_id") == original.get("provider_response_id") for r in approved):
-        return {"game": "TB@CAR", "state": "already_published", "published_versions": len(approved)}
+        return {"game": "CAR@TB", "state": "already_published", "published_versions": len(approved)}
     result = {"game": "TB@CAR", "draft": NAME, "state": "preview",
               "previously_published_versions": len(approved),
               "summary": original.get("summary"),
