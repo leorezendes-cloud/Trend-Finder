@@ -124,6 +124,44 @@ def injury_table_candidates(html):
     return candidates[:32]
 
 
+
+# Explicit NFL page labels; a label is only a candidate, not a verified record.
+_NFL_TEAM_LABELS = {
+    "Packers": "GB", "Rams": "LA", "Bears": "CHI", "Lions": "DET",
+    "Vikings": "MIN", "Cowboys": "DAL", "Giants": "NYG",
+    "Eagles": "PHI", "Commanders": "WAS", "49ers": "SF",
+    "Seahawks": "SEA", "Cardinals": "ARI", "Falcons": "ATL",
+    "Panthers": "CAR", "Saints": "NO", "Buccaneers": "TB",
+    "Bills": "BUF", "Dolphins": "MIA", "Patriots": "NE",
+    "Jets": "NYJ", "Ravens": "BAL", "Bengals": "CIN",
+    "Browns": "CLE", "Steelers": "PIT", "Texans": "HOU",
+    "Colts": "IND", "Jaguars": "JAX", "Titans": "TEN",
+    "Broncos": "DEN", "Chiefs": "KC", "Raiders": "LV",
+    "Chargers": "LAC",
+}
+
+
+def label_team_candidates(candidates):
+    """Assign a team only for an exact, unambiguous official table heading.
+
+    The returned team is still unverified, and cannot be imported automatically.
+    """
+    from collections import Counter
+    headings = [item.get("source_heading") for item in candidates]
+    counts = Counter(headings)
+    result = []
+    for item in candidates:
+        entry = dict(item)
+        heading = item.get("source_heading")
+        code = _NFL_TEAM_LABELS.get(heading)
+        entry["team"] = code if code and counts[heading] == 1 else None
+        entry["team_label_confidence"] = (
+            "exact_unique_heading" if entry["team"] else "unknown")
+        entry["verified"] = False
+        result.append(entry)
+    return result
+
+
 def fetch_official_injury_page(season, week, *, opener=None):
     """Fetch a single official week page, max 1 MiB, without persisting anything.
 
@@ -157,7 +195,7 @@ def fetch_official_injury_page(season, week, *, opener=None):
             "season": season, "week": week, "verified_player_records": False,
             "note": "Read-only source preview. Do not treat as verified injury statuses.",
             "preview": lines[:120],
-            "unverified_table_candidates": injury_table_candidates(html)}
+            "unverified_table_candidates": label_team_candidates(injury_table_candidates(html))}
 
 
 def main():

@@ -1,7 +1,7 @@
 import io
 import unittest
 from unittest.mock import Mock, MagicMock
-from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates
+from expert_official_injury_collect import fetch_official_injury_page, injury_table_candidates, label_team_candidates
 
 
 class CollectorTests(unittest.TestCase):
@@ -53,6 +53,18 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(rows[0]["source_heading"], "Packers")
         self.assertIsNone(rows[0]["team"])
         self.assertFalse(rows[0]["verified"])
+
+    def test_only_unique_exact_headings_receive_candidate_team(self):
+        rows = [
+            {"source_heading": "Packers", "team": None, "verified": False},
+            {"source_heading": "Rams", "team": None, "verified": False},
+            {"source_heading": "Packers injury news", "team": None, "verified": False},
+        ]
+        result = label_team_candidates(rows)
+        self.assertEqual([row["team"] for row in result], ["GB", "LA", None])
+        self.assertTrue(all(not row["verified"] for row in result))
+        duplicate = label_team_candidates([rows[0], rows[0]])
+        self.assertEqual([row["team"] for row in duplicate], [None, None])
 
     def test_ignore_unrecognized_tables(self):
         self.assertEqual(injury_table_candidates(
