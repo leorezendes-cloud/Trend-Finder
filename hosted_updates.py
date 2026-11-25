@@ -292,8 +292,7 @@ def scheduler_event(root, job, state, **details):
         logs = Path(root)/'logs'
         logs.mkdir(parents=True, exist_ok=True)
         with (logs/(job + '_scheduler.jsonl')).open('a') as stream:
-            stream.write(json.dumps(event) + '
-')
+            stream.write(json.dumps(event) + '\n')
     except Exception:
         LOGGER.exception('Cannot persist scheduler event for %s', job)
 
