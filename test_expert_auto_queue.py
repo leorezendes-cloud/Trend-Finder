@@ -140,6 +140,34 @@ class AutomationTests(unittest.TestCase):
         self.assertFalse(list((self.root/'drafts').glob('*.replacement-*.json')))
 
 
+    def test_successful_replacement_requires_explicit_second_and_game(self):
+        row = rec('BUF')
+        type(self).rows = [row]
+        version = row['version']
+        drafts = self.root/'drafts'
+        (drafts/(version+'.json')).write_text('original')
+        (drafts/(version+'.replacement-1.json')).write_text('first replacement')
+        (drafts/(version+'.replacement-1.attempt.json')).write_text(json.dumps({
+            'version': version, 'started_at': NOW.isoformat(),
+            'model': 'gpt-test', 'provider': 'openai',
+            'nfl_week': [2026, 7], 'reserved_usd': '0.10'}))
+        normal = self.module.bounded_replace_week(
+            self.root, 2026, 7, 'gpt-test', run_limit=1,
+            execute=False, matchup='BUF@NE')
+        self.assertEqual(normal['ready'], 0)
+        with self.assertRaisesRegex(ValueError, 'requires explicit'):
+            self.module.bounded_replace_week(
+                self.root, 2026, 7, 'gpt-test',
+                run_limit=1, execute=False, allow_second_replacement=True)
+        second = self.module.bounded_replace_week(
+            self.root, 2026, 7, 'gpt-test', run_limit=1,
+            execute=False, matchup='BUF@NE', allow_second_replacement=True)
+        self.assertEqual(second['ready'], 1)
+        self.assertEqual(second['planned_requests'], 1)
+        self.assertEqual((drafts/(version+'.json')).read_text(), 'original')
+        self.assertEqual((drafts/(version+'.replacement-1.json')).read_text(),
+                         'first replacement')
+
     def test_uncertain_replacement_retry_preview_preserves_original(self):
         row = rec('LV')
         type(self).rows = [row]

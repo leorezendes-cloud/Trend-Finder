@@ -162,7 +162,7 @@ class ExpertBetaTests(unittest.TestCase):
 
     def test_provider_unavailable_and_draft_not_publishable(self):
         with self.assertRaises(RuntimeError):generate_draft(self.games[0])
-        draft=generate_draft(self.games[0],lambda payload:report(payload['evidence']))
+        draft=generate_draft(self.games[0],lambda payload:report(self.games[0]))
         self.assertEqual(draft['review_status'],'pending')
         with self.assertRaises(ValueError):self.store.append(self.games[0],expert=draft)
 

@@ -274,7 +274,7 @@ def week_usage(root, records, week):
     return total, requests
 
 
-def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False, retry_uncertain=False):
+def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False, retry_uncertain=False, second_replacement=False):
     from expert_beta import generate_draft, validate_expert
     from expert_provider import OpenAIProvider, RateLimited
     from scheduler_runtime import atomic_json
@@ -290,11 +290,19 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
         if any(path.stem.rsplit('-', 1)[-1].isdigit()
                for path in folder.glob(version + '.replacement-*.json')):
             raise ValueError('A replacement response already exists; retry blocked')
-    elif replacement and attempts:
+    elif replacement and attempts and not (
+            second_replacement and len(attempts) == 1
+            and attempts[0].name.endswith('.replacement-1.attempt.json')
+            and (folder/(version+'.replacement-1.json')).is_file()
+            and not (folder/(version+'.replacement-2.attempt.json')).exists()):
         raise ValueError('A replacement attempt already exists; inspect its outcome before retrying')
     if not replacement and attempts and (not retry_ready(folder, version, clock())
                      or json.loads(attempts[0].read_text()).get('model') != model):
         raise ValueError('Previous request requires operator review')
+    if second_replacement and not replacement:
+        raise ValueError('Second replacement only applies to replacement mode')
+    if second_replacement and len(attempts) != 1:
+        raise ValueError('Second replacement requires one completed first replacement')
     number = len(attempts) + 1
     outcome = folder/(version+('.replacement.outcome.json' if replacement else '.outcome.json'))
     provider = OpenAIProvider(approved=True, model=model)
@@ -413,7 +421,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
 
 
 def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16,
-                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None):
+                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None, allow_second_replacement=False):
     """Regenerate only already-drafted production games, preserving originals.
 
     Operator-only temporary override. Writes separate replacement files and
@@ -427,6 +435,8 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         raise ValueError('Invalid NFL season/week')
     if not 1 <= daily_limit <= 16 or not 1 <= run_limit <= 2:
         raise ValueError('daily_limit must be 1..16 and run_limit must be 1..2')
+    if allow_second_replacement and run_limit != 1:
+        raise ValueError('Second replacement requires --run-limit 1')
     budget = positive_decimal(weekly_limit)
     if budget <= 0 or budget > Decimal('2.50'):
         raise ValueError('Temporary weekly budget must be greater than $0 and no more than $2.50')
@@ -469,11 +479,17 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
             if not (folder/(version+'.json')).is_file():
                 continue
             counts['existing_drafts'] += 1
-            if list(folder.glob(version+'.replacement-*.attempt.json')) or list(folder.glob(version+'.replacement-*.json')):
+            if (list(folder.glob(version+'.replacement-*.attempt.json')) or
+                    list(folder.glob(version+'.replacement-*.json'))) and not (
+                        allow_second_replacement
+                        and (folder/(version+'.replacement-1.json')).is_file()
+                        and not (folder/(version+'.replacement-2.attempt.json')).exists()):
                 counts['replacement_already_attempted'] += 1
                 continue
             queue.append(row)
         queue.sort(key=lambda r:(instant(r['scout']['game']['kickoff_utc']),identity(r['scout'])))
+        if allow_second_replacement and matchup is None:
+            raise ValueError('Second replacement requires explicit --replace-game')
         if matchup is not None:
             matchup = matchup.upper().replace(' ', '')
             if not re.fullmatch(r'[A-Z]{2,3}@[A-Z]{2,3}', matchup):
@@ -500,7 +516,7 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
             records = Store(root).records()
             for row in queue[:planned]:
                 try:
-                    state = openai_draft(root,row,records,model,budget,weekly_requests,daily_limit,replacement=True)
+                    state = openai_draft(root,row,records,model,budget,weekly_requests,daily_limit,replacement=True,second_replacement=allow_second_replacement)
                     if state == 'saved':
                         output['saved_drafts'] += 1
                         output['state'] = 'complete'
@@ -612,6 +628,7 @@ def main(argv=None):
     parser.add_argument('--replace-season', type=int)
     parser.add_argument('--replace-week', type=int)
     parser.add_argument('--replace-game', help='Optional exact AWAY@HOME game for replacement, e.g. GB@LA')
+    parser.add_argument('--second-replacement', action='store_true', help='Explicit one-time regeneration of an existing successful replacement; preserves both originals')
     parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
     parser.add_argument('--retry-uncertain-version', help='Exact 64-character production version; one operator-only retry')
     args = parser.parse_args(argv)
@@ -623,14 +640,14 @@ def main(argv=None):
         result = bounded_retry_uncertain(args.store,args.replace_season,args.replace_week,
             args.retry_uncertain_version,args.model,weekly_limit=args.temporary_weekly_budget,
             daily_limit=args.daily_limit,execute=args.execute)
-    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None or args.replace_game is not None:
+    elif args.replace_season is not None or args.replace_week is not None or args.temporary_weekly_budget is not None or args.replace_game is not None or args.second_replacement:
         if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
             parser.error('--replace-season, --replace-week and --temporary-weekly-budget must be supplied together')
         if args.provider not in (None, 'openai'):
             parser.error('Targeted replacement is OpenAI-only')
         result = bounded_replace_week(args.store,args.replace_season,args.replace_week,args.model,
             daily_limit=args.daily_limit,run_limit=args.run_limit,weekly_limit=args.temporary_weekly_budget,
-            execute=args.execute,matchup=args.replace_game)
+            execute=args.execute,matchup=args.replace_game,allow_second_replacement=args.second_replacement)
     else:
         result = bounded_run(args.store, args.model, daily_limit=args.daily_limit,
             run_limit=args.run_limit, execute=args.execute, provider_name=args.provider)
