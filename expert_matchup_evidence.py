@@ -347,6 +347,56 @@ def _attach_personnel(output, scout, root, as_of, player_names=None):
     return output
 
 
+def _observed_team_efficiency(root, season, manifest, history, away, home):
+    """Pregame-only descriptive EPA from existing nflverse team-week cache.
+
+    Never infer missing metrics or use target/future games. EPA is not opponent
+    adjusted, and passing/rushing EPA are components rather than per-play rates.
+    """
+    path = _feed_path(root, season, manifest, "team")
+    if path is None:
+        return {}
+    eligible = {str(game["game_id"]): game for game, _, _ in history}
+    by_team = {away: [], home: []}
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as stream:
+            for row in csv.DictReader(stream):
+                game = eligible.get(str(row.get("game_id")))
+                team = row.get("team")
+                if not game or team not in by_team or row.get("season_type") != "REG":
+                    continue
+                if str(row.get("season")) != str(season):
+                    continue
+                if team not in (game.get("away_team"), game.get("home_team")):
+                    continue
+                opponent = (game.get("home_team") if team == game.get("away_team")
+                            else game.get("away_team"))
+                by_team[team].append((game["gameday"], str(game["game_id"]), row, opponent))
+    except (OSError, UnicodeError, csv.Error):
+        return {}
+    output = {}
+    for team, records in by_team.items():
+        records.sort(key=lambda item: (item[0], item[1]), reverse=True)
+        def aggregate(sample):
+            result = {"games_with_feed": len(sample)}
+            for metric in ("passing_epa", "rushing_epa", "passing_yards",
+                           "rushing_yards", "sacks_suffered"):
+                values = [_number(row.get(metric)) for _, _, row, _ in sample]
+                valid = [value for value in values if value is not None]
+                result[metric + "_per_game"] = (round(sum(valid) / len(valid), 2)
+                                                if valid else None)
+                result[metric + "_sample_games"] = len(valid)
+            return result
+        output[team] = {
+            "season_to_date": aggregate(records),
+            "recent_five": aggregate(records[:5]),
+            "limitations": ("Unadjusted weekly team totals, not EPA/play or opponent-adjusted "
+                            "efficiency. No possession, snap or success-rate denominator. "
+                            "Missing feed values remain null."),
+        }
+    return output
+
+
 def snapshot(scout, root=None, as_of=None):
     """Bounded, verifiable team form and box-score standouts before kickoff.
 
@@ -437,6 +487,8 @@ def snapshot(scout, root=None, as_of=None):
         return _attach_personnel(output, scout, root, decision_time)
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        output["observed_team_efficiency"] = _observed_team_efficiency(
+            root, season, manifest, history, away, home)
         player_path = _feed_path(root, season, manifest, "player")
         if not player_path:
             return _attach_personnel(output, scout, root, decision_time)
