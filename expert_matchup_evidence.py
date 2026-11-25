@@ -278,6 +278,94 @@ def _personnel_context(scout, root, as_of, player_names=None):
     }, sources
 
 
+
+def _official_injury_context(scout, root, as_of):
+    """Read compact, operator-verified official injury reports; never fetch on render.
+
+    A report is not a declaration that unlisted players are healthy.
+    """
+    game = scout.get("game", {})
+    game_id = game.get("game_id")
+    if not game_id:
+        return {}, []
+    try:
+        kickoff = _time(game["kickoff_utc"])
+    except (KeyError, TypeError, ValueError):
+        return {}, []
+    if as_of >= kickoff:
+        return {}, []
+    directory = root / "data" / "expert_official_injuries" / str(game.get("season"))
+    candidates = {}
+    for path in sorted(directory.glob("*.json")):
+        try:
+            if path.stat().st_size > 32768:
+                continue
+            record = json.loads(path.read_text(encoding="utf-8"))
+            if record.get("game_id") != game_id or record.get("week") != int(game["week"]):
+                continue
+            team = record.get("team")
+            if team not in (game.get("away_team"), game.get("home_team")):
+                continue
+            source_url = record.get("source_url")
+            if not isinstance(source_url, str) or not source_url.startswith("https://"):
+                continue
+            from urllib.parse import urlsplit
+            host = (urlsplit(source_url).hostname or "").lower()
+            if not (host == "nfl.com" or host.endswith(".nfl.com")
+                    or host.endswith(".com") and host in {
+                        "packers.com", "therams.com", "rams.com"}):
+                # Unknown domains require review before being treated as official.
+                continue
+            observed = _time(record["observed_at"])
+            published = _time(record["published_at"])
+            if not (published <= observed <= as_of and observed < kickoff):
+                continue
+            players = record.get("players")
+            if not isinstance(players, list) or len(players) > 60:
+                continue
+            clean = []
+            for player in players:
+                if not isinstance(player, dict) or not isinstance(player.get("name"), str):
+                    raise ValueError("Invalid injury player")
+                clean.append({k: player.get(k) for k in (
+                    "name", "position", "practice_status", "game_status", "injury")})
+            previous = candidates.get(team)
+            if previous is None or observed > previous[0]:
+                candidates[team] = (observed, {
+                    "injury_coverage": "official published report; unlisted players not confirmed healthy",
+                    "key_injuries": clean[:30],
+                    "snapshot_observed_at": observed.isoformat(),
+                    "snapshot_freshness": "current" if (as_of-observed).total_seconds() <= 86400 else "stale",
+                    "source_published_at": published.isoformat(),
+                }, {"name": "official_injury_" + team,
+                    "url": source_url, "observed_at": observed.isoformat(),
+                    "description": "Operator-verified official team injury report, published " + published.isoformat()})
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+            continue
+    return ({team: item[1] for team, item in candidates.items()},
+            [item[2] for item in candidates.values()])
+
+
+def _merge_official_injuries(output, scout, root, as_of):
+    official, sources = _official_injury_context(scout, root, as_of)
+    if not official:
+        return output
+    personnel = output.setdefault("personnel", {"teams": {}})
+    teams = personnel.setdefault("teams", {})
+    for team, report in official.items():
+        existing = teams.setdefault(team, {})
+        existing_observed = existing.get("snapshot_observed_at")
+        if existing_observed:
+            try:
+                if _time(existing_observed) > _time(report["snapshot_observed_at"]):
+                    continue
+            except (TypeError, ValueError):
+                pass
+        existing.update(report)
+    output.setdefault("sources", []).extend(sources)
+    return output
+
+
 def _weather_context(scout, root, as_of):
     """Latest exact-game weather forecast observed before kickoff and Expert review."""
     game = scout.get("game", {})
@@ -343,6 +431,7 @@ def _attach_personnel(output, scout, root, as_of, player_names=None):
     sources = personnel_sources + weather_sources
     if sources:
         output["sources"] = sources
+    _merge_official_injuries(output, scout, root, as_of)
     output["expert_as_of_utc"] = as_of.isoformat()
     return output
 
