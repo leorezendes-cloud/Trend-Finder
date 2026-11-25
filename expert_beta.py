@@ -685,5 +685,5 @@ def init_app(app):
     app.config.setdefault('EXPERT_BETA_ENABLED', enabled)
     app.config.setdefault('EXPERT_BETA_STORE', os.environ.get('TREND_FINDAH_EXPERT_STORE', '/var/data/expert_beta' if hosted else str(Path(app.instance_path)/'expert_beta')))
     app.config.setdefault('EXPERT_PREMIUM_MEMBER_IDS', os.environ.get('TREND_FINDAH_EXPERT_MEMBERS', '').split(','))
-    app.config.setdefault('EXPERT_BETA_ALL_FREE', os.environ.get('TREND_FINDAH_EXPERT_BETA_ALL_FREE', '0') == '1')
+    app.config.setdefault('EXPERT_BETA_ALL_FREE', os.environ.get('TREND_FINDAH_EXPERT_BETA_ALL_FREE', '1') == '1')
     app.register_blueprint(bp)

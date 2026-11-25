@@ -137,6 +137,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
     from pathlib import Path
     try:
         from flask import current_app
+        all_free = current_app.config.get('EXPERT_BETA_ALL_FREE', False)
         from expert_beta import store, identity, validate_expert
         from plug_ats_v5_weekly import SCOUT_POLICY, read_week
         from plug_ou_weekly_v3 import read_effective
@@ -169,11 +170,12 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         # approved Expert version actually exists. The latest imported seal
         # may differ from the seal attached to an immutable Expert review.
         game = group[0]['scout']['game']
-        try:
-            featured = set(archive.featured(int(game['season']), int(game['week'])))
-        except (OSError, ValueError, TypeError):
-            featured = set()
-            warnings.append('Featured Expert configuration needs review.')
+        featured = set()
+        if not all_free:
+            try:
+                featured = set(archive.featured(int(game['season']), int(game['week'])))
+            except (OSError, ValueError, TypeError):
+                warnings.append('Featured Expert configuration needs review.')
         published_candidates = sorted(expert_by_game.get(game_id, []),
                                       key=lambda r: (r.get('generated_at', ''), r['version']),
                                       reverse=True)
@@ -181,7 +183,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             source for source in group
             if any(candidate['scout'] == source['scout']
                    and candidate.get('expert', {}).get('review_status') == 'approved'
-                   and identity(candidate['scout']) in featured
+                   and (all_free or identity(candidate['scout']) in featured)
                    for candidate in published_candidates)
         ), None)
         record = matching or group[0]
@@ -247,7 +249,7 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
             if candidate['scout'] != record['scout']:
                 continue
             report = candidate.get('expert') or {}
-            if report.get('review_status') != 'approved' or identity(candidate['scout']) not in featured:
+            if report.get('review_status') != 'approved' or (not all_free and identity(candidate['scout']) not in featured):
                 continue
             try:
                 validate_expert(report, candidate['scout'])
