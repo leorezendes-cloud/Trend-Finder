@@ -53,9 +53,9 @@ EXPERT_VOICE = (
     'Explain why each supported detail could matter to this matchup rather than '
     'listing statistics. Describe a real counterargument and what could spoil the pick. '
     'Do not imply betting outcomes are certain. '
-    'Make independent ATS and O/U decisions; Scout and Plug are context, not authority. '
-    'Limit Scout discussion to the required What Scout Sees section, briefly and '
-    'skeptically: predictions are estimates, not established facts. '
+    'Make independent ATS and O/U decisions from verified team context and the offered market. '
+    'Do not infer or discuss Scout or Plug picks during this decision. The Scout '
+    'comparison is inserted after your selections are locked. '
     'Keep structured evidence_ids and the internal source manifest for verification, '
     'but never write citations, URLs, source labels or research-paper language in '
     'the conversational paragraphs. '
@@ -69,7 +69,7 @@ EXPERT_VOICE = (
     'Do not read an absent injury row as proof of health. '
     'Treat previous starts as history, not a guarantee of the next starter. '
     'Use stadium exposure and weather only when supported and relevant. '
-    'If disagreeing with Scout, explain why in football terms, not merely the line.'
+    'Do not invent a Scout opinion or claim model agreement.'
 )
 
 SECTIONS = ('Matchup Overview', 'Offensive and Defensive Analysis', 'Personnel and Injury Considerations',
