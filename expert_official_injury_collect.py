@@ -41,6 +41,77 @@ class _VisibleText(HTMLParser):
                 self.parts.append(text + " ")
 
 
+
+class _InjuryTableParser(HTMLParser):
+    """Extract candidate table rows, never independently verified statuses."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.tables = []
+        self.table = None
+        self.row = None
+        self.cell = None
+        self.hidden = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "table":
+            self.table = []
+        elif tag == "tr" and self.table is not None:
+            self.row = []
+        elif tag in ("td", "th") and self.row is not None:
+            self.cell = []
+        elif tag in ("script", "style"):
+            self.hidden += 1
+
+    def handle_data(self, data):
+        if self.cell is not None and not self.hidden:
+            self.cell.append(data)
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self.hidden = max(0, self.hidden - 1)
+        elif tag in ("td", "th") and self.cell is not None:
+            self.row.append(" ".join("".join(self.cell).split()))
+            self.cell = None
+        elif tag == "tr" and self.row is not None:
+            if self.row:
+                self.table.append(self.row)
+            self.row = None
+        elif tag == "table" and self.table is not None:
+            self.tables.append(self.table)
+            self.table = None
+
+
+def injury_table_candidates(html):
+    """Read only recognizable 5-column injury tables; no team inference.
+
+    Team identity and report publication date must be verified separately.
+    """
+    parser = _InjuryTableParser()
+    parser.feed(html)
+    candidates = []
+    for table in parser.tables:
+        if not table:
+            continue
+        headers = [column.lower() for column in table[0]]
+        expected = ("player", "position", "injuries", "practice status", "game status")
+        if len(headers) != 5 or any(word not in header for word, header in zip(expected, headers)):
+            continue
+        rows = []
+        for cells in table[1:]:
+            if len(cells) != 5 or not cells[0] or len(cells[0]) > 100:
+                continue
+            if cells[4] not in ("", "Out", "Doubtful", "Questionable"):
+                continue
+            rows.append({"name": cells[0], "position": cells[1],
+                         "injury": cells[2], "practice_status": cells[3],
+                         "game_status": cells[4] or "Not Reported"})
+        if rows:
+            candidates.append({"verified": False, "team": None,
+                               "players": rows[:60]})
+    return candidates[:32]
+
+
 def fetch_official_injury_page(season, week, *, opener=None):
     """Fetch a single official week page, max 1 MiB, without persisting anything.
 
@@ -63,8 +134,9 @@ def fetch_official_injury_page(season, week, *, opener=None):
         raw = response.read(1_048_577)
     if len(raw) > 1_048_576:
         raise ValueError("Official source exceeds 1 MiB; no data saved")
+    html = raw.decode("utf-8", errors="replace")
     parser = _VisibleText()
-    parser.feed(raw.decode("utf-8", errors="replace"))
+    parser.feed(html)
     lines = [" ".join(part.split()) for part in "".join(parser.parts).splitlines()]
     lines = [line for line in lines if line]
     if not any(f"WEEK {week}" in line.upper() for line in lines[:100]):
@@ -72,7 +144,8 @@ def fetch_official_injury_page(season, week, *, opener=None):
     return {"source_url": url, "retrieved_at": datetime.now(timezone.utc).isoformat(),
             "season": season, "week": week, "verified_player_records": False,
             "note": "Read-only source preview. Do not treat as verified injury statuses.",
-            "preview": lines[:120]}
+            "preview": lines[:120],
+            "unverified_table_candidates": injury_table_candidates(html)}
 
 
 def main():
