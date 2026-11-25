@@ -23,7 +23,7 @@ def initialize_data(source, target):
             temporary = path.with_suffix('.persistent-link')
             temporary.symlink_to(saved)
             temporary.replace(path)
-    for relative in ('data/scout4', 'data/member_lines', 'data/research_qbs', 'data/recovered_totals', 'logs',
+    for relative in ('data/scout4', 'data/expert_official_observations', 'data/member_lines', 'data/research_qbs', 'data/recovered_totals', 'logs',
                      'plug_dynamic_research', 'plug_dynamic_closing', 'plug_dynamic_official', 'scout_dynamic'):
         original, saved = source / relative, target / relative
         if original.is_symlink():
@@ -483,6 +483,9 @@ def run_leader(root, stop):
     jobs = (
         ('recovered-nfl-tracker', lambda: run_worker('recovered_nfl_tracker.py', ['--root', str(root)]), 300),
         ('game-day-stats', lambda: run_worker('gameday_stats.py', [], 420), 3600),
+        ('official-injury-observations', lambda: run_worker('expert_official_injury_batch.py',
+            ['--schedule', str(root/'nfl_games.csv'), '--destination',
+             str(root/'data/expert_official_observations')], 180), 1800),
         ('expert-only-updates', lambda: run_worker('expert_automation.py', ['--once'], 900), 300),
         ('plug-ou-qualifiers', lambda: run_worker('plug_ou_weekly_v3.py', ['--once'], 90), 300),
         ('plug-ats-v5-qualifiers', lambda: run_worker('plug_ats_v5_weekly.py', ['--once'], 90), 300),
