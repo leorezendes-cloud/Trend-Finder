@@ -170,11 +170,12 @@ def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
         # approved Expert version actually exists. The latest imported seal
         # may differ from the seal attached to an immutable Expert review.
         game = group[0]['scout']['game']
-        try:
-            featured = set(archive.featured(int(game['season']), int(game['week'])))
-        except (OSError, ValueError, TypeError):
-            featured = set()
-            warnings.append('Featured Expert configuration needs review.')
+        featured = set()
+        if not all_free:
+            try:
+                featured = set(archive.featured(int(game['season']), int(game['week'])))
+            except (OSError, ValueError, TypeError):
+                warnings.append('Featured Expert configuration needs review.')
         published_candidates = sorted(expert_by_game.get(game_id, []),
                                       key=lambda r: (r.get('generated_at', ''), r['version']),
                                       reverse=True)
