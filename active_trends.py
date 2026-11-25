@@ -95,7 +95,12 @@ def _same_result_story(left, right):
             and {left.get('scope'), right.get('scope')} == {'team', 'qb'}):
         a = tuple(e.get('game_id') for e in left.get('evidence', [])[:left.get('streak', 0)])
         b = tuple(e.get('game_id') for e in right.get('evidence', [])[:right.get('streak', 0)])
-        return len(a) >= 5 and a == b
+        # The QB may have started fewer games than the team's full streak.
+        # Compare the shared recent run rather than requiring equal lengths.
+        # Require five matching games at the front so unrelated historical
+        # streaks (or a QB's earlier team) cannot be merged accidentally.
+        shared = min(len(a), len(b))
+        return shared >= 5 and a[:shared] == b[:shared]
     if (left.get('kind') == right.get('kind') == 'ats'
             and left.get('scope') == right.get('scope') == 'situational'
             and {left.get('outcome'), right.get('outcome')} == {'Cover', 'Loss'}):
