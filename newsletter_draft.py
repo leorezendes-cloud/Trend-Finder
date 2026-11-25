@@ -102,19 +102,25 @@ def _expert_newsletter_story(report):
     if not excerpt:
         excerpt = story
 
-    # The published side is authoritative; never derive a different pick from prose.
+    # Preserve the approved football prose. Only append pick status if the
+    # excerpt does not already state that market's decision.
+    low = excerpt.lower()
+    closing = []
     ats = report.get('ats_side')
     total = report.get('total_side')
-    closing = []
-    if ats:
-        closing.append(f"The Expert is backing {ats} against the spread.")
-    else:
+    if ats and not any(term in low for term in (
+            'against the number', 'against the spread', 'laying the',
+            'taking the points', 'i like ' + str(ats).lower(),
+            'i’m on ' + str(ats).lower())):
+        closing.append(f"The Expert likes {ats} against the spread.")
+    elif not ats and not any(term in low for term in ('pass on the spread', 'passing on the spread')):
         closing.append("The Expert is passing on the spread.")
-    if total:
-        closing.append(f"On the total, The Expert likes {total}.")
-    else:
-        closing.append("On the total, The Expert is passing.")
-    return excerpt + '\\n' + ' '.join(closing)
+    if total and not any(term in low for term in ('on the total', 'over', 'under')):
+        closing.append(f"The Expert likes the {total}.")
+    elif not total and not any(term in low for term in (
+            'on the total', 'total is a pass', 'total, i’d pass', 'total, i would pass')):
+        closing.append("The Expert is passing on the total.")
+    return excerpt + (' ' + ' '.join(closing) if closing else '')
 
 
 def _plug_content(now, origin, warnings, max_picks=MAX_PICKS, *, root=None):
@@ -405,7 +411,7 @@ def _weekly_featured_pick(picks, experts, versions, warnings):
             scout[0],
             'Plug: ' + scout[1],
             'Expert: ' + lines[1],
-            "Expert's take: " + ' '.join(lines[2:-1]),
+            "The Expert's Take: " + ' '.join(lines[2:-1]),
             lines[-1],
         ])
         return featured, [version] if version else []
