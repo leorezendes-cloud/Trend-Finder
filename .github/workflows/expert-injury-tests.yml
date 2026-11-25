@@ -4,7 +4,9 @@ on:
     paths:
       - 'expert_matchup_evidence.py'
       - 'expert_official_injury_collect.py'
-      - 'test_expert_official_injury_collect.py'
+      - 'expert_official_injury_import.py'
+      - 'test_expert_official_injury_import.py'
+      - 'test_expert_official_injury_collect test_expert_official_injury_import.py'
       - 'test_expert_matchup_evidence.py'
       - '.github/workflows/expert-injury-tests.yml'
   workflow_dispatch:
