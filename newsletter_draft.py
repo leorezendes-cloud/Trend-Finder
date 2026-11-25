@@ -436,6 +436,40 @@ def _trends_content(origin, warnings, limit=MAX_TRENDS):
                     if trend['scope'] == 'team':
                         chosen[duplicate] = trend
                     continue
+            # Favorite covers and opposing underdog non-covers describe
+            # exactly the same ATS outcomes when the underlying games match.
+            if (trend.get('kind') == 'ats'
+                    and trend.get('scope') == 'situational'
+                    and trend.get('outcome') in ('Cover', 'Loss')):
+                params = trend.get('params') or {}
+                role = params.get('research_role')
+                location = params.get('research_location')
+                opposite = {'favorite': 'underdog', 'underdog': 'favorite'}
+                opposite_location = {'home': 'away', 'away': 'home'}
+                if role in opposite and location in opposite_location:
+                    evidence = tuple((e.get('game_id'), e.get('result'))
+                                     for e in trend.get('evidence', [])[:7])
+                    duplicate = None
+                    for i, prior in enumerate(chosen):
+                        pp = prior.get('params') or {}
+                        pe = tuple((e.get('game_id'), e.get('result'))
+                                   for e in prior.get('evidence', [])[:7])
+                        if (prior.get('kind') == 'ats'
+                                and prior.get('scope') == 'situational'
+                                and prior.get('outcome') != trend['outcome']
+                                and pp.get('research_role') == opposite[role]
+                                and pp.get('research_location') == opposite_location[location]
+                                and pp.get('primetime') == params.get('primetime')
+                                and len(evidence) == 7 and len(pe) == 7
+                                and all(a[0] == b[0] and
+                                        {a[1], b[1]} == {'Cover', 'Loss'}
+                                        for a, b in zip(evidence, pe))):
+                            duplicate = i
+                            break
+                    if duplicate is not None:
+                        if role == 'favorite':
+                            chosen[duplicate] = trend
+                        continue
             chosen.append(trend)
         trends = chosen[:limit]
     except (ImportError, OSError, ValueError, KeyError, TypeError, RuntimeError):
@@ -592,6 +626,14 @@ def _matchups(root, now, origin, sources, warnings, *, days=7, active_only=True,
     selected = sorted(best_by_window.values(), key=lambda item:
                       (-priority.get(time_window(item[0]), 2),
                        -relevance(item), item[0], item[1]['game_id']))[:max_games]
+    # Thanksgiving 2026 edition: feature all saved holiday games, then
+    # Sunday/Monday highlights, without altering the normal site schedule.
+    if editorial and now.astimezone(ET).date() >= datetime(2026, 11, 23).date() and now.astimezone(ET).date() <= datetime(2026, 11, 27).date():
+        holiday = [item for item in upcoming
+                   if item[0].astimezone(ET).date() in
+                   (datetime(2026, 11, 26).date(), datetime(2026, 11, 27).date())]
+        remaining = [item for item in selected if item not in holiday]
+        selected = holiday + remaining[:max(0, max_games - len(holiday))]
     selected.sort(key=lambda item: (item[0], item[1]['game_id']))
 
     output = []
@@ -955,7 +997,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
         # report AND its matching Scout snapshot for the free weekly newsletter.
         picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None, root=root)
         matchups = _matchups(root, now, origin, sources, warnings,
-                            max_games=5 if not premium else 8, editorial=not premium,
+                            max_games=(7 if now.astimezone(ET).date() >= datetime(2026, 11, 23).date() and now.astimezone(ET).date() <= datetime(2026, 11, 27).date() else 5) if not premium else 8, editorial=not premium,
                              active_only=False)
         if premium:
             if len(picks) < 13:

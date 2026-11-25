@@ -74,9 +74,9 @@
 </td></tr>
 <tr><td style="padding:24px 24px 16px;border-bottom:1px solid #e5e9ee">
   <p style="margin:0 0 7px;color:#85858d;letter-spacing:1px;font-size:10px;font-weight:800">03 / AROUND THE LEAGUE</p>
-  <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">Marquee Matchups</h2>
+  <h2 style="margin:0 0 13px;color:#1a1a20;font-size:19px">{{ 'Thanksgiving & Black Friday Football 🦃' if 'Thu, Nov 26' in (sections.get('matchups') or '') and 'Fri, Nov 27' in (sections.get('matchups') or '') else 'Marquee Matchups' }}</h2>
   <p style="color:#555965;font-size:14px;line-height:1.55;margin:0 0 15px">A few featured games across this week's kickoff windows.</p>
-  {% for block in (sections.get('matchups') or '').split('\n\n')[:5] %}
+  {% for block in (sections.get('matchups') or '').split('\n\n')[:8] %}
     {% set lines = block.split('\n') %}
     {% if lines[0]|trim %}
     <p style="font-size:15px;font-weight:800;color:#252832;margin:12px 0 4px">{{ lines[0] }}</p>
