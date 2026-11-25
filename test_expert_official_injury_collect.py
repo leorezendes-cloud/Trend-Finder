@@ -175,8 +175,8 @@ class CollectorTests(unittest.TestCase):
         from expert_official_injury_collect import scout_game_from_schedule
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "nfl_games.csv"
-            path.write_text("game_id,season,week,game_type,gameday,gametime,away_team,home_team\\n"
-                            "2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\\n")
+            path.write_text("game_id,season,week,game_type,gameday,gametime,away_team,home_team\n"
+                            "2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\n")
             game = scout_game_from_schedule(path, "2026_12_GB_LA", 2026, 12)
             self.assertEqual(game["away_team"], "GB")
             self.assertEqual(game["home_team"], "LA")
@@ -186,7 +186,7 @@ class CollectorTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 scout_game_from_schedule(path, "wrong", 2026, 12)
             with path.open("a") as stream:
-                stream.write("2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\\n")
+                stream.write("2026_12_GB_LA,2026,12,REG,2026-11-22,16:25,GB,LA\n")
             with self.assertRaises(ValueError):
                 scout_game_from_schedule(path, "2026_12_GB_LA", 2026, 12)
 
