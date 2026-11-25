@@ -185,6 +185,39 @@ class ExpertMatchupEvidenceTests(unittest.TestCase):
         # Expert research observed after Scout's cutoff is valid when still pre-kickoff.
         self.assertGreater(result["personnel"]["observed_at"], self.scout["cutoff_utc"])
 
+    def test_official_injury_evidence_is_bounded_and_pregame(self):
+        from datetime import datetime, timezone
+        from expert_matchup_evidence import _official_injury_context, _merge_official_injuries
+        self.scout["game"].update(game_id="fixture", week=12,
+            kickoff_utc="2026-11-29T18:00:00+00:00")
+        folder = self.root / "data/expert_official_injuries/2026"
+        folder.mkdir(parents=True)
+        report = dict(game_id="fixture", season=2026, week=12, team="PHI",
+            source_url="https://www.nfl.com/news/injury-report",
+            published_at="2026-11-25T10:00:00+00:00",
+            observed_at="2026-11-25T11:00:00+00:00",
+            players=[dict(name="Example Player", position="QB",
+                          game_status="Questionable", injury="Ankle")])
+        (folder/"report.json").write_text(json.dumps(report))
+        as_of=datetime(2026,11,25,12,tzinfo=timezone.utc)
+        teams, sources = _official_injury_context(self.scout,self.root,as_of)
+        self.assertEqual(teams["PHI"]["key_injuries"][0]["game_status"],"Questionable")
+        self.assertEqual(sources[0]["name"],"official_injury_PHI")
+        output=_merge_official_injuries({},self.scout,self.root,as_of)
+        self.assertEqual(output["personnel"]["teams"]["PHI"]["official_report_source"],
+                         "official_injury_PHI")
+        report["observed_at"]="2026-11-30T11:00:00+00:00"
+        (folder/"report.json").write_text(json.dumps(report))
+        self.assertEqual(_official_injury_context(self.scout,self.root,as_of),({},[]))
+        report["observed_at"]="2026-11-25T11:00:00+00:00"
+        report["source_url"]="https://example.com/unverified"
+        (folder/"report.json").write_text(json.dumps(report))
+        self.assertEqual(_official_injury_context(self.scout,self.root,as_of),({},[]))
+        report["source_url"]="https://www.nfl.com/news/injury-report"
+        report["week"]=10
+        (folder/"report.json").write_text(json.dumps(report))
+        self.assertEqual(_official_injury_context(self.scout,self.root,as_of),({},[]))
+
     def test_player_metrics_are_limited_to_historical_games(self):
         self._schedule([
             dict(game_id="prior", season=2026, game_type="REG", gameday="2026-10-20",
