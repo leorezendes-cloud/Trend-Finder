@@ -7,6 +7,8 @@ import argparse
 import json
 from pathlib import Path
 import os
+import csv
+from zoneinfo import ZoneInfo
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
@@ -322,19 +324,55 @@ def save_observation(snapshot, destination):
     return path
 
 
+def scout_game_from_schedule(path, game_id, season, week):
+    """Resolve one exact NFLverse Scout schedule row; reject ambiguous or missing times."""
+    if not isinstance(game_id, str) or not game_id:
+        raise ValueError("Exact game ID required")
+    matches = []
+    with Path(path).open(encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if (row.get("game_id") == game_id and row.get("season") == str(season)
+                    and row.get("week") == str(week) and row.get("game_type") == "REG"):
+                matches.append(row)
+    if len(matches) != 1:
+        raise ValueError("Expected exactly one matching regular-season Scout game")
+    row = matches[0]
+    away, home = row.get("away_team"), row.get("home_team")
+    if not away or not home or away == home:
+        raise ValueError("Missing distinct matchup teams")
+    date, clock = row.get("gameday"), row.get("gametime")
+    if not date or not clock:
+        raise ValueError("Scout schedule lacks a precise gameday/gametime")
+    try:
+        local = datetime.fromisoformat(date + "T" + clock)
+        if local.tzinfo is not None:
+            raise ValueError("Unexpected timezone in Scout gametime")
+        kickoff = local.replace(tzinfo=ZoneInfo("America/New_York")).astimezone(timezone.utc)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Invalid Scout kickoff: " + str(exc)) from exc
+    return {"game_id": game_id, "season": season, "week": week,
+            "away_team": away, "home_team": home, "kickoff_utc": kickoff.isoformat()}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", type=int, required=True)
     parser.add_argument("--week", type=int, required=True)
+    parser.add_argument("--scout-schedule", help="Existing Scout nfl_games.csv; requires --game-id")
+    parser.add_argument("--game-id", help="Exact Scout game ID; requires --scout-schedule")
     parser.add_argument("--game-json", help="Local Scout game JSON with exact game_id, teams, kickoff")
     parser.add_argument("--as-of", help="Expert cutoff ISO timestamp (timezone required)")
     parser.add_argument("--save-observation", help="Save immutable unverified exact-game evidence to a new JSON path")
     parser.add_argument("--compact", action="store_true",
                         help="Show team counts and provenance instead of all player rows")
     args = parser.parse_args()
-    if args.save_observation and (not args.game_json or not args.as_of):
+    if args.game_json and args.scout_schedule:
+        parser.error("Choose either --game-json or --scout-schedule")
+    if bool(args.scout_schedule) != bool(args.game_id):
+        parser.error("--scout-schedule and --game-id are required together")
+    if args.save_observation and (not (args.game_json or args.scout_schedule) or not args.as_of):
         parser.error("--save-observation requires --game-json and --as-of")
-    if bool(args.game_json) != bool(args.as_of):
+    if bool(args.game_json or args.scout_schedule) != bool(args.as_of):
         parser.error("--game-json and --as-of must be provided together")
     if args.as_of:
         try:
@@ -343,9 +381,12 @@ def main():
                 raise ValueError("Timezone required")
             if cutoff.astimezone(timezone.utc) > datetime.now(timezone.utc):
                 raise ValueError("Cutoff cannot be in the future")
-            game = json.loads(Path(args.game_json).read_text(encoding="utf-8"))
-            if isinstance(game, dict) and isinstance(game.get("game"), dict):
-                game = game["game"]
+            if args.scout_schedule:
+                game = scout_game_from_schedule(args.scout_schedule, args.game_id, args.season, args.week)
+            else:
+                game = json.loads(Path(args.game_json).read_text(encoding="utf-8"))
+                if isinstance(game, dict) and isinstance(game.get("game"), dict):
+                    game = game["game"]
         except (OSError, ValueError, TypeError) as exc:
             parser.error("Invalid game JSON or as-of: " + str(exc))
         if not isinstance(game, dict):
@@ -353,7 +394,7 @@ def main():
         if game.get("season") != args.season or game.get("week") != args.week:
             parser.error("Game season/week differs from requested source")
     snapshot = fetch_official_injury_page(args.season, args.week)
-    if args.game_json:
+    if args.game_json or args.scout_schedule:
         audit = preflight_game(snapshot, game, args.as_of)
         snapshot["game_preflight"] = audit
     if args.save_observation:
