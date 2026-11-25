@@ -274,7 +274,7 @@ def week_usage(root, records, week):
     return total, requests
 
 
-def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False, retry_uncertain=False):
+def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily_limit, *, replacement=False, retry_uncertain=False, second_replacement=False):
     from expert_beta import generate_draft, validate_expert
     from expert_provider import OpenAIProvider, RateLimited
     from scheduler_runtime import atomic_json
@@ -291,7 +291,7 @@ def openai_draft(root, row, records, model, weekly_limit, weekly_requests, daily
                for path in folder.glob(version + '.replacement-*.json')):
             raise ValueError('A replacement response already exists; retry blocked')
     elif replacement and attempts and not (
-            len(attempts) == 1
+            second_replacement and len(attempts) == 1
             and attempts[0].name.endswith('.replacement-1.attempt.json')
             and (folder/(version+'.replacement-1.json')).is_file()
             and not (folder/(version+'.replacement-2.attempt.json')).exists()):
@@ -512,7 +512,7 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
             records = Store(root).records()
             for row in queue[:planned]:
                 try:
-                    state = openai_draft(root,row,records,model,budget,weekly_requests,daily_limit,replacement=True)
+                    state = openai_draft(root,row,records,model,budget,weekly_requests,daily_limit,replacement=True,second_replacement=allow_second_replacement)
                     if state == 'saved':
                         output['saved_drafts'] += 1
                         output['state'] = 'complete'
