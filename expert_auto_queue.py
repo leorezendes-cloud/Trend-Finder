@@ -421,7 +421,7 @@ def bounded_run(store_path, model=None, *, daily_limit=16, run_limit=1,
 
 
 def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16,
-                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None, allow_second_replacement=False):
+                         run_limit=2, weekly_limit=2, weekly_requests=32, execute=False, matchup=None, allow_second_replacement=False, owner_daily_override=False):
     """Regenerate only already-drafted production games, preserving originals.
 
     Operator-only temporary override. Writes separate replacement files and
@@ -433,8 +433,11 @@ def bounded_replace_week(store_path, season, week, model=None, *, daily_limit=16
         raise ValueError('Expert store does not exist')
     if not 2000 <= int(season) <= 2100 or not 1 <= int(week) <= 22:
         raise ValueError('Invalid NFL season/week')
-    if not 1 <= daily_limit <= 16 or not 1 <= run_limit <= 2:
-        raise ValueError('daily_limit must be 1..16 and run_limit must be 1..2')
+    if owner_daily_override and (int(season), int(week)) != (2026, 12):
+        raise ValueError('Owner daily override is restricted to 2026 Week 12')
+    maximum_daily = 32 if owner_daily_override else 16
+    if not 1 <= daily_limit <= maximum_daily or not 1 <= run_limit <= 2:
+        raise ValueError(f'daily_limit must be 1..{maximum_daily} and run_limit must be 1..2')
     if allow_second_replacement and run_limit != 1:
         raise ValueError('Second replacement requires --run-limit 1')
     budget = positive_decimal(weekly_limit)
@@ -623,6 +626,7 @@ def main(argv=None):
     parser.add_argument('--model')
     parser.add_argument('--provider', choices=('openai','gemini'), default=None)
     parser.add_argument('--daily-limit', type=int, default=16)
+    parser.add_argument('--owner-week12-daily-override', action='store_true', help='Explicit operator-only Week 12 replacement limit up to 32 per rolling 24 hours')
     parser.add_argument('--run-limit', type=int, default=1)
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--replace-season', type=int)
@@ -632,6 +636,8 @@ def main(argv=None):
     parser.add_argument('--temporary-weekly-budget', type=positive_decimal)
     parser.add_argument('--retry-uncertain-version', help='Exact 64-character production version; one operator-only retry')
     args = parser.parse_args(argv)
+    if args.owner_week12_daily_override and (args.replace_season, args.replace_week) != (2026, 12):
+        parser.error('Owner daily override requires --replace-season 2026 --replace-week 12')
     if args.retry_uncertain_version is not None:
         if args.replace_season is None or args.replace_week is None or args.temporary_weekly_budget is None:
             parser.error('Retry needs --replace-season, --replace-week and --temporary-weekly-budget')
@@ -647,7 +653,8 @@ def main(argv=None):
             parser.error('Targeted replacement is OpenAI-only')
         result = bounded_replace_week(args.store,args.replace_season,args.replace_week,args.model,
             daily_limit=args.daily_limit,run_limit=args.run_limit,weekly_limit=args.temporary_weekly_budget,
-            execute=args.execute,matchup=args.replace_game,allow_second_replacement=args.second_replacement)
+            execute=args.execute,matchup=args.replace_game,allow_second_replacement=args.second_replacement,
+            owner_daily_override=args.owner_week12_daily_override)
     else:
         result = bounded_run(args.store, args.model, daily_limit=args.daily_limit,
             run_limit=args.run_limit, execute=args.execute, provider_name=args.provider)
