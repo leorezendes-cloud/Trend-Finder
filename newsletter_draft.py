@@ -997,7 +997,7 @@ def build_draft(root, now, frequency='weekly', *, premium=False, report_month=No
         # report AND its matching Scout snapshot for the free weekly newsletter.
         picks, expert, all_versions = _plug_content(now, origin, warnings, max_picks=None, root=root)
         matchups = _matchups(root, now, origin, sources, warnings,
-                            max_games=5 if not premium else 8, editorial=not premium,
+                            max_games=(7 if now.astimezone(ET).date() >= datetime(2026, 11, 23).date() and now.astimezone(ET).date() <= datetime(2026, 11, 27).date() else 5) if not premium else 8, editorial=not premium,
                              active_only=False)
         if premium:
             if len(picks) < 13:
