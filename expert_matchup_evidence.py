@@ -353,6 +353,7 @@ def _merge_official_injuries(output, scout, root, as_of):
         return output
     personnel = output.setdefault("personnel", {"teams": {}})
     teams = personnel.setdefault("teams", {})
+    applied_sources = []
     for team, report in official.items():
         existing = teams.setdefault(team, {})
         existing_observed = existing.get("snapshot_observed_at")
@@ -364,7 +365,10 @@ def _merge_official_injuries(output, scout, root, as_of):
                 pass
         existing.update(report)
         existing["official_report_source"] = "official_injury_" + team
-    output.setdefault("sources", []).extend(sources)
+        applied_sources.extend(source for source in sources
+                               if source["name"] == "official_injury_" + team)
+    if applied_sources:
+        output.setdefault("sources", []).extend(applied_sources)
     return output
 
 
