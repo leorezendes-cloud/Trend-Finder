@@ -4,6 +4,7 @@ A hot trend is 5+ consecutive favorable results, or 5 of the latest 7 games.
 Pushes, ties, and missing outcomes occupy a game slot and interrupt streaks.
 """
 import csv
+import json
 from collections import defaultdict
 from datetime import date, datetime
 from functools import lru_cache
@@ -121,9 +122,31 @@ def _same_result_story(left, right):
     return False
 
 
+def _featured_qb_exclusions(root=None):
+    """Season-scoped editorial availability exclusions; never affect research."""
+    root = Path(root) if root is not None else Path(__file__).resolve().parent
+    path = root / 'featured_qb_availability.json'
+    try:
+        records = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError, TypeError):
+        return set()
+    if not isinstance(records, list):
+        return set()
+    return {(str(row['name']).strip().casefold(), int(row['season']))
+            for row in records if isinstance(row, dict)
+            and isinstance(row.get('name'), str)
+            and str(row.get('season', '')).isdigit()
+            and row.get('status') == 'out_for_season'}
+
+
 def _feature(all_trends, limit=MAX_FEATURED):
     """Choose distinct, balanced stories before filling the homepage's eight slots."""
-    ranked = sorted(all_trends, key=_rank, reverse=True)
+    excluded = _featured_qb_exclusions()
+    ranked = sorted((t for t in all_trends
+                     if not (t.get('scope') == 'qb'
+                             and (str(t.get('subject', '')).removeprefix('qb:').strip().casefold(),
+                                  int(t.get('season') or 0)) in excluded)),
+                    key=_rank, reverse=True)
     # Prefer the team headline for identical QB/team SU streaks, and
     # favorites for equivalent favorite-cover / underdog-non-cover stories.
     unique = []
