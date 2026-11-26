@@ -31,6 +31,22 @@ class HomepageTrendDedupTests(unittest.TestCase):
                    ['x'] + ['g'+str(i) for i in range(6)], streak=7)
         self.assertEqual(len(_feature([team, qb])), 2)
 
+    def test_season_scoped_unavailable_qb_is_not_featured(self):
+        games = ['g'+str(i) for i in range(7)]
+        qb = trend('qb:Gardner Minshew', 'qb', 'su', 'Win', games)
+        qb['season'] = 2026
+        other = trend('team:OTHER', 'team', 'su', 'Win',
+                      ['x'+str(i) for i in range(7)])
+        other['season'] = 2026
+        result = _feature([qb, other])
+        self.assertEqual([t['subject'] for t in result], ['team:OTHER'])
+
+    def test_unavailable_qb_historical_season_remains_eligible(self):
+        qb = trend('qb:Gardner Minshew', 'qb', 'su', 'Win',
+                   ['g'+str(i) for i in range(7)])
+        qb['season'] = 2025
+        self.assertEqual(len(_feature([qb])), 1)
+
     def test_opposing_situational_ats_stories_choose_favorite(self):
         games = ['g'+str(i) for i in range(7)]
         fav = trend('favorite', 'situational', 'ats', 'Cover', games, role='favorite', location='home')
