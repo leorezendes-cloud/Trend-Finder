@@ -1,0 +1,4186 @@
+{
+  "specification": {
+    "policy": "score-mismatch-bands-v1",
+    "thresholds_epa_per_opportunity": [
+      0.025,
+      0.075,
+      0.15
+    ],
+    "gate": "Both opponent-adjusted offense and defense-allowed residual must have the same sign. Strength is the weaker absolute residual.",
+    "bands": "Below .025: none; .025\u2013.075: moderate; .075\u2013.15: strong; >=.15: exceptional. Negative mirrors positive.",
+    "volume": "Pass share/.55 or rush share/.45, clipped to [.5,1.5].",
+    "calibration": "Nonnegative ridge on signed band indicators times volume; residual target is actual team points minus its pregame PF/PA projection. Symmetric favorable/adverse point magnitude.",
+    "ridge_penalty": 30,
+    "minimum_band_team_games": 20,
+    "maximum_type_points": 3,
+    "maximum_combined_points": 4,
+    "combined": "Joint six-coefficient fit, rather than summing independently fitted pass and rush effects.",
+    "cutoff": "Earliest kickoff in target week. Earlier outcomes only enter calibration 48h after estimated six-hour game end.",
+    "selection": "Fixed before this run. No threshold/penalty/cap search or target-season parameter selection.",
+    "limitations": "Retrospective corrected inputs; archived closing lines have unverified original timestamps. Not official Scout/Plug forecasts. No new home-field bonus."
+  },
+  "train_season": 2022,
+  "last_season": 2026,
+  "line_sha256": "595b0f30ac12dd825da928832fca007966ed1b233393ed403eb406d38c6e32a6",
+  "seasons": {
+    "2023": {
+      "games": 224,
+      "variants": {
+        "baseline": {
+          "ats": {
+            "wins": 96,
+            "losses": 114,
+            "pushes": 11,
+            "no_calls": 3,
+            "cover_pct": 45.714285714285715
+          },
+          "totals": {
+            "wins": 113,
+            "losses": 109,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 50.9009009009009
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 0,
+          "games_with_score_adjustment": 0,
+          "mean_abs_team_adjustment": 0.0,
+          "margin_mae": 10.613347664796658,
+          "total_mae": 10.77333647464258
+        },
+        "passing_only": {
+          "ats": {
+            "wins": 93,
+            "losses": 117,
+            "pushes": 11,
+            "no_calls": 3,
+            "cover_pct": 44.285714285714285
+          },
+          "totals": {
+            "wins": 118,
+            "losses": 104,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 53.153153153153156
+          },
+          "ats_changed_vs_baseline": 20,
+          "totals_changed_vs_baseline": 15,
+          "games_with_score_adjustment": 120,
+          "mean_abs_team_adjustment": 0.2973378200711244,
+          "margin_mae": 10.638027437533115,
+          "total_mae": 10.75480267813928
+        },
+        "rushing_only": {
+          "ats": {
+            "wins": 96,
+            "losses": 116,
+            "pushes": 11,
+            "no_calls": 1,
+            "cover_pct": 45.283018867924525
+          },
+          "totals": {
+            "wins": 111,
+            "losses": 111,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 50.0
+          },
+          "ats_changed_vs_baseline": 5,
+          "totals_changed_vs_baseline": 4,
+          "games_with_score_adjustment": 73,
+          "mean_abs_team_adjustment": 0.10809995319983508,
+          "margin_mae": 10.63750721946384,
+          "total_mae": 10.802044346408298
+        },
+        "combined": {
+          "ats": {
+            "wins": 94,
+            "losses": 118,
+            "pushes": 11,
+            "no_calls": 1,
+            "cover_pct": 44.339622641509436
+          },
+          "totals": {
+            "wins": 117,
+            "losses": 105,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 52.7027027027027
+          },
+          "ats_changed_vs_baseline": 20,
+          "totals_changed_vs_baseline": 16,
+          "games_with_score_adjustment": 153,
+          "mean_abs_team_adjustment": 0.3661588368852465,
+          "margin_mae": 10.66342311863644,
+          "total_mae": 10.774573368045592
+        }
+      }
+    },
+    "2024": {
+      "games": 224,
+      "variants": {
+        "baseline": {
+          "ats": {
+            "wins": 104,
+            "losses": 117,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 47.05882352941177
+          },
+          "totals": {
+            "wins": 119,
+            "losses": 102,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 53.84615384615385
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 0,
+          "games_with_score_adjustment": 0,
+          "mean_abs_team_adjustment": 0.0,
+          "margin_mae": 10.296442235686142,
+          "total_mae": 10.007562182897688
+        },
+        "passing_only": {
+          "ats": {
+            "wins": 108,
+            "losses": 113,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 48.86877828054298
+          },
+          "totals": {
+            "wins": 117,
+            "losses": 104,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 52.94117647058823
+          },
+          "ats_changed_vs_baseline": 15,
+          "totals_changed_vs_baseline": 20,
+          "games_with_score_adjustment": 113,
+          "mean_abs_team_adjustment": 0.30317314463174283,
+          "margin_mae": 10.243569538724783,
+          "total_mae": 9.976719959090474
+        },
+        "rushing_only": {
+          "ats": {
+            "wins": 101,
+            "losses": 120,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 45.70135746606335
+          },
+          "totals": {
+            "wins": 117,
+            "losses": 104,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 52.94117647058823
+          },
+          "ats_changed_vs_baseline": 5,
+          "totals_changed_vs_baseline": 4,
+          "games_with_score_adjustment": 91,
+          "mean_abs_team_adjustment": 0.13423418872261522,
+          "margin_mae": 10.273091227563274,
+          "total_mae": 10.031591237506962
+        },
+        "combined": {
+          "ats": {
+            "wins": 110,
+            "losses": 111,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 49.7737556561086
+          },
+          "totals": {
+            "wins": 115,
+            "losses": 106,
+            "pushes": 3,
+            "no_calls": 0,
+            "cover_pct": 52.036199095022624
+          },
+          "ats_changed_vs_baseline": 21,
+          "totals_changed_vs_baseline": 26,
+          "games_with_score_adjustment": 152,
+          "mean_abs_team_adjustment": 0.39336676368965634,
+          "margin_mae": 10.225337152065851,
+          "total_mae": 10.000753920891611
+        }
+      }
+    },
+    "2025": {
+      "games": 224,
+      "variants": {
+        "baseline": {
+          "ats": {
+            "wins": 120,
+            "losses": 103,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 53.81165919282511
+          },
+          "totals": {
+            "wins": 108,
+            "losses": 116,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 48.214285714285715
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 0,
+          "games_with_score_adjustment": 0,
+          "mean_abs_team_adjustment": 0.0,
+          "margin_mae": 10.56807847814204,
+          "total_mae": 10.45578365405453
+        },
+        "passing_only": {
+          "ats": {
+            "wins": 118,
+            "losses": 105,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 52.91479820627803
+          },
+          "totals": {
+            "wins": 114,
+            "losses": 110,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 50.892857142857146
+          },
+          "ats_changed_vs_baseline": 14,
+          "totals_changed_vs_baseline": 18,
+          "games_with_score_adjustment": 108,
+          "mean_abs_team_adjustment": 0.41762703683380126,
+          "margin_mae": 10.478561466198798,
+          "total_mae": 10.371244859592505
+        },
+        "rushing_only": {
+          "ats": {
+            "wins": 117,
+            "losses": 106,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 52.46636771300449
+          },
+          "totals": {
+            "wins": 104,
+            "losses": 120,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 46.42857142857143
+          },
+          "ats_changed_vs_baseline": 5,
+          "totals_changed_vs_baseline": 8,
+          "games_with_score_adjustment": 82,
+          "mean_abs_team_adjustment": 0.19099538079431505,
+          "margin_mae": 10.608891517587818,
+          "total_mae": 10.432002455846476
+        },
+        "combined": {
+          "ats": {
+            "wins": 116,
+            "losses": 107,
+            "pushes": 1,
+            "no_calls": 0,
+            "cover_pct": 52.01793721973094
+          },
+          "totals": {
+            "wins": 109,
+            "losses": 115,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 48.660714285714285
+          },
+          "ats_changed_vs_baseline": 20,
+          "totals_changed_vs_baseline": 25,
+          "games_with_score_adjustment": 144,
+          "mean_abs_team_adjustment": 0.5313102454863682,
+          "margin_mae": 10.52118938881982,
+          "total_mae": 10.359459421906966
+        }
+      }
+    },
+    "2026": {
+      "games": 31,
+      "variants": {
+        "baseline": {
+          "ats": {
+            "wins": 18,
+            "losses": 11,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 62.06896551724138
+          },
+          "totals": {
+            "wins": 10,
+            "losses": 21,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 32.25806451612903
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 0,
+          "games_with_score_adjustment": 0,
+          "mean_abs_team_adjustment": 0.0,
+          "margin_mae": 8.454205069124425,
+          "total_mae": 10.932051651305683
+        },
+        "passing_only": {
+          "ats": {
+            "wins": 18,
+            "losses": 11,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 62.06896551724138
+          },
+          "totals": {
+            "wins": 10,
+            "losses": 21,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 32.25806451612903
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 4,
+          "games_with_score_adjustment": 17,
+          "mean_abs_team_adjustment": 0.39573032793900426,
+          "margin_mae": 8.23195681954477,
+          "total_mae": 11.068146748726921
+        },
+        "rushing_only": {
+          "ats": {
+            "wins": 18,
+            "losses": 11,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 62.06896551724138
+          },
+          "totals": {
+            "wins": 8,
+            "losses": 23,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 25.806451612903224
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 2,
+          "games_with_score_adjustment": 13,
+          "mean_abs_team_adjustment": 0.27069392296409117,
+          "margin_mae": 8.530991162565321,
+          "total_mae": 11.003219394419157
+        },
+        "combined": {
+          "ats": {
+            "wins": 18,
+            "losses": 11,
+            "pushes": 2,
+            "no_calls": 0,
+            "cover_pct": 62.06896551724138
+          },
+          "totals": {
+            "wins": 9,
+            "losses": 22,
+            "pushes": 0,
+            "no_calls": 0,
+            "cover_pct": 29.032258064516128
+          },
+          "ats_changed_vs_baseline": 0,
+          "totals_changed_vs_baseline": 5,
+          "games_with_score_adjustment": 24,
+          "mean_abs_team_adjustment": 0.5596175780873842,
+          "margin_mae": 8.312070084843008,
+          "total_mae": 11.088385179448123
+        }
+      }
+    }
+  },
+  "skipped": {
+    "team_warmup": 240
+  },
+  "calibration_by_week": [
+    {
+      "season": 2022,
+      "week": 1,
+      "cutoff": "2022-09-09T00:20:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 2,
+      "cutoff": "2022-09-16T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 3,
+      "cutoff": "2022-09-23T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 4,
+      "cutoff": "2022-09-30T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 5,
+      "cutoff": "2022-10-07T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            6,
+            2,
+            0
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            6,
+            3,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            6,
+            2,
+            0,
+            6,
+            3,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 6,
+      "cutoff": "2022-10-14T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            9,
+            9,
+            2
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            20,
+            3,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            9,
+            9,
+            2,
+            20,
+            3,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 7,
+      "cutoff": "2022-10-21T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            14,
+            12,
+            2
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            27,
+            6,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            14,
+            12,
+            2,
+            27,
+            6,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 8,
+      "cutoff": "2022-10-28T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            19,
+            16,
+            2
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            31,
+            8,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            19,
+            16,
+            2,
+            31,
+            8,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 9,
+      "cutoff": "2022-11-04T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.4060762441602784,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            32,
+            18,
+            3
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            37,
+            8,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.4060762441602784,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            32,
+            18,
+            3,
+            37,
+            8,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 10,
+      "cutoff": "2022-11-11T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.162560252554666,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            39,
+            19,
+            4
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            44,
+            8,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.162560252554666,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            39,
+            19,
+            4,
+            44,
+            8,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 11,
+      "cutoff": "2022-11-18T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.181904874469515,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            44,
+            20,
+            4
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            50,
+            9,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.181904874469515,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            44,
+            20,
+            4,
+            50,
+            9,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 12,
+      "cutoff": "2022-11-24T17:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.508449001609714,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            51,
+            23,
+            4
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            56,
+            9,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.508449001609714,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            51,
+            23,
+            4,
+            56,
+            9,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 13,
+      "cutoff": "2022-12-02T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.3523440515833034,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            59,
+            27,
+            4
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.42799591659087516,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            66,
+            9,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3304869407628754,
+            0.0,
+            0.0,
+            0.3433980508634785,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            59,
+            27,
+            4,
+            66,
+            9,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 14,
+      "cutoff": "2022-12-09T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6450530297718162,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            63,
+            29,
+            4
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.5410751575118632,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            72,
+            10,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6143997428808747,
+            0.0,
+            0.0,
+            0.4286277859932433,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            63,
+            29,
+            4,
+            72,
+            10,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 15,
+      "cutoff": "2022-12-16T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6111621516642187,
+            0.10493182060324192,
+            0.0
+          ],
+          "band_team_games": [
+            67,
+            31,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7990463013772884,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            75,
+            11,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.5695755243000742,
+            0.0929127845954824,
+            0.0,
+            0.7084452956804642,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            67,
+            31,
+            5,
+            75,
+            11,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 16,
+      "cutoff": "2022-12-23T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.7112365231754203,
+            0.12694373373304552,
+            0.0
+          ],
+          "band_team_games": [
+            69,
+            35,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7915661090578765,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            77,
+            13,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6711894617757272,
+            0.1157203459447564,
+            0.0,
+            0.6964323651064813,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            69,
+            35,
+            5,
+            77,
+            13,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 17,
+      "cutoff": "2022-12-30T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.5165077342879631,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            75,
+            39,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9481000136150148,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            83,
+            13,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.469332246737448,
+            0.0,
+            0.0,
+            0.8700978318572014,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            75,
+            39,
+            5,
+            83,
+            13,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "week": 18,
+      "cutoff": "2023-01-07T21:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6683373254582186,
+            0.10361407658561435,
+            0.0
+          ],
+          "band_team_games": [
+            81,
+            41,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            1.0185050763322918,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            88,
+            14,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6125146102693368,
+            0.07777326593658632,
+            0.0,
+            0.9213724061578379,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            81,
+            41,
+            5,
+            88,
+            14,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 1,
+      "cutoff": "2023-09-08T00:20:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4443475747112942,
+            0.18760991732516347,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9892243622607528,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            15,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3864235540799343,
+            0.15158483152751057,
+            0.0,
+            0.8972040663720465,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5,
+            95,
+            15,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 2,
+      "cutoff": "2023-09-15T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4443475747112942,
+            0.18760991732516347,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9892243622607528,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            15,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3864235540799343,
+            0.15158483152751057,
+            0.0,
+            0.8972040663720465,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5,
+            95,
+            15,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 3,
+      "cutoff": "2023-09-22T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4443475747112942,
+            0.18760991732516347,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9892243622607528,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            15,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3864235540799343,
+            0.15158483152751057,
+            0.0,
+            0.8972040663720465,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5,
+            95,
+            15,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 4,
+      "cutoff": "2023-09-29T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4443475747112942,
+            0.18760991732516347,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9892243622607528,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            15,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3864235540799343,
+            0.15158483152751057,
+            0.0,
+            0.8972040663720465,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            89,
+            44,
+            5,
+            95,
+            15,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 5,
+      "cutoff": "2023-10-06T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.356068725128565,
+            0.3420350090143564,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            48,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            1.1937484081057446,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            99,
+            16,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2801530265466197,
+            0.3001656698749939,
+            0.0,
+            1.0981612926542081,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            95,
+            48,
+            5,
+            99,
+            16,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 6,
+      "cutoff": "2023-10-13T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9944901535360609,
+            0.4253996045870299,
+            0.0
+          ],
+          "band_team_games": [
+            103,
+            52,
+            5
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            1.049906394201071,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            106,
+            17,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9308021183620718,
+            0.3787897735662741,
+            0.0,
+            0.9776253286924963,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            103,
+            52,
+            5,
+            106,
+            17,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 7,
+      "cutoff": "2023-10-20T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9431529256292164,
+            0.3438850604663286,
+            0.0
+          ],
+          "band_team_games": [
+            105,
+            55,
+            6
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8286951023635323,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            114,
+            18,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.8945136691721763,
+            0.2918954902423517,
+            0.0,
+            0.7608402989694626,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            105,
+            55,
+            6,
+            114,
+            18,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 8,
+      "cutoff": "2023-10-27T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.0461379300557943,
+            0.09013962135422952,
+            0.0
+          ],
+          "band_team_games": [
+            113,
+            57,
+            6
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7695365284417266,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            124,
+            19,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9902254094864095,
+            0.04407500984915321,
+            0.0,
+            0.6903824977000571,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            113,
+            57,
+            6,
+            124,
+            19,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 9,
+      "cutoff": "2023-11-03T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.1109968082852064,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            120,
+            61,
+            6
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7148881845065742,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            129,
+            20,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.0621838613570744,
+            0.0,
+            0.0,
+            0.6347385361642894,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            120,
+            61,
+            6,
+            129,
+            20,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 10,
+      "cutoff": "2023-11-10T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.0628607400865135,
+            0.20914491274749203,
+            0.0
+          ],
+          "band_team_games": [
+            128,
+            63,
+            6
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.2681123170182051,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            138,
+            20,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.048620173933422,
+            0.19791796152932833,
+            0.0,
+            0.17916485914402602,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            128,
+            63,
+            6,
+            138,
+            20,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 11,
+      "cutoff": "2023-11-17T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.161563922305542,
+            0.2415383688197606,
+            0.0
+          ],
+          "band_team_games": [
+            134,
+            65,
+            8
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.2153775005990609,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            143,
+            22,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.1527085048051144,
+            0.23254405806715023,
+            0.0,
+            0.12522449352374113,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            134,
+            65,
+            8,
+            143,
+            22,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 12,
+      "cutoff": "2023-11-23T17:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.16057471903639,
+            0.3956800860023498,
+            0.0
+          ],
+          "band_team_games": [
+            138,
+            70,
+            8
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.17678376385161465,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            148,
+            22,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.1548530821494436,
+            0.390057049239736,
+            0.0,
+            0.08271847297999657,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            138,
+            70,
+            8,
+            148,
+            22,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 13,
+      "cutoff": "2023-12-01T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.3009985347230726,
+            0.48713609978065975,
+            0.0
+          ],
+          "band_team_games": [
+            145,
+            75,
+            8
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.18939419802538732,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            151,
+            23,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2953881909138156,
+            0.48152100938954745,
+            0.0,
+            0.10092782271778156,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            145,
+            75,
+            8,
+            151,
+            23,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 14,
+      "cutoff": "2023-12-08T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.239390412594314,
+            0.5261684046985459,
+            0.0
+          ],
+          "band_team_games": [
+            151,
+            77,
+            9
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.24851962478109157,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            154,
+            23,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2311218499702206,
+            0.5168423017485103,
+            0.0,
+            0.17055081674808323,
+            0.0,
+            0.0
+          ],
+          "band_team_games": [
+            151,
+            77,
+            9,
+            154,
+            23,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 15,
+      "cutoff": "2023-12-15T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.2581632707460373,
+            0.3734248320654904,
+            0.0
+          ],
+          "band_team_games": [
+            159,
+            79,
+            9
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.24772677630395132,
+            0.09972331120570072,
+            0.0
+          ],
+          "band_team_games": [
+            159,
+            25,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2495708898401912,
+            0.3639564642798005,
+            0.0,
+            0.17590932344161797,
+            0.077689584874481,
+            0.0
+          ],
+          "band_team_games": [
+            159,
+            79,
+            9,
+            159,
+            25,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 16,
+      "cutoff": "2023-12-22T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.3335285788530309,
+            0.5104755724149529,
+            0.0
+          ],
+          "band_team_games": [
+            168,
+            84,
+            9
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.17494344904595494,
+            0.09972331120570072,
+            0.0
+          ],
+          "band_team_games": [
+            161,
+            25,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.329091519632997,
+            0.5051583011860956,
+            0.0,
+            0.1024915785629947,
+            0.07619235658986293,
+            0.0
+          ],
+          "band_team_games": [
+            168,
+            84,
+            9,
+            161,
+            25,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 17,
+      "cutoff": "2023-12-29T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.242720654352012,
+            0.4324676904572569,
+            0.0
+          ],
+          "band_team_games": [
+            173,
+            85,
+            9
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.25252323260535314,
+            0.09972331120570072,
+            0.0
+          ],
+          "band_team_games": [
+            167,
+            25,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.235760972375706,
+            0.42249098899657567,
+            0.0,
+            0.1950305473021574,
+            0.07788272891679311,
+            0.0
+          ],
+          "band_team_games": [
+            173,
+            85,
+            9,
+            167,
+            25,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "week": 18,
+      "cutoff": "2024-01-06T21:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.0740472253810842,
+            0.5611133707018213,
+            0.0
+          ],
+          "band_team_games": [
+            180,
+            87,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.30108851478304705,
+            0.08273581244831432,
+            0.0
+          ],
+          "band_team_games": [
+            172,
+            26,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.0657922017664259,
+            0.54679075689655,
+            0.0,
+            0.24461601455290258,
+            0.06397941045164789,
+            0.0
+          ],
+          "band_team_games": [
+            180,
+            87,
+            12,
+            172,
+            26,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 1,
+      "cutoff": "2024-09-06T00:20:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9347333076088538,
+            0.8544670059096113,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.039279902898865036,
+            0.11462263971382344,
+            0.0
+          ],
+          "band_team_games": [
+            178,
+            27,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9342764288068466,
+            0.8544287820624555,
+            0.0,
+            0.0,
+            0.09807569291907221,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12,
+            178,
+            27,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 2,
+      "cutoff": "2024-09-13T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9347333076088538,
+            0.8544670059096113,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.039279902898865036,
+            0.11462263971382344,
+            0.0
+          ],
+          "band_team_games": [
+            178,
+            27,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9342764288068466,
+            0.8544287820624555,
+            0.0,
+            0.0,
+            0.09807569291907221,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12,
+            178,
+            27,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 3,
+      "cutoff": "2024-09-20T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9347333076088538,
+            0.8544670059096113,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.039279902898865036,
+            0.11462263971382344,
+            0.0
+          ],
+          "band_team_games": [
+            178,
+            27,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9342764288068466,
+            0.8544287820624555,
+            0.0,
+            0.0,
+            0.09807569291907221,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12,
+            178,
+            27,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 4,
+      "cutoff": "2024-09-27T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9347333076088538,
+            0.8544670059096113,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.039279902898865036,
+            0.11462263971382344,
+            0.0
+          ],
+          "band_team_games": [
+            178,
+            27,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.9342764288068466,
+            0.8544287820624555,
+            0.0,
+            0.0,
+            0.09807569291907221,
+            0.0
+          ],
+          "band_team_games": [
+            187,
+            90,
+            12,
+            178,
+            27,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 5,
+      "cutoff": "2024-10-04T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.0087860853161288,
+            0.516618849972064,
+            0.0
+          ],
+          "band_team_games": [
+            191,
+            97,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.0,
+            0.383038975190388,
+            0.0
+          ],
+          "band_team_games": [
+            184,
+            28,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.0071166078770255,
+            0.516482605717448,
+            0.0,
+            0.0,
+            0.3659079624524427,
+            0.0
+          ],
+          "band_team_games": [
+            191,
+            97,
+            12,
+            184,
+            28,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 6,
+      "cutoff": "2024-10-11T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            0.9851602313931506,
+            0.6540001850379177,
+            0.0
+          ],
+          "band_team_games": [
+            194,
+            101,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.13866663978615962,
+            0.5414037963520005,
+            0.0
+          ],
+          "band_team_games": [
+            189,
+            30,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            0.980213403409983,
+            0.6453036343690767,
+            0.0,
+            0.08663257231188651,
+            0.5152985778732194,
+            0.0
+          ],
+          "band_team_games": [
+            194,
+            101,
+            12,
+            189,
+            30,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 7,
+      "cutoff": "2024-10-18T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.0962927898276227,
+            0.8699097756274761,
+            0.0
+          ],
+          "band_team_games": [
+            200,
+            107,
+            12
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.2567940496087308,
+            0.6187501991792284,
+            0.0
+          ],
+          "band_team_games": [
+            190,
+            31,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.0872703680349607,
+            0.8557338456260376,
+            0.0,
+            0.1899719461695984,
+            0.587901682518883,
+            0.0
+          ],
+          "band_team_games": [
+            200,
+            107,
+            12,
+            190,
+            31,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 8,
+      "cutoff": "2024-10-25T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.1443555765162756,
+            0.8045388727332777,
+            0.0
+          ],
+          "band_team_games": [
+            201,
+            111,
+            13
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.43668086602040845,
+            0.8042791061568613,
+            0.0
+          ],
+          "band_team_games": [
+            199,
+            33,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.1282682306671938,
+            0.7828064315964238,
+            0.0,
+            0.37697194918037574,
+            0.7749436021825904,
+            0.0
+          ],
+          "band_team_games": [
+            201,
+            111,
+            13,
+            199,
+            33,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 9,
+      "cutoff": "2024-11-01T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.1452192231941754,
+            0.8262940810150311,
+            0.0
+          ],
+          "band_team_games": [
+            206,
+            118,
+            14
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.5655936769513784,
+            0.7832931877973649,
+            0.0
+          ],
+          "band_team_games": [
+            207,
+            34,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.125538717766675,
+            0.7908977780289281,
+            0.0,
+            0.4980179540570774,
+            0.7542603497395453,
+            0.0
+          ],
+          "band_team_games": [
+            206,
+            118,
+            14,
+            207,
+            34,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 10,
+      "cutoff": "2024-11-08T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.2410609721769568,
+            0.845873041863965,
+            0.0
+          ],
+          "band_team_games": [
+            212,
+            122,
+            14
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.623613447519718,
+            0.8065276008241202,
+            0.0
+          ],
+          "band_team_games": [
+            213,
+            35,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2158201764259664,
+            0.8087457823010915,
+            0.0,
+            0.5446098440791376,
+            0.7764481083258791,
+            0.0
+          ],
+          "band_team_games": [
+            212,
+            122,
+            14,
+            213,
+            35,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 11,
+      "cutoff": "2024-11-15T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.277867294803808,
+            0.8753339777602662,
+            0.0
+          ],
+          "band_team_games": [
+            216,
+            128,
+            14
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.6973697135851892,
+            0.9416555123821664,
+            0.0
+          ],
+          "band_team_games": [
+            215,
+            36,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2439004767322603,
+            0.8349775932515843,
+            0.0,
+            0.6120956168465165,
+            0.8942994169029169,
+            0.0
+          ],
+          "band_team_games": [
+            216,
+            128,
+            14,
+            215,
+            36,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 12,
+      "cutoff": "2024-11-22T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.253278642419383,
+            1.1153522527353057,
+            0.0
+          ],
+          "band_team_games": [
+            220,
+            133,
+            14
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7099160502254428,
+            0.9416555123821664,
+            0.0
+          ],
+          "band_team_games": [
+            219,
+            36,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.2215320296129883,
+            1.07921888348134,
+            0.0,
+            0.627220661012006,
+            0.8913468638044965,
+            0.0
+          ],
+          "band_team_games": [
+            220,
+            133,
+            14,
+            219,
+            36,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 13,
+      "cutoff": "2024-11-28T17:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.2285249872292545,
+            0.9721189951918692,
+            0.0
+          ],
+          "band_team_games": [
+            226,
+            137,
+            14
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.6033835730082396,
+            0.9097989602275754,
+            0.0
+          ],
+          "band_team_games": [
+            227,
+            37,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.198262018631719,
+            0.9343003742404437,
+            0.0,
+            0.5161417655389972,
+            0.8502800681482425,
+            0.0
+          ],
+          "band_team_games": [
+            226,
+            137,
+            14,
+            227,
+            37,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 14,
+      "cutoff": "2024-12-06T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.182783954722815,
+            0.9473514753463295,
+            0.0
+          ],
+          "band_team_games": [
+            230,
+            139,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.596625224068748,
+            0.9097989602275754,
+            0.0
+          ],
+          "band_team_games": [
+            231,
+            37,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.153208626705864,
+            0.9072918651621391,
+            0.0,
+            0.5101988635512402,
+            0.8522892559871037,
+            0.0
+          ],
+          "band_team_games": [
+            230,
+            139,
+            15,
+            231,
+            37,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 15,
+      "cutoff": "2024-12-13T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.3755032379455236,
+            0.9614578598356153,
+            0.0
+          ],
+          "band_team_games": [
+            237,
+            140,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.5535161330215472,
+            0.8003864262785968,
+            0.0
+          ],
+          "band_team_games": [
+            235,
+            38,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3512566448761827,
+            0.9257206851411457,
+            0.0,
+            0.46377745320375985,
+            0.7383013586128602,
+            0.0
+          ],
+          "band_team_games": [
+            237,
+            140,
+            15,
+            235,
+            38,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 16,
+      "cutoff": "2024-12-20T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.2999905331039359,
+            1.0709678128335602,
+            0.0
+          ],
+          "band_team_games": [
+            240,
+            143,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.7107662000921715,
+            0.7115269012703891,
+            0.0
+          ],
+          "band_team_games": [
+            243,
+            39,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.268311113370196,
+            1.0246988502715146,
+            0.0,
+            0.6151691939869841,
+            0.6500366177981718,
+            0.0
+          ],
+          "band_team_games": [
+            240,
+            143,
+            15,
+            243,
+            39,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 17,
+      "cutoff": "2024-12-25T18:00:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.2147232366757599,
+            1.0826155149466505,
+            0.0
+          ],
+          "band_team_games": [
+            247,
+            146,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.6072783030635013,
+            0.7115269012703891,
+            0.0
+          ],
+          "band_team_games": [
+            252,
+            39,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.1866577427640768,
+            1.0379866841939067,
+            0.0,
+            0.5065185487518655,
+            0.6518512106339642,
+            0.0
+          ],
+          "band_team_games": [
+            247,
+            146,
+            15,
+            252,
+            39,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "week": 18,
+      "cutoff": "2025-01-04T21:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.3843381166102904,
+            1.2671904178639657,
+            0.0
+          ],
+          "band_team_games": [
+            255,
+            148,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9226888346190008,
+            1.087881921608121,
+            0.0
+          ],
+          "band_team_games": [
+            261,
+            41,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3410123054485543,
+            1.1873299447674128,
+            0.0,
+            0.8079234708202637,
+            1.0076747891388589,
+            0.0
+          ],
+          "band_team_games": [
+            255,
+            148,
+            15,
+            261,
+            41,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 1,
+      "cutoff": "2025-09-05T00:20:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4038191778110616,
+            1.2091740643869058,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8804903039803735,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            269,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3633800056271967,
+            1.1242888670703814,
+            0.0,
+            0.7597669451197018,
+            0.93385975919812,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15,
+            269,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 2,
+      "cutoff": "2025-09-12T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4038191778110616,
+            1.2091740643869058,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8804903039803735,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            269,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3633800056271967,
+            1.1242888670703814,
+            0.0,
+            0.7597669451197018,
+            0.93385975919812,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15,
+            269,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 3,
+      "cutoff": "2025-09-19T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4038191778110616,
+            1.2091740643869058,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8804903039803735,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            269,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3633800056271967,
+            1.1242888670703814,
+            0.0,
+            0.7597669451197018,
+            0.93385975919812,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15,
+            269,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 4,
+      "cutoff": "2025-09-26T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.4038191778110616,
+            1.2091740643869058,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8804903039803735,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            269,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.3633800056271967,
+            1.1242888670703814,
+            0.0,
+            0.7597669451197018,
+            0.93385975919812,
+            0.0
+          ],
+          "band_team_games": [
+            257,
+            153,
+            15,
+            269,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 5,
+      "cutoff": "2025-10-03T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.5105861913397884,
+            1.2694982461232773,
+            0.0
+          ],
+          "band_team_games": [
+            262,
+            155,
+            16
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9931936132275688,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            275,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.4661988905630103,
+            1.1716678487615015,
+            0.0,
+            0.864467334309043,
+            0.9294577798919416,
+            0.0
+          ],
+          "band_team_games": [
+            262,
+            155,
+            16,
+            275,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 6,
+      "cutoff": "2025-10-10T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.5436319414769997,
+            1.2971360390788764,
+            0.0
+          ],
+          "band_team_games": [
+            268,
+            157,
+            18
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.922917842373846,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            284,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.5029277038013813,
+            1.2110524511210696,
+            0.0,
+            0.7978477165080948,
+            0.9270362565448956,
+            0.0
+          ],
+          "band_team_games": [
+            268,
+            157,
+            18,
+            284,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 7,
+      "cutoff": "2025-10-17T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.5058346334186852,
+            1.2305015005763589,
+            0.0
+          ],
+          "band_team_games": [
+            277,
+            159,
+            19
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9288897926914925,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            291,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.4681319866526308,
+            1.1436532646750321,
+            0.0,
+            0.8159528151257259,
+            0.930467728975877,
+            0.0
+          ],
+          "band_team_games": [
+            277,
+            159,
+            19,
+            291,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 8,
+      "cutoff": "2025-10-24T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.625764174840655,
+            1.2067315478337455,
+            0.0
+          ],
+          "band_team_games": [
+            284,
+            161,
+            20
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9880791801449663,
+            1.010982005454608,
+            0.0
+          ],
+          "band_team_games": [
+            298,
+            42,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.5867779585171666,
+            1.1113039573969192,
+            0.0,
+            0.8715839226155223,
+            0.9286778204936381,
+            0.0
+          ],
+          "band_team_games": [
+            284,
+            161,
+            20,
+            298,
+            42,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 9,
+      "cutoff": "2025-10-31T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.8043378231395348,
+            1.135330899267025,
+            0.0
+          ],
+          "band_team_games": [
+            291,
+            163,
+            20
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9533909881248595,
+            0.883014433414269,
+            0.0
+          ],
+          "band_team_games": [
+            302,
+            43,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.7635544667023955,
+            1.047195545863198,
+            0.0,
+            0.8250806573961319,
+            0.7998685377027748,
+            0.0
+          ],
+          "band_team_games": [
+            291,
+            163,
+            20,
+            302,
+            43,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 10,
+      "cutoff": "2025-11-07T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6881132724200276,
+            1.0941546835133507,
+            0.0
+          ],
+          "band_team_games": [
+            299,
+            167,
+            20
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9397696794090523,
+            0.820997162632656,
+            0.0
+          ],
+          "band_team_games": [
+            308,
+            44,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6490160463703962,
+            1.0020522266605905,
+            0.0,
+            0.8177176481094198,
+            0.7312269304252086,
+            0.0
+          ],
+          "band_team_games": [
+            299,
+            167,
+            20,
+            308,
+            44,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 11,
+      "cutoff": "2025-11-14T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.664238374908514,
+            1.1138214112579246,
+            0.0
+          ],
+          "band_team_games": [
+            305,
+            171,
+            20
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8298879883523445,
+            0.9579437718093663,
+            0.0
+          ],
+          "band_team_games": [
+            314,
+            45,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6276637965664111,
+            1.0271906937224167,
+            0.0,
+            0.7049338650848628,
+            0.856208024019781,
+            0.0
+          ],
+          "band_team_games": [
+            305,
+            171,
+            20,
+            314,
+            45,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 12,
+      "cutoff": "2025-11-21T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.664238374908514,
+            1.0019302071973735,
+            0.0
+          ],
+          "band_team_games": [
+            305,
+            174,
+            21
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8668379944280185,
+            0.9579437718093663,
+            0.0
+          ],
+          "band_team_games": [
+            317,
+            45,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6256411582917276,
+            0.9121993905245229,
+            0.0,
+            0.7493680713276594,
+            0.8631875940375657,
+            0.0
+          ],
+          "band_team_games": [
+            305,
+            174,
+            21,
+            317,
+            45,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 13,
+      "cutoff": "2025-11-27T18:00:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6292034703680338,
+            1.0287698185010874,
+            0.0
+          ],
+          "band_team_games": [
+            311,
+            176,
+            22
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9025468130295294,
+            1.002909303466258,
+            0.0
+          ],
+          "band_team_games": [
+            319,
+            47,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.587104178992298,
+            0.9320009031769501,
+            0.0,
+            0.7862338158090934,
+            0.8809499176641009,
+            0.0
+          ],
+          "band_team_games": [
+            311,
+            176,
+            22,
+            319,
+            47,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 14,
+      "cutoff": "2025-12-05T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6824357632149536,
+            0.9954594428631306,
+            0.0
+          ],
+          "band_team_games": [
+            315,
+            179,
+            22
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9066931520711862,
+            1.002909303466258,
+            0.0
+          ],
+          "band_team_games": [
+            327,
+            47,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6387026910206488,
+            0.8964439879468513,
+            0.0,
+            0.7860451785948015,
+            0.8816453846944924,
+            0.0
+          ],
+          "band_team_games": [
+            315,
+            179,
+            22,
+            327,
+            47,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 15,
+      "cutoff": "2025-12-12T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.645244187358273,
+            1.041357129638259,
+            0.0
+          ],
+          "band_team_games": [
+            319,
+            183,
+            22
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8993674874549367,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            332,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6014315291624779,
+            0.9302748185479983,
+            0.0,
+            0.7746560547563917,
+            1.0026921369256774,
+            0.0
+          ],
+          "band_team_games": [
+            319,
+            183,
+            22,
+            332,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 16,
+      "cutoff": "2025-12-19T01:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.7289529468309817,
+            1.091991021620836,
+            0.08132427798193556
+          ],
+          "band_team_games": [
+            325,
+            185,
+            23
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.9959946101500989,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            341,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6861852838308464,
+            0.971751714320931,
+            0.0,
+            0.8774698916073447,
+            0.9963690897149432,
+            0.0
+          ],
+          "band_team_games": [
+            325,
+            185,
+            23,
+            341,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 17,
+      "cutoff": "2025-12-25T18:00:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.7269476067061613,
+            1.0141650054999354,
+            0.0
+          ],
+          "band_team_games": [
+            331,
+            188,
+            24
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8894951587855914,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            347,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6906958773336647,
+            0.9050321136067696,
+            0.0,
+            0.7810173725743766,
+            1.001645320453932,
+            0.0
+          ],
+          "band_team_games": [
+            331,
+            188,
+            24,
+            347,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "week": 18,
+      "cutoff": "2026-01-03T21:30:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.7020155576081402,
+            1.0249116204706064,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            336,
+            189,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8724330577895163,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            351,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6668822333177655,
+            0.9182127145360843,
+            0.1461974884921926,
+            0.7636730547704431,
+            0.9963929337899239,
+            0.0
+          ],
+          "band_team_games": [
+            336,
+            189,
+            25,
+            351,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2026,
+      "week": 1,
+      "cutoff": "2026-09-10T00:20:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.717558322067838,
+            1.1863392667911508,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8347529355824282,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            354,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6866787706880917,
+            1.08677863451108,
+            0.15003568498290076,
+            0.7211293770850458,
+            0.9818471056328645,
+            0.0
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25,
+            354,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2026,
+      "week": 2,
+      "cutoff": "2026-09-18T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.717558322067838,
+            1.1863392667911508,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8347529355824282,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            354,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6866787706880917,
+            1.08677863451108,
+            0.15003568498290076,
+            0.7211293770850458,
+            0.9818471056328645,
+            0.0
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25,
+            354,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2026,
+      "week": 3,
+      "cutoff": "2026-09-25T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.717558322067838,
+            1.1863392667911508,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8347529355824282,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            354,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6866787706880917,
+            1.08677863451108,
+            0.15003568498290076,
+            0.7211293770850458,
+            0.9818471056328645,
+            0.0
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25,
+            354,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2026,
+      "week": 4,
+      "cutoff": "2026-10-02T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.717558322067838,
+            1.1863392667911508,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8347529355824282,
+            1.1341015790689453,
+            0.0
+          ],
+          "band_team_games": [
+            354,
+            48,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6866787706880917,
+            1.08677863451108,
+            0.15003568498290076,
+            0.7211293770850458,
+            0.9818471056328645,
+            0.0
+          ],
+          "band_team_games": [
+            344,
+            195,
+            25,
+            354,
+            48,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "season": 2026,
+      "week": 5,
+      "cutoff": "2026-10-09T00:15:00+00:00",
+      "models": {
+        "passing_only": {
+          "coefficients": [
+            1.6443805235971118,
+            1.1699420239515612,
+            0.253985601023343
+          ],
+          "band_team_games": [
+            350,
+            197,
+            25
+          ]
+        },
+        "rushing_only": {
+          "coefficients": [
+            0.8843835885507674,
+            1.0516097695589803,
+            0.0
+          ],
+          "band_team_games": [
+            364,
+            50,
+            0
+          ]
+        },
+        "combined": {
+          "coefficients": [
+            1.6146848213295493,
+            1.0673596149757854,
+            0.1500968513491534,
+            0.7838195257024129,
+            0.8951948165985095,
+            0.0
+          ],
+          "band_team_games": [
+            350,
+            197,
+            25,
+            364,
+            50,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "resources": {
+    "elapsed_seconds": 30.767,
+    "peak_rss_bytes": 76218368
+  },
+  "ledger": {
+    "file": "score_bands_results.games.csv",
+    "rows": 703,
+    "sha256": "bea7185b4140938f79c5dc8a2b0c180beac1e2279fc9e9874619fcc368ee4c89"
+  }
+}
